@@ -1,11 +1,14 @@
+import Newmap from '@/components/shared/map';
 import ClientOnly from '../components/shared/clientOnly';
-// import { MapWrapperV3 } from '../components/map/mapView/map-v3';
+import Navbar from '@/components/shared/navbar';
+import OpenLayersMap from '@/components/shared/map';
 
 function Map(): JSX.Element {
   return (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
       <main style={{ width: '100%' }}>
-        <ClientOnly>{{/* <MapWrapperV3 /> */ }}</ClientOnly>
+        <ClientOnly>{<Newmap/>}</ClientOnly>
+       
       </main>
     </div>
   );
