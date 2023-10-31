@@ -112,12 +112,7 @@ async function extractLayersFromLayerGroup(
           layers.push({
             name: nestedLayer.Name,
             displayName: nestedLayer.Title,
-            sourceLayer: 'overlays',
-            sourceType: 'external-wms',
-            url: `${geoServerBaseUrl}/geoserver/${geoserverWorkspace}/wms`,
-            params: `{\"LAYERS\":\"${nestedLayer.Name}\",\"TILED\": true}`,
-            serverType: 'geoserver',
-            scale: 'map-percentage-scale',
+            styleObject: nestedLayer.Style
           });
         }
       }
