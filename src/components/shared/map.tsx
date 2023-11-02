@@ -5,7 +5,7 @@ import TileLayer from "ol/layer/Tile";
 import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
-import "./CSS/styles.css";
+import "./CSS/LayerSwitcherStyles.css";
 import LayerGroup from "ol/layer/Group";
 import SourceOSM from "ol/source/OSM";
 import OSM from "ol/source/OSM";
