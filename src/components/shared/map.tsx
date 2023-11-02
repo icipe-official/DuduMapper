@@ -1,36 +1,46 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Map, View} from "ol";
-import OSM from 'ol/source/OSM';
+import { Map, View } from "ol";
 import TileLayer from "ol/layer/Tile";
 import 'ol/ol.css';
+import 'ol-ext/control/LayerSwitcher.css';
+import LayerSwitcher from 'ol-ext/control/LayerSwitcher';
+import LayerGroup from 'ol/layer/Group';
+import SourceOSM from 'ol/source/OSM';
 
-function Newmap(){
-    const [map, setMap] = useState();
+function Newmap() {
+    const [map, setMap] = useState<Map | undefined>();  // Specify the type using a generic type argument
     const mapElement = useRef(null);
-    const mapRef = useRef();
+    const mapRef = useRef<Map | undefined>(undefined);
     mapRef.current = map;
 
+    const osm = new TileLayer({
+        source: new SourceOSM()
+    });
 
+    const baseMaps = new LayerGroup({
+        layers: [osm]
+    });
 
-    useEffect(() =>{
+    useEffect(() => {
         if (!mapElement.current) return;
-        const initialMap:any = new Map({
+
+        const initialMap = new Map({
             target: mapElement.current,
-            layers: [
-                new TileLayer({
-                    source: new OSM(),
-                })
-            ],
+            layers: [baseMaps],
             view: new View({
                 center: [0, 0],
                 zoom: 4
             })
-        })
-        
-        setMap(initialMap);
-    }, [])
+        });
 
-    return <div  style={{ height: 'calc(100vh - 120px)' }} ref={mapElement} className="map-container" />;
+        const layerSwitcher = new LayerSwitcher();
+        initialMap.addControl(layerSwitcher);
+
+        setMap(initialMap);
+    }, []);
+
+    return <div style={{ height: 'calc(100vh - 120px)' }} ref={mapElement} className="map-container" />;
 }
+
 export default Newmap;
 
