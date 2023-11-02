@@ -1,0 +1,29 @@
+/* Custom styles for the LayerSwitcher container */
+.ol-layerswitcher {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 10px;
+  position: absolute; /* Position the LayerSwitcher absolutely */
+  top: 0; /* Align it to the top of the screen */
+  left: 0; /* Align it to the left side of the screen */
+  z-index: 1000; /* Adjust the z-index to ensure it's above other content */
+  width: 200px;
+
+  @media (max-width: 768px) {
+    /* Adjust positioning for smaller screens */
+    top: 50px;
+    left: 10px;
+  }
+}
+
+/* Custom styles for the layer labels */
+.ol-layerswitcher-label {
+  color: #333;
+  margin-left: 5px;
+}
+
+/* Custom styles for the checkboxes */
+.ol-layerswitcher-input {
+  margin-right: 5px;
+}
