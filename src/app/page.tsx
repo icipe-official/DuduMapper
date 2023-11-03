@@ -1,9 +1,10 @@
+"use client";
 import Newmap from "../components/shared/map";
 import NavBar from "../components/shared/navbar";
 
 export default function Home() {
   return (
-    <div style={{ overflow: "hidden" }}>
+    <div style={{ overflow: "hidden", height: "100%" }}>
       <NavBar />
       <Newmap />
     </div>
