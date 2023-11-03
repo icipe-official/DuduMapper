@@ -34,6 +34,26 @@ function Newmap() {
     }),
   });
 
+  var style_borders = new Style({
+    fill: new Fill({
+      color: "#000000",
+    }),
+    stroke: new Stroke({
+      color: "#000000",
+      width: 1,
+    }),
+  });
+
+  var style_water = new Style({
+    fill: new Fill({
+      color: "#87CEEB",
+    }),
+    stroke: new Stroke({
+      color: "#87CEEB",
+      width: 1,
+    }),
+  });
+
   const osm = new TileLayer({
     title: "OSM",
     type: "base",
@@ -56,9 +76,59 @@ function Newmap() {
     style: style_simple,
   } as BaseLayerOptions);
 
+  const Oceans = new VectorTileLayer({
+    title: "Ocean",
+    type: "base",
+    visible: false,
+    preload: Infinity,
+    source: new VectorTileSource({
+      maxZoom: 18,
+      format: new MVT(),
+      url:
+        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        "basemap:ocean@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+    }),
+    style: style_water,
+  } as BaseLayerOptions);
+
+  const Lakes = new VectorTileLayer({
+    title: "Lakes",
+    type: "base",
+    visible: false,
+    preload: Infinity,
+    source: new VectorTileSource({
+      maxZoom: 18,
+      format: new MVT(),
+      url:
+        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        "basemap:lakes@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+    }),
+    style: style_water,
+  } as BaseLayerOptions);
+
+  const countries_boundary_lines = new VectorTileLayer({
+    title: "Country Borders",
+    type: "base",
+    visible: false,
+    preload: Infinity,
+    source: new VectorTileSource({
+      maxZoom: 18,
+      format: new MVT(),
+      url:
+        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        "basemap:countries_boundary_lines@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+    }),
+    style: style_borders,
+  } as BaseLayerOptions);
+
   const baseMaps = new LayerGroup({
     title: "BASE MAPS",
-    layers: [land, osm],
+    layers: [land, Oceans, Lakes, countries_boundary_lines, osm],
+  } as GroupLayerOptions);
+
+  const Overlays = new LayerGroup({
+    title: "Overlays",
+    layers: [land],
   } as GroupLayerOptions);
 
   useEffect(() => {
@@ -66,7 +136,7 @@ function Newmap() {
 
     const initialMap = new Map({
       target: mapElement.current,
-      layers: [baseMaps],
+      layers: [baseMaps, Overlays],
       view: new View({
         center: [0, 0],
         zoom: 4,
