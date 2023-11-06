@@ -1,14 +1,15 @@
 import Newmap from '@/components/shared/map';
 import ClientOnly from '../components/shared/clientOnly';
 import Navbar from '@/components/shared/navbar';
-import OpenLayersMap from '@/components/shared/map';
+import 'ol/ol.css';
+import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 
 function Map(): JSX.Element {
   return (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
       <main style={{ width: '100%' }}>
-        <ClientOnly>{<Newmap/>}</ClientOnly>
-       
+        <ClientOnly>{<Newmap />}</ClientOnly>
+
       </main>
     </div>
   );
