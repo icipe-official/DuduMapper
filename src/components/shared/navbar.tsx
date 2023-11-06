@@ -1,17 +1,49 @@
-
-import React from 'react';
-import { AppBar, Toolbar, Button } from '@mui/material';
+"use client";
+import * as React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Link from 'next/link';
+import DrawerComp from './DrawerComp';
+import NavLink from './navlink';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const Navbar: React.FC = () => {
+  const theme = useTheme();
+
+  const navMenuItems: any[] = [];
+  navMenuItems.push(<NavLink key="Map" url="/map" text="Map" />);
+
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+
   return (
-    <AppBar position="static" style={{ backgroundColor: 'white', boxShadow: '1px 1px 1px 1px gray' }}>
-      <Toolbar>
-        <img src={"/vector-atlas-logo.svg"} alt="Logo" style={{ height: '40px', marginRight: '16px' }} />
-        <div style={{ flexGrow: 1 }}></div>
-        <Button color="primary">Map</Button>
-      </Toolbar>
-    </AppBar>
-  );
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="fixed" sx={{ bgcolor: 'white', margin: '0' }}>
+        <Toolbar>
+          <>
+            <Box sx={{ flexGrow: 1, mt: '6px' }}>
+              <Link href="/">
+                <picture>
+                  <img
+                    src="/vector-atlas-logo.svg"
+                    style={{ maxHeight: '80px', cursor: 'pointer' }}
+                    alt="Vector Atlas logo"
+                  />
+                </picture>
+              </Link>
+            </Box>
+
+            {isMobile ? (
+              <DrawerComp navItems={navMenuItems} />
+            ) : (
+              <>{navMenuItems}</>
+            )}
+          </>
+        </Toolbar>
+      </AppBar>
+    </Box>);
 };
 
 export default Navbar;
