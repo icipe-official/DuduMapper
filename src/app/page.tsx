@@ -4,7 +4,7 @@ import NavBar from "../components/shared/navbar";
 
 export default function Home() {
   return (
-    <div style={{ overflow: "hidden", height: "100%" }}>
+    <div style={{ overflow: "hidden", height: "100%", width: "100%" }}>
       <NavBar />
       <Newmap />
     </div>

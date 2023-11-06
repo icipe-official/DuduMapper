@@ -1,4 +1,3 @@
-"use client";
 import React, { useEffect, useRef, useState } from "react";
 import { Map, View } from "ol";
 import TileLayer from "ol/layer/Tile";
@@ -134,13 +133,83 @@ function Newmap() {
     style: style_borders,
   } as BaseLayerOptions);
 
+  const antarctic_ice_shelves = new VectorTileLayer({
+    title: "Antarctic Ice Shelves",
+    type: "base",
+    visible: false,
+    preload: Infinity,
+    source: new VectorTileSource({
+      maxZoom: 18,
+      format: new MVT(),
+      url:
+        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        "basemap:antarctic_ice_shelves@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+    }),
+    style: style_water,
+  } as BaseLayerOptions);
+
+  const rivers_lake_centerlines = new VectorTileLayer({
+    title: "Rivers Lake Centerlines",
+    type: "base",
+    visible: false,
+    preload: Infinity,
+    source: new VectorTileSource({
+      maxZoom: 18,
+      format: new MVT(),
+      url:
+        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        "basemap:rivers_lake_centerlines@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+    }),
+    style: style_water,
+  } as BaseLayerOptions);
+
+  const coastline = new VectorTileLayer({
+    title: "Coastline",
+    type: "base",
+    visible: false,
+    preload: Infinity,
+    source: new VectorTileSource({
+      maxZoom: 18,
+      format: new MVT(),
+      url:
+        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        "basemap:coastline@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+    }),
+    style: style_water,
+  } as BaseLayerOptions);
+
+  const populated_places = new VectorTileLayer({
+    title: "Populated Places",
+    type: "base",
+    visible: false,
+    preload: Infinity,
+    source: new VectorTileSource({
+      maxZoom: 18,
+      format: new MVT(),
+      url:
+        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        "basemap:populated_places@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+    }),
+  } as BaseLayerOptions);
+
   const baseMaps = new LayerGroup({
     title: "BASE MAPS",
-    layers: [land, Oceans, Lakes, countries_boundary_lines, osm],
+    layers: [
+      Oceans,
+      land,
+      glaciated_areas,
+      antarctic_ice_shelves,
+      Lakes,
+      countries_boundary_lines,
+      rivers_lake_centerlines,
+      coastline,
+      populated_places,
+      osm,
+    ],
   } as GroupLayerOptions);
 
   const Overlays = new LayerGroup({
-    title: "Overlays",
+    title: "OVERLAYS",
     layers: [glaciated_areas],
   } as GroupLayerOptions);
 
