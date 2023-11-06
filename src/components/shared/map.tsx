@@ -9,7 +9,6 @@ import "./CSS/LayerSwitcherStyles.css";
 import LayerGroup from "ol/layer/Group";
 import SourceOSM from "ol/source/OSM";
 import OSM from "ol/source/OSM";
-import "ol/ol.css";
 import Style from "ol/style/Style";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
@@ -17,6 +16,7 @@ import VectorTileSource from "ol/source/VectorTile";
 import VectorTileLayer from "ol/layer/VectorTile";
 import MVT from "ol/format/MVT";
 import { BaseLayerOptions, GroupLayerOptions } from "ol-layerswitcher";
+import "ol/ol.css";
 
 function Newmap() {
   const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
@@ -57,14 +57,14 @@ function Newmap() {
   const osm = new TileLayer({
     title: "OSM",
     type: "base",
-    visible: true,
+    visible: false,
     source: new OSM(),
   } as BaseLayerOptions);
 
   const land = new VectorTileLayer({
     title: "Land",
     type: "base",
-    visible: false,
+    visible: true,
     preload: Infinity,
     source: new VectorTileSource({
       maxZoom: 18,
@@ -74,6 +74,19 @@ function Newmap() {
         "basemap:land@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
     }),
     style: style_simple,
+  } as BaseLayerOptions);
+
+  var glaciated_areas = new VectorTileLayer({
+    title: "Glaciated Areas",
+    visible: true,
+    preload: Infinity,
+    source: new VectorTileSource({
+      maxZoom: 18,
+      format: new MVT(),
+      url:
+        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        "basemap:glaciated_areas@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+    }),
   } as BaseLayerOptions);
 
   const Oceans = new VectorTileLayer({
@@ -128,7 +141,7 @@ function Newmap() {
 
   const Overlays = new LayerGroup({
     title: "Overlays",
-    layers: [land],
+    layers: [glaciated_areas],
   } as GroupLayerOptions);
 
   useEffect(() => {
