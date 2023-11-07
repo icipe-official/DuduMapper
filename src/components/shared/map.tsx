@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Map, View } from "ol";
-import TileLayer from "ol/layer/Tile";
 import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
@@ -16,6 +15,10 @@ import VectorTileLayer from "ol/layer/VectorTile";
 import MVT from "ol/format/MVT";
 import { BaseLayerOptions, GroupLayerOptions } from "ol-layerswitcher";
 import "ol/ol.css";
+import VectorSource from "ol/source/Vector";
+import GeoJSON from "ol/format/GeoJSON.js";
+import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
+import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 
 function Newmap() {
   const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
@@ -33,13 +36,30 @@ function Newmap() {
     }),
   });
 
-  var style_borders = new Style({
+  var siteStyle = new Style({
     fill: new Fill({
-      color: "#000000",
+      color: "#db1e2a",
     }),
     stroke: new Stroke({
-      color: "#000000",
+      color: "#fafafa",
       width: 1,
+    }),
+  });
+
+  var occurrenceStyle = new Style({
+    fill: new Fill({
+      color: "#ff9e17",
+    }),
+    stroke: new Stroke({
+      color: "#fafafa",
+      width: 1,
+    }),
+  });
+
+  var style_borders = new Style({
+    stroke: new Stroke({
+      color: "#fafafa",
+      width: 2,
     }),
   });
 
@@ -91,7 +111,7 @@ function Newmap() {
   const Oceans = new VectorTileLayer({
     title: "Ocean",
     type: "base",
-    visible: false,
+    visible: true,
     preload: Infinity,
     source: new VectorTileSource({
       maxZoom: 18,
@@ -106,7 +126,7 @@ function Newmap() {
   const Lakes = new VectorTileLayer({
     title: "Lakes",
     type: "base",
-    visible: false,
+    visible: true,
     preload: Infinity,
     source: new VectorTileSource({
       maxZoom: 18,
@@ -121,7 +141,7 @@ function Newmap() {
   const countries_boundary_lines = new VectorTileLayer({
     title: "Country Borders",
     type: "base",
-    visible: false,
+    visible: true,
     preload: Infinity,
     source: new VectorTileSource({
       maxZoom: 18,
@@ -136,7 +156,7 @@ function Newmap() {
   const antarctic_ice_shelves = new VectorTileLayer({
     title: "Antarctic Ice Shelves",
     type: "base",
-    visible: false,
+    visible: true,
     preload: Infinity,
     source: new VectorTileSource({
       maxZoom: 18,
@@ -151,7 +171,7 @@ function Newmap() {
   const rivers_lake_centerlines = new VectorTileLayer({
     title: "Rivers Lake Centerlines",
     type: "base",
-    visible: false,
+    visible: true,
     preload: Infinity,
     source: new VectorTileSource({
       maxZoom: 18,
@@ -166,7 +186,7 @@ function Newmap() {
   const coastline = new VectorTileLayer({
     title: "Coastline",
     type: "base",
-    visible: false,
+    visible: true,
     preload: Infinity,
     source: new VectorTileSource({
       maxZoom: 18,
@@ -192,6 +212,40 @@ function Newmap() {
     }),
   } as BaseLayerOptions);
 
+  const vectorSource = new VectorSource({
+    format: new GeoJSON(),
+    url:
+      "http://4.221.32.87:8080/geoserver/vector/ows?service=WFS&version=1.0.0&" +
+      "request=GetFeature&typeName=vector%3Aoccurrence&maxFeatures=50&" +
+      "outputFormat=application%2Fjson",
+    strategy: bboxStrategy,
+  });
+
+  const occurrenceSource = new VectorSource({
+    format: new GeoJSON(),
+    url:
+      "http://4.221.32.87:8080/geoserver/vector/ows?service=WFS&version=" +
+      "1.0.0&request=GetFeature&typeName" +
+      "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson",
+    strategy: bboxStrategy,
+  });
+
+  const siteLayer = new VectorLayer({
+    title: "Site",
+    visible: false,
+    preload: Infinity,
+    source: vectorSource,
+    // style: siteStyle,
+  } as BaseLayerOptions);
+
+  const occurrenceLayer = new VectorLayer({
+    title: "Occurrence",
+    visible: false,
+    preload: Infinity,
+    source: occurrenceSource,
+    // style: occurrenceStyle,
+  } as BaseLayerOptions);
+
   const baseMaps = new LayerGroup({
     title: "BASE MAPS",
     layers: [
@@ -213,12 +267,17 @@ function Newmap() {
     layers: [glaciated_areas],
   } as GroupLayerOptions);
 
+  const occurrenceGroup = new LayerGroup({
+    title: "Occurence",
+    layers: [siteLayer, occurrenceLayer],
+  } as GroupLayerOptions);
+
   useEffect(() => {
     if (!mapElement.current) return;
 
     const initialMap = new Map({
       target: mapElement.current,
-      layers: [baseMaps, Overlays],
+      layers: [baseMaps, Overlays, occurrenceGroup],
       view: new View({
         center: [0, 0],
         zoom: 4,
