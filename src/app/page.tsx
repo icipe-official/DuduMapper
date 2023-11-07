@@ -6,7 +6,9 @@ export default function Home() {
   return (
     <div style={{ overflow: "hidden", height: "100%", width: "100%" }}>
       <NavBar />
-      <Newmap />
+      <div style={{ marginTop: "80px" }}>
+        <Newmap />
+      </div>
     </div>
   );
 }
