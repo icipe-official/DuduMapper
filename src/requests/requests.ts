@@ -2,15 +2,15 @@ import WMSCapabilities from 'ol/format/WMSCapabilities';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 
 
-const geoServerBaseUrl = process.env.NEXT_PUBLIC_GEOSERVER_URL?.trim().replace(
+export const geoServerBaseUrl = process.env.NEXT_PUBLIC_GEOSERVER_URL?.trim().replace(
   /['"]/g,
   ''
 );
-const overlaysLayergroup_in_geoserver =
+export const overlaysLayergroup_in_geoserver =
   process.env.NEXT_PUBLIC_OVERLAYS_LAYER_GROUP;
-const basemapLayergroup_in_geoserver =
+export const basemapLayergroup_in_geoserver =
   process.env.NEXT_PUBLIC_BASEMAP_LAYER_GROUP;
-const geoserverWorkspace = process.env.NEXT_PUBLIC_SELECTED_WORKSPACE;
+export const geoserverWorkspace = process.env.NEXT_PUBLIC_SELECTED_WORKSPACE;
 
 function appendPath(baseURL: string, path: string): string {
   if (baseURL.endsWith('/geoserver')) {
