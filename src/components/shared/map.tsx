@@ -19,8 +19,10 @@ import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
+import { geoServerBaseUrl } from "@/requests/requests";
 
 function Newmap() {
+  console.log("geoServerBaseUrl: " + geoServerBaseUrl);
   const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
   const mapElement = useRef(null);
   const mapRef = useRef<Map | undefined>(undefined);
@@ -89,7 +91,8 @@ function Newmap() {
       maxZoom: 18,
       format: new MVT(),
       url:
-        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        geoServerBaseUrl +
+        "/geoserver/gwc/service/tms/1.0.0/" +
         "basemap:land@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
     }),
     style: style_simple,
@@ -103,7 +106,8 @@ function Newmap() {
       maxZoom: 18,
       format: new MVT(),
       url:
-        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        geoServerBaseUrl +
+        "/geoserver/gwc/service/tms/1.0.0/" +
         "basemap:glaciated_areas@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
     }),
   } as BaseLayerOptions);
@@ -117,7 +121,8 @@ function Newmap() {
       maxZoom: 18,
       format: new MVT(),
       url:
-        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        geoServerBaseUrl +
+        "/geoserver/gwc/service/tms/1.0.0/" +
         "basemap:ocean@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
     }),
     style: style_water,
@@ -132,7 +137,8 @@ function Newmap() {
       maxZoom: 18,
       format: new MVT(),
       url:
-        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        geoServerBaseUrl +
+        "/geoserver/gwc/service/tms/1.0.0/" +
         "basemap:lakes@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
     }),
     style: style_water,
@@ -147,7 +153,8 @@ function Newmap() {
       maxZoom: 18,
       format: new MVT(),
       url:
-        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        geoServerBaseUrl +
+        "/geoserver/gwc/service/tms/1.0.0/" +
         "basemap:countries_boundary_lines@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
     }),
     style: style_borders,
@@ -162,7 +169,8 @@ function Newmap() {
       maxZoom: 18,
       format: new MVT(),
       url:
-        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        geoServerBaseUrl +
+        "/geoserver/gwc/service/tms/1.0.0/" +
         "basemap:antarctic_ice_shelves@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
     }),
     style: style_water,
@@ -177,7 +185,8 @@ function Newmap() {
       maxZoom: 18,
       format: new MVT(),
       url:
-        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        geoServerBaseUrl +
+        "/geoserver/gwc/service/tms/1.0.0/" +
         "basemap:rivers_lake_centerlines@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
     }),
     style: style_water,
@@ -192,7 +201,8 @@ function Newmap() {
       maxZoom: 18,
       format: new MVT(),
       url:
-        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        geoServerBaseUrl +
+        "/geoserver/gwc/service/tms/1.0.0/" +
         "basemap:coastline@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
     }),
     style: style_water,
@@ -207,7 +217,8 @@ function Newmap() {
       maxZoom: 18,
       format: new MVT(),
       url:
-        "http://4.221.32.87:8080/geoserver/gwc/service/tms/1.0.0/" +
+        geoServerBaseUrl +
+        "/geoserver/gwc/service/tms/1.0.0/" +
         "basemap:populated_places@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
     }),
   } as BaseLayerOptions);
@@ -215,7 +226,8 @@ function Newmap() {
   const vectorSource = new VectorSource({
     format: new GeoJSON(),
     url:
-      "http://4.221.32.87:8080/geoserver/vector/ows?service=WFS&version=1.0.0&" +
+      geoServerBaseUrl +
+      "/geoserver/vector/ows?service=WFS&version=1.0.0&" +
       "request=GetFeature&typeName=vector%3Aoccurrence&maxFeatures=50&" +
       "outputFormat=application%2Fjson",
     strategy: bboxStrategy,
@@ -224,7 +236,8 @@ function Newmap() {
   const occurrenceSource = new VectorSource({
     format: new GeoJSON(),
     url:
-      "http://4.221.32.87:8080/geoserver/vector/ows?service=WFS&version=" +
+      geoServerBaseUrl +
+      "/geoserver/vector/ows?service=WFS&version=" +
       "1.0.0&request=GetFeature&typeName" +
       "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson",
     strategy: bboxStrategy,
