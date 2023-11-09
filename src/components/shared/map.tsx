@@ -20,11 +20,25 @@ import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import { geoServerBaseUrl } from "@/requests/requests";
+import { Pixel } from "ol/pixel";
+const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+const [popoverContent, setPopoverContent] = React.useState<string>('');
+import MapBrowserEvent from 'ol/MapBrowserEvent';
+import Event from 'ol/events/Event';
+import Popover from '@mui/material/Popover';
+const open = Boolean(anchorEl);
+const id = open ? 'feature-popover' : undefined;
+const handleClosePopover = () => {
+  if (anchorEl) {
+    anchorEl.remove(); // This removes the dummy anchor from the DOM
+  }
+  setAnchorEl(null);
+};
 
 function Newmap() {
   console.log("geoServerBaseUrl: " + geoServerBaseUrl);
   const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
-  const mapElement = useRef(null);
+  const mapElement = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | undefined>(undefined);
   mapRef.current = map;
 
@@ -297,18 +311,69 @@ function Newmap() {
       }),
     });
 
+
+    const handleMapClick = (event: any) => {
+      initialMap.forEachFeatureAtPixel(event.pixel, (feature, layer) => {
+        if (layer === occurrenceLayer) {
+          // Create a reference to the dummy HTML element for Popover anchor
+          const dummyAnchor = document.createElement('div');
+          dummyAnchor.style.position = 'absolute';
+
+          // Position the dummy anchor based on the event's pixel
+          // Here you would use the map container's ID or ref to position correctly
+          dummyAnchor.style.left = `${event.pixel[0]}px`;
+          dummyAnchor.style.top = `${event.pixel[1]}px`;
+
+          // Append the dummy anchor to the map element
+          // Assuming mapElement.current is the container of the map
+          if (mapElement.current) {
+            mapElement.current.appendChild(dummyAnchor);
+          }
+
+          // Set the state for Popover content and anchor
+          setPopoverContent(JSON.stringify(feature.getProperties(), null, 2));
+          setAnchorEl(dummyAnchor);
+
+          // Return true to stop the forEach loop if needed
+          return true;
+        }
+      });
+    };
+
+
     const layerSwitcher = new LayerSwitcher();
     initialMap.addControl(layerSwitcher);
 
+
+
+    initialMap.on('singleclick', handleMapClick);
     setMap(initialMap);
   }, []);
 
   return (
-    <div
-      style={{ height: "calc(100vh - 120px)" }}
-      ref={mapElement}
-      className="map-container"
-    />
+    <>
+      <div
+        style={{ height: "calc(100vh - 120px)" }}
+        ref={mapElement}
+        className="map-container"
+        id="map-container"
+      >
+      </div>
+
+
+
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClosePopover}
+      // ... other props
+      >
+        {"hello"}
+      </Popover>
+
+
+    </>
   );
 }
 
