@@ -21,25 +21,28 @@ import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import { geoServerBaseUrl } from "@/requests/requests";
 import { Pixel } from "ol/pixel";
-const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-const [popoverContent, setPopoverContent] = React.useState<string>('');
+
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import Event from 'ol/events/Event';
 import Popover from '@mui/material/Popover';
-const open = Boolean(anchorEl);
-const id = open ? 'feature-popover' : undefined;
-const handleClosePopover = () => {
-  if (anchorEl) {
-    anchorEl.remove(); // This removes the dummy anchor from the DOM
-  }
-  setAnchorEl(null);
-};
+
+
 
 function Newmap() {
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const [popoverContent, setPopoverContent] = React.useState<string>('');
+  const open = Boolean(anchorEl);
+  const id = open ? 'feature-popover' : undefined;
   console.log("geoServerBaseUrl: " + geoServerBaseUrl);
   const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
   const mapElement = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | undefined>(undefined);
+  const handleClosePopover = () => {
+    if (anchorEl) {
+      anchorEl.remove(); // This removes the dummy anchor from the DOM
+    }
+    setAnchorEl(null);
+  };
   mapRef.current = map;
 
   var style_simple = new Style({
