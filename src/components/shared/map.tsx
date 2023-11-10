@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect, useRef, useState } from "react";
 import { Map, View } from "ol";
 import "ol/ol.css";
