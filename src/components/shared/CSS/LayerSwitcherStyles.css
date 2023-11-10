@@ -1,0 +1,151 @@
+/* Custom styles for the LayerSwitcher container */
+.ol-layerswitcher {
+  border-top: transparent;
+  background-color: transparent;
+  padding: 0px;
+  margin-top: 20px;
+  position: absolute; /* Position the LayerSwitcher absolutely */
+  top: 20; /* Align it to the top of the screen */
+  left: 60px; /* Align it to the left side of the screen */
+  z-index: 1000; /* Adjust the z-index to ensure it's above other content */
+  width: 320px;
+
+  @media (max-width: 768px) {
+    /* Adjust positioning for smaller screens */
+    top: 50px;
+    left: 10px;
+  }
+}
+
+/* Custom styles for the checkboxes */
+.ol-layerswitcher-input {
+  margin-right: 5px;
+}
+
+.ol-visible {
+  color: #038543;
+  margin-left: 20px;
+  width: "auto";
+  font-size: 17px;
+}
+
+button {
+  display: hidden !important;
+}
+.panel-container {
+  background-color: white !important;
+}
+
+.ol-layerswitcher-image > button:after,
+.ol-layerswitcher > button:after {
+  top: 0.22em;
+  left: 0.34em;
+  background: #28d909;
+  background-image: radial-gradient(
+    circle at 0.85em 0.6em,
+    #70b3be 0,
+    #70b3be 0.65em,
+    #83bcc5 0.65em
+  );
+}
+
+.ol-layerswitcher [type="radio"]:checked + label:after,
+.ol-layerswitcher [type="checkbox"]:checked + label:after {
+  content: "";
+  position: absolute;
+  left: 0.1em;
+  top: 0.1em;
+  width: 1.2em;
+  height: 1.2em;
+  color: green;
+  background: whitesmoke;
+  box-sizing: border-box;
+}
+
+.ol-layerswitcher [type="radio"] + label:before,
+.ol-layerswitcher [type="checkbox"] + label:before {
+  content: "";
+  position: absolute;
+  left: 0.1em;
+  top: 0.1em;
+  width: 1.2em;
+  height: 1.2em;
+  border-color: #787878;
+  background: whitesmoke;
+  box-sizing: border-box;
+}
+
+.ol-layerswitcher [type="checkbox"]:checked + label:after {
+  color: #038543 !important;
+  /* border-width: 0 3px 3px 0; */
+  border-style: solid;
+  width: 0.7em;
+  height: 1em;
+  transform: rotate(45deg);
+  left: 0.55em;
+  top: -0.05em;
+  /* box-shadow: 1px 0px 1px 1px #fff; */
+}
+.ol-layerswitcher .layerswitcher-opacity {
+  position: relative;
+  border: 1px solid #369;
+  height: 3px;
+  width: 120px;
+  margin: 5px 1em 10px 7px;
+  box-sizing: border-box;
+  border-radius: 3px;
+  background: #038543;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #038543;
+}
+
+.ol-control button {
+  display: block;
+  margin: 1px;
+  padding: 0;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: inherit;
+  text-align: center;
+  height: 1.375em;
+  width: 1.375em;
+  line-height: 0.4em;
+  background-color: #ebbd40;
+  border: none;
+  border-radius: 2px;
+}
+
+.ol-zoom {
+  top: 0.5em;
+}
+
+.ol-layerswitcher-image > button,
+.ol-layerswitcher > button {
+  background-color: #ebbd40;
+  float: left;
+  z-index: 10;
+  position: relative;
+  font-size: 1.7em;
+}
+.ol-layerswitcher .layerup {
+  float: right;
+  height: 2.5em;
+  background-color: #ebbd40;
+  opacity: 0.5;
+  cursor: move;
+  cursor: ns-resize;
+}
+
+.ol-layerswitcher-image > button:after,
+.ol-layerswitcher > button:after {
+  top: 0.22em;
+  left: 0.34em;
+  background: #28d909;
+  background-image: radial-gradient(
+    circle at 0.85em 0.6em,
+    #038543 0,
+    #038543 0.65em,
+    #038543 0.65em
+  );
+}
