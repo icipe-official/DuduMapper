@@ -14,7 +14,7 @@ on:
     paths:
       - ./**
       - .github/**
-
+  workflow_dispatch:
 defaults:
   run:
     working-directory: ./
