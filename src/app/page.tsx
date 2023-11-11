@@ -1,4 +1,3 @@
-"use client";
 import Newmap from "../components/shared/map";
 import NavBar from "../components/shared/navbar";
 
