@@ -241,7 +241,7 @@ export const getBasemapLayersArray = async () => {
         let layerName = layers[i].name;
         let displayName = layers[i].displayName;
 
-        let tileStyle = getTileStyle(layerName);
+        let tileStyle = getTileStyle(displayName);
 
         let theBasemapTile = new VectorTileLayer({
           title: displayName,
