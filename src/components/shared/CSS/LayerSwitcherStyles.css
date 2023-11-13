@@ -1,7 +1,7 @@
 /* Custom styles for the LayerSwitcher container */
 .ol-layerswitcher {
-  border-top: transparent;
-  background-color: transparent;
+  border-top: transparent !important;
+  background-color: transparent !important;
   padding: 0px;
   margin-top: 20px;
   position: absolute; /* Position the LayerSwitcher absolutely */
@@ -88,22 +88,22 @@ button {
 }
 .ol-layerswitcher .layerswitcher-opacity {
   position: relative;
-  border: 1px solid #369;
+  border: 1px solid #369 !important;
   height: 3px;
   width: 120px;
   margin: 5px 1em 10px 7px;
   box-sizing: border-box;
   border-radius: 3px;
-  background: #038543;
+  background: #038543 !important;
   cursor: pointer;
-  box-shadow: 1px 1px 1px #038543;
+  box-shadow: 1px 1px 1px #038543 !important;
 }
 
 .ol-control button {
   display: block;
   margin: 1px;
   padding: 0;
-  color: #fff;
+  color: #fff !important;
   font-weight: 700;
   text-decoration: none;
   font-size: inherit;
@@ -111,7 +111,7 @@ button {
   height: 1.375em;
   width: 1.375em;
   line-height: 0.4em;
-  background-color: #ebbd40;
+  background-color: #ebbd40 !important;
   border: none;
   border-radius: 2px;
 }
@@ -122,8 +122,8 @@ button {
 
 .ol-layerswitcher-image > button,
 .ol-layerswitcher > button {
-  background-color: #ebbd40;
-  float: left;
+  background-color: #ebbd40 !important;
+  float: left !important;
   z-index: 10;
   position: relative;
   font-size: 1.7em;
@@ -131,7 +131,7 @@ button {
 .ol-layerswitcher .layerup {
   float: right;
   height: 2.5em;
-  background-color: #ebbd40;
+  background-color: #ebbd40 !important;
   opacity: 0.5;
   cursor: move;
   cursor: ns-resize;
@@ -141,7 +141,7 @@ button {
 .ol-layerswitcher > button:after {
   top: 0.22em;
   left: 0.34em;
-  background: #28d909;
+  background: #038543 !important;
   background-image: radial-gradient(
     circle at 0.85em 0.6em,
     #038543 0,

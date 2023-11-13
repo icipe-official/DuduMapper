@@ -1,9 +1,9 @@
+"use client";
 import React, { useEffect, useRef, useState } from "react";
 import { Map, View } from "ol";
 import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
-import "./CSS/LayerSwitcherStyles.css";
 import LayerGroup from "ol/layer/Group";
 import SourceOSM from "ol/source/OSM";
 import OSM from "ol/source/OSM";
@@ -14,7 +14,6 @@ import VectorTileSource from "ol/source/VectorTile";
 import VectorTileLayer from "ol/layer/VectorTile";
 import MVT from "ol/format/MVT";
 import { BaseLayerOptions, GroupLayerOptions } from "ol-layerswitcher";
-import "ol/ol.css";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
@@ -25,6 +24,7 @@ import {
   getBasemapLayersArray,
   overlays,
 } from "@/requests/requests";
+import "./CSS/LayerSwitcherStyles.css";
 
 function Newmap() {
   const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
