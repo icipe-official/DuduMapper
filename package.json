@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -15,25 +15,21 @@
     "@mui/icons-material": "^5.14.15",
     "@mui/material": "^5.14.15",
     "axios": "^1.6.0",
-    "fs": "^0.0.1-security",
     "next": "13.5.6",
     "ol": "^6.15.1",
     "ol-ext": "^4.0.11",
     "ol-layerswitcher": "^4.1.1",
     "react": "^18",
-    "react-dom": "^18",
-    "react-xml-parser": "^1.1.8",
-    "xml2js": "^0.6.2"
+    "react-dom": "^18"
   },
   "devDependencies": {
     "@types/node": "^20.8.9",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
     "@types/ol-ext": "npm:@siedlerchr/types-ol-ext@^3.2.4",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "@types/xml2js": "^0.4.14",
     "babel-plugin-transform-commonjs": "^1.1.6",
     "eslint": "^8",
-    "eslint-config-next": "13.5.6",
+    "eslint-config-next": "^14.0.2",
     "typescript": "^5"
   }
 }
