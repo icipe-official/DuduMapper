@@ -19,14 +19,20 @@ import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
-import { geoServerBaseUrl } from "@/requests/requests";
+import {
+  basemapLayers,
+  geoServerBaseUrl,
+  getBasemapLayersArray,
+  overlays,
+} from "@/requests/requests";
 
 function Newmap() {
-  console.log("geoServerBaseUrl: " + geoServerBaseUrl);
   const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
   const mapElement = useRef(null);
   const mapRef = useRef<Map | undefined>(undefined);
   mapRef.current = map;
+
+  // createBasemapsLayerGroup();
 
   var style_simple = new Style({
     fill: new Fill({
@@ -259,22 +265,6 @@ function Newmap() {
     // style: occurrenceStyle,
   } as BaseLayerOptions);
 
-  const baseMaps = new LayerGroup({
-    title: "BASE MAPS",
-    layers: [
-      Oceans,
-      land,
-      glaciated_areas,
-      antarctic_ice_shelves,
-      Lakes,
-      countries_boundary_lines,
-      rivers_lake_centerlines,
-      coastline,
-      populated_places,
-      osm,
-    ],
-  } as GroupLayerOptions);
-
   const Overlays = new LayerGroup({
     title: "OVERLAYS",
     layers: [glaciated_areas],
@@ -286,28 +276,37 @@ function Newmap() {
   } as GroupLayerOptions);
 
   useEffect(() => {
-    if (!mapElement.current) return;
+    // if (!mapElement.current) return;
 
-    const initialMap = new Map({
-      target: mapElement.current,
-      layers: [baseMaps, Overlays, occurrenceGroup],
-      view: new View({
-        center: [0, 0],
-        zoom: 4,
-      }),
+    let BaseMaps;
+    getBasemapLayersArray().then((res) => {
+      console.log(res);
+      BaseMaps = new LayerGroup({
+        title: "BaseMaps",
+        layers: res,
+      } as GroupLayerOptions);
+      if (BaseMaps) {
+        const initialMap = new Map({
+          target: "map-container",
+          layers: [BaseMaps, Overlays, occurrenceGroup],
+          view: new View({
+            center: [0, 0],
+            zoom: 4,
+          }),
+        });
+        const layerSwitcher = new LayerSwitcher();
+        initialMap.addControl(layerSwitcher);
+
+        setMap(initialMap);
+      }
     });
-
-    const layerSwitcher = new LayerSwitcher();
-    initialMap.addControl(layerSwitcher);
-
-    setMap(initialMap);
   }, []);
 
   return (
     <div
       style={{ height: "calc(100vh - 120px)" }}
       ref={mapElement}
-      className="map-container"
+      id="map-container"
     />
   );
 }
