@@ -153,7 +153,7 @@ export const basemapLayers = (async () => {
   );
 })();
 
-const getTileStyle = (layerName: string) => {
+const getTileStyle = (displayName: string) => {
   let style;
 
   var style_simple = new Style({
@@ -188,7 +188,7 @@ const getTileStyle = (layerName: string) => {
 
   var style_borders = new Style({
     stroke: new Stroke({
-      color: "#fafafa",
+      color: "#999999",
       width: 2,
     }),
   });
@@ -203,23 +203,23 @@ const getTileStyle = (layerName: string) => {
     }),
   });
 
-  if (layerName) {
+  if (displayName) {
     if (
-      layerName === "Coastline" ||
-      layerName === "Ocean" ||
-      layerName === "Antarctic Ice Shelves" ||
-      layerName === "glaciated_areas" ||
-      layerName === "Lakes" ||
-      layerName === "Rivers" ||
-      layerName === "Places"
+      displayName === "Coastline" ||
+      displayName === "Ocean" ||
+      displayName === "Antarctic Ice Shelves" ||
+      displayName === "glaciated_areas" ||
+      displayName === "Lakes" ||
+      displayName === "Rivers" ||
+      displayName === "Places"
     ) {
       style = style_water;
     }
 
-    if (layerName === "Land") {
+    if (displayName === "Land") {
       style = style_simple;
     }
-    if (layerName === "Country Boundaries") {
+    if (displayName === "Country Boundaries") {
       style = style_borders;
     }
   }
@@ -261,7 +261,6 @@ export const getBasemapLayersArray = async () => {
         } as BaseLayerOptions);
 
         basemapArrays.push(theBasemapTile);
-        // console.log(basemapArrays);
       }
       return basemapArrays;
     }
