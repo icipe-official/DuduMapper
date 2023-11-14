@@ -108,8 +108,8 @@ button {
   text-decoration: none;
   font-size: inherit;
   text-align: center;
-  height: 1.375em;
-  width: 1.375em;
+  height: 1.375em !important;
+  width: 1.375em !important;
   line-height: 0.4em;
   background-color: #ebbd40 !important;
   border: none;

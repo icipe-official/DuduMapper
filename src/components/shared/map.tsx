@@ -32,76 +32,11 @@ function Newmap() {
   const mapRef = useRef<Map | undefined>(undefined);
   mapRef.current = map;
 
-  // createBasemapsLayerGroup();
-
-  var style_simple = new Style({
-    fill: new Fill({
-      color: "#e1e1e1",
-    }),
-    stroke: new Stroke({
-      color: "#f6f6f6",
-      width: 1,
-    }),
-  });
-
-  var siteStyle = new Style({
-    fill: new Fill({
-      color: "#db1e2a",
-    }),
-    stroke: new Stroke({
-      color: "#fafafa",
-      width: 1,
-    }),
-  });
-
-  var occurrenceStyle = new Style({
-    fill: new Fill({
-      color: "#ff9e17",
-    }),
-    stroke: new Stroke({
-      color: "#fafafa",
-      width: 1,
-    }),
-  });
-
-  var style_borders = new Style({
-    stroke: new Stroke({
-      color: "#fafafa",
-      width: 2,
-    }),
-  });
-
-  var style_water = new Style({
-    fill: new Fill({
-      color: "#87CEEB",
-    }),
-    stroke: new Stroke({
-      color: "#87CEEB",
-      width: 1,
-    }),
-  });
-
   const osm = new TileLayer({
     title: "OSM",
     type: "base",
     visible: false,
     source: new OSM(),
-  } as BaseLayerOptions);
-
-  const land = new VectorTileLayer({
-    title: "Land",
-    type: "base",
-    visible: true,
-    preload: Infinity,
-    source: new VectorTileSource({
-      maxZoom: 18,
-      format: new MVT(),
-      url:
-        geoServerBaseUrl +
-        "/geoserver/gwc/service/tms/1.0.0/" +
-        "basemap:land@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-    }),
-    style: style_simple,
   } as BaseLayerOptions);
 
   var glaciated_areas = new VectorTileLayer({
@@ -115,117 +50,6 @@ function Newmap() {
         geoServerBaseUrl +
         "/geoserver/gwc/service/tms/1.0.0/" +
         "basemap:glaciated_areas@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-    }),
-  } as BaseLayerOptions);
-
-  const Oceans = new VectorTileLayer({
-    title: "Ocean",
-    type: "base",
-    visible: true,
-    preload: Infinity,
-    source: new VectorTileSource({
-      maxZoom: 18,
-      format: new MVT(),
-      url:
-        geoServerBaseUrl +
-        "/geoserver/gwc/service/tms/1.0.0/" +
-        "basemap:ocean@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-    }),
-    style: style_water,
-  } as BaseLayerOptions);
-
-  const Lakes = new VectorTileLayer({
-    title: "Lakes",
-    type: "base",
-    visible: true,
-    preload: Infinity,
-    source: new VectorTileSource({
-      maxZoom: 18,
-      format: new MVT(),
-      url:
-        geoServerBaseUrl +
-        "/geoserver/gwc/service/tms/1.0.0/" +
-        "basemap:lakes@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-    }),
-    style: style_water,
-  } as BaseLayerOptions);
-
-  const countries_boundary_lines = new VectorTileLayer({
-    title: "Country Borders",
-    type: "base",
-    visible: true,
-    preload: Infinity,
-    source: new VectorTileSource({
-      maxZoom: 18,
-      format: new MVT(),
-      url:
-        geoServerBaseUrl +
-        "/geoserver/gwc/service/tms/1.0.0/" +
-        "basemap:countries_boundary_lines@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-    }),
-    style: style_borders,
-  } as BaseLayerOptions);
-
-  const antarctic_ice_shelves = new VectorTileLayer({
-    title: "Antarctic Ice Shelves",
-    type: "base",
-    visible: true,
-    preload: Infinity,
-    source: new VectorTileSource({
-      maxZoom: 18,
-      format: new MVT(),
-      url:
-        geoServerBaseUrl +
-        "/geoserver/gwc/service/tms/1.0.0/" +
-        "basemap:antarctic_ice_shelves@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-    }),
-    style: style_water,
-  } as BaseLayerOptions);
-
-  const rivers_lake_centerlines = new VectorTileLayer({
-    title: "Rivers Lake Centerlines",
-    type: "base",
-    visible: true,
-    preload: Infinity,
-    source: new VectorTileSource({
-      maxZoom: 18,
-      format: new MVT(),
-      url:
-        geoServerBaseUrl +
-        "/geoserver/gwc/service/tms/1.0.0/" +
-        "basemap:rivers_lake_centerlines@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-    }),
-    style: style_water,
-  } as BaseLayerOptions);
-
-  const coastline = new VectorTileLayer({
-    title: "Coastline",
-    type: "base",
-    visible: true,
-    preload: Infinity,
-    source: new VectorTileSource({
-      maxZoom: 18,
-      format: new MVT(),
-      url:
-        geoServerBaseUrl +
-        "/geoserver/gwc/service/tms/1.0.0/" +
-        "basemap:coastline@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-    }),
-    style: style_water,
-  } as BaseLayerOptions);
-
-  const populated_places = new VectorTileLayer({
-    title: "Populated Places",
-    type: "base",
-    visible: false,
-    preload: Infinity,
-    source: new VectorTileSource({
-      maxZoom: 18,
-      format: new MVT(),
-      url:
-        geoServerBaseUrl +
-        "/geoserver/gwc/service/tms/1.0.0/" +
-        "basemap:populated_places@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
     }),
   } as BaseLayerOptions);
 
@@ -266,25 +90,23 @@ function Newmap() {
   } as BaseLayerOptions);
 
   const Overlays = new LayerGroup({
-    title: "OVERLAYS",
+    title: "Overlays",
     layers: [glaciated_areas],
   } as GroupLayerOptions);
 
   const occurrenceGroup = new LayerGroup({
-    title: "Occurence",
+    title: "Occurrence",
     layers: [siteLayer, occurrenceLayer],
   } as GroupLayerOptions);
 
   useEffect(() => {
-    // if (!mapElement.current) return;
-
     let BaseMaps;
-    getBasemapLayersArray().then((res) => {
-      console.log(res);
+    getBasemapLayersArray().then((baseMapPromise) => {
       BaseMaps = new LayerGroup({
-        title: "BaseMaps",
-        layers: res,
+        title: "Base Maps",
+        layers: baseMapPromise,
       } as GroupLayerOptions);
+
       if (BaseMaps) {
         const initialMap = new Map({
           target: "map-container",
