@@ -156,7 +156,7 @@ export const basemapLayers = (async () => {
 const getTileStyle = (displayName: string) => {
   let style;
 
-  var style_simple = new Style({
+  const style_simple = new Style({
     fill: new Fill({
       color: "#e1e1e1",
     }),
@@ -166,34 +166,14 @@ const getTileStyle = (displayName: string) => {
     }),
   });
 
-  var siteStyle = new Style({
-    fill: new Fill({
-      color: "#db1e2a",
-    }),
-    stroke: new Stroke({
-      color: "#fafafa",
-      width: 1,
-    }),
-  });
-
-  var occurrenceStyle = new Style({
-    fill: new Fill({
-      color: "#ff9e17",
-    }),
-    stroke: new Stroke({
-      color: "#fafafa",
-      width: 1,
-    }),
-  });
-
-  var style_borders = new Style({
+  const style_borders = new Style({
     stroke: new Stroke({
       color: "#999999",
       width: 2,
     }),
   });
 
-  var style_water = new Style({
+  const style_water = new Style({
     fill: new Fill({
       color: "#87CEEB",
     }),
@@ -263,6 +243,49 @@ export const getBasemapLayersArray = async () => {
         basemapArrays.push(theBasemapTile);
       }
       return basemapArrays;
+    }
+  } catch (error) {
+    console.error("Failed to load basemapLayers:", error);
+    return null;
+  }
+};
+
+export const getOverlayLayersArray = async () => {
+  try {
+    // Directly await the Promise
+    const layers = await overlays;
+
+    if (layers) {
+      const layerLen = layers.length;
+      let i;
+      let overlaysArrays = [];
+
+      for (i = 0; i < layerLen; i++) {
+        let layerName = layers[i].name;
+        let displayName = layers[i].displayName;
+
+        let tileStyle = getTileStyle(displayName);
+
+        let theoverlaysTile = new VectorTileLayer({
+          title: displayName,
+          type: "base",
+          visible: true,
+          preload: Infinity,
+          source: new VectorTileSource({
+            maxZoom: 18,
+            format: new MVT(),
+            url:
+              geoServerBaseUrl +
+              "/geoserver/gwc/service/tms/1.0.0/" +
+              layerName +
+              "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+          }),
+          style: tileStyle,
+        } as BaseLayerOptions);
+
+        overlaysArrays.push(theoverlaysTile);
+      }
+      return overlaysArrays;
     }
   } catch (error) {
     console.error("Failed to load basemapLayers:", error);
