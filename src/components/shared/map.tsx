@@ -13,8 +13,7 @@ import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import {
   geoServerBaseUrl,
-  getBasemapLayersArray,
-  getOverlayLayersArray,
+  getBasemapOverlaysLayersArray,
 } from "@/requests/requests";
 import "./CSS/LayerSwitcherStyles.css";
 
@@ -55,8 +54,8 @@ function Newmap() {
   } as GroupLayerOptions);
 
   useEffect(() => {
-    getBasemapLayersArray().then((baseMapsArray) => {
-      getOverlayLayersArray().then((overlaysArray) => {
+    getBasemapOverlaysLayersArray('basemaps').then((baseMapsArray) => {
+      getBasemapOverlaysLayersArray('overlays').then((overlaysArray) => {
         const BaseMaps = new LayerGroup({
           title: "Base Maps",
           layers: baseMapsArray,
