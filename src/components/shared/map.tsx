@@ -114,47 +114,53 @@ function Newmap() {
             const layerSwitcher = new LayerSwitcher();
             initialMap.addControl(layerSwitcher);
 
+            const handleMapClick = (event: any) => {
+              console.log("handle map click before checking if map is defined")
+              // if (map) {
+              console.log("map defined")
+              initialMap.forEachFeatureAtPixel(event.pixel, (feature, layer) => {
+                if (layer === occurrenceLayer) {
+                  console.log("Point clicked")
+                  // Create a reference to the dummy HTML element for Popover anchor
+                  const dummyAnchor = document.createElement('div');
+                  dummyAnchor.style.position = 'absolute';
+
+                  // Position the dummy anchor based on the event's pixel
+                  // Here you would use the map container's ID or ref to position correctly
+                  dummyAnchor.style.left = `${event.pixel[0]}px`;
+                  dummyAnchor.style.top = `${event.pixel[1]}px`;
+
+                  // Append the dummy anchor to the map element
+                  // Assuming mapElement.current is the container of the map
+                  if (mapElement.current) {
+                    mapElement.current.appendChild(dummyAnchor);
+                  }
+
+                  // Set the state for Popover content and anchor
+                  setPopoverContent(feature.getProperties());
+                  setAnchorEl(dummyAnchor);
+
+                  // Return true to stop the forEach loop if needed
+                  return true;
+                }
+              });
+              // }
+            };
+
+            initialMap.on('singleclick', handleMapClick);
+
             setMap(initialMap);
           }
         }
       });
     });
 
-    const handleMapClick = (event: any) => {
-      if (map) {
-        map.forEachFeatureAtPixel(event.pixel, (feature, layer) => {
-          if (layer === occurrenceLayer) {
-            // Create a reference to the dummy HTML element for Popover anchor
-            const dummyAnchor = document.createElement('div');
-            dummyAnchor.style.position = 'absolute';
 
-            // Position the dummy anchor based on the event's pixel
-            // Here you would use the map container's ID or ref to position correctly
-            dummyAnchor.style.left = `${event.pixel[0]}px`;
-            dummyAnchor.style.top = `${event.pixel[1]}px`;
-
-            // Append the dummy anchor to the map element
-            // Assuming mapElement.current is the container of the map
-            if (mapElement.current) {
-              mapElement.current.appendChild(dummyAnchor);
-            }
-
-            // Set the state for Popover content and anchor
-            setPopoverContent(feature.getProperties());
-            setAnchorEl(dummyAnchor);
-
-            // Return true to stop the forEach loop if needed
-            return true;
-          }
-        });
-      }
-    };
 
 
     const layerSwitcher = new LayerSwitcher();
     if (map) {
       map.addControl(layerSwitcher);
-      map.on('singleclick', handleMapClick);
     }
   }, []);
 
@@ -251,8 +257,8 @@ function Newmap() {
             </AccordionSummary>
             <AccordionDetails>
               <Typography>
-                {popoverContent?.start_month && popoverContent?.start_year && popoverContent?.end_month && popoverContent?.end_year ? (
-                  `Data collected from ${popoverContent.start_month}/${popoverContent.start_year} to ${popoverContent.end_month}/${popoverContent.end_year}.`
+                {popoverContent?.period_start && popoverContent?.period_end ? (
+                  `Data collected from ${popoverContent.period_start} to ${popoverContent.period_end}.`
                 ) : (
                   <span>Loading or no data available...</span>
                 )}
