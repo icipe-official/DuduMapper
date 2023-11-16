@@ -11,7 +11,6 @@ import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
-import { geoServerBaseUrl } from "@/requests/requests";
 import { Pixel } from "ol/pixel";
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import Event from 'ol/events/Event';
@@ -26,8 +25,7 @@ import {
   getBasemapOverlaysLayersArray,
 } from "@/requests/requests";
 import "./CSS/LayerSwitcherStyles.css";
-
-
+import { Stroke, Fill, Style, Circle } from "ol/style";
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [popoverContent, setPopoverContent] = React.useState<{ [x: string]: any }>({});
@@ -61,12 +59,28 @@ function Newmap() {
     strategy: bboxStrategy,
   });
 
+  const fill = new Fill({
+    color: 'rgba(2,2,2,1)',
+  });
+  const stroke = new Stroke({
+    color: '#222',
+    width: 1.25,
+  });
+
   const occurrenceLayer = new VectorLayer({
     title: "Occurrence Layer",
     visible: false,
     preload: Infinity,
     source: occurrenceSource,
-    // style: occurrenceStyle,
+    style: new Style({
+      image: new Circle({
+        fill: fill,
+        stroke: stroke,
+        radius: 5,
+      }),
+      fill: fill,
+      stroke: stroke,
+    })
   } as BaseLayerOptions);
 
   const occurrenceGroup = new LayerGroup({
@@ -107,41 +121,41 @@ function Newmap() {
     });
 
     const handleMapClick = (event: any) => {
-      initialMap.forEachFeatureAtPixel(event.pixel, (feature, layer) => {
-        if (layer === occurrenceLayer) {
-          // Create a reference to the dummy HTML element for Popover anchor
-          const dummyAnchor = document.createElement('div');
-          dummyAnchor.style.position = 'absolute';
+      if (map) {
+        map.forEachFeatureAtPixel(event.pixel, (feature, layer) => {
+          if (layer === occurrenceLayer) {
+            // Create a reference to the dummy HTML element for Popover anchor
+            const dummyAnchor = document.createElement('div');
+            dummyAnchor.style.position = 'absolute';
 
-          // Position the dummy anchor based on the event's pixel
-          // Here you would use the map container's ID or ref to position correctly
-          dummyAnchor.style.left = `${event.pixel[0]}px`;
-          dummyAnchor.style.top = `${event.pixel[1]}px`;
+            // Position the dummy anchor based on the event's pixel
+            // Here you would use the map container's ID or ref to position correctly
+            dummyAnchor.style.left = `${event.pixel[0]}px`;
+            dummyAnchor.style.top = `${event.pixel[1]}px`;
 
-          // Append the dummy anchor to the map element
-          // Assuming mapElement.current is the container of the map
-          if (mapElement.current) {
-            mapElement.current.appendChild(dummyAnchor);
+            // Append the dummy anchor to the map element
+            // Assuming mapElement.current is the container of the map
+            if (mapElement.current) {
+              mapElement.current.appendChild(dummyAnchor);
+            }
+
+            // Set the state for Popover content and anchor
+            setPopoverContent(feature.getProperties());
+            setAnchorEl(dummyAnchor);
+
+            // Return true to stop the forEach loop if needed
+            return true;
           }
-
-          // Set the state for Popover content and anchor
-          setPopoverContent(feature.getProperties());
-          setAnchorEl(dummyAnchor);
-
-          // Return true to stop the forEach loop if needed
-          return true;
-        }
-      });
+        });
+      }
     };
 
 
     const layerSwitcher = new LayerSwitcher();
-    initialMap.addControl(layerSwitcher);
-
-
-
-    initialMap.on('singleclick', handleMapClick);
-    setMap(initialMap);
+    if (map) {
+      map.addControl(layerSwitcher);
+      map.on('singleclick', handleMapClick);
+    }
   }, []);
 
   return (
