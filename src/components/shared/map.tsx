@@ -23,13 +23,6 @@ function Newmap() {
   const mapRef = useRef<Map | undefined>(undefined);
   mapRef.current = map;
 
-  const osm = new TileLayer({
-    title: "OSM",
-    type: "base",
-    visible: false,
-    source: new OSM(),
-  } as BaseLayerOptions);
-
   const occurrenceSource = new VectorSource({
     format: new GeoJSON(),
     url:
