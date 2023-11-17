@@ -1,11 +1,16 @@
-import WMSCapabilities from 'ol/format/WMSCapabilities';
-import WMTSCapabilities from 'ol/format/WMTSCapabilities';
+import WMSCapabilities from "ol/format/WMSCapabilities";
+import WMTSCapabilities from "ol/format/WMTSCapabilities";
+import VectorTileLayer from "ol/layer/VectorTile";
+import VectorTileSource from "ol/source/VectorTile";
+import MVT from "ol/format/MVT";
+import { BaseLayerOptions, GroupLayerOptions } from "ol-layerswitcher";
+import Stroke from "ol/style/Stroke";
+import Fill from "ol/style/Fill";
+import Style from "ol/style/Style";
+import LayerGroup from "ol/layer/Group";
 
-
-export const geoServerBaseUrl = process.env.NEXT_PUBLIC_GEOSERVER_URL?.trim().replace(
-  /['"]/g,
-  ''
-);
+export const geoServerBaseUrl =
+  process.env.NEXT_PUBLIC_GEOSERVER_URL?.trim().replace(/['"]/g, "");
 export const overlaysLayergroup_in_geoserver =
   process.env.NEXT_PUBLIC_OVERLAYS_LAYER_GROUP;
 export const basemapLayergroup_in_geoserver =
@@ -13,7 +18,7 @@ export const basemapLayergroup_in_geoserver =
 export const geoserverWorkspace = process.env.NEXT_PUBLIC_SELECTED_WORKSPACE;
 
 function appendPath(baseURL: string, path: string): string {
-  if (baseURL.endsWith('/geoserver')) {
+  if (baseURL.endsWith("/geoserver")) {
     // Remove '/geoserver' from the end
     baseURL = baseURL.substring(0, baseURL.length - 10);
   }
@@ -22,7 +27,7 @@ function appendPath(baseURL: string, path: string): string {
 
 async function fetchXML(url: RequestInfo | URL) {
   try {
-    const response = await fetch(url, { credentials: 'omit' });
+    const response = await fetch(url, { credentials: "omit" });
 
     if (!response.ok) {
       console.error(
@@ -38,9 +43,9 @@ async function fetchXML(url: RequestInfo | URL) {
 }
 
 async function getWMSCapabilities() {
-  if (typeof geoServerBaseUrl !== 'string') {
+  if (typeof geoServerBaseUrl !== "string") {
     console.error(
-      'GeoServer base URL is not defined or not a string. Check your config settings.'
+      "GeoServer base URL is not defined or not a string. Check your config settings."
     );
     return null; // Return a default value or null
   }
@@ -48,12 +53,12 @@ async function getWMSCapabilities() {
   const xmlData = await fetchXML(
     appendPath(
       geoServerBaseUrl,
-      '/geoserver/ows?service=WMS&version=1.3.0&request=GetCapabilities'
+      "/geoserver/ows?service=WMS&version=1.3.0&request=GetCapabilities"
     )
   );
 
   if (!xmlData) {
-    console.error('Failed to fetch WMS capabilities.');
+    console.error("Failed to fetch WMS capabilities.");
     return null; // Return a default value or null
   }
 
@@ -62,9 +67,9 @@ async function getWMSCapabilities() {
 }
 
 async function getWMTSCapabilities() {
-  if (typeof geoServerBaseUrl !== 'string') {
+  if (typeof geoServerBaseUrl !== "string") {
     console.error(
-      'GeoServer base URL is not defined or not a string. Check your config settings.'
+      "GeoServer base URL is not defined or not a string. Check your config settings."
     );
     return null; // Return a default value or null
   }
@@ -72,12 +77,12 @@ async function getWMTSCapabilities() {
   const xmlData = await fetchXML(
     appendPath(
       geoServerBaseUrl,
-      '/geoserver/gwc/service/wmts?service=WMTS&version=1.1.1&request=GetCapabilities'
+      "/geoserver/gwc/service/wmts?service=WMTS&version=1.1.1&request=GetCapabilities"
     )
   );
 
   if (!xmlData) {
-    console.error('Failed to fetch WMTS capabilities.');
+    console.error("Failed to fetch WMTS capabilities.");
     return null; // Return a default value or null
   }
 
@@ -112,7 +117,7 @@ async function extractLayersFromLayerGroup(
           layers.push({
             name: nestedLayer.Name,
             displayName: nestedLayer.Title,
-            styleObject: nestedLayer.Style
+            styleObject: nestedLayer.Style,
           });
         }
       }
@@ -127,8 +132,8 @@ const geoServerData = (async () => {
 })();
 
 export const overlays = (async () => {
-  if (typeof overlaysLayergroup_in_geoserver !== 'string') {
-    console.error('overlaysLayergroup_in_geoserver must be a string');
+  if (typeof overlaysLayergroup_in_geoserver !== "string") {
+    console.error("overlaysLayergroup_in_geoserver must be a string");
     return null;
   }
   return await extractLayersFromLayerGroup(
@@ -138,8 +143,8 @@ export const overlays = (async () => {
 })();
 
 export const basemapLayers = (async () => {
-  if (typeof basemapLayergroup_in_geoserver !== 'string') {
-    console.error('overlaysLayergroup_in_geoserver must be a string');
+  if (typeof basemapLayergroup_in_geoserver !== "string") {
+    console.error("overlaysLayergroup_in_geoserver must be a string");
     return null;
   }
   return await extractLayersFromLayerGroup(
@@ -148,4 +153,104 @@ export const basemapLayers = (async () => {
   );
 })();
 
+const getTileStyle = (displayName: string) => {
+  let style;
 
+  const style_simple = new Style({
+    fill: new Fill({
+      color: "#e1e1e1",
+    }),
+    stroke: new Stroke({
+      color: "#f6f6f6",
+      width: 1,
+    }),
+  });
+
+  const style_borders = new Style({
+    stroke: new Stroke({
+      color: "#999999",
+      width: 2,
+    }),
+  });
+
+  const style_water = new Style({
+    fill: new Fill({
+      color: "#87CEEB",
+    }),
+    stroke: new Stroke({
+      color: "#87CEEB",
+      width: 1,
+    }),
+  });
+
+  if (displayName) {
+    if (
+      displayName === "Coastline" ||
+      displayName === "Ocean" ||
+      displayName === "Antarctic Ice Shelves" ||
+      displayName === "glaciated_areas" ||
+      displayName === "Lakes" ||
+      displayName === "Rivers" ||
+      displayName === "Places"
+    ) {
+      style = style_water;
+    }
+
+    if (displayName === "Land") {
+      style = style_simple;
+    }
+    if (displayName === "Country Boundaries") {
+      style = style_borders;
+    }
+  }
+
+  return style;
+};
+
+export const getBasemapOverlaysLayersArray = async (layerType: string) => {
+  try {
+    // Directly await the Promise
+    let layers;
+    if (layerType === "basemaps") {
+      layers = await basemapLayers;
+    } else if (layerType === "overlays") {
+      layers = await overlays;
+    }
+
+    if (layers) {
+      const layerLen = layers.length;
+      let i;
+      let basemapArrays = [];
+
+      for (i = 0; i < layerLen; i++) {
+        let layerName = layers[i].name;
+        let displayName = layers[i].displayName;
+
+        let tileStyle = getTileStyle(displayName);
+
+        let theBasemapTile = new VectorTileLayer({
+          title: displayName,
+          type: "base",
+          visible: true,
+          preload: Infinity,
+          source: new VectorTileSource({
+            maxZoom: 18,
+            format: new MVT(),
+            url:
+              geoServerBaseUrl +
+              "/geoserver/gwc/service/tms/1.0.0/" +
+              layerName +
+              "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+          }),
+          style: tileStyle,
+        } as BaseLayerOptions);
+
+        basemapArrays.push(theBasemapTile);
+      }
+      return basemapArrays;
+    }
+  } catch (error) {
+    console.error("Failed to load basemapLayers:", error);
+    return null;
+  }
+};
