@@ -20,12 +20,19 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+<<<<<<< HEAD
 import {
   geoServerBaseUrl,
   getBasemapOverlaysLayersArray,
 } from "@/requests/requests";
 import "./CSS/LayerSwitcherStyles.css";
 import { Stroke, Fill, Style, Circle } from "ol/style";
+=======
+import FilterSection from "../filters/filtersection";
+
+
+
+>>>>>>> e495101 (adding filter component)
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [popoverContent, setPopoverContent] = React.useState<{ [x: string]: any }>({});
@@ -85,7 +92,11 @@ function Newmap() {
 
   const occurrenceGroup = new LayerGroup({
     title: "Occurrence",
+<<<<<<< HEAD
     layers: [occurrenceLayer],
+=======
+    layers: [siteLayer, occurrenceLayer],
+>>>>>>> e495101 (adding filter component)
   } as GroupLayerOptions);
 
   useEffect(() => {
@@ -172,9 +183,8 @@ function Newmap() {
         className="map-container"
         id="map-container"
       >
-      </div>
-
-
+            <FilterSection />
+      </div>    
 
       <Popover
         id={id}

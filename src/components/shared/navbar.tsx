@@ -19,6 +19,7 @@ const Navbar: React.FC = () => {
 
 
   return (
+    <div>
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" sx={{ bgcolor: 'white', margin: '0' }}>
         <Toolbar>
@@ -28,7 +29,7 @@ const Navbar: React.FC = () => {
                 <picture>
                   <img
                     src="/vector-atlas-logo.svg"
-                    style={{ maxHeight: '80px', cursor: 'pointer' }}
+                    style={{ maxHeight: '60px', cursor: 'pointer' }}
                     alt="Vector Atlas logo"
                   />
                 </picture>
@@ -43,7 +44,10 @@ const Navbar: React.FC = () => {
           </>
         </Toolbar>
       </AppBar>
-    </Box>);
+    </Box>
+    </div>
+    );
+    
 };
 
 export default Navbar;
