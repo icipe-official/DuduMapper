@@ -30,6 +30,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import FilterSection from "../filters/filtersection";
 
 
 
@@ -310,7 +311,7 @@ function Newmap() {
   } as GroupLayerOptions);
 
   const occurrenceGroup = new LayerGroup({
-    title: "Occurence",
+    title: "Occurrence",
     layers: [siteLayer, occurrenceLayer],
   } as GroupLayerOptions);
 
@@ -373,9 +374,8 @@ function Newmap() {
         className="map-container"
         id="map-container"
       >
-      </div>
-
-
+            <FilterSection />
+      </div>    
 
       <Popover
         id={id}
