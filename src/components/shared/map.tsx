@@ -72,6 +72,7 @@ function Newmap() {
     setAnchorEl(null);
   };
   mapRef.current = map;
+  const speciesName = 'arabiensis';
 
   const occurrenceSource = new VectorSource({
     format: new GeoJSON(),
@@ -79,9 +80,21 @@ function Newmap() {
       geoServerBaseUrl +
       "/geoserver/vector/ows?service=WFS&version=" +
       "1.0.0&request=GetFeature&typeName" +
-      "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson",
+      "=vector%3Aoccurrence&maxFeatures=1000&outputFormat=application%2Fjson" +
+      `&cql_filter=species='${encodeURIComponent(speciesName)}'`,
     strategy: bboxStrategy,
   });
+
+  // const occurrenceSource = new VectorSource({
+  //   format: new GeoJSON(),
+  //   url:
+  //     geoServerBaseUrl +
+  //     "/geoserver/vector/ows?service=WFS&version=" +
+  //     "1.0.0&request=GetFeature&typeName" +
+  //     "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson" +
+  //     `&cql_filter=species='${encodeURIComponent(speciesName)}'`,
+  //   strategy: bboxStrategy,
+  // });
 
   const fill = new Fill({
     color: "rgba(2,2,2,1)",
@@ -317,6 +330,7 @@ function Newmap() {
           </Accordion>
         </div>
       </Popover>
+      <FilterSection/>
     </>
   );
 }
