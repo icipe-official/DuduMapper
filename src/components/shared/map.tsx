@@ -12,25 +12,28 @@ import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import { Pixel } from "ol/pixel";
-import MapBrowserEvent from 'ol/MapBrowserEvent';
-import Event from 'ol/events/Event';
-import Popover from '@mui/material/Popover';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MapBrowserEvent from "ol/MapBrowserEvent";
+import Event from "ol/events/Event";
+import Popover from "@mui/material/Popover";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import Typography from "@mui/material/Typography";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   geoServerBaseUrl,
   getBasemapOverlaysLayersArray,
 } from "@/requests/requests";
 import "./CSS/LayerSwitcherStyles.css";
 import { Stroke, Fill, Style, Circle } from "ol/style";
+import FilterSection from "../filters/filtersection";
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const [popoverContent, setPopoverContent] = React.useState<{ [x: string]: any }>({});
+  const [popoverContent, setPopoverContent] = React.useState<{
+    [x: string]: any;
+  }>({});
   const open = Boolean(anchorEl);
-  const id = open ? 'feature-popover' : undefined;
+  const id = open ? "feature-popover" : undefined;
   const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
   const mapElement = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | undefined>(undefined);
@@ -60,10 +63,10 @@ function Newmap() {
   });
 
   const fill = new Fill({
-    color: 'rgba(2,2,2,1)',
+    color: "rgba(2,2,2,1)",
   });
   const stroke = new Stroke({
-    color: '#222',
+    color: "#222",
     width: 1.25,
   });
 
@@ -80,7 +83,7 @@ function Newmap() {
       }),
       fill: fill,
       stroke: stroke,
-    })
+    }),
   } as BaseLayerOptions);
 
   const occurrenceGroup = new LayerGroup({
@@ -89,8 +92,8 @@ function Newmap() {
   } as GroupLayerOptions);
 
   useEffect(() => {
-    getBasemapOverlaysLayersArray('basemaps').then((baseMapsArray) => {
-      getBasemapOverlaysLayersArray('overlays').then((overlaysArray) => {
+    getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
+      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
         const BaseMaps = new LayerGroup({
           title: "Base Maps",
           layers: baseMapsArray,
@@ -115,39 +118,42 @@ function Newmap() {
             initialMap.addControl(layerSwitcher);
 
             const handleMapClick = (event: any) => {
-              console.log("handle map click before checking if map is defined")
+              console.log("handle map click before checking if map is defined");
               // if (map) {
-              console.log("map defined")
-              initialMap.forEachFeatureAtPixel(event.pixel, (feature, layer) => {
-                if (layer === occurrenceLayer) {
-                  console.log("Point clicked")
-                  // Create a reference to the dummy HTML element for Popover anchor
-                  const dummyAnchor = document.createElement('div');
-                  dummyAnchor.style.position = 'absolute';
+              console.log("map defined");
+              initialMap.forEachFeatureAtPixel(
+                event.pixel,
+                (feature, layer) => {
+                  if (layer === occurrenceLayer) {
+                    console.log("Point clicked");
+                    // Create a reference to the dummy HTML element for Popover anchor
+                    const dummyAnchor = document.createElement("div");
+                    dummyAnchor.style.position = "absolute";
 
-                  // Position the dummy anchor based on the event's pixel
-                  // Here you would use the map container's ID or ref to position correctly
-                  dummyAnchor.style.left = `${event.pixel[0]}px`;
-                  dummyAnchor.style.top = `${event.pixel[1]}px`;
+                    // Position the dummy anchor based on the event's pixel
+                    // Here you would use the map container's ID or ref to position correctly
+                    dummyAnchor.style.left = `${event.pixel[0]}px`;
+                    dummyAnchor.style.top = `${event.pixel[1]}px`;
 
-                  // Append the dummy anchor to the map element
-                  // Assuming mapElement.current is the container of the map
-                  if (mapElement.current) {
-                    mapElement.current.appendChild(dummyAnchor);
+                    // Append the dummy anchor to the map element
+                    // Assuming mapElement.current is the container of the map
+                    if (mapElement.current) {
+                      mapElement.current.appendChild(dummyAnchor);
+                    }
+
+                    // Set the state for Popover content and anchor
+                    setPopoverContent(feature.getProperties());
+                    setAnchorEl(dummyAnchor);
+
+                    // Return true to stop the forEach loop if needed
+                    return true;
                   }
-
-                  // Set the state for Popover content and anchor
-                  setPopoverContent(feature.getProperties());
-                  setAnchorEl(dummyAnchor);
-
-                  // Return true to stop the forEach loop if needed
-                  return true;
                 }
-              });
+              );
               // }
             };
 
-            initialMap.on('singleclick', handleMapClick);
+            initialMap.on("singleclick", handleMapClick);
 
             setMap(initialMap);
           }
@@ -155,15 +161,16 @@ function Newmap() {
       });
     });
 
-
-
-
     const layerSwitcher = new LayerSwitcher();
     if (map) {
       map.addControl(layerSwitcher);
     }
   }, []);
 
+  const parentContainerStyle = {
+    maxWidth: "800px", // Adjust as needed or remove for full-width responsiveness
+    margin: "0 auto", // Center the container on the page
+  };
   return (
     <>
       <div
@@ -172,63 +179,72 @@ function Newmap() {
         className="map-container"
         id="map-container"
       >
+        <div style={parentContainerStyle}>
+          <FilterSection />
+        </div>
       </div>
-
-
 
       <Popover
         id={id}
         open={open}
         anchorEl={anchorEl}
         onClose={handleClosePopover}
-      // ... other props
+        // ... other props
       >
-
         <div>
-          <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
+          <Accordion
+            expanded={expanded === "panel1"}
+            onChange={handleChange("panel1")}
+          >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1bh-content"
               id="panel1bh-header"
             >
-              <Typography sx={{ width: '33%', flexShrink: 0 }}>
+              <Typography sx={{ width: "33%", flexShrink: 0 }}>
                 Species
               </Typography>
-              <Typography sx={{ color: 'text.secondary' }}>Mosquito species details</Typography>
+              <Typography sx={{ color: "text.secondary" }}>
+                Mosquito species details
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>
-                {popoverContent?.notes}
-              </Typography>
+              <Typography>{popoverContent?.notes}</Typography>
             </AccordionDetails>
           </Accordion>
-          <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+          <Accordion
+            expanded={expanded === "panel2"}
+            onChange={handleChange("panel2")}
+          >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel2bh-content"
               id="panel2bh-header"
             >
-              <Typography sx={{ width: '33%', flexShrink: 0 }}>Bionomics</Typography>
-              <Typography sx={{ color: 'text.secondary' }}>
+              <Typography sx={{ width: "33%", flexShrink: 0 }}>
+                Bionomics
+              </Typography>
+              <Typography sx={{ color: "text.secondary" }}>
                 Ecological characteristics of species
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>
-                {popoverContent?.notes}
-              </Typography>
+              <Typography>{popoverContent?.notes}</Typography>
             </AccordionDetails>
           </Accordion>
-          <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+          <Accordion
+            expanded={expanded === "panel3"}
+            onChange={handleChange("panel3")}
+          >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel3bh-content"
               id="panel3bh-header"
             >
-              <Typography sx={{ width: '33%', flexShrink: 0 }}>
+              <Typography sx={{ width: "33%", flexShrink: 0 }}>
                 Site/Environment
               </Typography>
-              <Typography sx={{ color: 'text.secondary' }}>
+              <Typography sx={{ color: "text.secondary" }}>
                 Geographical and environmental data
               </Typography>
             </AccordionSummary>
@@ -237,7 +253,8 @@ function Newmap() {
                 {popoverContent.geometry ? (
                   <>
                     Location: {popoverContent.geometry.layout}
-                    Coordinates: {popoverContent.geometry.flatCoordinates.join(', ')}
+                    Coordinates:{" "}
+                    {popoverContent.geometry.flatCoordinates.join(", ")}
                   </>
                 ) : (
                   <span>Loading or no data available...</span>
@@ -245,13 +262,16 @@ function Newmap() {
               </Typography>
             </AccordionDetails>
           </Accordion>
-          <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')}>
+          <Accordion
+            expanded={expanded === "panel4"}
+            onChange={handleChange("panel4")}
+          >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel4bh-content"
               id="panel4bh-header"
             >
-              <Typography sx={{ width: '33%', flexShrink: 0 }}>
+              <Typography sx={{ width: "33%", flexShrink: 0 }}>
                 Period
               </Typography>
             </AccordionSummary>
