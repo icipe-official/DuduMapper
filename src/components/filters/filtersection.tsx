@@ -78,7 +78,7 @@ const FilterSection = () => {
 
   const formControlStyle = {
     marginBottom: "5px",
-    minWidth: "80%",
+    minWidth: "200px",
     minHeight: "5px",
     fontSize: "0.1rem",
     padding: "0.3px",
@@ -89,11 +89,10 @@ const FilterSection = () => {
     borderRadius: "3px",
     padding: "15px",
     display: "flex",
-    // flexDirection: 'column',
     alignItems: "center",
     border: "1px solid #ccc",
     margin: "0 auto",
-    maxWidth: "400px",
+    maxWidth: "380px",
   };
   const buttonContainerStyle = {
     marginTop: "35px",
@@ -125,7 +124,7 @@ const FilterSection = () => {
     <div
       style={{
         position: "absolute",
-        top: "135px",
+        top: "130px",
         left: "50%",
         alignItems: "center",
         transform: "translateX(-50%)",
@@ -136,8 +135,8 @@ const FilterSection = () => {
         <IconButton
           onClick={() => setOpen(!open)}
           sx={{
-            width: 24,
-            height: 24,
+            width: 26,
+            height: 26,
             backgroundColor: "#4CAF50", // Background color when the button is not hovered or active
             color: "white", // Text color when the button is not hovered or active
             "&:hover": {
@@ -154,65 +153,83 @@ const FilterSection = () => {
 
       <Collapse in={open}>
         <Box style={containerStyle}>
-          <Grid container spacing={1} style={{ marginTop: "10px" }}>
-            <Grid item xs={12} sm={4}>
-              <FormControl style={{ ...formControlStyle, marginRight: "10px" }}>
-                <InputLabel
-                  id="disease-label"
-                  sx={{ fontSize: "0.8rem", display: "flex" }}
+          <Grid
+            container
+            spacing={1}
+            style={{ marginTop: "10px", display: "flex" }}
+          >
+            <Grid>
+              <Grid item xs={12} sm={4}>
+                <FormControl
+                  style={{ ...formControlStyle, marginRight: "10px" }}
                 >
-                  {isDiseaseSelected ? "" : "Disease"}
-                </InputLabel>
-                <Select
-                  labelId="disease-label"
-                  id="disease-select"
-                  onChange={handleDiseaseChange}
-                  multiple
-                  value={selectedDisease}
-                  sx={{ maxWidth: "90%", shrink: "true" }}
-
-                  // renderValue={(selected) => (selected as string[]).join(", ")}
+                  <InputLabel
+                    id="disease-label"
+                    sx={{
+                      fontSize: "0.8rem",
+                      display: "flex",
+                      // lineHeight: 0.2,
+                    }}
+                  >
+                    {isDiseaseSelected ? "" : "Disease"}
+                  </InputLabel>
+                  <Select
+                    labelId="disease-label"
+                    id="disease-select"
+                    onChange={handleDiseaseChange}
+                    multiple
+                    value={selectedDisease}
+                    sx={{ maxWidth: "380px", shrink: "true" }}
+                  >
+                    <MenuItem value="disease1">Malaria</MenuItem>
+                    <MenuItem value="disease2">Chikungunya</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <FormControl
+                  style={{ ...formControlStyle, marginRight: "10px" }}
                 >
-                  <MenuItem value="disease1">Malaria</MenuItem>
-                  <MenuItem value="disease2">Chikungunya</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <FormControl style={{ ...formControlStyle, marginRight: "10px" }}>
-                <InputLabel id="country-label" sx={{ fontSize: "0.8rem" }}>
-                  {isCountrySelected ? "" : "Country"}
-                </InputLabel>
-                <Select
-                  labelId="country-label"
-                  id="country-select"
-                  value={selectedCountry}
-                  multiple
-                  onChange={handleCountryChange}
-                  sx={{ maxWidth: "90%", shrink: "true" }}
-                >
-                  <MenuItem value="country1">Kenya</MenuItem>
-                  <MenuItem value="country2">Uganda</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <FormControl style={formControlStyle}>
-                <InputLabel id="species-label" sx={{ fontSize: "0.8rem" }}>
-                  {isSpeciesSelected ? "" : "Species"}
-                </InputLabel>
-                <Select
-                  labelId="species-label"
-                  id="species-select"
-                  onChange={handleSpeciesChange}
-                  multiple
-                  value={selectedSpecies}
-                  sx={{ maxWidth: "90%", shrink: "true" }}
-                >
-                  <MenuItem value="species1">An. gambiae</MenuItem>
-                  <MenuItem value="species2">An. fenestus</MenuItem>
-                </Select>
-              </FormControl>
+                  <InputLabel id="country-label" sx={{ fontSize: "0.8rem" }}>
+                    {isCountrySelected ? "" : "Country"}
+                  </InputLabel>
+                  <Select
+                    labelId="country-label"
+                    id="country-select"
+                    value={selectedCountry}
+                    multiple
+                    onChange={handleCountryChange}
+                    sx={{ maxWidth: "380px", shrink: "true" }}
+                  >
+                    <MenuItem value="country1">Kenya</MenuItem>
+                    <MenuItem value="country2">Uganda</MenuItem>
+                    <MenuItem value="country3">Nigeria</MenuItem>
+                    <MenuItem value="country4">Botswana</MenuItem>
+                    <MenuItem value="country5">Cameroon</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <FormControl style={formControlStyle}>
+                  <InputLabel id="species-label" sx={{ fontSize: "0.8rem" }}>
+                    {isSpeciesSelected ? "" : "Species"}
+                  </InputLabel>
+                  <Select
+                    labelId="species-label"
+                    id="species-select"
+                    onChange={handleSpeciesChange}
+                    multiple
+                    value={selectedSpecies}
+                    sx={{ maxWidth: "380px", shrink: "true" }}
+                  >
+                    <MenuItem value="species1">An. gambiae</MenuItem>
+                    <MenuItem value="species2">An. fenestus</MenuItem>
+                    <MenuItem value="species3">An. arabiensis</MenuItem>
+                    <MenuItem value="species4">An. coluzzi</MenuItem>
+                    <MenuItem value="species5">An. coustani</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
             </Grid>
             <Grid
               container
@@ -224,7 +241,7 @@ const FilterSection = () => {
               <Grid
                 item
                 xs={12}
-                sm={6}
+                sm={4}
                 sx={{
                   display: "flex",
                   flexDirection: "row",
@@ -467,7 +484,7 @@ const FilterSection = () => {
                 </Tooltip>
               </Grid>
             </Grid>
-            <div style={buttonContainerStyle}>
+            {/* <div style={buttonContainerStyle}>
               <Button
                 variant="contained"
                 sx={{
@@ -482,7 +499,7 @@ const FilterSection = () => {
               >
                 Apply
               </Button>
-            </div>
+            </div> */}
             <div style={buttonContainerStyle}>
               <Button
                 variant="contained"
