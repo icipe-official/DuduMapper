@@ -90,28 +90,22 @@ const FilterSection = () => {
     padding: "15px",
     display: "flex",
     // flexDirection: 'column',
-    alignItems: "center",
-    border: "1px solid #ccc",
-    margin: "0 auto",
-    maxWidth: "400px",
+    // alignItems: "center",
+    // border: "1px solid #ccc",
+    // margin: "0 auto",
+    //  maxWidth: "980px",
+    width: 500,
+    marginLeft: 350,
+    position: "absolute",
+    top: -25,
   };
   const buttonContainerStyle = {
     marginTop: "35px",
     // display: 'flex',
     // justifyContent: 'center',
     // alignItems: 'center',
+    width: "auto",
     margin: "0 auto",
-  };
-
-  const buttonStyle = {
-    width: "10%",
-    height: "10%",
-    size: "small",
-    marginBottom: "10px",
-    marginLeft: "5px",
-    marginRight: "1px",
-    paddingRight: "10px",
-    fontSize: "0.5rem",
   };
 
   const renderMultipleSelection = (selected: string | string[]) => {
@@ -125,10 +119,10 @@ const FilterSection = () => {
     <div
       style={{
         position: "absolute",
-        top: "135px",
-        left: "50%",
+        top: "180px",
+        left: "20px",
         alignItems: "center",
-        transform: "translateX(-50%)",
+        transform: "translateX(0%)",
         zIndex: 1000,
       }}
     >
