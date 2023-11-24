@@ -6,7 +6,7 @@
   margin-top: 20px;
   position: absolute; /* Position the LayerSwitcher absolutely */
   top: 20; /* Align it to the top of the screen */
-  left: 60px; /* Align it to the left side of the screen */
+  left: 10px; /* Align it to the left side of the screen */
   z-index: 1000; /* Adjust the z-index to ensure it's above other content */
   width: 320px;
 
@@ -98,12 +98,17 @@ button {
   cursor: pointer;
   box-shadow: 1px 1px 1px #038543 !important;
 }
+.ol-touch .ol-control button {
+  font-size: 1.5em;
+  background-color: transparent !important;
+}
 
 .ol-control button {
   display: block;
   margin: 1px;
   padding: 0;
   color: #fff !important;
+  background-color: transparent !important;
   font-weight: 700;
   text-decoration: none;
   font-size: inherit;
@@ -111,18 +116,38 @@ button {
   height: 1.375em !important;
   width: 1.375em !important;
   line-height: 0.4em;
-  background-color: #ebbd40 !important;
   border: none;
   border-radius: 2px;
 }
 
-.ol-zoom {
-  top: 0.5em;
+.ol-zoom .ol-zoom-out {
+  border-radius: 2px 2px 0 0;
+  background-color: #ebbd40 !important;
+}
+
+.ol-zoom .ol-zoom-in {
+  border-radius: 2px 2px 0 0;
+  background-color: #ebbd40 !important;
+}
+
+.ol-layerswitcher .expend-layers,
+.ol-layerswitcher .collapse-layers {
+  margin: 0 2px;
+  background-color: transparent;
+}
+
+.ol-layerswitcher .expend-layers:after .expend-layers:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  margin-left: -2px;
+  width: 1px !important;
+  height: 100%;
 }
 
 .ol-layerswitcher-image > button,
 .ol-layerswitcher > button {
-  background-color: #ebbd40 !important;
   float: left !important;
   z-index: 10;
   position: relative;
@@ -131,10 +156,43 @@ button {
 .ol-layerswitcher .layerup {
   float: right;
   height: 2.5em;
-  background-color: #ebbd40 !important;
+  background-color: #b8dfcc !important;
   opacity: 0.5;
   cursor: move;
   cursor: ns-resize;
+}
+.ol-layerswitcher.ol-forceopen .panel-container {
+  display: block;
+  margin-left: 30px;
+}
+.ol-layerswitcher .panel {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  font-family: Tahoma, Geneva, sans-serif;
+  font-size: 0.9em;
+  -webkit-transition: top 0.3s;
+  transition: top 0.3s;
+  position: relative;
+  top: 0;
+  background-color: whitesmoke;
+  border: 1px solid #038543;
+  border-radius: 5px;
+  padding: 2px;
+}
+
+.ol-layerswitcher .layerup:before,
+.ol-layerswitcher .layerup:after {
+  border-color: #ebbd40 #fff !important;
+  border-style: solid;
+  border-width: 0.4em 0.4em 0;
+  content: "";
+  height: 0;
+  position: absolute;
+  bottom: 3px;
+  left: 0.1em;
+  width: 0;
 }
 
 .ol-layerswitcher-image > button:after,
