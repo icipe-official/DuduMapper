@@ -12,17 +12,6 @@ import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import { Pixel } from "ol/pixel";
-<<<<<<< HEAD
-import MapBrowserEvent from 'ol/MapBrowserEvent';
-import Event from 'ol/events/Event';
-import Popover from '@mui/material/Popover';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-<<<<<<< HEAD
-=======
 import MapBrowserEvent from "ol/MapBrowserEvent";
 import Event from "ol/events/Event";
 import Popover from "@mui/material/Popover";
@@ -31,25 +20,13 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
->>>>>>> 5045140 (added changes to styling)
 import {
   geoServerBaseUrl,
   getBasemapOverlaysLayersArray,
 } from "@/requests/requests";
 import "./CSS/LayerSwitcherStyles.css";
 import { Stroke, Fill, Style, Circle } from "ol/style";
-<<<<<<< HEAD
-=======
 import FilterSection from "../filters/filtersection";
-<<<<<<< HEAD
-
-
-
->>>>>>> e495101 (adding filter component)
-=======
-import FilterSection from "../filters/filtersection";
->>>>>>> 5045140 (added changes to styling)
-=======
 import {
   FormControl,
   InputLabel,
@@ -77,7 +54,6 @@ import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
 import { Geometry } from "ol/geom";
 
->>>>>>> 28960c2 (filter style)
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [popoverContent, setPopoverContent] = React.useState<{
@@ -300,21 +276,10 @@ function Newmap() {
   //   }),
   // } as BaseLayerOptions);
 
-<<<<<<< HEAD
-  const occurrenceGroup = new LayerGroup({
-    title: "Occurrence",
-<<<<<<< HEAD
-    layers: [occurrenceLayer],
-=======
-    layers: [siteLayer, occurrenceLayer],
->>>>>>> e495101 (adding filter component)
-  } as GroupLayerOptions);
-=======
   // const occurrenceGroup = new LayerGroup({
   //   title: "Occurrence",
   //   layers: [occurrenceLayer],
   // } as GroupLayerOptions);
->>>>>>> 15072f9 (url creation)
 
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
@@ -404,19 +369,10 @@ function Newmap() {
         className="map-container"
         id="map-container"
       >
-<<<<<<< HEAD
-<<<<<<< HEAD
-            <FilterSection />
-      </div>    
-=======
-        <div style={parentContainerStyle}>
-=======
         {/* <div style={parentContainerStyle}>
->>>>>>> 15072f9 (url creation)
           <FilterSection />
         </div> */}
       </div>
->>>>>>> 5045140 (added changes to styling)
 
       <div
       style={{
