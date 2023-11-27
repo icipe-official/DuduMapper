@@ -1,0 +1,37 @@
+
+/* Custom Accordion Header Style */
+.MuiAccordionSummary-root {
+  background-color: #FDD835; 
+  color: #43A047; 
+}
+
+/* Custom Accordion Details Style */
+.MuiAccordionDetails-root {
+  background-color: #FFF9C4; 
+  color: #1B5E20; 
+}
+
+
+
+/* Remove the divider from all accordion items */
+.MuiAccordion-root:before {
+  content: none !important;
+}
+
+/* Ensure that no margins are causing space between accordion items */
+.MuiAccordion-root {
+  margin: 0 !important;
+  box-shadow: none !important; /* Remove if you don't want any shadow */
+}
+
+
+/* Remove the box-shadow from the paper component if it is causing any spacing */
+.MuiPaper-elevation1 {
+  box-shadow: none !important;
+}
+
+/* Adjust spacing for expanded state if necessary */
+.MuiAccordion-root.Mui-expanded {
+  margin: 0 !important;
+}
+

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Popover from '@mui/material/Popover';
 import Accordion from '@mui/material/Accordion';
@@ -7,7 +6,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
-
+import './accordion-style.css'
 interface MapPopoverProps {
   id: string | undefined;
   open: boolean;
@@ -62,14 +61,14 @@ const OccurrencePopup: React.FC<MapPopoverProps> = ({
             aria-controls="panel1bh-content"
             id="panel1bh-header"
           >
-            <Typography sx={{ width: '33%', flexShrink: 0, ...textStyle }}>
+            <Typography sx={{ width: '33%', flexShrink: 0, }}>
               Occurrence
             </Typography>
-            <Typography sx={{ color: 'text.secondary', ...textStyle }}>Occurence details</Typography>
+            <Typography sx={{ color: 'text.secondary', }}></Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography>
-              {popoverContent?.notes}
+              Species name: {popoverContent?.species}
             </Typography>
           </AccordionDetails>
         </Accordion>
@@ -79,15 +78,13 @@ const OccurrencePopup: React.FC<MapPopoverProps> = ({
             aria-controls="panel2bh-content"
             id="panel2bh-header"
           >
-            <Typography sx={{ width: '33%', flexShrink: 0 }}>species</Typography>
-            <Typography sx={{ color: 'text.secondary' }}>
-              Species information            </Typography>
+            <Typography sx={{ width: '33%', flexShrink: 0 }}>Bionomics</Typography>
+            <Typography sx={{ color: 'text.secondary' }}></Typography>
           </AccordionSummary>
-          {/* <AccordionDetails> */}
-          <Typography>
-            Species name: {popoverContent?.species}
-          </Typography>
-          {/* </AccordionDetails> */}
+          <AccordionDetails>
+            <Typography>
+            </Typography>
+          </AccordionDetails>
         </Accordion>
         <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
           <AccordionSummary
@@ -96,22 +93,12 @@ const OccurrencePopup: React.FC<MapPopoverProps> = ({
             id="panel3bh-header"
           >
             <Typography sx={{ width: '33%', flexShrink: 0 }}>
-              Site/Environment
+              Insecticide Resistance
             </Typography>
-            <Typography sx={{ color: 'text.secondary' }}>
-              Geographical and environmental data
-            </Typography>
+            <Typography sx={{ color: 'text.secondary' }}></Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography>
-              {popoverContent.geometry ? (
-                <>
-                  Location: {popoverContent.geometry.layout}
-                  Coordinates: {popoverContent.geometry.flatCoordinates.join(', ')}
-                </>
-              ) : (
-                <span>Loading or no data available...</span>
-              )}
             </Typography>
           </AccordionDetails>
         </Accordion>
@@ -125,64 +112,103 @@ const OccurrencePopup: React.FC<MapPopoverProps> = ({
               handleChange('panel4.1'); // Manually trigger handleChange
             }}
           >
-            <Typography sx={{ width: '33%', flexShrink: 0 }}>Bionomics</Typography>
-            <Typography sx={{ color: 'text.secondary' }}>Bionomics information</Typography>
+            <Typography sx={{ width: '33%', flexShrink: 0 }}>Environment</Typography>
+            <Typography sx={{ color: 'text.secondary' }}></Typography>
           </AccordionSummary>
           <AccordionDetails>
             <div>
-              {/* Collapsible List for Biting Peak */}
-              <div className="collapsible">
-                <Typography
-                  sx={{ cursor: 'pointer' }}
-                  onClick={toggleBitingPeak}
-                >
-                  {isBitingPeakVisible ? '▼ ' : '► '}Biting peak
-                </Typography>
-                {isBitingPeakVisible && (
-                  <div className="content">
-                    <Typography>
-                      Biting peak details: {popoverContent?.bitingPeak}
-                    </Typography>
-                    {/* Add more details as needed */}
-                  </div>
-                )}
-              </div>
-              {/* Collapsible List for Bioessays */}
-              <div className="collapsible">
-                <Typography
-                  sx={{ cursor: 'pointer' }}
-                  onClick={toggleBioessays}
-                >
-                  {isBioessaysVisible ? '▼ ' : '► '} Bioessays
-                </Typography>
-                {isBioessaysVisible && (
-                  <div className="content">
-                    <Typography>
-                      Details about Bioessays {/* Add relevant content */}
-                    </Typography>
-                    {/* Add more details as needed */}
-                  </div>
-                )}
-              </div>
+              {/* {/* Collapsible List for Biting Peak */} */}
+              {/* <div className="collapsible"> */}
+              {/*   <Typography */}
+              {/*     sx={{ cursor: 'pointer' }} */}
+              {/*     onClick={toggleBitingPeak} */}
+              {/*   > */}
+              {/*     {isBitingPeakVisible ? '▼ ' : '► '}Biting peak */}
+              {/*   </Typography> */}
+              {/*   {isBitingPeakVisible && ( */}
+              {/*     <div className="content"> */}
+              {/*       <Typography> */}
+              {/*         Biting peak details: {popoverContent?.bitingPeak} */}
+              {/*       </Typography> */}
+              {/*       {/* Add more details as needed */} */}
+              {/*     </div> */}
+              {/*   )} */}
+              {/* </div> */}
+              {/* {/* Collapsible List for Bioessays */} */}
+              {/* <div className="collapsible"> */}
+              {/*   <Typography */}
+              {/*     sx={{ cursor: 'pointer' }} */}
+              {/*     onClick={toggleBioessays} */}
+              {/*   > */}
+              {/*     {isBioessaysVisible ? '▼ ' : '► '} Bioessays */}
+              {/*   </Typography> */}
+              {/*   {isBioessaysVisible && ( */}
+              {/*     <div className="content"> */}
+              {/*       <Typography> */}
+              {/*         Details about Bioessays {/* Add relevant content */} */}
+              {/*       </Typography> */}
+              {/*       {/* Add more details as needed */} */}
+              {/*     </div> */}
+              {/*   )} */}
+              {/* </div> */}
+              {/**/}
+              {/* {/* Collapsible List for Genetic Mechanisms */} */}
+              {/* <div className="collapsible"> */}
+              {/*   <Typography */}
+              {/*     sx={{ cursor: 'pointer' }} */}
+              {/*     onClick={toggleGeneticMechanisms} */}
+              {/*   > */}
+              {/*     {isGeneticMechanismsVisible ? '▼ ' : '► '} Genetic Mechanisms */}
+              {/*   </Typography> */}
+              {/*   {isGeneticMechanismsVisible && ( */}
+              {/*     <div className="content"> */}
+              {/*       <Typography> */}
+              {/*         Details about Genetic mechanisms {/* Add relevant content */} */}
+              {/*       </Typography> */}
+              {/*       {/* Add more details as needed */} */}
+              {/*     </div> */}
+              {/*   )} */}
+              {/* </div> */}
 
-              {/* Collapsible List for Genetic Mechanisms */}
-              <div className="collapsible">
-                <Typography
-                  sx={{ cursor: 'pointer' }}
-                  onClick={toggleGeneticMechanisms}
-                >
-                  {isGeneticMechanismsVisible ? '▼ ' : '► '} Genetic Mechanisms
-                </Typography>
-                {isGeneticMechanismsVisible && (
-                  <div className="content">
-                    <Typography>
-                      Details about Genetic mechanisms {/* Add relevant content */}
-                    </Typography>
-                    {/* Add more details as needed */}
-                  </div>
-                )}
-              </div>
+              {/* Basic Geographical Details */}
+
+              {/* Nested Accordion for Geographical Information */}
+              <Accordion expanded={expanded === 'geoInfo'} onChange={handleChange('geoInfo')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} id="geoInfo-header">
+                  <Typography>Geographical Information</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {/* Content for Geographical Information */}
+                </AccordionDetails>
+              </Accordion>
+
+              {/* Nested Accordion for Ecological Context */}
+              <Accordion expanded={expanded === 'ecoContext'} onChange={handleChange('ecoContext')}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} id="ecoContext-header">
+                  <Typography>Ecological Context</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {/* Content for Ecological Context */}
+                </AccordionDetails>
+              </Accordion>
+
+
+              {/* Land Use Information */}
+              <Typography variant="h6" sx={{ mt: 2 }}>Land Use</Typography>
+              <Typography>Land Use Type: {/* Data Here */}</Typography>
+              <Typography>Management Area: {/* Data Here */}</Typography>
+
+              {/* Climate Details */}
+              <Typography variant="h6" sx={{ mt: 2 }}>Climate Details</Typography>
+              <Typography>Temperature: {/* Data Here */}</Typography>
+              <Typography>Precipitation: {/* Data Here */}</Typography>
+              <Typography>Humidity: {/* Data Here */}</Typography>
+
+              {/* Additional Environmental Factors */}
+              <Typography variant="h6" sx={{ mt: 2 }}>Additional Factors</Typography>
+              {/* Add additional environmental factors as needed */}
             </div>
+
           </AccordionDetails>
         </Accordion>
 

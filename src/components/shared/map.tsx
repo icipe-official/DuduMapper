@@ -40,6 +40,7 @@ function Newmap() {
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpanded(isExpanded ? panel : false);
+      event.stopPropagation(); // Stop the click event from reaching the parent accordion
     };
 
   const handleClosePopover = () => {
