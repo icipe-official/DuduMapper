@@ -115,24 +115,29 @@ function Newmap() {
             const layerSwitcher = new LayerSwitcher();
             initialMap.addControl(layerSwitcher);
 
+
             const handleMapClick = (event: any) => {
               console.log("handle map click before checking if map is defined")
+
               // if (map) {
               console.log("map defined")
               initialMap.forEachFeatureAtPixel(event.pixel, (feature, layer) => {
                 if (layer === occurrenceLayer) {
                   console.log("Point clicked")
+
                   // Create a reference to the dummy HTML element for Popover anchor
                   const dummyAnchor = document.createElement('div');
                   dummyAnchor.style.position = 'absolute';
 
-                  // Position the dummy anchor based on the event's pixel
-                  // Here you would use the map container's ID or ref to position correctly
-                  dummyAnchor.style.left = `${event.pixel[0]}px`;
-                  dummyAnchor.style.top = `${event.pixel[1]}px`;
+                  // Adjust the position of the dummy anchor to be on the right side and vertically centered
+                  // You need to know the width of the map container, assuming it's available in mapContainerWidth
+                  const mapContainerWidth = mapElement.current ? mapElement.current.offsetWidth : 0;
+                  const verticalCenter = mapElement.current ? mapElement.current.offsetHeight / 2 : 0;
+
+                  dummyAnchor.style.left = `${mapContainerWidth - dummyAnchor.offsetWidth}px`;
+                  dummyAnchor.style.top = `${verticalCenter - dummyAnchor.offsetHeight / 2}px`;
 
                   // Append the dummy anchor to the map element
-                  // Assuming mapElement.current is the container of the map
                   if (mapElement.current) {
                     mapElement.current.appendChild(dummyAnchor);
                   }
@@ -147,6 +152,7 @@ function Newmap() {
               });
               // }
             };
+
 
             initialMap.on('singleclick', handleMapClick);
 
