@@ -15,6 +15,9 @@ export const formControlStyle = {
     display: "flex",
     // flexDirection: 'column',
     alignItems: "center",
+    border: "1px solid #ccc",
+    margin: "0 auto",
+    maxWidth: "400px",
   };
 
   export const buttonContainerStyle = {
