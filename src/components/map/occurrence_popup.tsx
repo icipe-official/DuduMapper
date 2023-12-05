@@ -7,6 +7,8 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
 import './accordion-style.css'
+import { CSSProperties } from 'react';
+
 interface MapPopoverProps {
   id: string | undefined;
   open: boolean;
@@ -30,6 +32,10 @@ const textStyle = {
   padding: '8px', // Optional, for better spacing
 };
 
+const scrollableStyle: CSSProperties = {
+  maxHeight: '400px', // Adjust the height as needed
+  overflowY: 'auto'  // Enable vertical scrolling
+};
 const OccurrencePopup: React.FC<MapPopoverProps> = ({
   id,
   open,
@@ -54,7 +60,7 @@ const OccurrencePopup: React.FC<MapPopoverProps> = ({
       anchorEl={anchorEl}
       onClose={handleClose}
       style={popoverStyle}     >
-      <div>
+      <div style={scrollableStyle}>
         <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
@@ -83,6 +89,63 @@ const OccurrencePopup: React.FC<MapPopoverProps> = ({
           </AccordionSummary>
           <AccordionDetails>
             <Typography>
+              <div>
+                {/* Collapsible List for Biting Peak */}
+                <div className="collapsible">
+                  <Typography
+                    sx={{ cursor: 'pointer' }}
+                    onClick={toggleBitingPeak}
+                  >
+                    {isBitingPeakVisible ? '▼ ' : '► '}Biting peak
+                  </Typography>
+                  {isBitingPeakVisible && (
+                    <div className="content">
+                      <Typography>
+                        Biting peak details: {popoverContent?.bitingPeak}
+                      </Typography>
+                      {/* Add more details as needed */}
+                    </div>
+                  )}
+                </div>
+                {/* Collapsible List for Bioessays */}
+                <div className="collapsible">
+                  <Typography
+                    sx={{ cursor: 'pointer' }}
+                    onClick={toggleBioessays}
+                  >
+                    {isBioessaysVisible ? '▼ ' : '► '} Bioessays
+                  </Typography>
+                  {isBioessaysVisible && (
+                    <div className="content">
+                      <Typography>
+                        Details about Bioessays {/* Add relevant content */}
+                      </Typography>
+                      {/* Add more details as needed */}
+                    </div>
+                  )}
+                </div>
+
+                {/* Collapsible List for Genetic Mechanisms */}
+                <div className="collapsible">
+                  <Typography
+                    sx={{ cursor: 'pointer' }}
+                    onClick={toggleGeneticMechanisms}
+                  >
+                    {isGeneticMechanismsVisible ? '▼ ' : '► '} Genetic Mechanisms
+                  </Typography>
+                  {isGeneticMechanismsVisible && (
+                    <div className="content">
+                      <Typography>
+                        Details about Genetic mechanisms {/* Add relevant content */}
+                      </Typography>
+                      {/* Add more details as needed */}
+                    </div>
+                  )}
+                </div>
+
+                {/* Basic Geographical Details */}
+
+              </div>
             </Typography>
           </AccordionDetails>
         </Accordion>
@@ -117,97 +180,32 @@ const OccurrencePopup: React.FC<MapPopoverProps> = ({
           </AccordionSummary>
           <AccordionDetails>
             <div>
-              {/* {/* Collapsible List for Biting Peak */} */}
-              {/* <div className="collapsible"> */}
-              {/*   <Typography */}
-              {/*     sx={{ cursor: 'pointer' }} */}
-              {/*     onClick={toggleBitingPeak} */}
-              {/*   > */}
-              {/*     {isBitingPeakVisible ? '▼ ' : '► '}Biting peak */}
-              {/*   </Typography> */}
-              {/*   {isBitingPeakVisible && ( */}
-              {/*     <div className="content"> */}
-              {/*       <Typography> */}
-              {/*         Biting peak details: {popoverContent?.bitingPeak} */}
-              {/*       </Typography> */}
-              {/*       {/* Add more details as needed */} */}
-              {/*     </div> */}
-              {/*   )} */}
-              {/* </div> */}
-              {/* {/* Collapsible List for Bioessays */} */}
-              {/* <div className="collapsible"> */}
-              {/*   <Typography */}
-              {/*     sx={{ cursor: 'pointer' }} */}
-              {/*     onClick={toggleBioessays} */}
-              {/*   > */}
-              {/*     {isBioessaysVisible ? '▼ ' : '► '} Bioessays */}
-              {/*   </Typography> */}
-              {/*   {isBioessaysVisible && ( */}
-              {/*     <div className="content"> */}
-              {/*       <Typography> */}
-              {/*         Details about Bioessays {/* Add relevant content */} */}
-              {/*       </Typography> */}
-              {/*       {/* Add more details as needed */} */}
-              {/*     </div> */}
-              {/*   )} */}
-              {/* </div> */}
-              {/**/}
-              {/* {/* Collapsible List for Genetic Mechanisms */} */}
-              {/* <div className="collapsible"> */}
-              {/*   <Typography */}
-              {/*     sx={{ cursor: 'pointer' }} */}
-              {/*     onClick={toggleGeneticMechanisms} */}
-              {/*   > */}
-              {/*     {isGeneticMechanismsVisible ? '▼ ' : '► '} Genetic Mechanisms */}
-              {/*   </Typography> */}
-              {/*   {isGeneticMechanismsVisible && ( */}
-              {/*     <div className="content"> */}
-              {/*       <Typography> */}
-              {/*         Details about Genetic mechanisms {/* Add relevant content */} */}
-              {/*       </Typography> */}
-              {/*       {/* Add more details as needed */} */}
-              {/*     </div> */}
-              {/*   )} */}
-              {/* </div> */}
+              <Typography variant="h6">Natural Surroundings</Typography>
+              <Typography>Forest: {/* Data Here */}</Typography>
+              <Typography>Farming: {/* Data Here */}</Typography>
+              <Typography>Livestock: {/* Data Here */}</Typography>
+              <Typography>Local Plants: {/* Data Here */}</Typography>
 
-              {/* Basic Geographical Details */}
+              <Typography variant="h6" sx={{ mt: 2 }}>Community and Occupation</Typography>
+              <Typography>Common Occupations: {/* Data Here */}</Typography>
+              <Typography>Community Notes: {/* Data Here */}</Typography>
 
-              {/* Nested Accordion for Geographical Information */}
-              <Accordion expanded={expanded === 'geoInfo'} onChange={handleChange('geoInfo')}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />} id="geoInfo-header">
-                  <Typography>Geographical Information</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  {/* Content for Geographical Information */}
-                </AccordionDetails>
-              </Accordion>
+              <Typography variant="h6" sx={{ mt: 2 }}>Daily Activities</Typography>
+              <Typography>Leave Home Time: {/* Data Here */}</Typography>
+              <Typography>Hours Away: {/* Data Here */}</Typography>
+              <Typography>Average Bedtime: {/* Data Here */}</Typography>
+              <Typography>Seasonal Labour: {/* Data Here */}</Typography>
+              <Typography>Outdoor Activities: {/* Data Here */}</Typography>
 
-              {/* Nested Accordion for Ecological Context */}
-              <Accordion expanded={expanded === 'ecoContext'} onChange={handleChange('ecoContext')}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />} id="ecoContext-header">
-                  <Typography>Ecological Context</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  {/* Content for Ecological Context */}
-                </AccordionDetails>
-              </Accordion>
-
-
-              {/* Land Use Information */}
-              <Typography variant="h6" sx={{ mt: 2 }}>Land Use</Typography>
-              <Typography>Land Use Type: {/* Data Here */}</Typography>
-              <Typography>Management Area: {/* Data Here */}</Typography>
-
-              {/* Climate Details */}
-              <Typography variant="h6" sx={{ mt: 2 }}>Climate Details</Typography>
-              <Typography>Temperature: {/* Data Here */}</Typography>
-              <Typography>Precipitation: {/* Data Here */}</Typography>
-              <Typography>Humidity: {/* Data Here */}</Typography>
-
-              {/* Additional Environmental Factors */}
-              <Typography variant="h6" sx={{ mt: 2 }}>Additional Factors</Typography>
-              {/* Add additional environmental factors as needed */}
+              <Typography variant="h6" sx={{ mt: 2 }}>Housing and Living Conditions</Typography>
+              <Typography>Roof Type: {/* Data Here */}</Typography>
+              <Typography>Wall Material: {/* Data Here */}</Typography>
+              <Typography>Cooking Facilities: {/* Data Here */}</Typography>
+              <Typography>Open Eaves: {/* Data Here */}</Typography>
+              <Typography>House Screening: {/* Data Here */}</Typography>
+              <Typography>Housing Notes: {/* Data Here */}</Typography>
             </div>
+
 
           </AccordionDetails>
         </Accordion>
