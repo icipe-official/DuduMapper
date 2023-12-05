@@ -35,6 +35,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import { countryList, speciesList } from "./filterUtils";
 
 const FilterSection = () => {
   const [open, setOpen] = useState(false);
@@ -84,57 +85,34 @@ const FilterSection = () => {
     setSelectedDisease(newSelectedDisease);
     setIsDiseaseSelected(newSelectedDisease.length > 0);
   };
-
-  const formControlStyle = {
-    marginBottom: "5px",
-    minWidth: "80%",
-    minHeight: "5px",
-    fontSize: "0.1rem",
-    padding: "0.3px",
+  const handleDeleteCountry = (index: number) => {
+    const newSelectedCountry = [...selectedCountry];
+    newSelectedCountry.splice(index, 1);
+    setSelectedCountry(newSelectedCountry);
+    setIsCountrySelected(newSelectedCountry.length > 0);
   };
 
-  const containerStyle = {
-    backgroundColor: "#f4f4f4", // Add your desired gray background color
-    borderRadius: "3px",
-    padding: "15px",
-    display: "flex",
-    // flexDirection: 'column',
-    // alignItems: "center",
-    // border: "1px solid #ccc",
-    // margin: "0 auto",
-    //  maxWidth: "980px",
-    width: 500,
-    marginLeft: 350,
-    position: "absolute",
-    top: -25,
-  };
-  const buttonContainerStyle = {
-    marginTop: "35px",
-    // display: 'flex',
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    width: "auto",
-    margin: "0 auto",
+  const handleDeleteSpecies = (index: number) => {
+    const newSelectedSpecies = [...selectedSpecies];
+    newSelectedSpecies.splice(index, 1);
+    setSelectedSpecies(newSelectedSpecies);
+    setIsSpeciesSelected(newSelectedSpecies.length > 0);
   };
 
-  const renderMultipleSelection = (selected: string | string[]) => {
-    if (Array.isArray(selected)) {
-      return selected.join(", ");
-    }
-    return selected;
-  };
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: "180px",
-        left: "20px",
-        alignItems: "center",
-        transform: "translateX(0%)",
-        zIndex: 1000,
+  const SelectionCounter: React.FC<{ count: number }> = ({ count }) => (
+    <Typography
+      variant="caption"
+      sx={{
+        fontSize: "0.8rem",
+        color: count > 0 ? "#2e7d32" : "", // Set color to green if items are selected
       }}
     >
+      {count > 0 ? `${count} item(s) selected` : ""}
+    </Typography>
+  );
+
+  return (
+    <div className="filter-section">
       <Tooltip title={open ? "Hide Filters" : "Show Filters"} arrow>
         <IconButton
           onClick={() => setOpen(!open)}
@@ -211,13 +189,7 @@ const FilterSection = () => {
                   <Autocomplete
                     multiple
                     id="country-select"
-                    options={[
-                      "Kenya",
-                      "Uganda",
-                      "Nigeria",
-                      "Botswana",
-                      "Cameroon",
-                    ]}
+                    options={countryList}
                     value={selectedCountry}
                     onChange={(event, value) =>
                       handleCountryChange(event, value)
@@ -271,13 +243,7 @@ const FilterSection = () => {
                   <Autocomplete
                     multiple
                     id="species-select"
-                    options={[
-                      "An.gambiae",
-                      "An.fenestus",
-                      "An.arabiensis",
-                      "An.coluzzi",
-                      "An.coustani",
-                    ]}
+                    options={speciesList}
                     value={selectedSpecies}
                     onChange={(event, value) =>
                       handleSpeciesChange(event, value)
