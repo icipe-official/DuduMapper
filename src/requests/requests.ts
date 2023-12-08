@@ -8,6 +8,27 @@ import Stroke from "ol/style/Stroke";
 import Fill from "ol/style/Fill";
 import Style from "ol/style/Style";
 import LayerGroup from "ol/layer/Group";
+import TileLayer from "ol/layer/Tile";
+import Map from "ol/Map.js";
+import OSM from "ol/source/OSM.js";
+
+import View from "ol/View.js";
+import WMTS from "ol/source/WMTS.js";
+import WMTSTileGrid from "ol/tilegrid/WMTS.js";
+import { get as getProjection } from "ol/proj.js";
+import { getTopLeft, getWidth } from "ol/extent.js";
+
+const projection = getProjection("EPSG:900913");
+const projectionExtent = projection.getExtent();
+const size = getWidth(projectionExtent) / 256;
+const resolutions = new Array(19);
+
+const matrixIds = new Array(19);
+for (let z = 0; z < 19; ++z) {
+  // generate resolutions and matrixIds arrays for this WMTS
+  resolutions[z] = size / Math.pow(2, z);
+  matrixIds[z] = `EPSG:900913:${z}`;
+}
 
 export const geoServerBaseUrl =
   process.env.NEXT_PUBLIC_GEOSERVER_URL?.trim().replace(/['"]/g, "");
@@ -211,6 +232,7 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
   try {
     // Directly await the Promise
     let layers;
+    let theTile;
     if (layerType === "basemaps") {
       layers = await basemapLayers;
     } else if (layerType === "overlays") {
@@ -228,24 +250,44 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
 
         let tileStyle = getTileStyle(displayName);
 
-        let theBasemapTile = new VectorTileLayer({
-          title: displayName,
-          type: "base",
-          visible: true,
-          preload: Infinity,
-          source: new VectorTileSource({
-            maxZoom: 18,
-            format: new MVT(),
-            url:
-              geoServerBaseUrl +
-              "/geoserver/gwc/service/tms/1.0.0/" +
-              layerName +
-              "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
-          }),
-          style: tileStyle,
-        } as BaseLayerOptions);
+        if (layerType === "basemaps") {
+          theTile = new VectorTileLayer({
+            title: displayName,
+            type: "base",
+            visible: true,
+            preload: Infinity,
+            source: new VectorTileSource({
+              maxZoom: 18,
+              format: new MVT(),
+              url:
+                geoServerBaseUrl +
+                "/geoserver/gwc/service/tms/1.0.0/" +
+                layerName +
+                "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
+            }),
+            style: tileStyle,
+          } as BaseLayerOptions);
+        } else if (layerType === "overlays") {
+          theTile = new TileLayer({
+            title: displayName,
+            source: new WMTS({
+              url: geoServerBaseUrl + "/geoserver/basemap/gwc/service/wmts",
+              layer: layerName,
+              matrixSet: "EPSG:900913",
+              format: "image/png",
+              projection: projection,
+              tileGrid: new WMTSTileGrid({
+                origin: getTopLeft(projectionExtent),
+                resolutions: resolutions,
+                matrixIds: matrixIds,
+              }),
+              // style: "default",
+              wrapX: true,
+            }),
+          });
+        }
 
-        basemapArrays.push(theBasemapTile);
+        basemapArrays.push(theTile);
       }
       return basemapArrays;
     }
