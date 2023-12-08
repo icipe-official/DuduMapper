@@ -18,8 +18,9 @@ const Navbar: React.FC = () => {
 
 
   return (
+    <div>
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" sx={{ bgcolor: 'white', margin: '0' }}>
+      <AppBar position="fixed" sx={{ bgcolor: 'white', margin: '0', padding: '0'}}>
         <Toolbar>
           <>
             <Box sx={{ flexGrow: 1, mt: '6px' }}>
@@ -42,7 +43,10 @@ const Navbar: React.FC = () => {
           </>
         </Toolbar>
       </AppBar>
-    </Box>);
+    </Box>
+    </div>
+    );
+    
 };
 
 export default Navbar;
