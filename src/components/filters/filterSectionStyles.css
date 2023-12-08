@@ -1,0 +1,58 @@
+.selected-label {
+  color: initial;
+}
+.filter-section {
+  position: absolute;
+  top: 180px;
+  left: 17px;
+  align-items: center;
+  transform: translateX(0%);
+  z-index: 1000;
+}
+.form-control {
+  margin-bottom: 5px;
+  min-width: 200px;
+  min-height: 5px;
+  font-size: 0.1rem;
+  padding: 0.3px;
+  margin-right: 10px;
+}
+
+/* iconButtonStyles.css */
+
+.custom-icon-button {
+  width: 26px;
+  height: 26px;
+  background-color: #4caf50;
+  color: white;
+}
+
+.custom-icon-button:hover {
+  background-color: #45a049;
+}
+
+.custom-icon-button:active {
+  background-color: #4caf50;
+}
+
+/* filterSectionStyles.css */
+
+.container-style {
+  background-color: #f4f4f4;
+  border-radius: 3px;
+  padding: 15px;
+  display: flex;
+  /* align-items: center; */
+  border: 1px solid #ccc;
+  margin: 0 auto;
+  max-width: 980px;
+  margin-left: 350px;
+  position: absolute;
+  width: 400px;
+  top: -70px;
+}
+
+.button-container-style {
+  margin-top: 35px;
+  margin: 0 auto;
+}
