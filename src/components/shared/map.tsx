@@ -12,14 +12,14 @@ import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import { Pixel } from "ol/pixel";
-import MapBrowserEvent from 'ol/MapBrowserEvent';
-import Event from 'ol/events/Event';
-import Popover from '@mui/material/Popover';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MapBrowserEvent from "ol/MapBrowserEvent";
+import Event from "ol/events/Event";
+import Popover from "@mui/material/Popover";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import Typography from "@mui/material/Typography";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   geoServerBaseUrl,
   getBasemapOverlaysLayersArray,
@@ -27,11 +27,14 @@ import {
 import "./CSS/LayerSwitcherStyles.css";
 import { Stroke, Fill, Style, Circle } from "ol/style";
 import OccurrencePopup from "../map/occurrence_popup";
+import FilterSection from "../filters/filtersection";
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const [popoverContent, setPopoverContent] = React.useState<{ [x: string]: any }>({});
+  const [popoverContent, setPopoverContent] = React.useState<{
+    [x: string]: any;
+  }>({});
   const open = Boolean(anchorEl);
-  const id = open ? 'feature-popover' : undefined;
+  const id = open ? "feature-popover" : undefined;
   const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
   const mapElement = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | undefined>(undefined);
@@ -62,10 +65,10 @@ function Newmap() {
   });
 
   const fill = new Fill({
-    color: 'rgba(2,2,2,1)',
+    color: "rgba(2,2,2,1)",
   });
   const stroke = new Stroke({
-    color: '#222',
+    color: "#222",
     width: 1.25,
   });
 
@@ -82,7 +85,7 @@ function Newmap() {
       }),
       fill: fill,
       stroke: stroke,
-    })
+    }),
   } as BaseLayerOptions);
 
   const occurrenceGroup = new LayerGroup({
@@ -91,8 +94,8 @@ function Newmap() {
   } as GroupLayerOptions);
 
   useEffect(() => {
-    getBasemapOverlaysLayersArray('basemaps').then((baseMapsArray) => {
-      getBasemapOverlaysLayersArray('overlays').then((overlaysArray) => {
+    getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
+      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
         const BaseMaps = new LayerGroup({
           title: "Base Maps",
           layers: baseMapsArray,
@@ -143,19 +146,22 @@ function Newmap() {
                     mapElement.current.appendChild(dummyAnchor);
                   }
 
-                  // Set the state for Popover content and anchor
-                  setPopoverContent(feature.getProperties());
-                  setAnchorEl(dummyAnchor);
 
-                  // Return true to stop the forEach loop if needed
-                  return true;
+                    // Set the state for Popover content and anchor
+                    setPopoverContent(feature.getProperties());
+                    setAnchorEl(dummyAnchor);
+
+                    // Return true to stop the forEach loop if needed
+                    return true;
+                  }
                 }
-              });
+              );
               // }
             };
 
 
             initialMap.on('singleclick', handleMapClick);
+
 
             setMap(initialMap);
           }
@@ -163,15 +169,16 @@ function Newmap() {
       });
     });
 
-
-
-
     const layerSwitcher = new LayerSwitcher();
     if (map) {
       map.addControl(layerSwitcher);
     }
   }, []);
 
+  const parentContainerStyle = {
+    maxWidth: "800px", // Adjust as needed or remove for full-width responsiveness
+    margin: "0 auto", // Center the container on the page
+  };
   return (
     <>
       <div
@@ -180,6 +187,9 @@ function Newmap() {
         className="map-container"
         id="map-container"
       >
+        <div style={parentContainerStyle}>
+          <FilterSection />
+        </div>
       </div>
 
       <OccurrencePopup
@@ -191,6 +201,7 @@ function Newmap() {
         expanded={expanded}
         handleChange={handleChange}
       />
+
     </>
   );
 }
