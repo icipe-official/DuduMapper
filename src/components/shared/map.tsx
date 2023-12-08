@@ -26,8 +26,8 @@ import {
 } from "@/requests/requests";
 import "./CSS/LayerSwitcherStyles.css";
 import { Stroke, Fill, Style, Circle } from "ol/style";
+import OccurrencePopup from "../map/occurrence_popup";
 import FilterSection from "../filters/filtersection";
-
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [popoverContent, setPopoverContent] = React.useState<{
@@ -43,6 +43,7 @@ function Newmap() {
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpanded(isExpanded ? panel : false);
+      event.stopPropagation(); // Stop the click event from reaching the parent accordion
     };
 
   const handleClosePopover = () => {
@@ -118,29 +119,33 @@ function Newmap() {
             const layerSwitcher = new LayerSwitcher();
             initialMap.addControl(layerSwitcher);
 
+
             const handleMapClick = (event: any) => {
-              console.log("handle map click before checking if map is defined");
+              console.log("handle map click before checking if map is defined")
+
               // if (map) {
-              console.log("map defined");
-              initialMap.forEachFeatureAtPixel(
-                event.pixel,
-                (feature, layer) => {
-                  if (layer === occurrenceLayer) {
-                    console.log("Point clicked");
-                    // Create a reference to the dummy HTML element for Popover anchor
-                    const dummyAnchor = document.createElement("div");
-                    dummyAnchor.style.position = "absolute";
+              console.log("map defined")
+              initialMap.forEachFeatureAtPixel(event.pixel, (feature, layer) => {
+                if (layer === occurrenceLayer) {
+                  console.log("Point clicked")
 
-                    // Position the dummy anchor based on the event's pixel
-                    // Here you would use the map container's ID or ref to position correctly
-                    dummyAnchor.style.left = `${event.pixel[0]}px`;
-                    dummyAnchor.style.top = `${event.pixel[1]}px`;
+                  // Create a reference to the dummy HTML element for Popover anchor
+                  const dummyAnchor = document.createElement('div');
+                  dummyAnchor.style.position = 'absolute';
 
-                    // Append the dummy anchor to the map element
-                    // Assuming mapElement.current is the container of the map
-                    if (mapElement.current) {
-                      mapElement.current.appendChild(dummyAnchor);
-                    }
+                  // Adjust the position of the dummy anchor to be on the right side and vertically centered
+                  // You need to know the width of the map container, assuming it's available in mapContainerWidth
+                  const mapContainerWidth = mapElement.current ? mapElement.current.offsetWidth : 0;
+                  const verticalCenter = mapElement.current ? mapElement.current.offsetHeight / 2 : 0;
+
+                  dummyAnchor.style.left = `${mapContainerWidth - dummyAnchor.offsetWidth}px`;
+                  dummyAnchor.style.top = `${verticalCenter - dummyAnchor.offsetHeight / 2}px`;
+
+                  // Append the dummy anchor to the map element
+                  if (mapElement.current) {
+                    mapElement.current.appendChild(dummyAnchor);
+                  }
+
 
                     // Set the state for Popover content and anchor
                     setPopoverContent(feature.getProperties());
@@ -154,7 +159,9 @@ function Newmap() {
               // }
             };
 
-            initialMap.on("singleclick", handleMapClick);
+
+            initialMap.on('singleclick', handleMapClick);
+
 
             setMap(initialMap);
           }
@@ -185,109 +192,16 @@ function Newmap() {
         </div>
       </div>
 
-      <Popover
+      <OccurrencePopup
         id={id}
         open={open}
         anchorEl={anchorEl}
-        onClose={handleClosePopover}
-        // ... other props
-      >
-        <div>
-          <Accordion
-            expanded={expanded === "panel1"}
-            onChange={handleChange("panel1")}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1bh-content"
-              id="panel1bh-header"
-            >
-              <Typography sx={{ width: "33%", flexShrink: 0 }}>
-                Species
-              </Typography>
-              <Typography sx={{ color: "text.secondary" }}>
-                Mosquito species details
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography>{popoverContent?.notes}</Typography>
-            </AccordionDetails>
-          </Accordion>
-          <Accordion
-            expanded={expanded === "panel2"}
-            onChange={handleChange("panel2")}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel2bh-content"
-              id="panel2bh-header"
-            >
-              <Typography sx={{ width: "33%", flexShrink: 0 }}>
-                Bionomics
-              </Typography>
-              <Typography sx={{ color: "text.secondary" }}>
-                Ecological characteristics of species
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography>{popoverContent?.notes}</Typography>
-            </AccordionDetails>
-          </Accordion>
-          <Accordion
-            expanded={expanded === "panel3"}
-            onChange={handleChange("panel3")}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel3bh-content"
-              id="panel3bh-header"
-            >
-              <Typography sx={{ width: "33%", flexShrink: 0 }}>
-                Site/Environment
-              </Typography>
-              <Typography sx={{ color: "text.secondary" }}>
-                Geographical and environmental data
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography>
-                {popoverContent.geometry ? (
-                  <>
-                    Location: {popoverContent.geometry.layout}
-                    Coordinates:{" "}
-                    {popoverContent.geometry.flatCoordinates.join(", ")}
-                  </>
-                ) : (
-                  <span>Loading or no data available...</span>
-                )}
-              </Typography>
-            </AccordionDetails>
-          </Accordion>
-          <Accordion
-            expanded={expanded === "panel4"}
-            onChange={handleChange("panel4")}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel4bh-content"
-              id="panel4bh-header"
-            >
-              <Typography sx={{ width: "33%", flexShrink: 0 }}>
-                Period
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography>
-                {popoverContent?.period_start && popoverContent?.period_end ? (
-                  `Data collected from ${popoverContent.period_start} to ${popoverContent.period_end}.`
-                ) : (
-                  <span>Loading or no data available...</span>
-                )}
-              </Typography>
-            </AccordionDetails>
-          </Accordion>
-        </div>
-      </Popover>
+        handleClose={handleClosePopover}
+        popoverContent={popoverContent}
+        expanded={expanded}
+        handleChange={handleChange}
+      />
+
     </>
   );
 }
