@@ -7,10 +7,9 @@ import Link from 'next/link';
 import DrawerComp from './DrawerComp';
 import NavLink from './navlink';
 import { useMediaQuery, useTheme } from '@mui/material';
-
+import { BASE_PATH } from '@/lib/constants';
 const Navbar: React.FC = () => {
   const theme = useTheme();
-
   const navMenuItems: any[] = [];
   navMenuItems.push(<NavLink key="Map" url="/map" text="Map" />);
 
@@ -19,15 +18,16 @@ const Navbar: React.FC = () => {
 
 
   return (
+    <div>
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" sx={{ bgcolor: 'white', margin: '0' }}>
+      <AppBar position="fixed" sx={{ bgcolor: 'white', margin: '0', padding: '0'}}>
         <Toolbar>
           <>
             <Box sx={{ flexGrow: 1, mt: '6px' }}>
               <Link href="/">
                 <picture>
                   <img
-                    src="/vector-atlas-logo.svg"
+                    src={`${BASE_PATH}/vector-atlas-logo.svg`}
                     style={{ maxHeight: '80px', cursor: 'pointer' }}
                     alt="Vector Atlas logo"
                   />
@@ -43,7 +43,10 @@ const Navbar: React.FC = () => {
           </>
         </Toolbar>
       </AppBar>
-    </Box>);
+    </Box>
+    </div>
+    );
+    
 };
 
 export default Navbar;

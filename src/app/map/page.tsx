@@ -1,16 +1,11 @@
-"use client"
-import Newmap from '@/components/shared/map';
-import ClientOnly from '../../components/shared/clientOnly';
-import Navbar from '@/components/shared/navbar';
-import 'ol/ol.css';
-import 'ol-layerswitcher/dist/ol-layerswitcher.css';
+"use client";
+import Newmap from "@/components/shared/map";
 
 function Map(): JSX.Element {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center' }}>
-      <main style={{ width: '100%' }}>
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <main style={{ width: "100%" }}>
         <Newmap />
-
       </main>
     </div>
   );
