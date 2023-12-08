@@ -7,10 +7,9 @@ import Link from 'next/link';
 import DrawerComp from './DrawerComp';
 import NavLink from './navlink';
 import { useMediaQuery, useTheme } from '@mui/material';
-
+import { BASE_PATH } from '@/lib/constants';
 const Navbar: React.FC = () => {
   const theme = useTheme();
-
   const navMenuItems: any[] = [];
   navMenuItems.push(<NavLink key="Map" url="/map" text="Map" />);
 
@@ -27,7 +26,7 @@ const Navbar: React.FC = () => {
               <Link href="/">
                 <picture>
                   <img
-                    src="/vector-atlas-logo.svg"
+                    src={`${BASE_PATH}/vector-atlas-logo.svg`}
                     style={{ maxHeight: '80px', cursor: 'pointer' }}
                     alt="Vector Atlas logo"
                   />
