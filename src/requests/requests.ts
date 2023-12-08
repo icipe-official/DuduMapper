@@ -18,7 +18,14 @@ import WMTSTileGrid from "ol/tilegrid/WMTS.js";
 import { get as getProjection } from "ol/proj.js";
 import { getTopLeft, getWidth } from "ol/extent.js";
 
-const projection = getProjection("EPSG:900913");
+let projection: any = null;
+
+const maybeProjection = getProjection("EPSG:900913");
+
+if (maybeProjection) {
+  projection = maybeProjection;
+}
+
 const projectionExtent = projection.getExtent();
 const size = getWidth(projectionExtent) / 256;
 const resolutions = new Array(19);
@@ -281,10 +288,10 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
                 resolutions: resolutions,
                 matrixIds: matrixIds,
               }),
-              // style: "default",
+              style: "",
               wrapX: true,
             }),
-          });
+          } as BaseLayerOptions);
         }
 
         basemapArrays.push(theTile);
