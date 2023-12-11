@@ -182,7 +182,7 @@ function Newmap() {
   return (
     <>
       <div
-        style={{ height: "calc(100vh - 80px)" }}
+        style={{ height: "calc(100vh - 70px)" }}
         ref={mapElement}
         className="map-container"
         id="map-container"
