@@ -19,34 +19,34 @@ const Navbar: React.FC = () => {
 
   return (
     <div>
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" sx={{ bgcolor: 'white', margin: '0', padding: '0'}}>
-        <Toolbar>
-          <>
-            <Box sx={{ flexGrow: 1, mt: '6px' }}>
-              <Link href="/">
-                <picture>
-                  <img
-                    src={`${BASE_PATH}/vector-atlas-logo.svg`}
-                    style={{ maxHeight: '80px', cursor: 'pointer' }}
-                    alt="Vector Atlas logo"
-                  />
-                </picture>
-              </Link>
-            </Box>
+      <Box sx={{ flexGrow: 1 }}>
+        <AppBar position="fixed" sx={{ bgcolor: 'white', margin: '0', padding: '0' }}>
+          <Toolbar>
+            <>
+              <Box sx={{ flexGrow: 1, mt: '6px' }}>
+                <Link href="/">
+                  <picture>
+                    <img
+                      src={`${BASE_PATH}/vector-atlas-logo.svg`}
+                      style={{ maxHeight: '50px', cursor: 'pointer' }}
+                      alt="Vector Atlas logo"
+                    />
+                  </picture>
+                </Link>
+              </Box>
 
-            {isMobile ? (
-              <DrawerComp navItems={navMenuItems} />
-            ) : (
-              <>{navMenuItems}</>
-            )}
-          </>
-        </Toolbar>
-      </AppBar>
-    </Box>
+              {isMobile ? (
+                <DrawerComp navItems={navMenuItems} />
+              ) : (
+                <>{navMenuItems}</>
+              )}
+            </>
+          </Toolbar>
+        </AppBar>
+      </Box>
     </div>
-    );
-    
+  );
+
 };
 
 export default Navbar;
