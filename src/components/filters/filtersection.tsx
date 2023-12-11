@@ -37,8 +37,8 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { countryList, speciesList } from "./filterUtils";
 
-const FilterSection = () => {
-  const [open, setOpen] = useState(false);
+const FilterSection = (openFilter: any) => {
+  const [open, setOpen] = useState(openFilter);
   const [selectedDisease, setSelectedDisease] = useState<string[]>([]);
   const [isDiseaseSelected, setIsDiseaseSelected] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
@@ -113,15 +113,6 @@ const FilterSection = () => {
 
   return (
     <div className="filter-section">
-      <Tooltip title={open ? "Hide Filters" : "Show Filters"} arrow>
-        <IconButton
-          onClick={() => setOpen(!open)}
-          className="custom-icon-button"
-        >
-          <TuneIcon />
-        </IconButton>
-      </Tooltip>
-
       <Collapse in={open}>
         <div className="flex-container">
           <Box className="container-style">

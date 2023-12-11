@@ -2,11 +2,9 @@
 .ol-layerswitcher {
   border-top: transparent !important;
   background-color: transparent !important;
-  padding: 0px;
-  margin-top: 20px;
+  margin-top: 18px;
   position: absolute; /* Position the LayerSwitcher absolutely */
-  top: 20; /* Align it to the top of the screen */
-  left: 10px; /* Align it to the left side of the screen */
+  left: 9px; /* Align it to the left side of the screen */
   z-index: 1000; /* Adjust the z-index to ensure it's above other content */
   width: 320px;
 }
@@ -34,12 +32,12 @@ button {
 .ol-layerswitcher > button:after {
   top: 0.22em;
   left: 0.34em;
-  background: #28d909;
+  background: #ebbd40;
   background-image: radial-gradient(
     circle at 0.85em 0.6em,
-    #70b3be 0,
-    #70b3be 0.65em,
-    #83bcc5 0.65em
+    #ebbd40 0,
+    #ebbd40 0.65em,
+    #ebbd40 0.65em
   );
 }
 
@@ -100,7 +98,6 @@ button {
 .ol-control button {
   display: block;
   margin: 1px;
-  padding: 0;
   color: #fff !important;
   background-color: transparent !important;
   font-weight: 700;
@@ -110,7 +107,6 @@ button {
   height: 1.375em !important;
   width: 1.375em !important;
   line-height: 0.4em;
-  border: none;
   border-radius: 2px;
 }
 
@@ -146,6 +142,7 @@ button {
   z-index: 10;
   position: relative;
   font-size: 1.7em;
+  padding-right: 10px !important;
 }
 .ol-layerswitcher .layerup {
   float: right;
@@ -193,11 +190,11 @@ button {
 .ol-layerswitcher > button:after {
   top: 0.22em;
   left: 0.34em;
-  background: #038543 !important;
+  background: #ebbd40 !important;
   background-image: radial-gradient(
     circle at 0.85em 0.6em,
-    #038543 0,
-    #038543 0.65em,
-    #038543 0.65em
+    #ebbd40 0,
+    #ebbd40 0.65em,
+    #ebbd40 0.65em
   );
 }
