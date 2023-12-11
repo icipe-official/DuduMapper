@@ -1,21 +1,19 @@
 "use client";
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Link from 'next/link';
-import DrawerComp from './DrawerComp';
-import NavLink from './navlink';
-import { useMediaQuery, useTheme } from '@mui/material';
-import { BASE_PATH } from '@/lib/constants';
+import * as React from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import Link from "next/link";
+import DrawerComp from "./DrawerComp";
+import NavLink from "./navlink";
+import { useMediaQuery, useTheme } from "@mui/material";
+import { BASE_PATH } from "@/lib/constants";
 const Navbar: React.FC = () => {
   const theme = useTheme();
   const navMenuItems: any[] = [];
   navMenuItems.push(<NavLink key="Map" url="/map" text="Map" />);
 
-
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <div>
@@ -46,8 +44,6 @@ const Navbar: React.FC = () => {
       </Box>
     </div>
   );
-
 };
 
 export default Navbar;
-

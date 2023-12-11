@@ -28,6 +28,10 @@ import "./CSS/LayerSwitcherStyles.css";
 import { Stroke, Fill, Style, Circle } from "ol/style";
 import OccurrencePopup from "../map/occurrence_popup";
 import FilterSection from "../filters/filtersection";
+import { IconButton, Tooltip } from "@mui/material";
+import "../filters/filterSectionStyles.css";
+import TuneIcon from "@mui/icons-material/Tune";
+
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [popoverContent, setPopoverContent] = React.useState<{
@@ -39,6 +43,8 @@ function Newmap() {
   const mapElement = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | undefined>(undefined);
   const [expanded, setExpanded] = React.useState<string | false>(false);
+
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -74,7 +80,7 @@ function Newmap() {
 
   const occurrenceLayer = new VectorLayer({
     title: "Occurrence Layer",
-    visible: false,
+    visible: true,
     preload: Infinity,
     source: occurrenceSource,
     style: new Style({
@@ -119,33 +125,41 @@ function Newmap() {
             const layerSwitcher = new LayerSwitcher();
             initialMap.addControl(layerSwitcher);
 
-
             const handleMapClick = (event: any) => {
-              console.log("handle map click before checking if map is defined")
+              console.log("handle map click before checking if map is defined");
 
               // if (map) {
-              console.log("map defined")
-              initialMap.forEachFeatureAtPixel(event.pixel, (feature, layer) => {
-                if (layer === occurrenceLayer) {
-                  console.log("Point clicked")
+              console.log("map defined");
+              initialMap.forEachFeatureAtPixel(
+                event.pixel,
+                (feature, layer) => {
+                  if (layer === occurrenceLayer) {
+                    console.log("Point clicked");
 
-                  // Create a reference to the dummy HTML element for Popover anchor
-                  const dummyAnchor = document.createElement('div');
-                  dummyAnchor.style.position = 'absolute';
+                    // Create a reference to the dummy HTML element for Popover anchor
+                    const dummyAnchor = document.createElement("div");
+                    dummyAnchor.style.position = "absolute";
 
-                  // Adjust the position of the dummy anchor to be on the right side and vertically centered
-                  // You need to know the width of the map container, assuming it's available in mapContainerWidth
-                  const mapContainerWidth = mapElement.current ? mapElement.current.offsetWidth : 0;
-                  const verticalCenter = mapElement.current ? mapElement.current.offsetHeight / 2 : 0;
+                    // Adjust the position of the dummy anchor to be on the right side and vertically centered
+                    // You need to know the width of the map container, assuming it's available in mapContainerWidth
+                    const mapContainerWidth = mapElement.current
+                      ? mapElement.current.offsetWidth
+                      : 0;
+                    const verticalCenter = mapElement.current
+                      ? mapElement.current.offsetHeight / 2
+                      : 0;
 
-                  dummyAnchor.style.left = `${mapContainerWidth - dummyAnchor.offsetWidth}px`;
-                  dummyAnchor.style.top = `${verticalCenter - dummyAnchor.offsetHeight / 2}px`;
+                    dummyAnchor.style.left = `${
+                      mapContainerWidth - dummyAnchor.offsetWidth
+                    }px`;
+                    dummyAnchor.style.top = `${
+                      verticalCenter - dummyAnchor.offsetHeight / 2
+                    }px`;
 
-                  // Append the dummy anchor to the map element
-                  if (mapElement.current) {
-                    mapElement.current.appendChild(dummyAnchor);
-                  }
-
+                    // Append the dummy anchor to the map element
+                    if (mapElement.current) {
+                      mapElement.current.appendChild(dummyAnchor);
+                    }
 
                   // Set the state for Popover content and anchor
                   setPopoverContent(feature.getProperties());
@@ -159,9 +173,7 @@ function Newmap() {
               // }
             };
 
-
-            initialMap.on('singleclick', handleMapClick);
-
+            initialMap.on("singleclick", handleMapClick);
 
             setMap(initialMap);
           }
@@ -175,10 +187,6 @@ function Newmap() {
     }
   }, []);
 
-  const parentContainerStyle = {
-    maxWidth: "800px", // Adjust as needed or remove for full-width responsiveness
-    margin: "0 auto", // Center the container on the page
-  };
   return (
     <>
       <div
@@ -187,8 +195,20 @@ function Newmap() {
         className="map-container"
         id="map-container"
       >
-        <div style={parentContainerStyle}>
-          <FilterSection />
+        <div>
+          {filterOpen && <FilterSection openFilter={filterOpen} />}
+
+          <div className="filter-section">
+            <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>
+              <IconButton
+                onClick={() => setFilterOpen(!filterOpen)}
+                className="custom-icon-button"
+                style={{ color: "white" }}
+              >
+                <TuneIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
         </div>
       </div>
 
@@ -201,7 +221,6 @@ function Newmap() {
         expanded={expanded}
         handleChange={handleChange}
       />
-
     </>
   );
 }
