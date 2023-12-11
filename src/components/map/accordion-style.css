@@ -19,10 +19,10 @@
 }
 
 /* Ensure that no margins are causing space between accordion items */
-/* .MuiAccordion-root { */
-/*   margin: 0 !important; */
-/*   box-shadow: none !important;  */
-/* } */
+.MuiAccordion-root {
+  margin: 0 !important;
+  box-shadow: none !important; 
+}
 
 
 /* Remove the box-shadow from the paper component if it is causing any spacing */
