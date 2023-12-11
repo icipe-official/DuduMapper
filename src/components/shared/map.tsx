@@ -65,7 +65,7 @@ function Newmap() {
   });
 
   const fill = new Fill({
-    color: "rgba(2,2,2,1)",
+    color: "rgba(2,255,2,1)",
   });
   const stroke = new Stroke({
     color: "#222",
@@ -81,7 +81,7 @@ function Newmap() {
       image: new Circle({
         fill: fill,
         stroke: stroke,
-        radius: 5,
+        radius: 8,
       }),
       fill: fill,
       stroke: stroke,
@@ -147,14 +147,14 @@ function Newmap() {
                   }
 
 
-                    // Set the state for Popover content and anchor
-                    setPopoverContent(feature.getProperties());
-                    setAnchorEl(dummyAnchor);
+                  // Set the state for Popover content and anchor
+                  setPopoverContent(feature.getProperties());
+                  setAnchorEl(dummyAnchor);
 
-                    // Return true to stop the forEach loop if needed
-                    return true;
-                  }
+                  // Return true to stop the forEach loop if needed
+                  return true;
                 }
+              }
               );
               // }
             };
