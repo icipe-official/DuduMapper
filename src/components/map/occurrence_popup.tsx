@@ -24,8 +24,12 @@ interface ExpandedState {
 }
 
 const popoverStyle = {
-  opacity: 0.85, // Adjust for desired translucency
+  opacity: 0.85,
 };
+
+const borderStyle = {
+  'border-style': 'solid', 'border-color': 'green', 'border-width': '2px 2px 2px 2px', 'border-radius': '5px'
+}
 
 const textStyle = {
   background: 'white', // Opaque background for text
@@ -60,7 +64,7 @@ const OccurrencePopup: React.FC<MapPopoverProps> = ({
       anchorEl={anchorEl}
       onClose={handleClose}
       style={popoverStyle}     >
-      <div style={scrollableStyle}>
+      <div style={{ ...scrollableStyle, ...borderStyle }}>
         <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
