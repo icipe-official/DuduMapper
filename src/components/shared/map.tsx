@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Map, View } from "ol";
+import { Feature, Map, View } from "ol";
 import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
@@ -52,7 +52,7 @@ import PestControlIcon from "@mui/icons-material/PestControl";
 import EggIcon from "@mui/icons-material/Egg";
 import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
-import { Geometry } from "ol/geom";
+import { Geometry, Point } from "ol/geom";
 
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
@@ -65,7 +65,8 @@ function Newmap() {
   const mapElement = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | undefined>(undefined);
   const [expanded, setExpanded] = React.useState<string | false>(false);
-  
+  const [occurrenceData, setOccurrenceData] = useState<any[]>([]);
+
 
   //filtersection
   const [newopen, setOpen] = useState(false);
@@ -83,7 +84,7 @@ function Newmap() {
   const [isAdultSelected, setIsAdultSelected] = useState(false);
   const [selectedLarval, setSelectedLarval] = useState("");
   const [isLarvalSelected, setIsLarvalSelected] = useState(false);
- 
+
   const handleDiseaseChange = (event: SelectChangeEvent<string[]>) => {
     const selectedValues = [...(event.target.value as string[])];
     setSelectedDisease(selectedValues);
@@ -119,7 +120,7 @@ function Newmap() {
     }
     return selected;
   };
-  
+
   //end of filters
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -135,130 +136,370 @@ function Newmap() {
   mapRef.current = map;
 
   const jsonurl = "/geoserver/vector/ows?service=WFS&version=" +
-  "1.0.0&request=GetFeature&typeName" +
-  "=vector%3Aoccurrence&maxFeatures=1000&outputFormat=application%2Fjson"
+    "1.0.0&request=GetFeature&typeName" +
+    "=vector%3Aoccurrence&maxFeatures=1000&outputFormat=application%2Fjson"
 
-  const speciesName = ['arabiensis','funestus'];
+  const speciesName = ['arabiensis', 'funestus'];
   const specFilter = `species IN ('${speciesName.join("','")}')`;
 
-  
-  // const occurrenceSource = new VectorSource({
-  //   format: new GeoJSON(),
-  //   url:
-  //     geoServerBaseUrl +
-  //     jsonurl +
-  //      `&cql_filter=species IN ('arabiensis','funestus')`,
-  //   strategy: bboxStrategy,
-  // })
-  // console.log(occurrenceSource)
+  const [colorArray, setColorArray] = useState<string[]>([
+    '#648fff',
+    '#785ef0',
+    '#fe6100',
+    '#ffb000',
+    '#000000',
+    '#ffffff',
+    '#dc267f',
+  ]);
 
-  
+
+  //  const [occurrenceSource, setOccurrenceSource] = useState<VectorSource>( 
+  //   new VectorSource({
+  //     format: new GeoJSON(),
+  //     url:
+  //       geoServerBaseUrl +
+  //       "/geoserver/vector/ows?service=WFS&version=" +
+  //       "1.0.0&request=GetFeature&typeName" +
+  //       "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson" 
+  //      ,
+  //     strategy: bboxStrategy,
+  //   }) 
+  // );
+
+  // useEffect(() => {
+  //   const fetchOccurrenceData = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         geoServerBaseUrl +
+  //           "/geoserver/vector/ows?service=WFS&version=" +
+  //           "1.0.0&request=GetFeature&typeName" +
+  //           "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson"
+  //       );
+
+  //       const data = await response.json();
+
+  //       console.log("Fetched data:", data);
+  //       const featuresArray = data.features || [];
+
+  //     // Ensure featuresArray is an array before setting it
+  //     if (Array.isArray(featuresArray)) {
+  //       setOccurrenceData(featuresArray);
+
+
+  //     const occurrenceSource = new VectorSource({
+  //       format: new GeoJSON(),
+  //       features: new GeoJSON().readFeatures(responseToGEOJSON(featuresArray), {
+  //         featureProjection: 'EPSG:3857',
+  //       }),
+  //       strategy: bboxStrategy,
+  //     });
+  //     const occurrenceLayer = new VectorLayer({
+  //       title: "Occurrence Layer",
+  //       visible: true,
+  //       preload: Infinity,
+  //       source: occurrenceSource,
+  //       style: new Style({
+  //         image: new Circle({
+  //           radius: 5,
+  //           fill: new Fill({
+  //             color: "red", // or any other color
+  //           }),
+  //         }),
+  //       }),
+  //     } as BaseLayerOptions);
+
+  //     setOccurrenceLayer(occurrenceLayer);
+
+  //   }
+  //     else {
+  //       console.error("Fetched data features are not an array:", data);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching occurrence data:", error);
+  //   }
+  //   };
+  //   fetchOccurrenceData();
+  // }, []); 
+
+  function responseToGEOJSON(occurrenceData: any) {
+    const geoJSONPoints = (occurrenceData || []).map((d: any) => {
+      const coordinates = d.geometry.coordinates;
+      return {
+        type: 'Feature',
+        geometry: {
+          type: d.geometry.type,
+          coordinates: coordinates,
+        },
+        properties: d.properties
+        
+      };
+    });
+   
+    const geoJSONFeatureCollection = {
+      type: 'FeatureCollection',
+      features: geoJSONPoints,
+    };
+    return geoJSONFeatureCollection;
+  }
+
+
   const [occurrenceSource, setOccurrenceSource] = useState<VectorSource>(
     new VectorSource({
       format: new GeoJSON(),
-      url:
-        geoServerBaseUrl +
-        "/geoserver/vector/ows?service=WFS&version=" +
-        "1.0.0&request=GetFeature&typeName" +
-        "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson" +
-        `&cql_filter=species IN ('arabiensis','funestus')`,
+      // Initially, provide an empty array for features
+      features: new GeoJSON().readFeatures(
+        responseToGEOJSON(occurrenceData)
+      ),
       strategy: bboxStrategy,
     })
   );
-  const [occurrenceLayer, setOccurrenceLayer] = useState<VectorLayer<VectorSource<Geometry>>>(
-    new VectorLayer({
-      title: "Occurrence Layer",
-      visible: true,
-      preload: Infinity,
-      source: occurrenceSource,
-      style: new Style({
-        image: new Circle({
-          fill: new Fill({
-            color: "rgba(255, 0, 0, 0.5)", // Fill color
-          }),
-          stroke: new Stroke({
-            color: "rgba(255, 0, 0, 1)", // Stroke color
-            width: 2, // Stroke width
-          }),
-          radius: 5,
-        }),
-      }),
-    } as BaseLayerOptions)
-  );
-
-
-  const [occurrenceGroup, setOccurrenceGroup] = useState<LayerGroup>(
-    new LayerGroup({
-      title: "Occurrence",
-      layers: [occurrenceLayer],
-    } as GroupLayerOptions)
-  );
 
  
-  useEffect(() => {
-    const speciesFilter = selectedSpecies.length
-    ? `species IN (${selectedSpecies.map(species => `'${encodeURIComponent(species)}'`).join(',')})`
-    : '';
-    const url = new URL(`${geoServerBaseUrl}/geoserver/vector/ows`);
-    url.searchParams.set('service', 'WFS');
-    url.searchParams.set('version', '1.0.0');
-    url.searchParams.set('request', 'GetFeature');
-    url.searchParams.set('typeName', 'vector:occurrence');
-    url.searchParams.set('maxFeatures', '1000');
-    url.searchParams.set('outputFormat', 'application/json');
+  // useEffect(() => {
+  //   // Update occurrenceSource when occurrenceData changes
+  //   setOccurrenceSource(new VectorSource({
+  //     format: new GeoJSON(),
+  //     features: new GeoJSON().readFeatures(responseToGEOJSON(occurrenceData), {
+  //       featureProjection: 'EPSG:4326',
+  //     }),
+  //     strategy: bboxStrategy,
+  //   }));
+  //   console.log(occurrenceSource)
+  // }, [occurrenceData]);
 
-    if (speciesFilter) {
-      url.searchParams.set('cql_filter', speciesFilter);
-    }
-    const urlString: string = url.toString();
-    console.log(urlString);
+  // const [occurrenceLayer, setOccurrenceLayer] = useState<VectorLayer<VectorSource<Geometry>>>(
+  //   new VectorLayer({
+  //     title: "Occurrence Layer",
+  //     visible: true,
+  //     preload: Infinity,
+  //     source: occurrenceSource,
+  //     style: new Style({
+  //       image: new Circle({
+  //         radius: 5,
+  //         fill: new Fill({
+  //           color: "red", // or any other color
+  //         }),
+  //       }),
+  //     }),
+  //   } as BaseLayerOptions)
+  // );
 
-    const updatedOccurrenceSource = new VectorSource({
-      format: new GeoJSON(),
-      url: urlString,
-      strategy: bboxStrategy,
-    });
-    console.log(updatedOccurrenceSource)
+  // const [occurrenceGroup, setOccurrenceGroup] = useState<LayerGroup>(
+  //   new LayerGroup({
+  //     title: "Occurrence",
+  //     layers: [occurrenceLayer],
+  //   } as GroupLayerOptions)
+  // );
 
-    const updatedOccurrenceLayer = new VectorLayer({
-      title: "Occurrence Layer",
-      visible: true,
-      preload: Infinity,
-      source: updatedOccurrenceSource,
-      style: new Style({
-        image: new Circle({
-          fill: new Fill({
-            color: "rgba(255, 0, 0, 0.5)", // Fill color
-          }),
-          stroke: new Stroke({
-            color: "rgba(255, 0, 0, 1)", // Stroke color
-            width: 2, // Stroke width
-          }),
-          radius: 5,
-        }),
-      }),
-    } as BaseLayerOptions);
-    console.log(updatedOccurrenceLayer)
 
-    const updatedOccurrenceGroup = new LayerGroup({
-      title: "Occurrence",
-      layers: [updatedOccurrenceLayer],
-    } as GroupLayerOptions);
+  // const [occurrenceSource, setOccurrenceSource] = useState<VectorSource | null>(null);
+  // const [occurrenceLayer, setOccurrenceLayer] = useState<VectorLayer<VectorSource<Geometry>> | null>(null);
+  // const [occurrenceGroup, setOccurrenceGroup] = useState<LayerGroup>(new LayerGroup());
 
-    setOccurrenceSource(updatedOccurrenceSource);
-    setOccurrenceLayer(updatedOccurrenceLayer);
-    setOccurrenceGroup(updatedOccurrenceGroup);
 
-  }, [selectedSpecies, geoServerBaseUrl, bboxStrategy,]);
-  console.log(occurrenceSource)
+  // const fetchOccurrenceData = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       geoServerBaseUrl +
+  //       "/geoserver/vector/ows?service=WFS&version=" +
+  //       "1.0.0&request=GetFeature&typeName" +
+  //       "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson"
+  //     );
 
-  const fill = new Fill({
-    color: "rgba(2,2,2,1)",
-  });
-  const stroke = new Stroke({
-    color: "#222",
-    width: 1.25,
-  });
+  //     const data = await response.json();
+
+  //     console.log("Fetched Occurrence Data:", data);
+
+  //     // Create a new VectorSource with the fetched data
+  //     setOccurrenceSource(
+  //       new VectorSource({
+  //         format: new GeoJSON(),
+  //         features: data.features || [], // Assuming the data structure has a 'features' property
+  //         strategy: bboxStrategy,
+  //       })
+  //     );
+
+  //     // const newOccurrenceLayer = new VectorLayer({
+  //     //   title: "Occurrence Layer",
+  //     //   visible: true,
+  //     //   preload: Infinity,
+  //     //   source: newOccurrenceSource,
+  //     //   style: (feature: { get: (arg0: string) => any; }) => {
+  //     //     const species = feature.get('species');
+  //     //     const ind = selectedSpecies.indexOf(species);
+
+  //     //     const validInd = ind >= 0 && ind < colorArray.length ? ind : 0;
+
+  //     //     return new Style({
+  //     //       image: new Circle({
+  //     //         fill: new Fill({
+  //     //           color: colorArray[validInd],
+  //     //         }),
+  //     //         stroke: new Stroke({
+  //     //           color: 'rgba(255, 0, 0, 1)',
+  //     //           width: 2,
+  //     //         }),
+  //     //         radius: 5,
+  //     //       }),
+  //     //     });
+  //     //   },
+  //     // } as BaseLayerOptions);
+
+  //     // const newOccurrenceGroup = 
+  //     //   new LayerGroup({
+  //     //     title: "Occurrence",
+  //     //     layers: [newOccurrenceLayer],
+  //     //   } as GroupLayerOptions)
+
+
+  //     // // Update the state with the new VectorSource, VectorLayer, and LayerGroup
+  //     // setOccurrenceSource(newOccurrenceSource);
+  //     // setOccurrenceLayer(newOccurrenceLayer);
+  //     // setOccurrenceGroup(newOccurrenceGroup);
+
+  //   } catch (error) {
+  //     console.error("Error fetching occurrence data:", error);
+  //   }
+  // };
+
+
+
+
+  // useEffect(() => {
+  //   // Filter occurrenceSource based on selected species
+  //   if (occurrenceSource && selectedSpecies) {
+  //     const filteredFeatures = occurrenceSource.getFeatures().filter(feature => {
+  //       // Assuming 'species' is the field in your GeoJSON data
+  //       const speciesProperty = feature.get('species');
+  //       return speciesProperty === selectedSpecies;
+  //     });
+
+  //     const filteredOccurrenceSource = new VectorSource({
+  //       features: filteredFeatures,
+  //     });
+
+  //     // Update the occurrence layer with the filtered source
+  //     const newOccurrenceLayer = new VectorLayer({
+  //       title: "Occurrence Layer",
+  //       visible: true,
+  //       preload: Infinity,
+  //       source: filteredOccurrenceSource,
+  //       style: new Style({
+  //         image: new Circle({
+  //           fill: new Fill({
+  //             color: "rgba(255, 0, 0, 0.5)", // Fill color
+  //           }),
+  //           stroke: new Stroke({
+  //             color: "rgba(255, 0, 0, 1)", // Stroke color
+  //             width: 2, // Stroke width
+  //           }),
+  //           radius: 5,
+  //         }),
+  //       }),
+  //     } as BaseLayerOptions);
+
+  //     // Update the occurrenceLayer state
+  //     setOccurrenceLayer(newOccurrenceLayer);
+  //   }
+  // }, [selectedSpecies, occurrenceSource]);
+
+  // useEffect(() => {
+  //   // Update the occurrenceGroup with the new occurrenceLayer
+  //   if (occurrenceLayer) {
+  //     const newOccurrenceGroup = new LayerGroup({
+  //       title: "Occurrence",
+  //       layers: [occurrenceLayer],
+  //     } as GroupLayerOptions);
+  //     console.log(newOccurrenceGroup)
+
+  //     // Update the occurrenceGroup state
+  //     setOccurrenceGroup(newOccurrenceGroup);
+  //   }
+  // }, [occurrenceLayer]);
+
+
+  // START OF STATE DECLARATION
+
+  //'END OF STATE DECLARATION'
+
+
+  // START OF URL USE EFFECT
+  // useEffect(() => {
+
+  //   const speciesFilter = selectedSpecies.length
+  //   ? `species IN (${selectedSpecies.map(species => `'${encodeURIComponent(species)}'`).join(',')})`
+  //   : '';
+  //   const url = new URL(`${geoServerBaseUrl}/geoserver/vector/ows`);
+  //   url.searchParams.set('service', 'WFS');
+  //   url.searchParams.set('version', '1.0.0');
+  //   url.searchParams.set('request', 'GetFeature');
+  //   url.searchParams.set('typeName', 'vector:occurrence');
+  //   url.searchParams.set('maxFeatures', '1000');
+  //   url.searchParams.set('outputFormat', 'application/json');
+
+  //   if (speciesFilter) {
+  //     url.searchParams.set('cql_filter', speciesFilter);
+  //   }
+
+  //   const urlString: string = url.toString();
+  //   console.log(urlString);
+
+  //   occurrenceSource.setUrl(url.toString());
+  //   occurrenceSource.refresh();
+
+  //   const updatedOccurrenceSource = new VectorSource({
+  //     format: new GeoJSON(),
+  //     url: urlString,
+  //     strategy: bboxStrategy,
+  //   });
+  //   console.log(updatedOccurrenceSource)
+
+  //   if (occurrenceLayer.getSource() !== updatedOccurrenceSource) {
+  //     // Update the source of the existing layer
+  //     occurrenceLayer.setSource(updatedOccurrenceSource);
+  //   }
+
+  //   const updatedOccurrenceLayer = new VectorLayer({
+  //     title: "Occurrence Layer",
+  //     visible: true,
+  //     preload: Infinity,
+  //     source: updatedOccurrenceSource,
+  //     style: (feature: { get: (arg0: string) => any; }) => {
+  //       const species = feature.get('species');
+  //       const ind = selectedSpecies.indexOf(species);
+
+
+  //     //  console.log(ind);
+
+  //      const validInd = ind >= 0 && ind < colorArray.length ? ind : 0;
+  //     //  console.log('Fill Color:', colorArray[validInd]);
+  //       return new Style({
+  //         image: new Circle({
+  //           fill: new Fill({
+  //             color:  colorArray[0],
+  //           }),
+  //           stroke: new Stroke({
+  //             color: 'rgba(255, 0, 0, 1)',
+  //             width: 2,
+  //           }),
+  //           radius: 5,
+  //         }),
+  //       });
+
+  //     }
+  //   } as BaseLayerOptions);
+  //   console.log(updatedOccurrenceLayer)
+
+  //   const updatedOccurrenceGroup = new LayerGroup({
+  //     title: "Occurrence",
+  //     layers: [updatedOccurrenceLayer],
+  //   } as GroupLayerOptions);
+
+  //   setOccurrenceSource(updatedOccurrenceSource);
+  //   setOccurrenceLayer(updatedOccurrenceLayer);
+  //   setOccurrenceGroup(updatedOccurrenceGroup);
+
+  // }, [selectedSpecies, geoServerBaseUrl,]);
 
   // const occurrenceLayer = new VectorLayer({
   //   title: "Occurrence Layer",
@@ -282,80 +523,260 @@ function Newmap() {
   // } as GroupLayerOptions);
 
   useEffect(() => {
-    getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
-      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
-        const BaseMaps = new LayerGroup({
-          title: "Base Maps",
-          layers: baseMapsArray,
-        } as GroupLayerOptions);
+    const speciesColors = [
+      '#648fff',
+      '#785ef0',
+      '#fe6100',
+      '#ffb000',
+      '#000000',
+      '#ffffff',
+      '#dc267f',
+    ];
 
-        const Overlays = new LayerGroup({
-          title: "Overlays",
-          layers: overlaysArray,
-        } as GroupLayerOptions);
+    const occurrenceSource = new VectorSource({
+      format: new GeoJSON(),
+      features: [],
+      strategy: bboxStrategy,
+    });
+    const occurrenceLayer = new VectorLayer({
+      title: "Occurrence Layer",
+      visible: true,
+      preload: Infinity,
+      source: occurrenceSource,
+      style: (feature: any) => {
+        const species = feature.getProperties().species;
+        const isSelectedSpecies = selectedSpecies.includes(species);
+        const speciesIndex = selectedSpecies.indexOf(species);
+        const color = speciesIndex !== -1 ? speciesColors[speciesIndex] : 'red';
 
-        if (BaseMaps) {
-          if (Overlays) {
-            const initialMap = new Map({
-              target: "map-container",
-              layers: [BaseMaps, Overlays, occurrenceGroup],
-              view: new View({
-                center: [0, 0],
-                zoom: 4,
-              }),
-            });
-            const layerSwitcher = new LayerSwitcher();
-            initialMap.addControl(layerSwitcher);
+        return new Style({
+          image: new Circle({
+            radius: 5,
+            fill: new Fill({
+              color: isSelectedSpecies ? color : 'red',
+            }),
+          }),
+        });
+      },
+    } as BaseLayerOptions);
+    occurrenceLayer.set('occurrence-data', true);
 
-            const handleMapClick = (event: any) => {
-              console.log("handle map click before checking if map is defined");
-              // if (map) {
-              console.log("map defined");
-              initialMap.forEachFeatureAtPixel(
-                event.pixel,
-                (feature, layer) => {
-                  if (layer === occurrenceLayer) {
-                    console.log("Point clicked");
-                    // Create a reference to the dummy HTML element for Popover anchor
-                    const dummyAnchor = document.createElement("div");
-                    dummyAnchor.style.position = "absolute";
+    const fetchOccurrenceData = async () => {
+      try {
+        const response = await fetch(
+          geoServerBaseUrl +
+          "/geoserver/vector/ows?service=WFS&version=" +
+          "1.0.0&request=GetFeature&typeName" +
+          "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson"
+        );
 
-                    // Position the dummy anchor based on the event's pixel
-                    // Here you would use the map container's ID or ref to position correctly
-                    dummyAnchor.style.left = `${event.pixel[0]}px`;
-                    dummyAnchor.style.top = `${event.pixel[1]}px`;
+        const data = await response.json();
 
-                    // Append the dummy anchor to the map element
-                    // Assuming mapElement.current is the container of the map
-                    if (mapElement.current) {
-                      mapElement.current.appendChild(dummyAnchor);
+        console.log("Fetched data:", data);
+        const featuresArray = data.features || [];
+
+        if (Array.isArray(featuresArray)) {
+          // Update the occurrence source with the fetched features
+          occurrenceSource.clear();
+          occurrenceSource.addFeatures(
+            new GeoJSON().readFeatures(responseToGEOJSON(featuresArray), {
+              featureProjection: 'EPSG:3857',
+            })
+          );
+          occurrenceLayer.changed();
+
+          setOccurrenceData(featuresArray);
+
+          console.log(selectedSpecies)
+
+          // const occurrenceSource = new VectorSource({
+          //   format: new GeoJSON(),
+          //   features: new GeoJSON().readFeatures(responseToGEOJSON(featuresArray), {
+          //     featureProjection: 'EPSG:3857',
+          //   }),
+          //   strategy: bboxStrategy,
+          // });
+
+          // const occurrenceLayer = new VectorLayer({
+          //   title: "Occurrence Layer",
+          //   visible: true,
+          //   preload: Infinity,
+          //   source: occurrenceSource,
+          //   style: (feature: any) => {
+          //     const species = feature.getProperties().species;
+          //     const isSelectedSpecies = selectedSpecies.includes(species);
+
+          //     // Find the index of the species in the selectedSpecies array
+          //     const speciesIndex = selectedSpecies.indexOf(species);
+
+          //     // Use the speciesIndex to get the corresponding color from the array
+          //     const color = speciesIndex !== -1 ? speciesColors[speciesIndex] : 'red';
+
+          //     return new Style({
+          //       image: new Circle({
+          //         radius: 5,
+          //         fill: new Fill({
+          //           color: isSelectedSpecies ? color : 'red',
+          //         }),
+          //       }),
+          //     });
+          //   },
+          // } as BaseLayerOptions);
+          // occurrenceLayer.set('occurrence-data', true);
+          // const isOccurrenceData = occurrenceLayer.get('occurrence-data');
+          // console.log(isOccurrenceData); // Should log true
+
+
+          getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
+            getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
+              const BaseMaps = new LayerGroup({
+                title: "Base Maps",
+                layers: baseMapsArray,
+              } as GroupLayerOptions);
+
+              const Overlays = new LayerGroup({
+                title: "Overlays",
+                layers: overlaysArray,
+              } as GroupLayerOptions);
+
+              // const occurrenceGroup = new LayerGroup({
+              //   title: "Occurrence",
+              //   layers: [occurrenceLayer],
+              // } as GroupLayerOptions);
+              // const occurrenceLayer = map?.getAllLayers().find((l) => l.get('occurrence-data'));
+
+              if (BaseMaps && Overlays) {
+                const initialMap = new Map({
+                  target: "map-container",
+                  layers: [BaseMaps, Overlays, occurrenceLayer],
+                  view: new View({
+                    center: [0, 0],
+                    zoom: 4,
+                  }),
+                });
+
+                initialMap.getLayers().clear();
+                initialMap.addLayer(BaseMaps);
+                initialMap.addLayer(Overlays);
+                initialMap.addLayer(occurrenceLayer);
+
+                const layerSwitcher = new LayerSwitcher();
+                initialMap.addControl(layerSwitcher);
+                const mapLayers = initialMap.getLayers().getArray();
+                console.log("Map Layers:", mapLayers);
+
+                const handleMapClick = (event: any) => {
+                  console.log("handle map click before checking if map is defined");
+                  // if (map) {
+                  console.log("map defined");
+                  initialMap.forEachFeatureAtPixel(
+                    event.pixel,
+                    (feature, layer) => {
+                      if (layer === occurrenceLayer) {
+                        console.log("Point clicked");
+                        // Create a reference to the dummy HTML element for Popover anchor
+                        const dummyAnchor = document.createElement("div");
+                        dummyAnchor.style.position = "absolute";
+
+                        // Position the dummy anchor based on the event's pixel
+                        // Here you would use the map container's ID or ref to position correctly
+                        dummyAnchor.style.left = `${event.pixel[0]}px`;
+                        dummyAnchor.style.top = `${event.pixel[1]}px`;
+
+                        // Append the dummy anchor to the map element
+                        // Assuming mapElement.current is the container of the map
+                        if (mapElement.current) {
+                          mapElement.current.appendChild(dummyAnchor);
+                        }
+
+                        // Set the state for Popover content and anchor
+                        setPopoverContent(feature.getProperties());
+                        setAnchorEl(dummyAnchor);
+
+                        // Return true to stop the forEach loop if needed
+                        return true;
+                      }
                     }
+                  );
+                  // }
+                };
 
-                    // Set the state for Popover content and anchor
-                    setPopoverContent(feature.getProperties());
-                    setAnchorEl(dummyAnchor);
+                initialMap.on("singleclick", handleMapClick);
 
-                    // Return true to stop the forEach loop if needed
-                    return true;
-                  }
-                }
-              );
-              // }
-            };
+                setMap(initialMap);
+              }
+            });
+          });
 
-            initialMap.on("singleclick", handleMapClick);
-
-            setMap(initialMap);
+          const layerSwitcher = new LayerSwitcher();
+          if (map) {
+            map.addControl(layerSwitcher);
           }
         }
-      });
-    });
+      }
 
-    const layerSwitcher = new LayerSwitcher();
-    if (map) {
-      map.addControl(layerSwitcher);
+      catch (error) {
+        console.error("Error fetching occurrence data:", error);
+      }
     }
+    fetchOccurrenceData();
   }, []);
+
+  useEffect(() => {
+    const greenCircleStyle = new Style({
+      image: new Circle({
+        radius: 5,
+        fill: new Fill({
+          color: 'green',
+        }),
+      }),
+    });
+    const logFilteredFeatures = () => {
+      const filteredFeatures = occurrenceData.filter((feature) => {
+        const species = feature.properties.species;
+        return selectedSpecies.includes(species);
+      });
+
+      console.log('Filtered Features:', filteredFeatures);
+    
+    const existingOccurrenceLayer = map?.getLayers().getArray().find((layer) => {
+      return layer.get('occurrence-data') === true;
+    });
+    console.log(existingOccurrenceLayer)
+    if (existingOccurrenceLayer) {
+      // Remove the existing occurrence layer from the map
+      map?.removeLayer(existingOccurrenceLayer);
+      console.log(map?.getAllLayers())
+      const newOccurrenceLayer = new VectorLayer({
+        title: 'Occurrence Layer',
+        visible: true,
+        preload: Infinity,
+        source: new VectorSource({
+          format: new GeoJSON(),
+          features: new GeoJSON().readFeatures(responseToGEOJSON(filteredFeatures), {
+            featureProjection: 'EPSG:3857',
+          }),
+          strategy: bboxStrategy,
+        }),
+        style: greenCircleStyle,
+      }as BaseLayerOptions);
+
+      newOccurrenceLayer.set('occurrence-data', true);
+      newOccurrenceLayer.setZIndex(999)
+
+      // Add the new occurrence layer to the map
+      map?.addLayer(newOccurrenceLayer);
+      console.log(map?.getAllLayers())
+      map?.render()
+    }
+  }
+
+    logFilteredFeatures();
+    return () => {
+      logFilteredFeatures();
+    };
+  
+  }, [selectedSpecies, ]);
 
   const parentContainerStyle = {
     maxWidth: "800px", // Adjust as needed or remove for full-width responsiveness
@@ -375,409 +796,409 @@ function Newmap() {
       </div>
 
       <div
-      style={{
-        position: "absolute",
-        top: "135px",
-        left: "50%",
-        alignItems: "center",
-        transform: "translateX(-50%)",
-        zIndex: 1000,
-      }}
-    >
-      <Tooltip title={newopen ? "Hide Filters" : "Show Filters"} arrow>
-        <IconButton
-          onClick={() => setOpen(!newopen)}
-          sx={{
-            width: 24,
-            height: 24,
-            backgroundColor: "#4CAF50", // Background color when the button is not hovered or active
-            color: "white", // Text color when the button is not hovered or active
-            "&:hover": {
-              backgroundColor: "#45a049", // Background color on hover
-            },
-            "&:active": {
-              backgroundColor: "#4CAF50", // Background color on click
-            },
-          }}
-        >
-          <TuneIcon />
-        </IconButton>
-      </Tooltip>
+        style={{
+          position: "absolute",
+          top: "135px",
+          left: "50%",
+          alignItems: "center",
+          transform: "translateX(-50%)",
+          zIndex: 1000,
+        }}
+      >
+        <Tooltip title={newopen ? "Hide Filters" : "Show Filters"} arrow>
+          <IconButton
+            onClick={() => setOpen(!newopen)}
+            sx={{
+              width: 24,
+              height: 24,
+              backgroundColor: "#4CAF50", // Background color when the button is not hovered or active
+              color: "white", // Text color when the button is not hovered or active
+              "&:hover": {
+                backgroundColor: "#45a049", // Background color on hover
+              },
+              "&:active": {
+                backgroundColor: "#4CAF50", // Background color on click
+              },
+            }}
+          >
+            <TuneIcon />
+          </IconButton>
+        </Tooltip>
 
-      <Collapse in={newopen}>
-        <Box style={containerStyle}>
-          <Grid container spacing={1} style={{ marginTop: "10px" }}>
-            <Grid item xs={12} sm={4}>
-              <FormControl style={{ ...formControlStyle, marginRight: "10px" }}>
-                <InputLabel
-                  id="disease-label"
-                  sx={{ fontSize: "0.8rem", display: "flex" }}
-                >
-                  {isDiseaseSelected ? "" : "Disease"}
-                </InputLabel>
-                <Select
-                  labelId="disease-label"
-                  id="disease-select"
-                  onChange={handleDiseaseChange}
-                  multiple
-                  value={selectedDisease}
-                  sx={{ maxWidth: "90%", shrink: "true" }}
+        <Collapse in={newopen}>
+          <Box style={containerStyle}>
+            <Grid container spacing={1} style={{ marginTop: "10px" }}>
+              <Grid item xs={12} sm={4}>
+                <FormControl style={{ ...formControlStyle, marginRight: "10px" }}>
+                  <InputLabel
+                    id="disease-label"
+                    sx={{ fontSize: "0.8rem", display: "flex" }}
+                  >
+                    {isDiseaseSelected ? "" : "Disease"}
+                  </InputLabel>
+                  <Select
+                    labelId="disease-label"
+                    id="disease-select"
+                    onChange={handleDiseaseChange}
+                    multiple
+                    value={selectedDisease}
+                    sx={{ maxWidth: "90%", shrink: "true" }}
 
                   // renderValue={(selected) => (selected as string[]).join(", ")}
-                >
-                  <MenuItem value="disease1">Malaria</MenuItem>
-                  <MenuItem value="disease2">Chikungunya</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <FormControl style={{ ...formControlStyle, marginRight: "10px" }}>
-                <InputLabel id="country-label" sx={{ fontSize: "0.8rem" }}>
-                  {isCountrySelected ? "" : "Country"}
-                </InputLabel>
-                <Select
-                  labelId="country-label"
-                  id="country-select"
-                  value={selectedCountry}
-                  multiple
-                  onChange={handleCountryChange}
-                  sx={{ maxWidth: "90%", shrink: "true" }}
-                >
-                  <MenuItem value="country1">Kenya</MenuItem>
-                  <MenuItem value="country2">Uganda</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <FormControl style={formControlStyle}>
-                <InputLabel id="species-label" sx={{ fontSize: "0.8rem" }}>
-                  {isSpeciesSelected ? "" : "Species"}
-                </InputLabel>
-                <Select
-                  labelId="species-label"
-                  id="species-select"
-                  onChange={handleSpeciesChange}
-                  multiple
-                  value={selectedSpecies}
-                  sx={{ maxWidth: "90%", shrink: "true" }}
-                >
-                  <MenuItem value="gambiae">An. gambiae</MenuItem>
-                  <MenuItem value="funestus">An. fenestus</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
-              container
-              alignItems="center"
-              direction="row"
-              justifyContent="space-between"
-              p="6px"
-            >
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{ fontStyle: "italic", marginRight: ".5px" }}
-                >
-                  Season:{" "}
-                </Typography>
-                <Tooltip title="Rainy" arrow>
-                  <IconButton
-                    onClick={() => setSelectedSeason("Rainy")}
-                    color={selectedSeason === "Rainy" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color: "#2e7d32", // Green color on hover
-                      },
-                    }}
                   >
-                    <ThunderstormIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Dry" arrow>
-                  <IconButton
-                    onClick={() => setSelectedSeason("Dry")}
-                    color={selectedSeason === "Dry" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color: selectedSeason === "Dry" ? "default" : "#2e7d32",
-                      },
-                    }}
+                    <MenuItem value="disease1">Malaria</MenuItem>
+                    <MenuItem value="disease2">Chikungunya</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <FormControl style={{ ...formControlStyle, marginRight: "10px" }}>
+                  <InputLabel id="country-label" sx={{ fontSize: "0.8rem" }}>
+                    {isCountrySelected ? "" : "Country"}
+                  </InputLabel>
+                  <Select
+                    labelId="country-label"
+                    id="country-select"
+                    value={selectedCountry}
+                    multiple
+                    onChange={handleCountryChange}
+                    sx={{ maxWidth: "90%", shrink: "true" }}
                   >
-                    <WbSunnyIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Empty" arrow>
-                  <IconButton
-                    onClick={() => setSelectedSeason("Empty")}
-                    color={selectedSeason === "Empty" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedSeason === "Empty" ? "#2e7d32" : "primary",
-                      },
-                    }}
+                    <MenuItem value="country1">Kenya</MenuItem>
+                    <MenuItem value="country2">Uganda</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <FormControl style={formControlStyle}>
+                  <InputLabel id="species-label" sx={{ fontSize: "0.8rem" }}>
+                    {isSpeciesSelected ? "" : "Species"}
+                  </InputLabel>
+                  <Select
+                    labelId="species-label"
+                    id="species-select"
+                    onChange={handleSpeciesChange}
+                    multiple
+                    value={selectedSpecies}
+                    sx={{ maxWidth: "90%", shrink: "true" }}
                   >
-                    <DataArrayIcon />
-                  </IconButton>
-                </Tooltip>
+                    <MenuItem value="gambiae">An. gambiae</MenuItem>
+                    <MenuItem value="funestus">An. fenestus</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid
-                item
-                xs={12}
-                sm={6}
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
+                container
+                alignItems="center"
+                direction="row"
+                justifyContent="space-between"
+                p="6px"
               >
-                <Typography
-                  variant="caption"
-                  sx={{ fontStyle: "italic", marginRight: "0.5px" }}
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
                 >
-                  Control:{" "}
-                </Typography>
-                <Tooltip title="True" arrow>
-                  <IconButton
-                    onClick={() => setSelectedControl("True")}
-                    color={selectedControl === "True" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedControl === "True" ? "#2e7d32" : "primary",
-                      },
-                    }}
+                  <Typography
+                    variant="caption"
+                    sx={{ fontStyle: "italic", marginRight: ".5px" }}
                   >
-                    <DoneIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="False" arrow>
-                  <IconButton
-                    onClick={() => setSelectedControl("False")}
-                    color={selectedControl === "False" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedControl === "False" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Empty" arrow>
-                  <IconButton
-                    onClick={() => setSelectedControl("Empty")}
-                    color={selectedControl === "Empty" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedControl === "Empty" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <DataArrayIcon />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{ fontStyle: "italic", marginRight: "10px" }}
+                    Season:{" "}
+                  </Typography>
+                  <Tooltip title="Rainy" arrow>
+                    <IconButton
+                      onClick={() => setSelectedSeason("Rainy")}
+                      color={selectedSeason === "Rainy" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color: "#2e7d32", // Green color on hover
+                        },
+                      }}
+                    >
+                      <ThunderstormIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Dry" arrow>
+                    <IconButton
+                      onClick={() => setSelectedSeason("Dry")}
+                      color={selectedSeason === "Dry" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color: selectedSeason === "Dry" ? "default" : "#2e7d32",
+                        },
+                      }}
+                    >
+                      <WbSunnyIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Empty" arrow>
+                    <IconButton
+                      onClick={() => setSelectedSeason("Empty")}
+                      color={selectedSeason === "Empty" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedSeason === "Empty" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <DataArrayIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
                 >
-                  Adult:{" "}
-                </Typography>
-                <Tooltip title="True" arrow>
-                  <IconButton
-                    onClick={() => setSelectedAdult("True")}
-                    color={selectedAdult === "True" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color: selectedAdult === "True" ? "#2e7d32" : "primary",
-                      },
-                    }}
+                  <Typography
+                    variant="caption"
+                    sx={{ fontStyle: "italic", marginRight: "0.5px" }}
                   >
-                    <EmojiNatureIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="False" arrow>
-                  <IconButton
-                    onClick={() => setSelectedAdult("False")}
-                    color={selectedAdult === "False" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedAdult === "False" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <BugReportIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Empty" arrow>
-                  <IconButton
-                    onClick={() => setSelectedAdult("Empty")}
-                    color={selectedAdult === "Empty" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedAdult === "Empty" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <DataArrayIcon />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{ fontStyle: "italic", marginRight: "5px" }}
+                    Control:{" "}
+                  </Typography>
+                  <Tooltip title="True" arrow>
+                    <IconButton
+                      onClick={() => setSelectedControl("True")}
+                      color={selectedControl === "True" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedControl === "True" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <DoneIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="False" arrow>
+                    <IconButton
+                      onClick={() => setSelectedControl("False")}
+                      color={selectedControl === "False" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedControl === "False" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Empty" arrow>
+                    <IconButton
+                      onClick={() => setSelectedControl("Empty")}
+                      color={selectedControl === "Empty" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedControl === "Empty" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <DataArrayIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
                 >
-                  Larval:{" "}
-                </Typography>
-                <Tooltip title="True" arrow>
-                  <IconButton
-                    onClick={() => setSelectedLarval("True")}
-                    color={selectedLarval === "True" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedLarval === "True" ? "#2e7d32" : "primary",
-                      },
-                    }}
+                  <Typography
+                    variant="caption"
+                    sx={{ fontStyle: "italic", marginRight: "10px" }}
                   >
-                    <PestControlIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="False" arrow>
-                  <IconButton
-                    onClick={() => setSelectedLarval("False")}
-                    color={selectedLarval === "False" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedLarval === "False" ? "#2e7d32" : "primary",
-                      },
-                    }}
+                    Adult:{" "}
+                  </Typography>
+                  <Tooltip title="True" arrow>
+                    <IconButton
+                      onClick={() => setSelectedAdult("True")}
+                      color={selectedAdult === "True" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color: selectedAdult === "True" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <EmojiNatureIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="False" arrow>
+                    <IconButton
+                      onClick={() => setSelectedAdult("False")}
+                      color={selectedAdult === "False" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedAdult === "False" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <BugReportIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Empty" arrow>
+                    <IconButton
+                      onClick={() => setSelectedAdult("Empty")}
+                      color={selectedAdult === "Empty" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedAdult === "Empty" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <DataArrayIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ fontStyle: "italic", marginRight: "5px" }}
                   >
-                    <EggIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Empty" arrow>
-                  <IconButton
-                    onClick={() => setSelectedLarval("Empty")}
-                    color={selectedLarval === "Empty" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedLarval === "Empty" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <DataArrayIcon />
-                  </IconButton>
-                </Tooltip>
+                    Larval:{" "}
+                  </Typography>
+                  <Tooltip title="True" arrow>
+                    <IconButton
+                      onClick={() => setSelectedLarval("True")}
+                      color={selectedLarval === "True" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedLarval === "True" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <PestControlIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="False" arrow>
+                    <IconButton
+                      onClick={() => setSelectedLarval("False")}
+                      color={selectedLarval === "False" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedLarval === "False" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <EggIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Empty" arrow>
+                    <IconButton
+                      onClick={() => setSelectedLarval("Empty")}
+                      color={selectedLarval === "Empty" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedLarval === "Empty" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <DataArrayIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
               </Grid>
-            </Grid>
-            <div style={buttonContainerStyle}>
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: "#2e7d32",
-                  "&:hover": {
-                    backgroundColor: colors.grey[500], // Background color on hover
-                  },
-                }}
-                size="small"
-                style={{ fontSize: "0.6rem" }}
-                onClick={handleApplyFilters}
-              >
-                Apply
-              </Button>
-            </div>
-            <div style={buttonContainerStyle}>
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: "#2e7d32",
-                  "&:hover": {
-                    backgroundColor: colors.grey[500], // Background color on hover
-                  },
-                }}
-                size="small"
-                style={{ fontSize: "0.6rem" }}
-                onClick={() => {
-                  setSelectedDisease([] as string[]);
-                  setIsDiseaseSelected(false);
-                  setSelectedCountry([] as string[]);
-                  setIsCountrySelected(false);
-                  setSelectedSpecies([] as string[]);
-                  setIsSpeciesSelected(false);
-                  setSelectedSeason("");
-                  setIsSeasonSelected(false);
-                  setSelectedAdult("");
-                  setIsAdultSelected(false);
-                  setSelectedControl("");
-                  setIsControlSelected(false);
-                  setSelectedLarval("");
-                  setIsLarvalSelected(false);
+              <div style={buttonContainerStyle}>
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#2e7d32",
+                    "&:hover": {
+                      backgroundColor: colors.grey[500], // Background color on hover
+                    },
+                  }}
+                  size="small"
+                  style={{ fontSize: "0.6rem" }}
+                  onClick={handleApplyFilters}
+                >
+                  Apply
+                </Button>
+              </div>
+              <div style={buttonContainerStyle}>
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#2e7d32",
+                    "&:hover": {
+                      backgroundColor: colors.grey[500], // Background color on hover
+                    },
+                  }}
+                  size="small"
+                  style={{ fontSize: "0.6rem" }}
+                  onClick={() => {
+                    setSelectedDisease([] as string[]);
+                    setIsDiseaseSelected(false);
+                    setSelectedCountry([] as string[]);
+                    setIsCountrySelected(false);
+                    setSelectedSpecies([] as string[]);
+                    setIsSpeciesSelected(false);
+                    setSelectedSeason("");
+                    setIsSeasonSelected(false);
+                    setSelectedAdult("");
+                    setIsAdultSelected(false);
+                    setSelectedControl("");
+                    setIsControlSelected(false);
+                    setSelectedLarval("");
+                    setIsLarvalSelected(false);
 
-                  // Reset other state variables as needed
-                }}
-              >
-                Clear Selection
-              </Button>
-            </div>
-          </Grid>
-        </Box>
-      </Collapse>
-    </div>
+                    // Reset other state variables as needed
+                  }}
+                >
+                  Clear Selection
+                </Button>
+              </div>
+            </Grid>
+          </Box>
+        </Collapse>
+      </div>
       <Popover
         id={id}
         open={open}
         anchorEl={anchorEl}
         onClose={handleClosePopover}
-        // ... other props
+      // ... other props
       >
         <div>
           <Accordion
@@ -875,7 +1296,7 @@ function Newmap() {
           </Accordion>
         </div>
       </Popover>
-      
+
     </>
   );
 }
