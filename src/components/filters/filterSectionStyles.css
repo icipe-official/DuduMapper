@@ -3,11 +3,13 @@
 }
 .filter-section {
   position: absolute;
-  top: 180px;
+  top: 190px;
   left: 17px;
   align-items: center;
   transform: translateX(0%);
   z-index: 1000;
+  background-color: #45a049;
+  border-radius: 20px;
 }
 .form-control {
   margin-bottom: 5px;
