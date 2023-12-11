@@ -3,12 +3,13 @@
 }
 .filter-section {
   position: absolute;
-  top: 190px;
+  top: 170px;
   left: 17px;
   align-items: center;
   transform: translateX(0%);
   z-index: 1000;
-  background-color: #45a049;
+  background-color: #ebbd40;
+  color: white !important;
   border-radius: 20px;
 }
 .form-control {
@@ -50,7 +51,7 @@
   max-width: 980px;
   margin-left: 350px;
   position: absolute;
-  width: 400px;
+  width: 600px;
   top: -70px;
 }
 
