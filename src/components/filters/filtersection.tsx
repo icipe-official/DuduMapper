@@ -36,6 +36,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { countryList, speciesList } from "./filterUtils";
+import RectangleOutlinedIcon from "@mui/icons-material/RectangleOutlined";
+import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
+import FormatShapesIcon from "@mui/icons-material/FormatShapes";
 
 const FilterSection = (openFilter: any) => {
   const [open, setOpen] = useState(openFilter);
@@ -53,6 +56,7 @@ const FilterSection = (openFilter: any) => {
   const [isAdultSelected, setIsAdultSelected] = useState(false);
   const [selectedLarval, setSelectedLarval] = useState("");
   const [isLarvalSelected, setIsLarvalSelected] = useState(false);
+  const [selectedByArea, setSelectedByArea] = useState("");
 
   const handleDiseaseChange = (
     _: React.SyntheticEvent<Element, Event>,
@@ -97,6 +101,16 @@ const FilterSection = (openFilter: any) => {
     newSelectedSpecies.splice(index, 1);
     setSelectedSpecies(newSelectedSpecies);
     setIsSpeciesSelected(newSelectedSpecies.length > 0);
+  };
+
+  const toggleSelectedByArea = (shape: string) => {
+    if (selectedByArea === "") {
+      setSelectedByArea(shape);
+    } else if (selectedByArea != shape && selectedByArea != "") {
+      setSelectedByArea(shape);
+    } else {
+      setSelectedByArea("");
+    }
   };
 
   const SelectionCounter: React.FC<{ count: number }> = ({ count }) => (
@@ -295,212 +309,328 @@ const FilterSection = (openFilter: any) => {
                   xs={12}
                   sm={4}
                   sx={{
-                    display: "flex",
                     flexDirection: "row",
                     alignItems: "center",
                   }}
                 >
-                  <Typography
-                    variant="caption"
+                  <Grid
+                    item
+                    xs={12}
+                    sm={4}
                     sx={{
-                      fontStyle: "italic",
-                      marginRight: ".5px",
-                      color: "black",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
                     }}
                   >
-                    Season:{" "}
-                  </Typography>
-                  <Tooltip title="Rainy" arrow>
-                    <IconButton
-                      onClick={() => setSelectedSeason("Rainy")}
-                      color={selectedSeason === "Rainy" ? "success" : "default"}
+                    <Typography
+                      variant="caption"
                       sx={{
-                        fontSize: "1.5rem",
-                        "&:hover": {
-                          color: "#2e7d32", // Green color on hover
-                        },
+                        fontStyle: "italic",
+                        marginRight: ".5px",
+                        color: "black",
                       }}
                     >
-                      <ThunderstormIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Dry" arrow>
-                    <IconButton
-                      onClick={() => setSelectedSeason("Dry")}
-                      color={selectedSeason === "Dry" ? "success" : "default"}
+                      Season:{" "}
+                    </Typography>
+                    <Tooltip title="Rainy" arrow>
+                      <IconButton
+                        onClick={() => setSelectedSeason("Rainy")}
+                        color={
+                          selectedSeason === "Rainy" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color: "#2e7d32", // Green color on hover
+                          },
+                        }}
+                      >
+                        <ThunderstormIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Dry" arrow>
+                      <IconButton
+                        onClick={() => setSelectedSeason("Dry")}
+                        color={selectedSeason === "Dry" ? "success" : "default"}
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedSeason === "Dry" ? "default" : "#2e7d32",
+                          },
+                        }}
+                      >
+                        <WbSunnyIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Empty" arrow>
+                      <IconButton
+                        onClick={() => setSelectedSeason("Empty")}
+                        color={
+                          selectedSeason === "Empty" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedSeason === "Empty"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
                       sx={{
-                        fontSize: "1.5rem",
-                        "&:hover": {
-                          color:
-                            selectedSeason === "Dry" ? "default" : "#2e7d32",
-                        },
+                        fontStyle: "italic",
+                        marginRight: "0.5px",
+                        color: "black",
                       }}
                     >
-                      <WbSunnyIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Empty" arrow>
-                    <IconButton
-                      onClick={() => setSelectedSeason("Empty")}
-                      color={selectedSeason === "Empty" ? "success" : "default"}
-                      sx={{
-                        fontSize: "1.5rem",
-                        "&:hover": {
-                          color:
-                            selectedSeason === "Empty" ? "#2e7d32" : "primary",
-                        },
-                      }}
-                    >
-                      <DataArrayIcon />
-                    </IconButton>
-                  </Tooltip>
+                      Control:{" "}
+                    </Typography>
+                    <Tooltip title="True" arrow>
+                      <IconButton
+                        onClick={() => setSelectedControl("True")}
+                        color={
+                          selectedControl === "True" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedControl === "True"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <DoneIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="False" arrow>
+                      <IconButton
+                        onClick={() => setSelectedControl("False")}
+                        color={
+                          selectedControl === "False" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedControl === "False"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Empty" arrow>
+                      <IconButton
+                        onClick={() => setSelectedControl("Empty")}
+                        color={
+                          selectedControl === "Empty" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedControl === "Empty"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
                 </Grid>
                 <Grid
                   item
                   xs={12}
-                  sm={6}
+                  sm={4}
                   sx={{
-                    display: "flex",
                     flexDirection: "row",
                     alignItems: "center",
                   }}
                 >
-                  <Typography
-                    variant="caption"
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
                     sx={{
-                      fontStyle: "italic",
-                      marginRight: "0.5px",
-                      color: "black",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
                     }}
                   >
-                    Control:{" "}
-                  </Typography>
-                  <Tooltip title="True" arrow>
-                    <IconButton
-                      onClick={() => setSelectedControl("True")}
-                      color={selectedControl === "True" ? "success" : "default"}
+                    <Typography
+                      variant="caption"
                       sx={{
-                        fontSize: "1.5rem",
-                        "&:hover": {
-                          color:
-                            selectedControl === "True" ? "#2e7d32" : "primary",
-                        },
+                        fontStyle: "italic",
+                        marginRight: "10px",
+                        color: "black",
                       }}
                     >
-                      <DoneIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="False" arrow>
-                    <IconButton
-                      onClick={() => setSelectedControl("False")}
-                      color={
-                        selectedControl === "False" ? "success" : "default"
-                      }
+                      Adult:{" "}
+                    </Typography>
+                    <Tooltip title="True" arrow>
+                      <IconButton
+                        onClick={() => setSelectedAdult("True")}
+                        color={selectedAdult === "True" ? "success" : "default"}
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedAdult === "True" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <EmojiNatureIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="False" arrow>
+                      <IconButton
+                        onClick={() => setSelectedAdult("False")}
+                        color={
+                          selectedAdult === "False" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedAdult === "False" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <BugReportIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Empty" arrow>
+                      <IconButton
+                        onClick={() => setSelectedAdult("Empty")}
+                        color={
+                          selectedAdult === "Empty" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedAdult === "Empty" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
                       sx={{
-                        fontSize: "1.5rem",
-                        "&:hover": {
-                          color:
-                            selectedControl === "False" ? "#2e7d32" : "primary",
-                        },
+                        fontStyle: "italic",
+                        marginRight: "5px",
+                        color: "black",
                       }}
                     >
-                      <CloseIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Empty" arrow>
-                    <IconButton
-                      onClick={() => setSelectedControl("Empty")}
-                      color={
-                        selectedControl === "Empty" ? "success" : "default"
-                      }
-                      sx={{
-                        fontSize: "1.5rem",
-                        "&:hover": {
-                          color:
-                            selectedControl === "Empty" ? "#2e7d32" : "primary",
-                        },
-                      }}
-                    >
-                      <DataArrayIcon />
-                    </IconButton>
-                  </Tooltip>
+                      Larval:{" "}
+                    </Typography>
+                    <Tooltip title="True" arrow>
+                      <IconButton
+                        onClick={() => setSelectedLarval("True")}
+                        color={
+                          selectedLarval === "True" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedLarval === "True" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <PestControlIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="False" arrow>
+                      <IconButton
+                        onClick={() => setSelectedLarval("False")}
+                        color={
+                          selectedLarval === "False" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedLarval === "False"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <EggIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Empty" arrow>
+                      <IconButton
+                        onClick={() => setSelectedLarval("Empty")}
+                        color={
+                          selectedLarval === "Empty" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedLarval === "Empty"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
                 </Grid>
                 <Grid
                   item
                   xs={12}
-                  sm={6}
+                  sm={4}
                   sx={{
-                    display: "flex",
                     flexDirection: "row",
                     alignItems: "center",
                   }}
                 >
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontStyle: "italic",
-                      marginRight: "10px",
-                      color: "black",
-                    }}
-                  >
-                    Adult:{" "}
+                  <Typography sx={{ color: "green", fontSize: 15 }}>
+                    Select by Area
                   </Typography>
-                  <Tooltip title="True" arrow>
-                    <IconButton
-                      onClick={() => setSelectedAdult("True")}
-                      color={selectedAdult === "True" ? "success" : "default"}
-                      sx={{
-                        fontSize: "1.5rem",
-                        "&:hover": {
-                          color:
-                            selectedAdult === "True" ? "#2e7d32" : "primary",
-                        },
-                      }}
-                    >
-                      <EmojiNatureIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="False" arrow>
-                    <IconButton
-                      onClick={() => setSelectedAdult("False")}
-                      color={selectedAdult === "False" ? "success" : "default"}
-                      sx={{
-                        fontSize: "1.5rem",
-                        "&:hover": {
-                          color:
-                            selectedAdult === "False" ? "#2e7d32" : "primary",
-                        },
-                      }}
-                    >
-                      <BugReportIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Empty" arrow>
-                    <IconButton
-                      onClick={() => setSelectedAdult("Empty")}
-                      color={selectedAdult === "Empty" ? "success" : "default"}
-                      sx={{
-                        fontSize: "1.5rem",
-                        "&:hover": {
-                          color:
-                            selectedAdult === "Empty" ? "#2e7d32" : "primary",
-                        },
-                      }}
-                    >
-                      <DataArrayIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
                   <Typography
                     variant="caption"
                     sx={{
@@ -509,71 +639,77 @@ const FilterSection = (openFilter: any) => {
                       color: "black",
                     }}
                   >
-                    Larval:{" "}
+                    Rectangle:{" "}
+                    <IconButton
+                      onClick={() => toggleSelectedByArea("Rectangle")}
+                      color={
+                        selectedByArea === "Rectangle" ? "success" : "default"
+                      }
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedByArea === "Rectangle"
+                              ? "#2e7d32"
+                              : "primary",
+                        },
+                      }}
+                    >
+                      <RectangleOutlinedIcon />
+                    </IconButton>
                   </Typography>
-                  <Tooltip title="True" arrow>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontStyle: "italic",
+                      marginRight: "5px",
+                      color: "black",
+                    }}
+                  >
+                    Circle:{" "}
                     <IconButton
-                      onClick={() => setSelectedLarval("True")}
-                      color={selectedLarval === "True" ? "success" : "default"}
+                      onClick={() => toggleSelectedByArea("circle")}
+                      color={
+                        selectedByArea === "circle" ? "success" : "default"
+                      }
                       sx={{
                         fontSize: "1.5rem",
                         "&:hover": {
                           color:
-                            selectedLarval === "True" ? "#2e7d32" : "primary",
+                            selectedByArea === "circle" ? "#2e7d32" : "primary",
                         },
                       }}
                     >
-                      <PestControlIcon />
+                      <CircleOutlinedIcon />
                     </IconButton>
-                  </Tooltip>
-                  <Tooltip title="False" arrow>
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontStyle: "italic",
+                      marginRight: "5px",
+                      color: "black",
+                    }}
+                  >
+                    Free Hand:{" "}
                     <IconButton
-                      onClick={() => setSelectedLarval("False")}
-                      color={selectedLarval === "False" ? "success" : "default"}
+                      onClick={() => toggleSelectedByArea("freeHand")}
+                      color={
+                        selectedByArea === "freeHand" ? "success" : "default"
+                      }
                       sx={{
                         fontSize: "1.5rem",
                         "&:hover": {
                           color:
-                            selectedLarval === "False" ? "#2e7d32" : "primary",
+                            selectedByArea === "Circle" ? "#2e7d32" : "primary",
                         },
                       }}
                     >
-                      <EggIcon />
+                      <FormatShapesIcon />
                     </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Empty" arrow>
-                    <IconButton
-                      onClick={() => setSelectedLarval("Empty")}
-                      color={selectedLarval === "Empty" ? "success" : "default"}
-                      sx={{
-                        fontSize: "1.5rem",
-                        "&:hover": {
-                          color:
-                            selectedLarval === "Empty" ? "#2e7d32" : "primary",
-                        },
-                      }}
-                    >
-                      <DataArrayIcon />
-                    </IconButton>
-                  </Tooltip>
+                  </Typography>
                 </Grid>
               </Grid>
-              {/* <div style={buttonContainerStyle}>
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: "#2e7d32",
-                  "&:hover": {
-                    backgroundColor: colors.grey[500], // Background color on hover
-                  },
-                }}
-                size="small"
-                style={{ fontSize: "0.6rem" }}
-                onClick={handleApplyFilters}
-              >
-                Apply
-              </Button>
-            </div> */}
               <div className="button-container-style">
                 <Button
                   variant="contained"
