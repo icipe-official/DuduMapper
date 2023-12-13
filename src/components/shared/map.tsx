@@ -11,6 +11,8 @@ import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
+import Button from '@mui/material/Button';
+import AdjustIcon from '@mui/icons-material/Adjust';
 import { Pixel } from "ol/pixel";
 import MapBrowserEvent from "ol/MapBrowserEvent";
 import Event from "ol/events/Event";
@@ -31,7 +33,9 @@ import FilterSection from "../filters/filtersection";
 import { IconButton, Tooltip } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 import "../filters/filterSectionStyles.css";
-
+import SpeciesVisualizationButton from "../map/SpeciesVisualizationButton";
+import { init } from "next/dist/compiled/webpack/webpack";
+import SpeciesOccurrenceVisualizationControl from "../map/SpeciesOccurrenceVisualizationControl";
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [popoverContent, setPopoverContent] = React.useState<{
@@ -98,7 +102,11 @@ function Newmap() {
     title: "Occurrence",
     layers: [occurrenceLayer],
   } as GroupLayerOptions);
+  const [isSpeciesVisualizationControlVisible, setSpeciesVisualizationControlVisible] = useState(false);
 
+  const toggleSpeciesVisualizationControl = () => {
+    setSpeciesVisualizationControlVisible(!isSpeciesVisualizationControlVisible);
+  };
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
       getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
@@ -123,8 +131,9 @@ function Newmap() {
               }),
             });
             const layerSwitcher = new LayerSwitcher();
+            const speciesVisualizationControl = new SpeciesOccurrenceVisualizationControl({ onClick: toggleSpeciesVisualizationControl });
             initialMap.addControl(layerSwitcher);
-
+            initialMap.addControl(speciesVisualizationControl);
             const handleMapClick = (event: any) => {
               console.log("handle map click before checking if map is defined");
 
@@ -149,12 +158,10 @@ function Newmap() {
                       ? mapElement.current.offsetHeight / 2
                       : 0;
 
-                    dummyAnchor.style.left = `${
-                      mapContainerWidth - dummyAnchor.offsetWidth
-                    }px`;
-                    dummyAnchor.style.top = `${
-                      verticalCenter - dummyAnchor.offsetHeight / 2
-                    }px`;
+                    dummyAnchor.style.left = `${mapContainerWidth - dummyAnchor.offsetWidth
+                      }px`;
+                    dummyAnchor.style.top = `${verticalCenter - dummyAnchor.offsetHeight / 2
+                      }px`;
 
                     // Append the dummy anchor to the map element
                     if (mapElement.current) {
@@ -221,6 +228,8 @@ function Newmap() {
         expanded={expanded}
         handleChange={handleChange}
       />
+
+
     </>
   );
 }
