@@ -29,8 +29,8 @@ import { Stroke, Fill, Style, Circle } from "ol/style";
 import OccurrencePopup from "../map/occurrence_popup";
 import FilterSection from "../filters/filtersection";
 import { IconButton, Tooltip } from "@mui/material";
-import "../filters/filterSectionStyles.css";
 import TuneIcon from "@mui/icons-material/Tune";
+import "../filters/filterSectionStyles.css";
 
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
@@ -161,14 +161,14 @@ function Newmap() {
                       mapElement.current.appendChild(dummyAnchor);
                     }
 
-                  // Set the state for Popover content and anchor
-                  setPopoverContent(feature.getProperties());
-                  setAnchorEl(dummyAnchor);
+                    // Set the state for Popover content and anchor
+                    setPopoverContent(feature.getProperties());
+                    setAnchorEl(dummyAnchor);
 
-                  // Return true to stop the forEach loop if needed
-                  return true;
+                    // Return true to stop the forEach loop if needed
+                    return true;
+                  }
                 }
-              }
               );
               // }
             };
