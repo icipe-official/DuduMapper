@@ -8,6 +8,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
 import './accordion-style.css'
 import { CSSProperties } from 'react';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
 
 interface MapPopoverProps {
   id: string | undefined;
@@ -78,8 +80,19 @@ const OccurrencePopup: React.FC<MapPopoverProps> = ({
           </AccordionSummary>
           <AccordionDetails>
             <Typography>
+
               Species name: {popoverContent?.species}
+
             </Typography>
+
+
+            <Typography>
+              Period recorded
+            </Typography>
+            <Stack direction="row" spacing={1}>
+              <Chip label={popoverContent?.period_start} color="primary" />
+              <Chip label={popoverContent?.period_end} color="primary" />
+            </Stack>
           </AccordionDetails>
         </Accordion>
         <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
