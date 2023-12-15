@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Map, View } from "ol";
 import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
@@ -11,6 +11,10 @@ import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
+import Cluster from 'ol/source/Cluster';
+import { Text } from 'ol/style';
+import { Feature } from 'ol'
+import CircleStyle from "ol/style/Circle";
 import Button from '@mui/material/Button';
 import AdjustIcon from '@mui/icons-material/Adjust';
 import { Pixel } from "ol/pixel";
@@ -49,6 +53,19 @@ function Newmap() {
   const [expanded, setExpanded] = React.useState<string | false>(false);
 
   const [filterOpen, setFilterOpen] = useState(false);
+
+  const [distance, setDistance] = useState(40);
+  const [minDistance, setMinDistance] = useState(20);
+
+  // Event handlers with specified event types
+  const handleDistanceChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setDistance(event.target.valueAsNumber); // Assuming the value should be treated as a number
+  };
+
+  const handleMinDistanceChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setMinDistance(event.target.valueAsNumber); // Assuming the value should be treated as a number
+  };
+
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -97,10 +114,59 @@ function Newmap() {
       stroke: stroke,
     }),
   } as BaseLayerOptions);
+  const clusteredSource = new Cluster({
+    distance: distance,
+    minDistance: minDistance,
+    source: occurrenceSource,
+  });
 
+
+  const clusterStyle = new Style({
+    image: new Circle({
+      radius: 10,
+      fill: new Fill({ color: 'rgba(255,0,0,0.5)' }),
+    }),
+    text: new Text({
+      font: '12px Calibri,sans-serif',
+      fill: new Fill({ color: '#fff' }),
+      stroke: new Stroke({ color: '#000', width: 3 }),
+      // Other necessary Text properties can be added here
+    }),
+  });
+  const styleCache: { [key: number]: Style } = {};
+  const clusteredLayer = new VectorLayer({
+    title: "Clustered Occurrence Layer",
+    visible: true, // Set to false if you want to start with this layer hidden
+    source: clusteredSource,
+    style: function(feature: Feature) {
+      const size = feature.get('features').length;
+      let style = styleCache[size];
+      if (!style) {
+        style = new Style({
+          image: new CircleStyle({
+            radius: 10,
+            stroke: new Stroke({
+              color: '#fff',
+            }),
+            fill: new Fill({
+              color: '#3399CC',
+            }),
+          }),
+          text: new Text({
+            text: size.toString(),
+            fill: new Fill({
+              color: '#fff',
+            }),
+          }),
+        });
+        styleCache[size] = style;
+      }
+      return style;
+    },
+  } as BaseLayerOptions);
   const occurrenceGroup = new LayerGroup({
     title: "Occurrence",
-    layers: [occurrenceLayer],
+    layers: [occurrenceLayer, clusteredLayer],
   } as GroupLayerOptions);
   const [isSpeciesVisualizationControlVisible, setSpeciesVisualizationControlVisible] = useState(false);
 
@@ -218,7 +284,6 @@ function Newmap() {
           </div>
         </div>
       </div>
-
       <OccurrencePopup
         id={id}
         open={open}
