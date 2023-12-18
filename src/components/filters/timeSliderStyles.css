@@ -1,0 +1,34 @@
+/* timeSliderStyles.css */
+.time-slider {
+  width: 80%;
+  margin: 20px auto;
+  position: fixed;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+}
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+}
+
+.time-slider-info {
+  color: #555;
+  margin-top: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  width: 50%;
+  box-sizing: border-box;
+  /* text-shadow: 1px 1px 15px #555; */
+}
+
+div.time-slider .rc-slider-track {
+  background-color: #026c37;
+}
+
+div.time-slider .rc-slider-handle {
+  background-color: #038543;
+  border-color: #026c37;
+}
