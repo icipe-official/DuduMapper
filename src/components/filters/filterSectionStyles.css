@@ -9,7 +9,7 @@
   transform: translateX(0%);
   z-index: 1000;
   background-color: #ebbd40;
-  color: white !important;
+  color: black !important;
   border-radius: 20px;
 }
 .form-control {

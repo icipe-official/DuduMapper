@@ -31,6 +31,7 @@ import FilterSection from "../filters/filtersection";
 import { IconButton, Tooltip } from "@mui/material";
 import "../filters/filterSectionStyles.css";
 import TuneIcon from "@mui/icons-material/Tune";
+import TimeSlider from "../filters/timeslider";
 
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
@@ -45,6 +46,25 @@ function Newmap() {
   const [expanded, setExpanded] = React.useState<string | false>(false);
 
   const [filterOpen, setFilterOpen] = useState(false);
+
+  const handleTimeChange = (startDate: Date, endDate: Date) => {
+    if (!isValidDate(startDate) || !isValidDate(endDate)) {
+      return;
+    }
+
+    // Update the occurrenceSource URL with the new date range parameters
+    const formattedStartDate = startDate.toISOString().split("T")[0];
+    const formattedEndDate = endDate.toISOString().split("T")[0];
+    const updatedUrl = `${geoServerBaseUrl}/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson&CQL_FILTER=datetime BETWEEN '${formattedStartDate}' AND '${formattedEndDate}'`;
+    occurrenceSource.setUrl(updatedUrl);
+
+    // Refresh the occurrence layer source to apply the changes
+    occurrenceLayer.setSource(occurrenceSource);
+  };
+
+  const isValidDate = (date: Date) => {
+    return !isNaN(date.getTime());
+  };
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -161,14 +181,14 @@ function Newmap() {
                       mapElement.current.appendChild(dummyAnchor);
                     }
 
-                  // Set the state for Popover content and anchor
-                  setPopoverContent(feature.getProperties());
-                  setAnchorEl(dummyAnchor);
+                    // Set the state for Popover content and anchor
+                    setPopoverContent(feature.getProperties());
+                    setAnchorEl(dummyAnchor);
 
-                  // Return true to stop the forEach loop if needed
-                  return true;
+                    // Return true to stop the forEach loop if needed
+                    return true;
+                  }
                 }
-              }
               );
               // }
             };
@@ -176,6 +196,7 @@ function Newmap() {
             initialMap.on("singleclick", handleMapClick);
 
             setMap(initialMap);
+            // handleTimeChange(selectedYear);
           }
         }
       });
@@ -209,6 +230,9 @@ function Newmap() {
               </IconButton>
             </Tooltip>
           </div>
+        </div>
+        <div className="time-slider-container">
+          <TimeSlider onChange={handleTimeChange} />
         </div>
       </div>
 
