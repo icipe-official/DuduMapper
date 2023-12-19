@@ -15,6 +15,7 @@ import Cluster from 'ol/source/Cluster';
 import { Text } from 'ol/style';
 import { Feature } from 'ol'
 import CircleStyle from "ol/style/Circle";
+// import clusteredLayer from "../map/occurrencelayer/clusteredlayer";
 import Button from '@mui/material/Button';
 import AdjustIcon from '@mui/icons-material/Adjust';
 import { Pixel } from "ol/pixel";

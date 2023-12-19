@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client'; // Import createRoot
 import { Control } from 'ol/control';
 import SpeciesVisualizationButton from './SpeciesVisualizationButton';
 
@@ -15,11 +15,11 @@ class SpeciesOccurrenceVisualizationControl extends Control {
       element: buttonElement,
     });
 
-    ReactDOM.render(
-      <SpeciesVisualizationButton onClick={props.onClick} />,
-      buttonElement
-    );
+    // Use createRoot to render the component
+    const root = createRoot(buttonElement);
+    root.render(<SpeciesVisualizationButton onClick={props.onClick} />);
   }
 }
 
 export default SpeciesOccurrenceVisualizationControl;
+
