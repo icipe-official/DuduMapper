@@ -16,12 +16,14 @@
     "@mui/material": "^5.14.15",
     "axios": "^1.6.0",
     "eslint-plugin-jsx-a11y": "^6.8.0",
+    "material-ui-flags": "^1.2.4",
     "next": "^14.0.2",
     "ol": "^8.1.0",
     "ol-ext": "^4.0.11",
     "ol-layerswitcher": "^4.1.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-query": "^3.39.3"
   },
   "devDependencies": {
     "@types/node": "^20.8.9",

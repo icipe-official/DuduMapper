@@ -11,7 +11,7 @@ import { BASE_PATH } from "@/lib/constants";
 const Navbar: React.FC = () => {
   const theme = useTheme();
   const navMenuItems: any[] = [];
-  navMenuItems.push(<NavLink key="Map" url="/map" text="Map" />);
+  navMenuItems.push(<NavLink key="Map" url="/about" text="About" />);
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
