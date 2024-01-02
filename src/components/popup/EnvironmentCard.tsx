@@ -5,12 +5,10 @@ import Box from "@mui/material/Box";
 import CardHeader from "@mui/material/CardHeader";
 
 export default function EnvironmentCard({siteInfo}: { siteInfo: any }) {
-    console.log("SiteInfo in Env Card", siteInfo)
     let siteProps = {};
     if (siteInfo) {
         siteProps = siteInfo.features[0].properties;
     }
-    console.log(siteProps)
     return (
         <Box>
 

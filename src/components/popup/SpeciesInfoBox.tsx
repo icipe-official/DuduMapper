@@ -57,10 +57,16 @@ export default function SpeciesInfoBox({speciesInfo}: { speciesInfo: any }) {
         setExpanded(!expanded);
     };
 
-    console.log("Species Info", speciesInfo)
+    const cardStyle = {
+        display: 'block',
+        width: '30vw',
+        transitionDuration: '0.3s',
+        height: '30vw'
+    }
+
 
     return (
-        <Card style={{maxWidth: 345}}>
+        <Card style={cardStyle}>
             <CardHeader
                 title={speciesInfo['vector'] + " " + speciesInfo['species']}
                 subheader={"Period of " + speciesInfo['period_start'] + " to " + speciesInfo['period_end']}
@@ -71,7 +77,7 @@ export default function SpeciesInfoBox({speciesInfo}: { speciesInfo: any }) {
             </CardHeader>
             <CardMedia
                 component="img"
-                height="194"
+                //height="194"
                 image={`${BASE_PATH}/images/gambie.png`}
                 alt={speciesInfo['species']}
             />
