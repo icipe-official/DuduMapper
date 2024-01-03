@@ -1,5 +1,5 @@
 // TimeSlider.tsx
-import React from "react";
+import React, { useEffect } from "react";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import "./timeSliderStyles.css";
@@ -10,8 +10,12 @@ interface TimeSliderProps {
 
 const TimeSlider: React.FC<TimeSliderProps> = ({ onChange }) => {
   const currentYear = new Date().getFullYear();
-  const [startYear, setStartYear] = React.useState(currentYear);
+  const [startYear, setStartYear] = React.useState(1970);
   const [endYear, setEndYear] = React.useState(currentYear);
+
+  // useEffect(() => {
+  //   onChange(new Date(startYear, 0), new Date(endYear, 11, 31));
+  // }, [startYear, endYear, onChange]);
 
   const handleChange = (values: number | number[]) => {
     const selectedValues = Array.isArray(values) ? values : [values, values];
@@ -32,7 +36,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({ onChange }) => {
           range
           min={1970}
           max={currentYear}
-          defaultValue={[currentYear, currentYear]}
+          defaultValue={[1970, currentYear]}
           onChange={handleChange}
         />
       </div>
