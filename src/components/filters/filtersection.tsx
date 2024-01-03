@@ -302,7 +302,11 @@ const FilterSection = (openFilter: any) => {
                 >
                   <Typography
                     variant="caption"
-                    sx={{ fontStyle: "italic", marginRight: ".5px" }}
+                    sx={{
+                      fontStyle: "italic",
+                      marginRight: ".5px",
+                      color: "black",
+                    }}
                   >
                     Season:{" "}
                   </Typography>
@@ -363,7 +367,11 @@ const FilterSection = (openFilter: any) => {
                 >
                   <Typography
                     variant="caption"
-                    sx={{ fontStyle: "italic", marginRight: "0.5px" }}
+                    sx={{
+                      fontStyle: "italic",
+                      marginRight: "0.5px",
+                      color: "black",
+                    }}
                   >
                     Control:{" "}
                   </Typography>
@@ -429,7 +437,11 @@ const FilterSection = (openFilter: any) => {
                 >
                   <Typography
                     variant="caption"
-                    sx={{ fontStyle: "italic", marginRight: "10px" }}
+                    sx={{
+                      fontStyle: "italic",
+                      marginRight: "10px",
+                      color: "black",
+                    }}
                   >
                     Adult:{" "}
                   </Typography>
@@ -491,7 +503,11 @@ const FilterSection = (openFilter: any) => {
                 >
                   <Typography
                     variant="caption"
-                    sx={{ fontStyle: "italic", marginRight: "5px" }}
+                    sx={{
+                      fontStyle: "italic",
+                      marginRight: "5px",
+                      color: "black",
+                    }}
                   >
                     Larval:{" "}
                   </Typography>
