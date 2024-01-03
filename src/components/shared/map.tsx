@@ -9,17 +9,8 @@ import OSM from "ol/source/OSM";
 import { BaseLayerOptions, GroupLayerOptions } from "ol-layerswitcher";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON.js";
-import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
+import { all, bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
-import { Pixel } from "ol/pixel";
-import MapBrowserEvent from "ol/MapBrowserEvent";
-import Event from "ol/events/Event";
-import Popover from "@mui/material/Popover";
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import Typography from "@mui/material/Typography";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   geoServerBaseUrl,
   getBasemapOverlaysLayersArray,
@@ -31,6 +22,11 @@ import FilterSection from "../filters/filtersection";
 import { IconButton, Tooltip } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 import "../filters/filterSectionStyles.css";
+import {
+  addAreaInteractions,
+  buildAreaSelectionLayer,
+  removeAreaInteractions,
+} from "./pointUtils";
 
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
@@ -45,6 +41,16 @@ function Newmap() {
   const [expanded, setExpanded] = React.useState<string | false>(false);
 
   const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedByArea, setSelectedByArea] = useState("");
+
+  const handleSelectByAreaData = (dataFromChild: any) => {
+    // Handle the data received from the child component
+    if (dataFromChild === "Box") {
+      setSelectedByArea("Polygon");
+    } else {
+      setSelectedByArea(dataFromChild);
+    }
+  };
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -67,7 +73,7 @@ function Newmap() {
       "/geoserver/vector/ows?service=WFS&version=" +
       "1.0.0&request=GetFeature&typeName" +
       "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson",
-    strategy: bboxStrategy,
+    strategy: all,
   });
 
   const fill = new Fill({
@@ -93,6 +99,7 @@ function Newmap() {
       stroke: stroke,
     }),
   } as BaseLayerOptions);
+  occurrenceLayer.set("area-select", true);
 
   const occurrenceGroup = new LayerGroup({
     title: "Occurrence",
@@ -124,6 +131,12 @@ function Newmap() {
             });
             const layerSwitcher = new LayerSwitcher();
             initialMap.addControl(layerSwitcher);
+
+            if (selectedByArea) {
+              addAreaInteractions(initialMap, selectedByArea);
+            } else {
+              removeAreaInteractions(initialMap);
+            }
 
             const handleMapClick = (event: any) => {
               console.log("handle map click before checking if map is defined");
@@ -185,7 +198,22 @@ function Newmap() {
     if (map) {
       map.addControl(layerSwitcher);
     }
-  }, []);
+  }, [selectedByArea]);
+
+  // useEffect(() => {
+  //   if (!map) {
+  //     return;
+  //   }
+
+  //   console.log("Hello, its trickered..");
+  //   console.log("slectAreaVar: " + selectedByArea);
+
+  //   if (selectedByArea) {
+  //     addAreaInteractions(map, selectedByArea);
+  //   } else {
+  //     removeAreaInteractions(map);
+  //   }
+  // }, [selectedByArea]);
 
   return (
     <>
@@ -196,7 +224,12 @@ function Newmap() {
         id="map-container"
       >
         <div>
-          {filterOpen && <FilterSection openFilter={filterOpen} />}
+          {filterOpen && (
+            <FilterSection
+              onSelectByAreaData={handleSelectByAreaData}
+              openFilter={filterOpen}
+            />
+          )}
 
           <div className="filter-section">
             <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>

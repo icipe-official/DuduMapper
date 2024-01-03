@@ -40,8 +40,8 @@ import RectangleOutlinedIcon from "@mui/icons-material/RectangleOutlined";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import FormatShapesIcon from "@mui/icons-material/FormatShapes";
 
-const FilterSection = (openFilter: any) => {
-  const [open, setOpen] = useState(openFilter);
+const FilterSection = (props: any) => {
+  const [open, setOpen] = useState(props.openFilter);
   const [selectedDisease, setSelectedDisease] = useState<string[]>([]);
   const [isDiseaseSelected, setIsDiseaseSelected] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
@@ -58,6 +58,10 @@ const FilterSection = (openFilter: any) => {
   const [isLarvalSelected, setIsLarvalSelected] = useState(false);
   const [selectedByArea, setSelectedByArea] = useState("");
 
+  const sendDataToParent = () => {
+    props.onSelectByAreaData(selectedByArea);
+  };
+  sendDataToParent();
   const handleDiseaseChange = (
     _: React.SyntheticEvent<Element, Event>,
     value: string[]
@@ -641,17 +645,13 @@ const FilterSection = (openFilter: any) => {
                   >
                     Rectangle:{" "}
                     <IconButton
-                      onClick={() => toggleSelectedByArea("Rectangle")}
-                      color={
-                        selectedByArea === "Rectangle" ? "success" : "default"
-                      }
+                      onClick={() => toggleSelectedByArea("Box")}
+                      color={selectedByArea === "Box" ? "success" : "default"}
                       sx={{
                         fontSize: "1.5rem",
                         "&:hover": {
                           color:
-                            selectedByArea === "Rectangle"
-                              ? "#2e7d32"
-                              : "primary",
+                            selectedByArea === "Box" ? "#2e7d32" : "primary",
                         },
                       }}
                     >
@@ -668,15 +668,15 @@ const FilterSection = (openFilter: any) => {
                   >
                     Circle:{" "}
                     <IconButton
-                      onClick={() => toggleSelectedByArea("circle")}
+                      onClick={() => toggleSelectedByArea("Circle")}
                       color={
-                        selectedByArea === "circle" ? "success" : "default"
+                        selectedByArea === "Circle" ? "success" : "default"
                       }
                       sx={{
                         fontSize: "1.5rem",
                         "&:hover": {
                           color:
-                            selectedByArea === "circle" ? "#2e7d32" : "primary",
+                            selectedByArea === "Circle" ? "#2e7d32" : "primary",
                         },
                       }}
                     >
@@ -693,15 +693,17 @@ const FilterSection = (openFilter: any) => {
                   >
                     Free Hand:{" "}
                     <IconButton
-                      onClick={() => toggleSelectedByArea("freeHand")}
+                      onClick={() => toggleSelectedByArea("Polygon")}
                       color={
-                        selectedByArea === "freeHand" ? "success" : "default"
+                        selectedByArea === "Polygon" ? "success" : "default"
                       }
                       sx={{
                         fontSize: "1.5rem",
                         "&:hover": {
                           color:
-                            selectedByArea === "Circle" ? "#2e7d32" : "primary",
+                            selectedByArea === "Polygon"
+                              ? "#2e7d32"
+                              : "primary",
                         },
                       }}
                     >
