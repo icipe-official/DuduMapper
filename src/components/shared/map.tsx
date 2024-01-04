@@ -43,15 +43,15 @@ function Newmap() {
   const mapElement = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | undefined>(undefined);
   const [expanded, setExpanded] = React.useState<string | false>(false);
-
+  const popupRef = useRef(null);
   const [filterOpen, setFilterOpen] = useState(false);
-
+  const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpanded(isExpanded ? panel : false);
       event.stopPropagation(); // Stop the click event from reaching the parent accordion
     };
-
+  const occurrencePopupRef = useRef(null);
   const handleClosePopover = () => {
     if (anchorEl) {
       anchorEl.remove(); // This removes the dummy anchor from the DOM
@@ -98,7 +98,9 @@ function Newmap() {
     title: "Occurrence",
     layers: [occurrenceLayer],
   } as GroupLayerOptions);
-
+  const handleClosePopup = () => {
+    setShowOccurrencePopup(false);
+  };
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
       getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
@@ -136,39 +138,14 @@ function Newmap() {
                   if (layer === occurrenceLayer) {
                     console.log("Point clicked");
 
-                    // Create a reference to the dummy HTML element for Popover anchor
-                    const dummyAnchor = document.createElement("div");
-                    dummyAnchor.style.position = "absolute";
 
-                    // Adjust the position of the dummy anchor to be on the right side and vertically centered
-                    // You need to know the width of the map container, assuming it's available in mapContainerWidth
-                    const mapContainerWidth = mapElement.current
-                      ? mapElement.current.offsetWidth
-                      : 0;
-                    const verticalCenter = mapElement.current
-                      ? mapElement.current.offsetHeight / 2
-                      : 0;
-
-                    dummyAnchor.style.left = `${
-                      mapContainerWidth - dummyAnchor.offsetWidth
-                    }px`;
-                    dummyAnchor.style.top = `${
-                      verticalCenter - dummyAnchor.offsetHeight / 2
-                    }px`;
-
-                    // Append the dummy anchor to the map element
-                    if (mapElement.current) {
-                      mapElement.current.appendChild(dummyAnchor);
-                    }
-
-                  // Set the state for Popover content and anchor
-                  setPopoverContent(feature.getProperties());
-                  setAnchorEl(dummyAnchor);
-
-                  // Return true to stop the forEach loop if needed
-                  return true;
+                    // Set the state for Popover content and anchor
+                    setPopoverContent(feature.getProperties());
+                    setShowOccurrencePopup(true);
+                    // Return true to stop the forEach loop if needed
+                    return true;
+                  }
                 }
-              }
               );
               // }
             };
@@ -187,10 +164,37 @@ function Newmap() {
     }
   }, []);
 
+
+
+
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      const mapContainer = mapElement.current;
+      const occurrencePopup = document.querySelector(".occurrence-popup");
+
+      if (
+        showOccurrencePopup &&
+        mapContainer &&
+        occurrencePopup &&
+        !mapContainer.contains(event.target) &&
+        !occurrencePopup.contains(event.target)
+      ) {
+        handleClosePopup();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showOccurrencePopup]);
+
+
+
   return (
-    <>
+    <div style={{ display: 'flex', height: 'calc(100vh - 70px)' }}>
       <div
-        style={{ height: "calc(100vh - 70px)" }}
+        style={{ flexGrow: 1, width: showOccurrencePopup ? '70%' : '100%' }}
         ref={mapElement}
         className="map-container"
         id="map-container"
@@ -210,18 +214,23 @@ function Newmap() {
             </Tooltip>
           </div>
         </div>
+
+
       </div>
 
-      <OccurrencePopup
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        handleClose={handleClosePopover}
-        popoverContent={popoverContent}
-        expanded={expanded}
-        handleChange={handleChange}
-      />
-    </>
+      {showOccurrencePopup && (
+        <OccurrencePopup
+          id={id}
+          open={showOccurrencePopup}
+          handleClose={handleClosePopup}
+          popoverContent={popoverContent}
+          expanded={expanded}
+          handleChange={handleChange}
+          ref={occurrencePopupRef} />
+
+      )}
+
+    </div>
   );
 }
 
