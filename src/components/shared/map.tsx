@@ -238,7 +238,7 @@ mapRef.current = map;
           geoServerBaseUrl +
           "/geoserver/vector/ows?service=WFS&version=" +
           "1.0.0&request=GetFeature&typeName" +
-          "=vector%3Aoccurrence&maxFeatures=500&outputFormat=application%2Fjson"
+          "=vector%3Aoccurrence&maxFeatures=5000&outputFormat=application%2Fjson"
         );
 
         const data = await response.json();
@@ -260,7 +260,6 @@ mapRef.current = map;
 
           console.log(selectedSpecies)
 
-   
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
       getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
         const BaseMaps = new LayerGroup({
@@ -433,7 +432,22 @@ fetchOccurrenceData();
     const logFilteredFeatures = () => {
       const filteredFeatures = occurrenceData.filter((feature) => {
         const species = feature.properties.species;
-        return selectedSpecies.includes(species);
+        const season = feature.properties.season_given;
+        const control = feature.properties.control;
+        const adult = feature.properties.adult;
+        const larval = feature.properties.larval;
+
+        console.log(season)
+
+        const isSpeciesSelected = selectedSpecies.includes(species);
+        const isSeasonSelected = selectedSeason === season;
+        const isControlSelected =selectedControl.includes(control);
+        const isAdultSelected = selectedAdult.includes(adult);
+        const isLarvalSelected = selectedLarval.includes(larval);
+
+        console.log(selectedSeason)
+
+    return isSpeciesSelected && isSeasonSelected && isControlSelected && isAdultSelected && isLarvalSelected;
       });
 
       console.log('Filtered Features:', filteredFeatures);
@@ -535,7 +549,7 @@ fetchOccurrenceData();
       logFilteredFeatures();
     };
 
-  }, [selectedSpecies, setOccurrenceSource, speciesColors]);
+  }, [selectedSpecies, setOccurrenceSource, speciesColors, selectedSeason, selectedControl, selectedAdult, selectedLarval]);
 
   return (
     <>
@@ -779,7 +793,7 @@ fetchOccurrenceData();
                   </Tooltip>
                   <Tooltip title="Empty" arrow>
                     <IconButton
-                      onClick={() => setSelectedSeason("Empty")}
+                      onClick={() => setSelectedSeason("null")}
                       color={selectedSeason === "Empty" ? "success" : "default"}
                       sx={{
                         fontSize: "1.5rem",
