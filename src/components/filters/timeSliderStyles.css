@@ -18,7 +18,7 @@
   color: #555;
   margin-top: 8px;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 13px;
   width: 50%;
   box-sizing: border-box;
   /* text-shadow: 1px 1px 15px #555; */
@@ -31,4 +31,11 @@ div.time-slider .rc-slider-track {
 div.time-slider .rc-slider-handle {
   background-color: #038543;
   border-color: #026c37;
+  box-shadow: 0px 0px 10px rgba(3, 133, 67, 0.5);
+}
+div.time-slider .rc-slider-handle:hover {
+  background-color: #04a361; /* Change handle color on hover */
+}
+div.time-slider .rc-slider-mark-text {
+  font-size: 10px; /* Adjust the font size as needed */
 }
