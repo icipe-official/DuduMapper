@@ -47,14 +47,17 @@ function Newmap() {
     const mapRef = useRef<Map | undefined>(undefined);
     const [filterOpen, setFilterOpen] = useState(false);
     const [popup, setPopup] = useState({maxHeight: "400px", height: "500px"})
+    const [overlaysOpen, setOverlaysOpen] = useState(false)
+
     const handleClosePopover = () => {
         if (anchorEl) {
             anchorEl.remove(); // This removes the dummy anchor from the DOM
         }
         setAnchorEl(null);
+        setPopoverContent({})
     };
 
-    const [overlaysOpen, setOverlaysOpen] = useState(false)
+
 
 
     const occurrenceSource = new VectorSource({
@@ -241,12 +244,9 @@ function Newmap() {
 
                 <OccurrencePopup
                     id={id}
-                    open={open}
                     anchorEl={anchorEl}
                     handleClose={handleClosePopover}
                     speciesData={popoverContent}
-                    height={popup.height}
-                    maxHeight={popup.maxHeight}
                 />
             </div>
         </QueryClientProvider>

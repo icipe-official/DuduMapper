@@ -1,5 +1,4 @@
 import React, {CSSProperties, useState} from 'react';
-import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import '../map/accordion-style.css'
 import SpeciesInfoBox from "@/components/popup/SpeciesInfoBox";
@@ -8,30 +7,35 @@ import {fetchSiteInfo} from "@/api/occurrence";
 import {useQuery,} from 'react-query'
 import EnvironmentCard from "@/components/popup/EnvironmentCard";
 import CustomAccordionSummary from "@/components/popup/CustomAccordionSummary";
-import {Popper} from "@mui/material";
+import {DialogTitle, IconButton, Popper, LinearProgress, Box, Accordion} from "@mui/material";
 import IrDetails from "@/components/popup/IrDetails";
 import BionomicsDetails from "@/components/popup/BionomicsDetails";
-
-
-const textStyle = {
-    background: 'white', // Opaque background for text
-    padding: '8px', // Optional, for better spacing
-};
+import CloseIcon from "@mui/icons-material/Close";
+import Typography from "@mui/material/Typography";
 
 
 export default function OccurrencePopup
 ({
      id,
-     open,
      anchorEl,
      handleClose,
      speciesData,
-     height,
-     maxHeight
  }) {
 
     const [expanded, setExpanded] = React.useState<string | false>(false);
-    const query = useQuery(["siteInfo", speciesData['site_id']], async ({queryKey}) => {
+    const open = Object.keys(speciesData).length > 0;
+    const defaultExpanded = true;
+
+    const bionomicsEnabled = (open && Boolean(speciesData['bionomics_id']));
+    const environmentEnabled = (open && Boolean(speciesData['site_id']));
+    const irEnabled = (open && Boolean(speciesData['ir_bioassays_id']) && Boolean(speciesData['genetic_mechanisms_id']));
+
+    const {
+        status,
+        data: siteData,
+        error,
+        isFetching,
+    } = useQuery(["siteInfo", speciesData['site_id']], async ({queryKey}) => {
         return fetchSiteInfo(queryKey[1]);
 
     });
@@ -45,54 +49,59 @@ export default function OccurrencePopup
     const scrollableStyle: CSSProperties = {
         display: 'flow',
         boxShadow: "0 2px 12px 0 rgba(0, 0, 0, 0.5)",
-        maxHeight: "700px", // Adjust the height as needed
+        maxHeight: "600px", // Adjust the height as needed
         overflowY: 'auto'  // Enable vertical scrolling
     };
-    if (query.status === "pending") {
-        return <span>Loading...</span>
-    }
 
-    if (query.status === "success") {
-        //TODO Dynamically show components that have data otherwise hide
-        //TODO Change background color
-        //Increase height of the Popup
-        return (
-            <Popper
-                id={id}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-            >
-                <div style={{...scrollableStyle}}>
-                    <Accordion defaultExpanded expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
-                        <CustomAccordionSummary title={"Occurrence"} desc={"Vector occurrence information"}/>
-                        <AccordionDetails sx={{ bgcolor: "#E8E8E8", opacity: 0.75}}>
-                            <SpeciesInfoBox speciesInfo={speciesData}/>
-                        </AccordionDetails>
-                    </Accordion>
-                    <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
-                        <CustomAccordionSummary title={"Bionomics"} desc={"Vector behavioral information"}/>
-                        <AccordionDetails>
-                            <BionomicsDetails/>
-                        </AccordionDetails>
-                    </Accordion>
-                    <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
-                        <CustomAccordionSummary title={"Insecticide Resistance"} desc={"Insecticide Resistance data"}/>
-                        <AccordionDetails>
-                            <IrDetails irData={{}}/>
-                        </AccordionDetails>
-                    </Accordion>
-                    <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')}>
-                        <CustomAccordionSummary title={"Environment"}
-                                                desc={"Specimen collection site and environment data"}/>
-                        <AccordionDetails>
-                            <EnvironmentCard siteInfo={query.data}/>
-                        </AccordionDetails>
-                    </Accordion>
+    //TODO Dynamically show components that have data otherwise hide
+    //TODO Change background color
+    //Increase height of the Popup
+    return (
+        <Popper
+            id={id}
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+        >
+            <DialogTitle sx={{display: 'flex', padding: 0, justifyContent: 'flex-end'}}>
+                <IconButton
+                    variant="outlined"
+                    onClick={handleClose}
+                    sx={{m: 1,}}
+                >
+                    <CloseIcon/>
+                </IconButton>
+            </DialogTitle>
+            <div style={{...scrollableStyle}}>
 
-                </div>
+                <Accordion defaultExpanded expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
+                    <CustomAccordionSummary title={"Occurrence"} desc={"Vector occurrence information"}/>
+                    <AccordionDetails sx={{bgcolor: "#696463", opacity: 0.75}}>
+                        <SpeciesInfoBox speciesInfo={speciesData}/>
+                    </AccordionDetails>
+                </Accordion>
+                <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')} disabled={!bionomicsEnabled}>
+                    <CustomAccordionSummary title={"Bionomics"} desc={"Vector behavioral information"}/>
+                    <AccordionDetails>
+                        <BionomicsDetails/>
+                    </AccordionDetails>
+                </Accordion>
+                <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')} disabled={!irEnabled}>
+                    <CustomAccordionSummary title={"Insecticide Resistance"} desc={"Insecticide Resistance data"}/>
+                    <AccordionDetails>
+                        <IrDetails irData={{}}/>
+                    </AccordionDetails>
+                </Accordion>
+                <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')} disabled={!environmentEnabled}>
+                    <CustomAccordionSummary title={"Environment"}
+                                            desc={"Specimen collection site and environment data"}/>
+                    <AccordionDetails>
+                        <EnvironmentCard siteInfo={siteData} isFetching={isFetching} status={status}/>
+                    </AccordionDetails>
+                </Accordion>
 
-            </Popper>
-        );
-    }
+            </div>
+
+        </Popper>
+    );
 };

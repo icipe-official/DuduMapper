@@ -1,14 +1,20 @@
-import {Card, Divider} from "@mui/material";
+import {Card, Divider, LinearProgress} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import Box from "@mui/material/Box";
 import CardHeader from "@mui/material/CardHeader";
 
-export default function EnvironmentCard({siteInfo}: { siteInfo: any }) {
+export default function EnvironmentCard({siteInfo, status, isFetching}: { siteInfo: any, status: string, isFetching: boolean }) {
     let siteProps = {};
     if (siteInfo) {
         siteProps = siteInfo.features[0].properties;
     }
+    if (status === 'pending' || isFetching) {
+        return (
+            <LinearProgress/>
+        )
+    }
+
     return (
         <Box>
 
