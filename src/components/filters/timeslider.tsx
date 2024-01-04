@@ -13,10 +13,6 @@ const TimeSlider: React.FC<TimeSliderProps> = ({ onChange }) => {
   const [startYear, setStartYear] = React.useState(1970);
   const [endYear, setEndYear] = React.useState(currentYear);
 
-  // useEffect(() => {
-  //   onChange(new Date(startYear, 0), new Date(endYear, 11, 31));
-  // }, [startYear, endYear, onChange]);
-
   const handleChange = (values: number | number[]) => {
     const selectedValues = Array.isArray(values) ? values : [values, values];
     setStartYear(selectedValues[0]);
@@ -38,6 +34,15 @@ const TimeSlider: React.FC<TimeSliderProps> = ({ onChange }) => {
           max={currentYear}
           defaultValue={[1970, currentYear]}
           onChange={handleChange}
+          marks={{
+            1970: "1970",
+            1980: "1980",
+            1990: "1990",
+            2000: "2000",
+            2010: "2010",
+            2020: "2020",
+            [currentYear]: `${currentYear}`,
+          }}
         />
       </div>
     </div>

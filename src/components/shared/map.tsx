@@ -44,8 +44,11 @@ function Newmap() {
   const mapElement = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | undefined>(undefined);
   const [expanded, setExpanded] = React.useState<string | false>(false);
-
   const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState<[number, number]>([
+    1970,
+    new Date().getFullYear(),
+  ]);
 
   const handleTimeChange = (startDate: Date, endDate: Date) => {
     if (!isValidDate(startDate) || !isValidDate(endDate)) {
@@ -56,10 +59,24 @@ function Newmap() {
     const formattedStartDate = startDate.toISOString().split("T")[0];
     const formattedEndDate = endDate.toISOString().split("T")[0];
     const updatedUrl = `${geoServerBaseUrl}/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson&CQL_FILTER=datetime BETWEEN '${formattedStartDate}' AND '${formattedEndDate}'`;
+    console.log("Updated URL:", updatedUrl);
     occurrenceSource.setUrl(updatedUrl);
-
+    console.log(startDate, endDate);
     // Refresh the occurrence layer source to apply the changes
     occurrenceLayer.setSource(occurrenceSource);
+    // Update the selected period state
+    setSelectedPeriod([startDate.getFullYear(), endDate.getFullYear()]);
+  };
+  const handleYearsChange = (startYear: number, endYear: number) => {
+    // Add logic to handle the changes in selected years
+    console.log("Selected years changed:", startYear, endYear);
+
+    // Convert the start and end years to Date objects
+    const startDate = new Date(startYear, 0);
+    const endDate = new Date(endYear, 11, 31);
+
+    // Call handleTimeChange with the correct argument types
+    handleTimeChange(startDate, endDate);
   };
 
   const isValidDate = (date: Date) => {
@@ -206,7 +223,7 @@ function Newmap() {
     if (map) {
       map.addControl(layerSwitcher);
     }
-  }, []);
+  }, [selectedPeriod]);
 
   return (
     <>
