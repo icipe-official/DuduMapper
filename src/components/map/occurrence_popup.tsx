@@ -10,7 +10,8 @@ import './accordion-style.css'
 import { CSSProperties } from 'react';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
-
+import CloseIcon from '@mui/icons-material/Close';
+import { pink, red } from '@mui/material/colors';
 
 interface MapPopoverProps {
   id: string | undefined;
@@ -46,7 +47,7 @@ const textStyle = {
 };
 
 const scrollableStyle: CSSProperties = {
-  maxHeight: '400px', // Adjust the height as needed
+  // maxHeight: '400px', // Adjust the height as needed
   overflowY: 'auto'  // Enable vertical scrolling
 };
 const sidePanelStyle: CSSProperties = {
@@ -85,7 +86,9 @@ const OccurrencePopup: React.FC<MapPopoverProps> = ({
   }
   return (
 
-    <div id={id} style={{ ...scrollableStyle, ...borderStyle, ...{ width: '30%', overflowY: 'auto', background: 'white' } }}>
+    <div id={id} onClick={handleClose} style={{ ...scrollableStyle, ...borderStyle, ...{ width: '30%', overflowY: 'auto', } }}>
+      <div style={{ right: '0px' }}>  <CloseIcon sx={{ color: red }} />
+      </div>
       <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
