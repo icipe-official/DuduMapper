@@ -1,4 +1,4 @@
-import Newmap from "../components/shared/map";
+import Newmap from "../components/map/Map";
 import NavBar from "../components/shared/navbar";
 
 export default function Home() {

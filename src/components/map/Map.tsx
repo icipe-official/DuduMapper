@@ -5,28 +5,18 @@ import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
 import LayerGroup from "ol/layer/Group";
-import OSM from "ol/source/OSM";
 import { BaseLayerOptions, GroupLayerOptions } from "ol-layerswitcher";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
-import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
-import { Pixel } from "ol/pixel";
-import MapBrowserEvent from "ol/MapBrowserEvent";
-import Event from "ol/events/Event";
-import Popover from "@mui/material/Popover";
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import Typography from "@mui/material/Typography";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Vector as VectorLayer } from "ol/layer.js";
 import {
     geoServerBaseUrl,
     getBasemapOverlaysLayersArray,
 } from "@/api/requests";
-import "./CSS/LayerSwitcherStyles.css";
 import { Stroke, Fill, Style, Circle } from "ol/style";
-import OccurrencePopup from "../map/occurrence_popup";
+import "../shared/CSS/LayerSwitcherStyles.css";
+import OccurrencePopup from "../popup/OccurrenceDrawer";
 import FilterSection from "../filters/filtersection";
 import { IconButton, Tooltip } from "@mui/material";
 import "../filters/filterSectionStyles.css";
@@ -84,6 +74,7 @@ function Newmap() {
         title: "Occurrence",
         layers: [occurrenceLayer],
     } as GroupLayerOptions);
+
     const handleClosePopup = () => {
         setShowOccurrencePopup(false);
     };
