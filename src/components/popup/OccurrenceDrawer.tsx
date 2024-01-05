@@ -1,8 +1,6 @@
 import React from 'react';
 import {Accordion, AccordionDetails} from '@mui/material';
-import {useState} from 'react';
-import CloseIcon from '@mui/icons-material/Close';
-import {pink, red} from '@mui/material/colors';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import {IconButton} from "@mui/material";
 import CustomAccordionSummary from "@/components/popup/CustomAccordionSummary";
 import SpeciesInfoBox from "@/components/popup/SpeciesInfoBox";
@@ -10,7 +8,7 @@ import BionomicsDetails from "@/components/popup/BionomicsDetails";
 import IrDetails from "@/components/popup/IrDetails";
 import EnvironmentCard from "@/components/popup/EnvironmentCard";
 import {fetchSiteInfo} from "@/api/occurrence";
-import './accordion-style.css'
+import '../map/accordion-style.css'
 import {CSSProperties} from 'react';
 import {useQuery} from "@tanstack/react-query";
 
@@ -55,9 +53,9 @@ export default function OccurrencePopup({id, handleClose, popoverContent}) {
     }
     return (
 
-        <div id={id} style={{...scrollableStyle, ...borderStyle, ...{width: '30%', overflowY: 'auto',}}}>
+        <div id={id} style={{...scrollableStyle, ...borderStyle, ...{width: '30%', overflowY: 'auto',transitionDuration: '4s'}}}>
             <IconButton style={{right: '0px'}} onClick={handleClose}>
-                <CloseIcon sx={{color: red}}/>
+                <CloseRoundedIcon/>
             </IconButton>
             <Accordion defaultExpanded expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
                 <CustomAccordionSummary title={"Occurrence"} desc={"Vector occurrence information"}/>
