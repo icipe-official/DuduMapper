@@ -21,121 +21,113 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
-  geoServerBaseUrl,
-  getBasemapOverlaysLayersArray,
-} from "@/requests/requests";
+    geoServerBaseUrl,
+    getBasemapOverlaysLayersArray,
+} from "@/api/requests";
 import "./CSS/LayerSwitcherStyles.css";
 import { Stroke, Fill, Style, Circle } from "ol/style";
 import OccurrencePopup from "../map/occurrence_popup";
 import FilterSection from "../filters/filtersection";
 import { IconButton, Tooltip } from "@mui/material";
-import TuneIcon from "@mui/icons-material/Tune";
 import "../filters/filterSectionStyles.css";
+import TuneIcon from "@mui/icons-material/Tune";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 function Newmap() {
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const [popoverContent, setPopoverContent] = React.useState<{
-    [x: string]: any;
-  }>({});
-  const open = Boolean(anchorEl);
-  const id = open ? "feature-popover" : undefined;
-  const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
-  const mapElement = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<Map | undefined>(undefined);
-  const [expanded, setExpanded] = React.useState<string | false>(false);
-  const popupRef = useRef(null);
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
-  const handleChange =
-    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpanded(isExpanded ? panel : false);
-      event.stopPropagation(); // Stop the click event from reaching the parent accordion
+
+    const mapRef = useRef<Map>(undefined)
+    const [popoverContent, setPopoverContent] = React.useState<{
+        [x: string]: any;
+    }>({});
+    const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
+    const mapElement = useRef<HTMLDivElement>(null);
+    const [filterOpen, setFilterOpen] = useState(false);
+    const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
+
+    const occurrenceSource = new VectorSource({
+        format: new GeoJSON(),
+        url:
+            geoServerBaseUrl +
+            "/geoserver/vector/ows?service=WFS&version=" +
+            "1.0.0&request=GetFeature&typeName" +
+            "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson",
+        strategy: bboxStrategy,
+    });
+
+    const fill = new Fill({
+        color: "rgba(2,255,2,1)",
+    });
+    const stroke = new Stroke({
+        color: "#222",
+        width: 1.25,
+    });
+
+    const occurrenceLayer = new VectorLayer({
+        title: "Occurrence Layer",
+        visible: true,
+        preload: Infinity,
+        source: occurrenceSource,
+        style: new Style({
+            image: new Circle({
+                fill: fill,
+                stroke: stroke,
+                radius: 8,
+            }),
+            fill: fill,
+            stroke: stroke,
+        }),
+    } as BaseLayerOptions);
+
+    const occurrenceGroup = new LayerGroup({
+        title: "Occurrence",
+        layers: [occurrenceLayer],
+    } as GroupLayerOptions);
+    const handleClosePopup = () => {
+        setShowOccurrencePopup(false);
     };
-  const occurrencePopupRef = useRef(null);
-  const handleClosePopover = () => {
-    if (anchorEl) {
-      anchorEl.remove(); // This removes the dummy anchor from the DOM
-    }
-    setAnchorEl(null);
-  };
-  mapRef.current = map;
 
-  const occurrenceSource = new VectorSource({
-    format: new GeoJSON(),
-    url:
-      geoServerBaseUrl +
-      "/geoserver/vector/ows?service=WFS&version=" +
-      "1.0.0&request=GetFeature&typeName" +
-      "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson",
-    strategy: bboxStrategy,
-  });
+    useEffect(() => {
+        getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
+            getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
+                const BaseMaps = new LayerGroup({
+                    title: "Basemaps",
+                    layers: baseMapsArray,
+                } as GroupLayerOptions);
 
-  const fill = new Fill({
-    color: "rgba(2,255,2,1)",
-  });
-  const stroke = new Stroke({
-    color: "#222",
-    width: 1.25,
-  });
+                const Overlays = new LayerGroup({
+                    title: "Labels",
+                    layers: overlaysArray,
+                } as GroupLayerOptions);
 
-  const occurrenceLayer = new VectorLayer({
-    title: "Occurrence Layer",
-    visible: true,
-    preload: Infinity,
-    source: occurrenceSource,
-    style: new Style({
-      image: new Circle({
-        fill: fill,
-        stroke: stroke,
-        radius: 8,
-      }),
-      fill: fill,
-      stroke: stroke,
-    }),
-  } as BaseLayerOptions);
-
-  const occurrenceGroup = new LayerGroup({
-    title: "Occurrence",
-    layers: [occurrenceLayer],
-  } as GroupLayerOptions);
-  const handleClosePopup = () => {
-    setShowOccurrencePopup(false);
-  };
-  useEffect(() => {
-    getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
-      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
-        const BaseMaps = new LayerGroup({
-          title: "Base Maps",
-          layers: baseMapsArray,
-        } as GroupLayerOptions);
-
-        const Overlays = new LayerGroup({
-          title: "Overlays",
-          layers: overlaysArray,
-        } as GroupLayerOptions);
-
-        if (BaseMaps) {
-          if (Overlays) {
-            const initialMap = new Map({
-              target: "map-container",
-              layers: [BaseMaps, Overlays, occurrenceGroup],
-              view: new View({
-                center: [0, 0],
-                zoom: 4,
-              }),
+                if (BaseMaps) {
+                    if (Overlays) {
+                        const initialMap = new Map({
+                            target: "map-container",
+                            layers: [BaseMaps, Overlays, occurrenceGroup],
+                            view: new View({
+                                center: [0, 0],
+                                zoom: 4,
+                            }),
+                        });
+                        const layerSwitcher = new LayerSwitcher();
+                        initialMap.addControl(layerSwitcher);
+                        initialMap.on("singleclick", handleMapClick);
+                        mapRef.current = initialMap;
+                        setMap(initialMap);
+                    }
+                }
             });
-            const layerSwitcher = new LayerSwitcher();
-            initialMap.addControl(layerSwitcher);
+        });
+    }, []);
 
-            const handleMapClick = (event: any) => {
-              console.log("handle map click before checking if map is defined");
-
-              // if (map) {
-              console.log("map defined");
-              initialMap.forEachFeatureAtPixel(
-                event.pixel,
-                (feature, layer) => {
-                  if (layer === occurrenceLayer) {
+    const handleMapClick = (event: any) => {
+        console.log("Map single click triggered");
+        mapRef.current?.forEachFeatureAtPixel(
+            event.pixel,
+            (feature, layer) => {
+                if (layer === occurrenceLayer) {
                     console.log("Point clicked");
 
 
@@ -143,94 +135,47 @@ function Newmap() {
                     setShowOccurrencePopup(true);
                     // Return true to stop the forEach loop if needed
                     return true;
-                  }
                 }
-              );
-              // }
-            };
-
-            initialMap.on("singleclick", handleMapClick);
-
-            setMap(initialMap);
-          }
-        }
-      });
-    });
-
-    const layerSwitcher = new LayerSwitcher();
-    if (map) {
-      map.addControl(layerSwitcher);
-    }
-  }, []);
-
-
-
-
-  useEffect(() => {
-    const handleClickOutside = (event: any) => {
-      const mapContainer = mapElement.current;
-      const occurrencePopup = document.querySelector(".occurrence-popup");
-
-      if (
-        showOccurrencePopup &&
-        mapContainer &&
-        occurrencePopup &&
-        !mapContainer.contains(event.target) &&
-        !occurrencePopup.contains(event.target)
-      ) {
-        handleClosePopup();
-      }
+            }
+        );
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showOccurrencePopup]);
+    return (
+        <QueryClientProvider client={queryClient}>
+            <div style={{ display: 'flex', height: 'calc(100vh - 70px)' }}>
+                <div
+                    style={{ flexGrow: 1, width: showOccurrencePopup ? '70%' : '100%' }}
+                    ref={mapElement}
+                    className="map-container"
+                    id="map-container"
+                >
+                    <div>
+                        {filterOpen && <FilterSection openFilter={filterOpen} />}
 
+                        <div className="filter-section">
+                            <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>
+                                <IconButton
+                                    onClick={() => setFilterOpen(!filterOpen)}
+                                    className="custom-icon-button"
+                                    style={{ color: "white" }}
+                                >
+                                    <TuneIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </div>
+                    </div>
+                </div>
 
-
-  return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 70px)' }}>
-      <div
-        style={{ flexGrow: 1, width: showOccurrencePopup ? '70%' : '100%' }}
-        ref={mapElement}
-        className="map-container"
-        id="map-container"
-      >
-        <div>
-          {filterOpen && <FilterSection openFilter={filterOpen} />}
-
-          <div className="filter-section">
-            <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>
-              <IconButton
-                onClick={() => setFilterOpen(!filterOpen)}
-                className="custom-icon-button"
-                style={{ color: "white" }}
-              >
-                <TuneIcon />
-              </IconButton>
-            </Tooltip>
-          </div>
-        </div>
-
-
-      </div>
-
-      {showOccurrencePopup && (
-        <OccurrencePopup
-          id={id}
-          open={showOccurrencePopup}
-          handleClose={handleClosePopup}
-          popoverContent={popoverContent}
-          expanded={expanded}
-          handleChange={handleChange}
-          ref={occurrencePopupRef} />
-
-      )}
-
-    </div>
-  );
+                {showOccurrencePopup && (
+                    <OccurrencePopup
+                        id={'feature_popover'}
+                        handleClose={handleClosePopup}
+                        popoverContent={popoverContent}
+                    />
+                )}
+            </div>
+        </QueryClientProvider>
+    );
 }
 
 export default Newmap;
