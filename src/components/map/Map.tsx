@@ -42,7 +42,7 @@ function Newmap() {
             geoServerBaseUrl +
             "/geoserver/vector/ows?service=WFS&version=" +
             "1.0.0&request=GetFeature&typeName" +
-            "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson",
+            "=vector%3Aoccurrence&maxFeatures=10000&outputFormat=application%2Fjson",
         strategy: bboxStrategy,
     });
 
