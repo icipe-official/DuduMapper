@@ -1,5 +1,5 @@
 "use client";
-import Newmap from "@/components/shared/map";
+import Newmap from "@/components/map/Map";
 
 function Map(): JSX.Element {
   return (
