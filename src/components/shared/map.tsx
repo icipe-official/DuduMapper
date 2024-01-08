@@ -58,7 +58,6 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { countryList, speciesList } from "../filters/filterUtils";
 import Control from "ol/control/Control";
-import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
@@ -594,44 +593,66 @@ function Newmap() {
     selectedLarval,
   ]);
   const printToScale = () => {
-    if (map) {
-      // Capture the current map view
-      const mapView = map.getView();
+    console.log("Button clicked!");
 
-      // Create a new map for printing
+    if (map && mapElement.current) {
+      console.log("Map and mapElement are available");
+
+      const mapView = map.getView();
+      console.log("Current map view:", mapView);
+
       const printMap = new Map({
         layers: map.getLayers().getArray(),
         view: new View({
           center: mapView.getCenter(),
           zoom: mapView.getZoom(),
         }),
-        controls: [], // Remove unnecessary controls for printing
+        controls: map.getControls().getArray(),
       });
 
-      // Use html2canvas to generate an image of the map
-      html2canvas(printMap.getViewport()).then((canvas) => {
-        // Create a PDF document
-        const pdf = new jsPDF("landscape");
+      console.log("Print map created:", printMap);
 
-        // Calculate the scale factor based on the original and printed map sizes
-        const scaleFactor = mapElement.current
-          ? mapElement.current.offsetWidth / canvas.width
-          : 1;
+      const canvas = document.createElement("canvas");
+      canvas.width = mapElement.current.offsetWidth;
+      canvas.height = mapElement.current.offsetHeight;
+      const context = canvas.getContext("2d");
 
-        // Add the image to the PDF
-        pdf.addImage(
-          canvas.toDataURL("image/jpeg"),
-          "JPEG",
-          0,
-          0,
-          canvas.width * scaleFactor,
-          canvas.height * scaleFactor
-        );
-        pdf.save("printed_map.pdf");
-        // Save or print the PDF as needed
-        // Example: pdf.save("printed_map.pdf");
-        // Example for opening the print dialog: pdf.autoPrint();
-      });
+      if (context) {
+        console.log("Canvas and context are available");
+
+        printMap.once("rendercomplete", async () => {
+          console.log("Render complete");
+
+          // Draw the map onto the canvas
+          const mapCanvas = printMap.getViewport().querySelector("canvas");
+          if (mapCanvas) {
+            console.log("Map canvas found:", mapCanvas.width, mapCanvas.height);
+            context.drawImage(mapCanvas, 0, 0, canvas.width, canvas.height);
+
+            // Export the canvas as PNG
+            const pngDataUrl = canvas.toDataURL("image/png");
+            console.log("PNG Data URL:", pngDataUrl);
+
+            // Create a link element and trigger download
+            const downloadLink = document.createElement("a");
+            downloadLink.href = pngDataUrl;
+            downloadLink.download = "printed_map.png";
+            downloadLink.click();
+          } else {
+            console.log("Map canvas is not found");
+          }
+        });
+
+        setTimeout(() => {
+          // Trigger the rendering of the map
+          printMap.render();
+          console.log("After render call");
+        }, 1000); // Adjust the delay as needed
+      } else {
+        console.log("Canvas context is not available");
+      }
+    } else {
+      console.log("Map or mapElement is not available");
     }
   };
 
