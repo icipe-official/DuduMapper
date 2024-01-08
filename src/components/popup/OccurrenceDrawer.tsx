@@ -23,7 +23,7 @@ const scrollableStyle: CSSProperties = {
     overflowY: 'auto'
 };
 
-export default function OccurrencePopup({id, handleClose, popoverContent}) {
+export default function OccurrencePopup({id, handleClose, popoverContent}: {id: string, handleClose: any, popoverContent: any}) {
     const [expanded, setExpanded] = React.useState<string | false>(false);
 
     const open = Object.keys(popoverContent).length > 0;
@@ -66,7 +66,7 @@ export default function OccurrencePopup({id, handleClose, popoverContent}) {
             <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')} disabled={!bionomicsEnabled}>
                 <CustomAccordionSummary title={"Bionomics"} desc={"Vector behavioral information"}/>
                 <AccordionDetails>
-                    <BionomicsDetails/>
+                    <BionomicsDetails bioData={{}}/>
                 </AccordionDetails>
             </Accordion>
             <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')} disabled={!irEnabled}>

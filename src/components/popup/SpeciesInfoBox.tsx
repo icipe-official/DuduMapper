@@ -1,7 +1,6 @@
 import React from "react";
-import {styled} from '@mui/material/styles';
-import {Card, IconButton, IconButtonProps} from "@mui/material";
-import {ExpandMore} from "@mui/icons-material";
+import { styled } from '@mui/material/styles';
+import { Card, IconButton, IconButtonProps } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
@@ -9,7 +8,7 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
-import {BASE_PATH} from "@/lib/constants";
+import { BASE_PATH } from "@/lib/constants";
 
 export interface SpeciesInfo {
     occurrence_id: number
@@ -41,16 +40,16 @@ interface ExpandMoreProps extends IconButtonProps {
 }
 
 const ExpandMore = styled((props: ExpandMoreProps) => {
-    const {expand, ...other} = props;
+    const { expand, ...other } = props;
     return <IconButton {...other} />;
-})(({theme, expand}) => ({
+})(({ theme, expand }) => ({
     transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
     marginLeft: 'auto',
     transition: theme.transitions.create('transform', {
         duration: theme.transitions.duration.shortest,
     }),
 }));
-export default function SpeciesInfoBox({speciesInfo}: { speciesInfo: any }) {
+export default function SpeciesInfoBox({ speciesInfo }: { speciesInfo: any }) {
     const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = () => {
@@ -91,7 +90,7 @@ export default function SpeciesInfoBox({speciesInfo}: { speciesInfo: any }) {
                     aria-expanded={expanded}
                     aria-label="show more"
                 >
-                    <ExpandMoreIcon/>
+                    <ExpandMoreIcon />
                 </ExpandMore>
             </CardActions>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
