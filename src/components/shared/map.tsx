@@ -60,6 +60,7 @@ import { countryList, speciesList } from "../filters/filterUtils";
 import Control from "ol/control/Control";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import PrintIcon from "@mui/icons-material/Print";
 
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
@@ -1212,9 +1213,6 @@ function Newmap() {
                       Clear Selection
                     </Button>
                   </div>
-                  <div>
-                    <Button onClick={printToScale}>Print to Scale</Button>
-                  </div>
                 </Grid>
               </Box>
             </div>
@@ -1232,6 +1230,14 @@ function Newmap() {
             </IconButton>
           </Tooltip>
         </div>
+      </div>
+
+      <div className="print-section">
+        <Tooltip title="Print to Scale" arrow>
+          <IconButton onClick={printToScale}>
+            <PrintIcon style={{ color: "#ebbd40" }} />
+          </IconButton>
+        </Tooltip>
       </div>
 
       <OccurrencePopup
