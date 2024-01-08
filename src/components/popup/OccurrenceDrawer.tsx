@@ -1,16 +1,16 @@
 import React from 'react';
-import {Accordion, AccordionDetails} from '@mui/material';
+import { Accordion, AccordionDetails } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import {IconButton} from "@mui/material";
+import { IconButton } from "@mui/material";
 import CustomAccordionSummary from "@/components/popup/CustomAccordionSummary";
 import SpeciesInfoBox from "@/components/popup/SpeciesInfoBox";
 import BionomicsDetails from "@/components/popup/BionomicsDetails";
 import IrDetails from "@/components/popup/IrDetails";
 import EnvironmentCard from "@/components/popup/EnvironmentCard";
-import {fetchSiteInfo} from "@/api/occurrence";
+import { fetchSiteInfo } from "@/api/occurrence";
 import '../map/accordion-style.css'
-import {CSSProperties} from 'react';
-import {useQuery} from "@tanstack/react-query";
+import { CSSProperties } from 'react';
+import { useQuery } from "@tanstack/react-query";
 
 const borderStyle = {
     borderStyle: 'solid',
@@ -20,11 +20,11 @@ const borderStyle = {
 };
 
 const scrollableStyle: CSSProperties = {
-    overflowY: 'auto'
+    overflowY: 'scroll'
 };
 
-export default function OccurrencePopup({id, handleClose, popoverContent}: {id: string, handleClose: any, popoverContent: any}) {
-    const [expanded, setExpanded] = React.useState<string | false>(false);
+export default function OccurrencePopup({ id, handleClose, popoverContent }: { id: string, handleClose: any, popoverContent: any }) {
+    const [expanded, setExpanded] = React.useState<string | false>('panel1');
 
     const open = Object.keys(popoverContent).length > 0;
 
@@ -39,48 +39,48 @@ export default function OccurrencePopup({id, handleClose, popoverContent}: {id: 
         };
 
     const {
-            status,
-            data: siteData,
-            error,
-            isFetching,
-        } = useQuery({
-            queryKey: ["siteInfo", popoverContent['site_id']],
-            queryFn: ({ queryKey}) => fetchSiteInfo(queryKey[1])
-        });
+        status,
+        data: siteData,
+        error,
+        isFetching,
+    } = useQuery({
+        queryKey: ["siteInfo", popoverContent['site_id']],
+        queryFn: ({ queryKey }) => fetchSiteInfo(queryKey[1])
+    });
 
     if (!open) {
         return null;
     }
     return (
 
-        <div id={id} style={{...scrollableStyle, ...borderStyle, ...{width: '30%', overflowY: 'auto',transitionDuration: '4s'}}}>
-            <IconButton style={{right: '0px'}} onClick={handleClose}>
-                <CloseRoundedIcon/>
+        <div id={id} style={{ ...scrollableStyle, ...borderStyle, ...{ width: '30%', overflowY: 'auto', transitionDuration: '4s' } }}>
+            <IconButton style={{ right: '0px' }} onClick={handleClose}>
+                <CloseRoundedIcon />
             </IconButton>
             <Accordion defaultExpanded expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
-                <CustomAccordionSummary title={"Occurrence"} desc={"Vector occurrence information"}/>
+                <CustomAccordionSummary title={"Occurrence"} desc={"Vector occurrence information"} />
                 <AccordionDetails>
-                    <SpeciesInfoBox speciesInfo={popoverContent}/>
+                    <SpeciesInfoBox speciesInfo={popoverContent} />
                 </AccordionDetails>
             </Accordion>
             <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')} disabled={!bionomicsEnabled}>
-                <CustomAccordionSummary title={"Bionomics"} desc={"Vector behavioral information"}/>
+                <CustomAccordionSummary title={"Bionomics"} desc={"Vector behavioral information"} />
                 <AccordionDetails>
-                    <BionomicsDetails bioData={{}}/>
+                    <BionomicsDetails bioData={{}} />
                 </AccordionDetails>
             </Accordion>
             <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')} disabled={!irEnabled}>
-                <CustomAccordionSummary title={"Insecticide Resistance"} desc={"Insecticide Resistance data"}/>
+                <CustomAccordionSummary title={"Insecticide Resistance"} desc={"Insecticide Resistance data"} />
                 <AccordionDetails>
-                    <IrDetails irData={{}}/>
+                    <IrDetails irData={{}} />
                 </AccordionDetails>
             </Accordion>
             <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')}
-                       disabled={!environmentEnabled}>
+                disabled={!environmentEnabled}>
                 <CustomAccordionSummary title={"Environment"}
-                                        desc={"Specimen collection site and environment data"}/>
+                    desc={"Specimen collection site and environment data"} />
                 <AccordionDetails>
-                    <EnvironmentCard siteInfo={siteData} isFetching={isFetching} status={status}/>
+                    <EnvironmentCard siteInfo={siteData} isFetching={isFetching} status={status} />
                 </AccordionDetails>
             </Accordion>
 
