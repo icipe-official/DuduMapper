@@ -12,6 +12,15 @@
   color: white !important;
   border-radius: 20px;
 }
+.print-section {
+  position: absolute;
+  top: 210px;
+  left: 12px;
+  align-items: center;
+  transform: translateX(0%);
+  z-index: 1000;
+  border-radius: 15px;
+}
 .form-control {
   margin-bottom: 5px;
   min-width: 200px;
@@ -24,6 +33,13 @@
 /* iconButtonStyles.css */
 
 .custom-icon-button {
+  width: 26px;
+  height: 26px;
+  background-color: #4caf50;
+  color: white;
+}
+
+.custom-icon-print {
   width: 26px;
   height: 26px;
   background-color: #4caf50;
