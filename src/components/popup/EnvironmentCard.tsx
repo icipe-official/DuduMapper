@@ -5,22 +5,23 @@ import Box from "@mui/material/Box";
 import CardHeader from "@mui/material/CardHeader";
 
 export default function EnvironmentCard({siteInfo, status, isFetching}: { siteInfo: any, status: string, isFetching: boolean }) {
-    let siteProps = {};
-    if (siteInfo) {
-        siteProps = siteInfo.features[0].properties;
-    }
+    let siteProps: any = {};
+   
     if (status === 'pending' || isFetching) {
         return (
             <LinearProgress/>
         )
     }
+    if (siteInfo) {
+        siteProps = siteInfo.features[0].properties;
 
+    }
     return (
         <Box>
 
             <Card>
                 <CardHeader
-                    title={siteProps["country"] }
+                    title={siteProps['country'] }
                     subheader={"Notes: " + siteProps["site_notes"]}
                 />
             </Card>

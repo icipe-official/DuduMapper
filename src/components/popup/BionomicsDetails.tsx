@@ -1,7 +1,7 @@
 import Typography from "@mui/material/Typography";
 import React, {useState} from "react";
 
-export default function BionomicsDetails ({bioData}) {
+export default function BionomicsDetails ({bioData}:{bioData:any}) {
 
     const [isBitingPeakVisible, setBitingPeakVisible] = useState(false);
 

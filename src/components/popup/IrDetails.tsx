@@ -1,7 +1,7 @@
 import Typography from "@mui/material/Typography";
 import React, {useState} from "react";
 
-export default function IrDetails({irData}) {
+export default function IrDetails({irData}: {irData: any}) {
 
     const [isBioessaysVisible, setBioessaysVisible] = useState(false);
     const [isGeneticMechanismsVisible, setGeneticMechanismsVisible] = useState(false);
