@@ -27,7 +27,7 @@ const queryClient = new QueryClient();
 
 function Newmap() {
 
-    const mapRef = useRef<Map>(undefined)
+    const mapRef = useRef<Map>()
     const [popoverContent, setPopoverContent] = React.useState<{
         [x: string]: any;
     }>({});
