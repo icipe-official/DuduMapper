@@ -1,32 +1,48 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { Map, View } from "ol";
+import React, {useEffect, useRef, useState} from "react";
+import {Map, View} from "ol";
 import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
 import LayerGroup from "ol/layer/Group";
-import { BaseLayerOptions, GroupLayerOptions } from "ol-layerswitcher";
+import {BaseLayerOptions, GroupLayerOptions} from "ol-layerswitcher";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON.js";
-import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
-import { Vector as VectorLayer } from "ol/layer.js";
+import {bbox as bboxStrategy} from "ol/loadingstrategy.js";
+import {Vector as VectorLayer} from "ol/layer.js";
 import {
     geoServerBaseUrl,
     getBasemapOverlaysLayersArray,
 } from "@/api/requests";
-import { Stroke, Fill, Style, Circle } from "ol/style";
+import {Stroke, Fill, Style, Circle} from "ol/style";
 import "../shared/CSS/LayerSwitcherStyles.css";
 import OccurrencePopup from "../popup/OccurrenceDrawer";
 import FilterSection from "../filters/filtersection";
-import { IconButton, Tooltip } from "@mui/material";
+import {IconButton, Tooltip} from "@mui/material";
 import "../filters/filterSectionStyles.css";
 import TuneIcon from "@mui/icons-material/Tune";
-import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import {QueryClient, QueryClientProvider, useQuery, useQueryClient} from "@tanstack/react-query";
+import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 
 const queryClient = new QueryClient();
 
-function Newmap() {
+const OCCURRENCE_API = `${geoServerBaseUrl}/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:occurrence&maxFeatures=10000&outputFormat=application/json`;
+const getOccurrences = async (queryKey) => {
+    console.log(queryKey[1])
+    const params: string = queryKey[1]
+    if (params) {
+        console.log('Filtering occurrence on: ', params)
+        const url = `${OCCURRENCE_API}&cql_filter=${params}`;
+        console.log(url)
+        const response = await fetch(url)
+        return response.json();
+    }
+    const response = await fetch(`${OCCURRENCE_API}`)
+    return response.json();
+}
 
+function Newmap() {
+    const queryClient =  useQueryClient();
     const mapRef = useRef<Map>()
     const [popoverContent, setPopoverContent] = React.useState<{
         [x: string]: any;
@@ -35,6 +51,35 @@ function Newmap() {
     const mapElement = useRef<HTMLDivElement>(null);
     const [filterOpen, setFilterOpen] = useState(false);
     const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
+    const [filterParams, setFilterParams] = useState(null)
+
+    const updateFilterParams = (filter: string) => {
+        setFilterParams(filter)
+    }
+
+    const {
+        status,
+        data,
+        isError,
+        error,
+        isFetching,
+    } = useQuery({
+        queryKey: ["occurrences", filterParams],
+        //queryFn: getOccurrences
+        queryFn: ({ queryKey }) => getOccurrences(queryKey)
+    });
+
+    if (isFetching) {
+        console.log('Loading occurrences...')
+    }
+    if (isError){
+        console.log('Error', error)
+    }
+    if (status==='success') {
+        const total = data['totalFeatures']
+        const returned = data['numberReturned']
+        console.log(`${returned} out of ${total} features`)
+    }
 
     const occurrenceSource = new VectorSource({
         format: new GeoJSON(),
@@ -132,25 +177,25 @@ function Newmap() {
     };
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <div style={{ display: 'flex', height: 'calc(100vh - 70px)' }}>
+        //<QueryClientProvider client={queryClient}>
+            <div style={{display: 'flex', height: 'calc(100vh - 70px)'}}>
                 <div
-                    style={{ flexGrow: 1, width: showOccurrencePopup ? '70%' : '100%' }}
+                    style={{flexGrow: 1, width: showOccurrencePopup ? '70%' : '100%'}}
                     ref={mapElement}
                     className="map-container"
                     id="map-container"
                 >
                     <div>
-                        {filterOpen && <FilterSection openFilter={filterOpen} />}
+                        {filterOpen && <OccurrenceFilter open={filterOpen} handleFilterParams={updateFilterParams}/>}
 
                         <div className="filter-section">
                             <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>
                                 <IconButton
-                                    onClick={() => setFilterOpen(!filterOpen)}
                                     className="custom-icon-button"
-                                    style={{ color: "white" }}
+                                    style={{color: "white"}}
+                                    onClick={() => setFilterOpen(!filterOpen)}
                                 >
-                                    <TuneIcon />
+                                    <TuneIcon/>
                                 </IconButton>
                             </Tooltip>
                         </div>
@@ -165,7 +210,7 @@ function Newmap() {
                     />
                 )}
             </div>
-        </QueryClientProvider>
+        //</QueryClientProvider>
     );
 }
 
