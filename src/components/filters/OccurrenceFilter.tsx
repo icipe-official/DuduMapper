@@ -1,7 +1,5 @@
 import {useEffect, useState} from "react";
 import {Autocomplete, Collapse, Stack, TextField} from "@mui/material";
-import { countryList, speciesList } from "./filterUtils";
-
 
 export default function OccurrenceFilter({open, handleFilterParams}: { open: boolean, handleFilterParams: any }) {
     const [selectedSpecies, setSelectedSpecies] = useState<string>(null)
