@@ -9,31 +9,10 @@ import CardActions from '@mui/material/CardActions';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
 import { BASE_PATH } from "@/lib/constants";
+import {useQuery} from "@tanstack/react-query";
+import {fetchOccurrenceSamples} from "@/api/occurrence";
+import Box from "@mui/material/Box";
 
-export interface SpeciesInfo {
-    occurrence_id: number
-    abundance_data: any
-    binary_presence: any
-    period_start: string
-    period_end: string
-    bionomics_id: number
-    dataset_id: any
-    genetic_mechanisms_id: any
-    ir_bioassays_id: any
-    reference_id: any
-    site_id: number
-    species_id: number
-    occurrence_notes: any
-    estimated_season: any
-    season_given: any
-    vector: string
-    complex: any
-    species: string
-    thumbnail_url: any
-    image_url: any
-    distribution_map_url: any
-    vector_notes: any
-}
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -52,6 +31,16 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 export default function SpeciesInfoBox({ speciesInfo }: { speciesInfo: any }) {
     const [expanded, setExpanded] = React.useState(false);
 
+    const {
+        status,
+        data: occurrence_samples,
+        error,
+        isFetching,
+    } = useQuery({
+        queryKey: ["occurrence_samples", speciesInfo['occurrence_id']],
+        queryFn: ({ queryKey }) => fetchOccurrenceSamples(queryKey[1])
+    });
+
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
@@ -63,25 +52,22 @@ export default function SpeciesInfoBox({ speciesInfo }: { speciesInfo: any }) {
     return (
         <Card style={cardStyle}>
             <CardHeader
-                title={speciesInfo['vector'] + " " + speciesInfo['species']}
-                subheader={"Period of " + speciesInfo['period_start'] + " to " + speciesInfo['period_end']}
-            >
-                <Typography>
-                    {speciesInfo['species']}
-                </Typography>
+                title={`${speciesInfo['species']} ${speciesInfo['vector']}`}
+                subheader={`Sampled between ${speciesInfo['start_month']}/${speciesInfo['start_year']} to ${speciesInfo['end_month']}/${speciesInfo['end_year']}`}
+            >h
             </CardHeader>
             <CardMedia
                 component="img"
-                //height="194"
                 image={`${BASE_PATH}/images/gambie.png`}
                 alt={speciesInfo['species']}
             />
             <CardContent>
-                <Typography variant="body2" color="text.secondary">
-                    The Anopheles gambiae complex consists of at least seven morphologically indistinguishable species
-                    of mosquitoes in the genus Anopheles. The complex was recognised in the 1960s and includes the most
-                    important vectors of malaria in sub-Saharan Africa
+                <Typography >
+                    Sampling Methods
                 </Typography>
+                <Box sx={{display: 'flex', m: 1, p: 1,fontSize: '0.875rem', fontWeight: '700',}}>
+
+                </Box>
             </CardContent>
             <CardActions disableSpacing>
                 <ExpandMore

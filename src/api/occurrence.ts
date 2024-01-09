@@ -1,21 +1,29 @@
 import {geoServerBaseUrl} from "@/api/requests";
 
-const SITE_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:site_v&maxFeatures=50&outputFormat=application/json&cql_filter=site_id=SITE_ID";
-const BIONOMICS_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:bionomics_v&maxFeatures=50&outputFormat=application/json&cql_filter=bionomics_id=BIO_ID"
+const RESOURCE_URL = geoServerBaseUrl + "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:RESOURCE&maxFeatures=50&outputFormat=application/json&cql_filter=FILTER";
 
-export const fetchSiteInfo = async (siteId: any) => {
-    console.log("Site ID", siteId)
-    const url = geoServerBaseUrl + SITE_URL.replace("SITE_ID", siteId);
-    console.log("URL", url)
+const fetchResource =  async (resource: string, filter: string)=> {
+    console.log(`Fetching resource: ${resource} with filter ${filter}`)
+    const url = RESOURCE_URL.replace('RESOURCE', resource).replace("FILTER", filter);
+    console.log("Complete URL", url)
     const response = await fetch(url);
     return await response.json();
 }
 
-export const fetchBionomics = (bioId: number) => {
-    fetch(geoServerBaseUrl + SITE_URL + "&cql_filter=bionomics_id=" + {bioId})
-        .then(response => response.json())
-        .then(json => {
-            return json;
-        })
-        .catch(error => console.error(error));
+export const fetchSiteInfo = async (siteId: number) => {
+    const filter = `site_id=${siteId}`;
+    const response = await fetchResource('site', filter);
+    return await response.json();
+}
+
+export const fetchOccurrenceSamples = async (occurrenceId: number) => {
+    const filter = `occurrence_id=${occurrenceId}`;
+    const response = await fetchResource('occurrence_sample', filter);
+    return await response.json();
+}
+
+export const fetchBionomics = async (bionomicsId: number) => {
+    const filter = `bionomics_id=${bionomicsId}`;
+    const response = await fetchResource('bionomics', filter);
+    return await response.json();
 }
