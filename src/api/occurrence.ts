@@ -1,14 +1,11 @@
-import {geoServerBaseUrl} from "@/api/requests";
-
+import { geoServerBaseUrl } from "@/api/requests";
 const OCCURRENCE_API = `${geoServerBaseUrl}/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:occurrence&maxFeatures=10000&outputFormat=application/json`;
-const SITE_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:site_v&maxFeatures=50&outputFormat=application/json&cql_filter=site_id=SITE_ID";
-
-const BIONOMICS_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:bionomics_v&maxFeatures=50&outputFormat=application/json&cql_filter=bionomics_id=BIO_ID"
+const SITE_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Asite&maxFeatures=50&outputFormat=application/json&cql_filter=site_id=SITE_ID";
+const BIONOMICS_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Abionomics_v&maxFeatures=50&outputFormat=application/json&cql_filter=bionomics_id=BIO_ID"
 export const fetchSiteInfo = async (siteId: any) => {
     const url = geoServerBaseUrl + SITE_URL.replace("SITE_ID", siteId);
     const response = await fetch(url);
     return await response.json();
-
 }
 export const fetchBionomics = async (bioId: any) => {
     const url = geoServerBaseUrl + BIONOMICS_URL.replace('BIO_ID', bioId);
