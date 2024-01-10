@@ -1,31 +1,101 @@
-import {useEffect, useState} from "react";
-import {Autocomplete, Collapse, Stack, TextField} from "@mui/material";
+import React, {useEffect, useState} from "react";
+import {Autocomplete, CircularProgress, Collapse, Stack, TextField} from "@mui/material";
+import {GEOSERVER_BASE_PATH} from "@/lib/constants";
+import axios from "axios";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
+import wellknown from "wellknown"
+import {simplify} from "@turf/turf";
+
+const reqParams = {
+    service: 'WFS',
+    version: '1.0.0',
+    request: 'GetFeature',
+    typeName: 'basemap:countries',
+    maxFeatures: 100,
+    outputFormat: 'application/json',
+}
+const COUNTRIES_API = `${GEOSERVER_BASE_PATH}/geoserver/basemap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=basemap:countries&maxFeatures=100&outputFormat=application/json`
+const getCountries = async () => {
+    const res = await axios.get(COUNTRIES_API);
+    return res.data;
+
+}
 
 export default function OccurrenceFilter({open, handleFilterParams}: { open: boolean, handleFilterParams: any }) {
+    const queryClient = useQueryClient()
     const [selectedSpecies, setSelectedSpecies] = useState<string>(null)
-    const [filterParams, setFilterParams] = useState<string>(null);
-
-    const composeFilterParams = () => {
-        if (selectedSpecies) {
-
-            const arrayOfSpecies: [] = String(selectedSpecies).split(',')
-            const quotedSpecies= `'${arrayOfSpecies.join("', '")}'`
-            const speciesFilter: string = `species IN(${quotedSpecies})`
-            setFilterParams(speciesFilter)
-        }
+    const [openCountries, setOpenCountries] = useState(false)
+    const [countriesOptions, setCountriesOptions] = useState<[]>([])
+    const [selectedCountries, setSelectedCountries] = useState(null)
+    const {
+        isFetching: isFetchingCountries,
+        data: countriesData,
+        isError: countriesError,
+        status: countriesStatus
+    } =
+        useQuery({
+            queryKey: ['countries'],
+            queryFn: getCountries
+        })
+    function isEmpty(value) {
+        return (value == null || (typeof value === "string" && value.trim().length === 0));
     }
+
+    const composeFilterParams = (): string => {
+        const filterConditions = [];
+        if (selectedSpecies) {
+            const arrayOfSpecies: [] = String(selectedSpecies).split(',')
+            const quotedSpecies = `'${arrayOfSpecies.join("', '")}'`
+            const speciesFilter: string = `species IN(${quotedSpecies}) `
+            filterConditions.push(speciesFilter)
+        }
+        if (selectedCountries) {
+            const cFilter = ` WITHIN(the_geom, ${selectedCountries})`
+            filterConditions.push(cFilter)
+        }
+
+        return filterConditions
+    }
+
+    useEffect(() => {
+        let active = true;
+
+        if (countriesStatus === 'success') {
+            setCountriesOptions(countriesData.features)
+        }
+        return () => {
+            active = false;
+        };
+    }, [isFetchingCountries])
+
+
+    // useEffect(() => {
+    //     if (!openCountries) {
+    //         setCountriesOptions([]);
+    //     }
+    // }, [openCountries]);
+
 
     const handleSpecies = (values) => {
         setSelectedSpecies(values);
     }
 
-    useEffect(() => {
-        composeFilterParams()
-    }, [selectedSpecies]);
+    const simplifyGeometry = (geometry) => {
+        const options = {tolerance: 0.1, highQuality: false};
+        return simplify(geometry, options)
+    }
+
+
+    const handleCountries= (values) => {
+        const simplifiedGeoms = values.map(value => simplifyGeometry((value.geometry)))
+        const wktGeoms = simplifiedGeoms.map(geom => wellknown.stringify(geom))
+        setSelectedCountries(wktGeoms)
+    }
 
     useEffect(() => {
+        const filterParams = composeFilterParams()
         handleFilterParams(filterParams)
-    }, [filterParams]);
+    }, [selectedSpecies, selectedCountries]);
 
     return (
         <div className="filter-section">
@@ -34,7 +104,7 @@ export default function OccurrenceFilter({open, handleFilterParams}: { open: boo
                     <Autocomplete
                         multiple
                         id="species-filter"
-                        options={speciesList}
+                        options={speciesList.map(species => species.properties.species)}
                         freeSolo
                         limitTags={3}
                         filterSelectedOptions
@@ -48,6 +118,41 @@ export default function OccurrenceFilter({open, handleFilterParams}: { open: boo
                         )}
                         onChange={(event, values) => (handleSpecies(values))}
                     />
+
+                    <Autocomplete
+                        id="asynchronous-demo"
+                        multiple
+                        sx={{width: 300}}
+                        open={openCountries}
+                        onOpen={() => {
+                            setOpenCountries(true);
+                        }}
+                        onClose={() => {
+                            setOpenCountries(false);
+                        }}
+                        //isOptionEqualToValue={(option, value) => option === value}
+                        getOptionLabel={(option) => option['properties']['name']}
+                        getOptionKey={option => option.properties.id}
+                        options={countriesOptions}
+                        loading={isFetchingCountries}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Countries"
+                                InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                        <React.Fragment>
+                                            {isFetchingCountries ? <CircularProgress color="inherit" size={20}/> : null}
+                                            {params.InputProps.endAdornment}
+                                        </React.Fragment>
+                                    ),
+                                }}
+                            />
+                        )}
+                        onChange={(event, values) => (handleCountries(values))}
+                    />
+                    );
                 </Stack>
             </Collapse>
         </div>
