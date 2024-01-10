@@ -42,7 +42,7 @@ const getOccurrences = async (queryKey) => {
 }
 
 function Newmap() {
-    const queryClient =  useQueryClient();
+    const queryClient = useQueryClient();
     const mapRef = useRef<Map>()
     const [popoverContent, setPopoverContent] = React.useState<{
         [x: string]: any;
@@ -51,10 +51,15 @@ function Newmap() {
     const mapElement = useRef<HTMLDivElement>(null);
     const [filterOpen, setFilterOpen] = useState(false);
     const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
-    const [filterParams, setFilterParams] = useState(null)
+    const [cqlFilter, setCqlFilter] = useState(null)
 
-    const updateFilterParams = (filter: string) => {
-        setFilterParams(filter)
+    const updateFilterParams = (filters: any) => {
+
+        //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
+        console.log('Conditions',filters)
+        const cql_filter = filters.join('AND');
+        console.log('Conditions',cql_filter)
+        setCqlFilter(cql_filter)
     }
 
     const {
@@ -64,21 +69,35 @@ function Newmap() {
         error,
         isFetching,
     } = useQuery({
-        queryKey: ["occurrences", filterParams],
+        queryKey: ["occurrences", cqlFilter],
         //queryFn: getOccurrences
-        queryFn: ({ queryKey }) => getOccurrences(queryKey)
+        queryFn: ({queryKey}) => getOccurrences(queryKey)
     });
 
     if (isFetching) {
         console.log('Loading occurrences...')
     }
-    if (isError){
+    if (isError) {
         console.log('Error', error)
     }
-    if (status==='success') {
+    if (status === 'success') {
         const total = data['totalFeatures']
         const returned = data['numberReturned']
         console.log(`${returned} out of ${total} features`)
+       const occLayer = new VectorLayer({
+            source: new VectorSource({
+                features: new GeoJSON().readFeatures(data),
+            })
+        })
+        console.log('Occurrence Layer', occLayer)
+        const occurrence2 = new LayerGroup({
+            title: "Occurrence 2",
+            layers: [occLayer],
+        } as GroupLayerOptions);
+        console.log('Adding occurrence to map', mapRef.current)
+        if (map && map instanceof Map) {
+            map.addLayer(occurrence2)
+        }
     }
 
     const occurrenceSource = new VectorSource({
@@ -178,38 +197,38 @@ function Newmap() {
 
     return (
         //<QueryClientProvider client={queryClient}>
-            <div style={{display: 'flex', height: 'calc(100vh - 70px)'}}>
-                <div
-                    style={{flexGrow: 1, width: showOccurrencePopup ? '70%' : '100%'}}
-                    ref={mapElement}
-                    className="map-container"
-                    id="map-container"
-                >
-                    <div>
-                        {filterOpen && <OccurrenceFilter open={filterOpen} handleFilterParams={updateFilterParams}/>}
+        <div style={{display: 'flex', height: 'calc(100vh - 70px)'}}>
+            <div
+                style={{flexGrow: 1, width: showOccurrencePopup ? '70%' : '100%'}}
+                ref={mapElement}
+                className="map-container"
+                id="map-container"
+            >
+                <div>
+                    {filterOpen && <OccurrenceFilter open={filterOpen} handleFilterParams={updateFilterParams}/>}
 
-                        <div className="filter-section">
-                            <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>
-                                <IconButton
-                                    className="custom-icon-button"
-                                    style={{color: "white"}}
-                                    onClick={() => setFilterOpen(!filterOpen)}
-                                >
-                                    <TuneIcon/>
-                                </IconButton>
-                            </Tooltip>
-                        </div>
+                    <div className="filter-section">
+                        <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>
+                            <IconButton
+                                className="custom-icon-button"
+                                style={{color: "white"}}
+                                onClick={() => setFilterOpen(!filterOpen)}
+                            >
+                                <TuneIcon/>
+                            </IconButton>
+                        </Tooltip>
                     </div>
                 </div>
-
-                {showOccurrencePopup && (
-                    <OccurrencePopup
-                        id={'feature_popover'}
-                        handleClose={handleClosePopup}
-                        popoverContent={popoverContent}
-                    />
-                )}
             </div>
+
+            {showOccurrencePopup && (
+                <OccurrencePopup
+                    id={'feature_popover'}
+                    handleClose={handleClosePopup}
+                    popoverContent={popoverContent}
+                />
+            )}
+        </div>
         //</QueryClientProvider>
     );
 }
