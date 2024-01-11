@@ -16,6 +16,7 @@
     "@mui/material": "^5.14.15",
     "@tanstack/react-query": "^5.17.1",
     "@tanstack/react-query-devtools": "^5.17.9",
+    "@types/react-date-range": "^1.4.9",
     "@turf/turf": "^6.5.0",
     "axios": "^1.6.0",
     "eslint-plugin-jsx-a11y": "^6.8.0",
@@ -23,9 +24,13 @@
     "ol": "^8.1.0",
     "ol-ext": "^4.0.11",
     "ol-layerswitcher": "^4.1.1",
+    "rc-slider": "^10.5.0",
+    "rc-tooltip": "^6.1.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "wellknown": "^0.5.0"
+    "wellknown": "^0.5.0",
+    "react-date-range": "^1.4.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.8.9",

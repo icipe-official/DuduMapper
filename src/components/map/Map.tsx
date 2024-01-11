@@ -23,6 +23,7 @@ import "../filters/filterSectionStyles.css";
 import TuneIcon from "@mui/icons-material/Tune";
 import {QueryClient, QueryClientProvider, useQuery, useQueryClient} from "@tanstack/react-query";
 import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
+import TimeSlider from "@/components/filters/TimeSlider";
 
 const queryClient = new QueryClient();
 
@@ -53,26 +54,44 @@ function Newmap() {
     const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
     const [cqlFilter, setCqlFilter] = useState(null)
 
-    const updateFilterParams = (filters: any) => {
 
-        //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
-        console.log('Conditions',filters)
-        const cql_filter = filters.join('AND');
-        console.log('Conditions',cql_filter)
-        setCqlFilter(cql_filter)
-    }
+    const [selectedPeriod, setSelectedPeriod] = useState<[number, number]>([
+        1970,
+        new Date().getFullYear(),
+    ]);
 
     const {
         status,
-        data,
+        data: occurrenceData,
         isError,
         error,
         isFetching,
     } = useQuery({
-        queryKey: ["occurrences", cqlFilter],
+        queryKey: ["occurrences", cqlFilter], //Example CQl filter species IN ('gambie', 'finiestus', 'fini') AND WITHIN (the_geom, MULTIPOLYGON((22,22,223,223))) AND adult =true AND season=dry
         //queryFn: getOccurrences
         queryFn: ({queryKey}) => getOccurrences(queryKey)
     });
+
+    const updateFilterConditions = (filterConditions: any) => {
+
+        //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
+        console.log('Conditions', filterConditions)
+        const cql_filter = filterConditions.join('AND');
+        console.log('CQL Filter', cql_filter)
+        setCqlFilter(cql_filter)
+    }
+
+    const isValidDate = (date: Date) => {
+        return !isNaN(date.getTime());
+    };
+    const handleTimeChange = (startDate: Date, endDate: Date) => {
+        if (!isValidDate(startDate) || !isValidDate(endDate)) {
+            return;
+        }
+        setSelectedPeriod([startDate.getFullYear(), endDate.getFullYear()]);
+    };
+
+
 
     if (isFetching) {
         console.log('Loading occurrences...')
@@ -81,13 +100,16 @@ function Newmap() {
         console.log('Error', error)
     }
     if (status === 'success') {
-        const total = data['totalFeatures']
-        const returned = data['numberReturned']
+        const total = occurrenceData['totalFeatures']
+        const returned = occurrenceData['numberReturned']
         console.log(`${returned} out of ${total} features`)
-       const occLayer = new VectorLayer({
+
+
+        const occLayer = new VectorLayer({
             source: new VectorSource({
-                features: new GeoJSON().readFeatures(data),
-            })
+                features: new GeoJSON().readFeatures(occurrenceData),
+            }),
+
         })
         console.log('Occurrence Layer', occLayer)
         const occurrence2 = new LayerGroup({
@@ -196,7 +218,6 @@ function Newmap() {
     };
 
     return (
-        //<QueryClientProvider client={queryClient}>
         <div style={{display: 'flex', height: 'calc(100vh - 70px)'}}>
             <div
                 style={{flexGrow: 1, width: showOccurrencePopup ? '70%' : '100%'}}
@@ -205,7 +226,7 @@ function Newmap() {
                 id="map-container"
             >
                 <div>
-                    {filterOpen && <OccurrenceFilter open={filterOpen} handleFilterParams={updateFilterParams}/>}
+                    {filterOpen && <OccurrenceFilter open={filterOpen} handleFilterConditions={updateFilterConditions}/>}
 
                     <div className="filter-section">
                         <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>
@@ -228,8 +249,11 @@ function Newmap() {
                     popoverContent={popoverContent}
                 />
             )}
+            {/*<div className="time-slider-container">*/}
+            {/*    <TimeSlider onChange={handleTimeChange}/>*/}
+            {/*</div>*/}
+
         </div>
-        //</QueryClientProvider>
     );
 }
 
