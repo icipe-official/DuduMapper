@@ -1,1296 +1,818 @@
-import React, {useEffect, useState} from "react";
-import {Autocomplete, CircularProgress, Collapse, Stack, TextField} from "@mui/material";
-import {GEOSERVER_BASE_PATH} from "@/lib/constants";
+import React, { useEffect, useState } from "react";
+import "./filterSectionStyles.css";
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  Box,
+  Grid,
+  Typography,
+  Tooltip,
+  IconButton,
+  colors,
+  SelectChangeEvent,
+  Checkbox,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Chip,
+  Autocomplete,
+  TextField,
+} from "@mui/material";
+import TuneIcon from "@mui/icons-material/Tune";
+import ThunderstormIcon from "@mui/icons-material/Thunderstorm";
+import WbSunnyIcon from "@mui/icons-material/WbSunny";
+import DataArrayIcon from "@mui/icons-material/DataArray";
+import EmojiNatureIcon from "@mui/icons-material/EmojiNature";
+import BugReportIcon from "@mui/icons-material/BugReport";
+import PestControlIcon from "@mui/icons-material/PestControl";
+import EggIcon from "@mui/icons-material/Egg";
+import DoneIcon from "@mui/icons-material/Done";
+import CloseIcon from "@mui/icons-material/Close";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import { countryList, speciesList } from "./filterUtils";
+import { CircularProgress, Collapse, Stack } from "@mui/material";
+import { GEOSERVER_BASE_PATH } from "@/lib/constants";
 import axios from "axios";
-import {useQuery, useQueryClient} from "@tanstack/react-query";
-import wellknown from "wellknown"
-import {simplify} from "@turf/turf";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import wellknown from "wellknown";
+import { simplify } from "@turf/turf";
+import FormatShapesIcon from "@mui/icons-material/FormatShapes";
+import RectangleOutlinedIcon from "@mui/icons-material/RectangleOutlined";
+import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
+import Map from "ol/Map";
+import { Draw } from "ol/interaction";
 
 const reqParams = {
-    service: 'WFS',
-    version: '1.0.0',
-    request: 'GetFeature',
-    typeName: 'basemap:countries',
-    maxFeatures: 100,
-    outputFormat: 'application/json',
-}
-const COUNTRIES_API = `${GEOSERVER_BASE_PATH}/geoserver/basemap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=basemap:countries&maxFeatures=100&outputFormat=application/json`
+  service: "WFS",
+  version: "1.0.0",
+  request: "GetFeature",
+  typeName: "basemap:countries",
+  maxFeatures: 100,
+  outputFormat: "application/json",
+};
+const COUNTRIES_API = `${GEOSERVER_BASE_PATH}/geoserver/basemap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=basemap:countries&maxFeatures=100&outputFormat=application/json`;
 const getCountries = async () => {
-    const res = await axios.get(COUNTRIES_API);
-    return res.data;
+  const res = await axios.get(COUNTRIES_API);
+  return res.data;
+};
 
-}
-
-export default function OccurrenceFilter({open, handleFilterConditions, handleSpeciesColor}: {
-    open: boolean,
-    handleFilterConditions: any,
-    handleSpeciesColor: any
+export default function OccurrenceFilter({
+  open,
+  handleFilterConditions,
+  handleSelectedSpecies,
+  handleDrawArea,
+}: {
+  open: boolean;
+  handleFilterConditions: any;
+  handleSpeciesColor: any;
+  handleDrawArea: any;
+  handleSelectedSpecies: any
 }) {
-    const queryClient = useQueryClient()
-    const [selectedSpecies, setSelectedSpecies] = useState<string>(null)
-    const [openCountries, setOpenCountries] = useState(false)
-    const [selectedCountries, setSelectedCountries] = useState(null)
+  const queryClient = useQueryClient();
+  const [selectedSpecies, setSelectedSpecies] = useState<string>();
+  const [openCountries, setOpenCountries] = useState(false);
+  const [selectedCountries, setSelectedCountries] = useState();
+  const [countriesOptions, setCountriesOptions] = useState<[]>([]);
+  const [selectedDisease, setSelectedDisease] = useState<string[]>([]);
+  const [isDiseaseSelected, setIsDiseaseSelected] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
+  const [isCountrySelected, setIsCountrySelected] = useState(false);
+  const [isSpeciesSelected, setIsSpeciesSelected] = useState(false);
+  const [selectedSeason, setSelectedSeason] = useState("");
+  const [isSeasonSelected, setIsSeasonSelected] = useState(false);
+  const [selectedControl, setSelectedControl] = useState("");
+  const [isControlSelected, setIsControlSelected] = useState(false);
+  const [selectedAdult, setSelectedAdult] = useState("");
+  const [isAdultSelected, setIsAdultSelected] = useState(false);
+  const [selectedLarval, setSelectedLarval] = useState("");
+  const [isLarvalSelected, setIsLarvalSelected] = useState(false);
+  const [selectedByArea, setSelectedByArea] = useState<string>("");
+  const [enableAreaMode, setEnableAreaMode] = useState(false);
 
-    const [countriesOptions, setCountriesOptions] = useState<[]>([])
+  const {
+    isFetching: isFetchingCountries,
+    data: countriesData,
+    isError: countriesError,
+    status: countriesStatus,
+  } = useQuery({
+    queryKey: ["countries"],
+    queryFn: getCountries,
+  });
 
-    const {
-        isFetching: isFetchingCountries,
-        data: countriesData,
-        isError: countriesError,
-        status: countriesStatus
-    } =
-        useQuery({
-            queryKey: ['countries'],
-            queryFn: getCountries
-        })
+  const composeFilterConditions = (): string[] => {
+    const filterConditions = [];
+    if (selectedSpecies && selectedSpecies.length > 0) {
+      console.log("Selected Species", selectedSpecies);
+      const arrayOfSpecies: string[] = String(selectedSpecies).split(","); //
+      const quotedSpecies = `'${arrayOfSpecies.join("', '")}'`;
+      const speciesFilter: string = `species IN(${quotedSpecies}) `;
 
-    const composeFilterConditions = (): string => {
-        const filterConditions = [];
-        if (selectedSpecies && selectedSpecies.length > 0) {
-            console.log('Selected Species', selectedSpecies)
-            const arrayOfSpecies: [] = String(selectedSpecies).split(',') //
-            const quotedSpecies = `'${arrayOfSpecies.join("', '")}'`
-            const speciesFilter: string = `species IN(${quotedSpecies}) `
-            filterConditions.push(speciesFilter)
-        }
-        if (selectedCountries && selectedCountries.length > 0) {
-            console.log('Selected Countries', selectedCountries)
-            const cFilter = ` WITHIN(the_geom, ${selectedCountries})`
-            filterConditions.push(cFilter)
-        }
-
-        //season, larvae, adult,
-        return filterConditions
+      filterConditions.push(speciesFilter);
+    }
+    if (selectedCountries && selectedCountries.length > 0) {
+      console.log("Selected Countries", selectedCountries);
+      const cFilter = ` WITHIN(the_geom, ${selectedCountries})`;
+      filterConditions.push(cFilter);
     }
 
-    useEffect(() => {
-        let active = true;
+    //season, larvae, adult,
+    return filterConditions;
+  };
 
-        if (countriesStatus === 'success') {
-            setCountriesOptions(countriesData.features)
-        }
-        return () => {
-            active = false;
-        };
-    }, [isFetchingCountries])
+  const handleDiseaseChange = (
+    _: React.SyntheticEvent<Element, Event>,
+    value: string[]
+  ) => {
+    const selectedValues = [...value];
+    setSelectedDisease(selectedValues);
+    setIsDiseaseSelected(selectedValues.length > 0);
+  };
+  const handleCountryChange = (
+    _: React.SyntheticEvent<Element, Event>,
+    value: string[]
+  ) => {
+    const selectedValues = [...value];
+    setSelectedCountry(selectedValues);
+    setIsCountrySelected(selectedValues.length > 0);
+  };
 
+  const handleDeleteDisease = (index: number) => {
+    const newSelectedDisease = [...selectedDisease];
+    newSelectedDisease.splice(index, 1);
+    setSelectedDisease(newSelectedDisease);
+    setIsDiseaseSelected(newSelectedDisease.length > 0);
+  };
+  const handleDeleteCountry = (index: number) => {
+    const newSelectedCountry = [...selectedCountry];
+    newSelectedCountry.splice(index, 1);
+    setSelectedCountry(newSelectedCountry);
+    setIsCountrySelected(newSelectedCountry.length > 0);
+  };
 
-    const handleSpecies = (values) => {
-        setSelectedSpecies(values);
+  const handleDeleteSpecies = (index: number) => {
+    const newSelectedSpecies = [...selectedSpecies];
+    newSelectedSpecies.splice(index, 1);
+    setSelectedSpecies(newSelectedSpecies);
+    setIsSpeciesSelected(newSelectedSpecies.length > 0);
+  };
+
+  const toggleSelectedByArea = (shape: string) => {
+    // if (selectedByArea === "") {
+    //   //setEnableAreaMode(true);
+    //   setSelectedByArea(shape);
+    // } else if (selectedByArea != shape && selectedByArea != "") {
+    //   //setEnableAreaMode(true);
+    //   setSelectedByArea(shape);
+    // } else {
+    //   //setEnableAreaMode(false);
+    //   setSelectedByArea("");
+    // }
+    setSelectedByArea(shape);
+    handleDrawArea(shape);
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    if (countriesStatus === "success") {
+      setCountriesOptions(countriesData.features);
     }
+    return () => {
+      active = false;
+    };
+  }, [isFetchingCountries]);
 
-    const simplifyGeometry = (geometry) => {
-        const options = {tolerance: 0.1, highQuality: false};
-        return simplify(geometry, options)
-    }
+  const handleSpecies = (values) => {
+    setSelectedSpecies(values);
+  };
 
+  const simplifyGeometry = (geometry) => {
+    const options = { tolerance: 0.1, highQuality: false };
+    return simplify(geometry, options);
+  };
 
-    const handleCountries = (values) => {
-        const simplifiedGeoms = values.map(value => simplifyGeometry((value.geometry)))
-        //const wktGeoms = simplifiedGeoms.map(geom => wellknown.stringify(geom)) // changing geojson geometry to well know text representation
-        const wktGeoms = wellknown.stringify(simplifiedGeoms) // changing geojson geometry to well know text representation
-        //TODO handle multiple countries
-        setSelectedCountries(wktGeoms)
-    }
-
-    useEffect(() => {
-        const filterParams = composeFilterConditions()
-        handleFilterConditions(filterParams)
-        // if (selectedSpecies.length > 0) {
-        //     const arrayOfSpecies:
-        //         [] = String(selectedSpecies).split(',') //
-        //     handleSpeciesColor(arrayOfSpecies)
-        // }
-    }, [selectedSpecies, selectedCountries]);
-
-    return (
-        <div className="filter-section">
-            <Collapse in={open}>
-                <Stack spacing={3} sx={{width: 500}}>
-                    <Autocomplete
-                        //multiple
-                        id="species-filter"
-                        options={speciesList.map(species => species.properties.species)}
-                        freeSolo
-                        limitTags={3}
-                        filterSelectedOptions
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                variant="filled"
-                                label="Species"
-                                placeholder="Select Species"
-                            />
-                        )}
-                        onChange={(event, values) => (handleSpecies(values))}
-                    />
-
-                    <Autocomplete
-                        id="asynchronous-demo"
-                        multiple
-                        sx={{width: 300}}
-                        open={openCountries}
-                        onOpen={() => {
-                            setOpenCountries(true);
-                        }}
-                        onClose={() => {
-                            setOpenCountries(false);
-                        }}
-                        //isOptionEqualToValue={(option, value) => option === value}
-                        getOptionLabel={(option) => option['properties']['name']}
-                        getOptionKey={option => option.properties.id}
-                        options={countriesOptions}
-                        loading={isFetchingCountries}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Countries"
-                                InputProps={{
-                                    ...params.InputProps,
-                                    endAdornment: (
-                                        <React.Fragment>
-                                            {isFetchingCountries ? <CircularProgress color="inherit" size={20}/> : null}
-                                            {params.InputProps.endAdornment}
-                                        </React.Fragment>
-                                    ),
-                                }}
-                            />
-                        )}
-                        onChange={(event, values) => (handleCountries(values))}
-                    />
-                    );
-                </Stack>
-            </Collapse>
-        </div>
+  const handleCountries = (values) => {
+    const simplifiedGeoms = values.map((value) =>
+      simplifyGeometry(value.geometry)
     );
-}
+    const wktGeoms = simplifiedGeoms.map((geom) => wellknown.stringify(geom)); // changing geojson geometry to well know text representation
+    //TODO handle multiple countries
+    setSelectedCountries(wktGeoms);
+  };
 
+  useEffect(() => {
+    const filterParams = composeFilterConditions();
+    handleFilterConditions(filterParams);
+    if (selectedSpecies.length > 0) {
 
-const speciesList = [
-    {
-        "type": "Feature",
-        "id": "vector_info.1",
-        "geometry": null,
-        "properties": {
-            "species": "arabiensis",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.2",
-        "geometry": null,
-        "properties": {
-            "species": "bwambae",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.3",
-        "geometry": null,
-        "properties": {
-            "species": "carnevalei",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.4",
-        "geometry": null,
-        "properties": {
-            "species": "coluzzii",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.5",
-        "geometry": null,
-        "properties": {
-            "species": "culicifacies",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.6",
-        "geometry": null,
-        "properties": {
-            "species": "faini",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.7",
-        "geometry": null,
-        "properties": {
-            "species": "funestus",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.8",
-        "geometry": null,
-        "properties": {
-            "species": "FUNESTUS COMPLEX",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.9",
-        "geometry": null,
-        "properties": {
-            "species": "labranchiae",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.10",
-        "geometry": null,
-        "properties": {
-            "species": "melas",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.11",
-        "geometry": null,
-        "properties": {
-            "species": "merus",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.12",
-        "geometry": null,
-        "properties": {
-            "species": "moucheti",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.13",
-        "geometry": null,
-        "properties": {
-            "species": "multicolor",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.14",
-        "geometry": null,
-        "properties": {
-            "species": "nili",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.15",
-        "geometry": null,
-        "properties": {
-            "species": "pharoensis",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.16",
-        "geometry": null,
-        "properties": {
-            "species": "pseudopunctipennis",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.17",
-        "geometry": null,
-        "properties": {
-            "species": "quadriannulatus",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.18",
-        "geometry": null,
-        "properties": {
-            "species": "quadriannulatus sp. B",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.19",
-        "geometry": null,
-        "properties": {
-            "species": "quadrimaculatus",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.20",
-        "geometry": null,
-        "properties": {
-            "species": "sergentii",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.21",
-        "geometry": null,
-        "properties": {
-            "species": "stephensi",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.22",
-        "geometry": null,
-        "properties": {
-            "species": "Test123",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.23",
-        "geometry": null,
-        "properties": {
-            "species": "gambiae",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.24",
-        "geometry": null,
-        "properties": {
-            "species": "GAMBIAE COMPLEX",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.25",
-        "geometry": null,
-        "properties": {
-            "species": "gambiae (S/M, 1)",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.26",
-        "geometry": null,
-        "properties": {
-            "species": "gambiae s.s.",
-            "vector": "Mosquito"
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.27",
-        "geometry": null,
-        "properties": {
-            "species": "flavirostris",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.28",
-        "geometry": null,
-        "properties": {
-            "species": "barberellus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.29",
-        "geometry": null,
-        "properties": {
-            "species": "n.a.",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.30",
-        "geometry": null,
-        "properties": {
-            "species": "marshalli",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.31",
-        "geometry": null,
-        "properties": {
-            "species": "gambiae (Forest)",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.32",
-        "geometry": null,
-        "properties": {
-            "species": "minimus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.33",
-        "geometry": null,
-        "properties": {
-            "species": "dirus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.34",
-        "geometry": null,
-        "properties": {
-            "species": "annularis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.35",
-        "geometry": null,
-        "properties": {
-            "species": "aconitus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.36",
-        "geometry": null,
-        "properties": {
-            "species": "gambiae (S/M)",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.37",
-        "geometry": null,
-        "properties": {
-            "species": "cinereus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.38",
-        "geometry": null,
-        "properties": {
-            "species": "melas ",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.39",
-        "geometry": null,
-        "properties": {
-            "species": "coustani",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.40",
-        "geometry": null,
-        "properties": {
-            "species": "squamosus-cydippis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.41",
-        "geometry": null,
-        "properties": {
-            "species": "mascarensis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.42",
-        "geometry": null,
-        "properties": {
-            "species": "flavicosta",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.43",
-        "geometry": null,
-        "properties": {
-            "species": "brunnipes",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.44",
-        "geometry": null,
-        "properties": {
-            "species": "maculipalpis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.45",
-        "geometry": null,
-        "properties": {
-            "species": "grassei",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.46",
-        "geometry": null,
-        "properties": {
-            "species": "rivulorum",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.47",
-        "geometry": null,
-        "properties": {
-            "species": "gambiae  (S/M)",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.48",
-        "geometry": null,
-        "properties": {
-            "species": "squamosus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.49",
-        "geometry": null,
-        "properties": {
-            "species": "ziemanni",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.50",
-        "geometry": null,
-        "properties": {
-            "species": "albimanus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.51",
-        "geometry": null,
-        "properties": {
-            "species": "darlingi",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.52",
-        "geometry": null,
-        "properties": {
-            "species": "anthropophagus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.53",
-        "geometry": null,
-        "properties": {
-            "species": "sinensis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.54",
-        "geometry": null,
-        "properties": {
-            "species": "NILI COMPLEX",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.55",
-        "geometry": null,
-        "properties": {
-            "species": "squasmous",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.56",
-        "geometry": null,
-        "properties": {
-            "species": "ziemani",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.57",
-        "geometry": null,
-        "properties": {
-            "species": "marshallii",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.58",
-        "geometry": null,
-        "properties": {
-            "species": "paludis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.59",
-        "geometry": null,
-        "properties": {
-            "species": "rufipes",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.60",
-        "geometry": null,
-        "properties": {
-            "species": "hancocki",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.61",
-        "geometry": null,
-        "properties": {
-            "species": "sacharovi",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.62",
-        "geometry": null,
-        "properties": {
-            "species": "implexus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.63",
-        "geometry": null,
-        "properties": {
-            "species": "abscurus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.64",
-        "geometry": null,
-        "properties": {
-            "species": "smithii",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.65",
-        "geometry": null,
-        "properties": {
-            "species": "namibiensis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.66",
-        "geometry": null,
-        "properties": {
-            "species": "domicola",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.67",
-        "geometry": null,
-        "properties": {
-            "species": "marshalii",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.68",
-        "geometry": null,
-        "properties": {
-            "species": "demeilloni",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.69",
-        "geometry": null,
-        "properties": {
-            "species": "gibbinsi",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.70",
-        "geometry": null,
-        "properties": {
-            "species": "pretoriensis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.71",
-        "geometry": null,
-        "properties": {
-            "species": "gambiae (S)",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.72",
-        "geometry": null,
-        "properties": {
-            "species": "wellcomei",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.73",
-        "geometry": null,
-        "properties": {
-            "species": "tenebrosus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.74",
-        "geometry": null,
-        "properties": {
-            "species": "ovengensis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.75",
-        "geometry": null,
-        "properties": {
-            "species": "longipalpis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.76",
-        "geometry": null,
-        "properties": {
-            "species": "christyi",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.77",
-        "geometry": null,
-        "properties": {
-            "species": "atroparvus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.78",
-        "geometry": null,
-        "properties": {
-            "species": "dthali",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.79",
-        "geometry": null,
-        "properties": {
-            "species": "rhodesiensis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.80",
-        "geometry": null,
-        "properties": {
-            "species": "rupicolus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.81",
-        "geometry": null,
-        "properties": {
-            "species": "garnhami",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.82",
-        "geometry": null,
-        "properties": {
-            "species": "harperi",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.83",
-        "geometry": null,
-        "properties": {
-            "species": "farauti",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.84",
-        "geometry": null,
-        "properties": {
-            "species": "maculatus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.85",
-        "geometry": null,
-        "properties": {
-            "species": "barbirostris",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.86",
-        "geometry": null,
-        "properties": {
-            "species": "balabacensis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.87",
-        "geometry": null,
-        "properties": {
-            "species": "subpictus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.88",
-        "geometry": null,
-        "properties": {
-            "species": "campestris",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.89",
-        "geometry": null,
-        "properties": {
-            "species": "fluviatilis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.90",
-        "geometry": null,
-        "properties": {
-            "species": "pulcherrimus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.91",
-        "geometry": null,
-        "properties": {
-            "species": "leucosphyrus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.92",
-        "geometry": null,
-        "properties": {
-            "species": "nigerrimus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.93",
-        "geometry": null,
-        "properties": {
-            "species": "nuneztovari",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.94",
-        "geometry": null,
-        "properties": {
-            "species": "aquasalis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.95",
-        "geometry": null,
-        "properties": {
-            "species": "albitarsis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.96",
-        "geometry": null,
-        "properties": {
-            "species": "marajoara",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.97",
-        "geometry": null,
-        "properties": {
-            "species": "sundaicus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.98",
-        "geometry": null,
-        "properties": {
-            "species": "parensis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.99",
-        "geometry": null,
-        "properties": {
-            "species": "freetownensis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.100",
-        "geometry": null,
-        "properties": {
-            "species": "superpictus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.101",
-        "geometry": null,
-        "properties": {
-            "species": "cydippis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.102",
-        "geometry": null,
-        "properties": {
-            "species": "messeae",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.103",
-        "geometry": null,
-        "properties": {
-            "species": "leesoni",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.104",
-        "geometry": null,
-        "properties": {
-            "species": "coustani ",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.105",
-        "geometry": null,
-        "properties": {
-            "species": "gambiae (Form M)",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.106",
-        "geometry": null,
-        "properties": {
-            "species": "gambiae (Form S)",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.107",
-        "geometry": null,
-        "properties": {
-            "species": "na",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.108",
-        "geometry": null,
-        "properties": {
-            "species": "punctimacula",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.109",
-        "geometry": null,
-        "properties": {
-            "species": "gambiae / coluzzii",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.110",
-        "geometry": null,
-        "properties": {
-            "species": "argyritarsis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.111",
-        "geometry": null,
-        "properties": {
-            "species": "cruzii",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.112",
-        "geometry": null,
-        "properties": {
-            "species": "bellator",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.113",
-        "geometry": null,
-        "properties": {
-            "species": "cinereus ",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.114",
-        "geometry": null,
-        "properties": {
-            "species": "claviger ",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.115",
-        "geometry": null,
-        "properties": {
-            "species": "gambiae  ",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.116",
-        "geometry": null,
-        "properties": {
-            "species": "christi",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.117",
-        "geometry": null,
-        "properties": {
-            "species": "punctulatus",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.118",
-        "geometry": null,
-        "properties": {
-            "species": "koliensis",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.180",
-        "geometry": null,
-        "properties": {
-            "species": "source provides rtemperature data",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.181",
-        "geometry": null,
-        "properties": {
-            "species": "d'thali",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.182",
-        "geometry": null,
-        "properties": {
-            "species": "rupicola",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.183",
-        "geometry": null,
-        "properties": {
-            "species": "chrysti",
-            "vector": null
-        }
-    },
-
-    {
-        "type": "Feature",
-        "id": "vector_info.202",
-        "geometry": null,
-        "properties": {
-            "species": "rivulorum  ",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.206",
-        "geometry": null,
-        "properties": {
-            "species": "pauliani",
-            "vector": null
-        }
-    },
-    {
-        "type": "Feature",
-        "id": "vector_info.207",
-        "geometry": null,
-        "properties": {
-            "species": "radama",
-            "vector": null
-        }
+            handleSelectedSpecies(selectedSpecies)
     }
-]
+  }, [selectedSpecies, selectedCountries]);
+
+  return (
+    <div className="filter-section">
+      <Collapse in={open}>
+        <div className="filter-section">
+          <div className="flex-container">
+            <Box className="container-style">
+              <Grid
+                container
+                spacing={1}
+                style={{ marginTop: "10px", display: "flex" }}
+              >
+                <Grid item xs={12} sm={4}>
+                  <FormControl fullWidth>
+                    <Autocomplete
+                      multiple
+                      id="disease-select"
+                      options={["Malaria", "Chikungunya"]}
+                      value={selectedDisease}
+                      onChange={(event, value) =>
+                        handleDiseaseChange(event, value)
+                      }
+                      getOptionLabel={(option) => option}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={`Disease (${selectedDisease.length} selected)`}
+                          InputLabelProps={{ sx: { fontSize: "0.8rem" } }}
+                        />
+                      )}
+                      renderTags={() => null}
+                      renderOption={(props, option, { selected }) => (
+                        <li {...props}>
+                          <Checkbox
+                            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                            checkedIcon={<CheckBoxIcon fontSize="small" />}
+                            style={{ marginRight: 8 }}
+                            checked={selected}
+                          />
+                          {option}
+                        </li>
+                      )}
+                      ListboxComponent={(props) => <ul {...props} />}
+                    />
+                  </FormControl>
+                  <div
+                    style={{
+                      marginTop: "4px",
+                      display: "flex",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {selectedDisease.map((value, index) => (
+                      <Chip
+                        key={value}
+                        label={value}
+                        style={{
+                          marginRight: "4px",
+                          marginBottom: "4px",
+                          fontSize: "0.7rem",
+                        }}
+                        onDelete={() => handleDeleteDisease(index)}
+                      />
+                    ))}
+                  </div>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <FormControl fullWidth>
+                    <Autocomplete
+                      id="asynchronous-demo"
+                      multiple
+                      open={openCountries}
+                      onOpen={() => {
+                        setOpenCountries(true);
+                      }}
+                      onClose={() => {
+                        setOpenCountries(false);
+                      }}
+                      //isOptionEqualToValue={(option, value) => option === value}
+                      getOptionLabel={(option) => option["properties"]["name"]}
+                      getOptionKey={(option) => option.properties.id}
+                      options={countriesOptions}
+                      loading={isFetchingCountries}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Countries"
+                          InputProps={{
+                            ...params.InputProps,
+                            endAdornment: (
+                              <React.Fragment>
+                                {isFetchingCountries ? (
+                                  <CircularProgress color="inherit" size={20} />
+                                ) : null}
+                                {params.InputProps.endAdornment}
+                              </React.Fragment>
+                            ),
+                          }}
+                        />
+                      )}
+                      onChange={(event, values) => handleCountries(values)}
+                    />
+                  </FormControl>
+                  <div
+                    style={{
+                      marginTop: "4px",
+                      display: "flex",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {selectedCountry.slice(0, 4).map((value, index) => (
+                      <Chip
+                        key={value}
+                        label={value}
+                        style={{
+                          marginRight: "4px",
+                          marginBottom: "4px",
+                          fontSize: "0.7rem",
+                        }}
+                        onDelete={() => handleDeleteCountry(index)}
+                      />
+                    ))}
+                  </div>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <FormControl fullWidth>
+                    <Autocomplete
+                      //multiple
+                      id="species-filter"
+                      options={speciesList.map(
+                        (species) => species.properties.species
+                      )}
+                      freeSolo
+                      limitTags={3}
+                      filterSelectedOptions
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          variant="filled"
+                          label="Species"
+                          placeholder="Select Species"
+                        />
+                      )}
+                      onChange={(event, values) => handleSpecies(values)}
+                    />
+                  </FormControl>
+                  <div
+                    style={{
+                      marginTop: "4px",
+                      display: "flex",
+                      flexWrap: "wrap",
+                    }}
+                  ></div>
+                </Grid>
+                <Grid
+                  container
+                  alignItems="center"
+                  direction="row"
+                  justifyContent="space-between"
+                  p="6px"
+                >
+                  <Grid
+                    item
+                    xs={12}
+                    sm={4}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontStyle: "italic",
+                        marginRight: ".5px",
+                        color: "black",
+                      }}
+                    >
+                      Season:{" "}
+                    </Typography>
+                    <Tooltip title="Rainy" arrow>
+                      <IconButton
+                        onClick={() => setSelectedSeason("Rainy")}
+                        color={
+                          selectedSeason === "Rainy" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color: "#2e7d32", // Green color on hover
+                          },
+                        }}
+                      >
+                        <ThunderstormIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Dry" arrow>
+                      <IconButton
+                        onClick={() => setSelectedSeason("Dry")}
+                        color={selectedSeason === "Dry" ? "success" : "default"}
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedSeason === "Dry" ? "default" : "#2e7d32",
+                          },
+                        }}
+                      >
+                        <WbSunnyIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Empty" arrow>
+                      <IconButton
+                        onClick={() => setSelectedSeason("Empty")}
+                        color={
+                          selectedSeason === "Empty" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedSeason === "Empty"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontStyle: "italic",
+                        marginRight: "0.5px",
+                        color: "black",
+                      }}
+                    >
+                      Control:{" "}
+                    </Typography>
+                    <Tooltip title="True" arrow>
+                      <IconButton
+                        onClick={() => setSelectedControl("True")}
+                        color={
+                          selectedControl === "True" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedControl === "True"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <DoneIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="False" arrow>
+                      <IconButton
+                        onClick={() => setSelectedControl("False")}
+                        color={
+                          selectedControl === "False" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedControl === "False"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Empty" arrow>
+                      <IconButton
+                        onClick={() => setSelectedControl("Empty")}
+                        color={
+                          selectedControl === "Empty" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedControl === "Empty"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontStyle: "italic",
+                        marginRight: "10px",
+                        color: "black",
+                      }}
+                    >
+                      Adult:{" "}
+                    </Typography>
+                    <Tooltip title="True" arrow>
+                      <IconButton
+                        onClick={() => setSelectedAdult("True")}
+                        color={selectedAdult === "True" ? "success" : "default"}
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedAdult === "True" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <EmojiNatureIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="False" arrow>
+                      <IconButton
+                        onClick={() => setSelectedAdult("False")}
+                        color={
+                          selectedAdult === "False" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedAdult === "False" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <BugReportIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Empty" arrow>
+                      <IconButton
+                        onClick={() => setSelectedAdult("Empty")}
+                        color={
+                          selectedAdult === "Empty" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedAdult === "Empty" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontStyle: "italic",
+                        marginRight: "5px",
+                        color: "black",
+                      }}
+                    >
+                      Larval:{" "}
+                    </Typography>
+                    <Tooltip title="True" arrow>
+                      <IconButton
+                        onClick={() => setSelectedLarval("True")}
+                        color={
+                          selectedLarval === "True" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedLarval === "True" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <PestControlIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="False" arrow>
+                      <IconButton
+                        onClick={() => setSelectedLarval("False")}
+                        color={
+                          selectedLarval === "False" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedLarval === "False"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <EggIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Empty" arrow>
+                      <IconButton
+                        onClick={() => setSelectedLarval("Empty")}
+                        color={
+                          selectedLarval === "Empty" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedLarval === "Empty"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={4}
+                    sx={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography sx={{ color: "green", fontSize: 15 }}>
+                      Select by Area
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontStyle: "italic",
+                        marginRight: "5px",
+                        color: "black",
+                      }}
+                    >
+                      Rectangle:{" "}
+                      <IconButton
+                        onClick={() => toggleSelectedByArea("Box")}
+                        color={selectedByArea === "Box" ? "success" : "default"}
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedByArea === "Box" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <RectangleOutlinedIcon />
+                      </IconButton>
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontStyle: "italic",
+                        marginRight: "5px",
+                        color: "black",
+                      }}
+                    >
+                      Circle:{" "}
+                      <IconButton
+                        onClick={() => toggleSelectedByArea("Circle")}
+                        color={
+                          selectedByArea === "Circle" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedByArea === "Circle"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <CircleOutlinedIcon />
+                      </IconButton>
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontStyle: "italic",
+                        marginRight: "5px",
+                        color: "black",
+                      }}
+                    >
+                      Free Hand:{" "}
+                      <IconButton
+                        onClick={() => toggleSelectedByArea("Polygon")}
+                        color={
+                          selectedByArea === "Polygon" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedByArea === "Polygon"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <FormatShapesIcon />
+                      </IconButton>
+                    </Typography>
+                  </Grid>
+                </Grid>
+                {/* <div style={buttonContainerStyle}>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: "#2e7d32",
+                  "&:hover": {
+                    backgroundColor: colors.grey[500], // Background color on hover
+                  },
+                }}
+                size="small"
+                style={{ fontSize: "0.6rem" }}
+                onClick={handleApplyFilters}
+              >
+                Apply
+              </Button>
+            </div> */}
+                <div className="button-container-style">
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#2e7d32",
+                      "&:hover": {
+                        backgroundColor: colors.grey[500], // Background color on hover
+                      },
+                    }}
+                    size="small"
+                    style={{ fontSize: "0.6rem" }}
+                    onClick={() => {
+                      setSelectedDisease([] as string[]);
+                      setIsDiseaseSelected(false);
+                      setSelectedCountry([] as string[]);
+                      setIsCountrySelected(false);
+                      //   setSelectedSpecies([] as string[]);
+                      setIsSpeciesSelected(false);
+                      setSelectedSeason("");
+                      setIsSeasonSelected(false);
+                      setSelectedAdult("");
+                      setIsAdultSelected(false);
+                      setSelectedControl("");
+                      setIsControlSelected(false);
+                      setSelectedLarval("");
+                      setIsLarvalSelected(false);
+
+                      // Reset other state variables as needed
+                    }}
+                  >
+                    Clear Selection
+                  </Button>
+                </div>
+              </Grid>
+            </Box>
+          </div>
+        </div>
+      </Collapse>
+    </div>
+  );
+}

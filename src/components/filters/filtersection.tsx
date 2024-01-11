@@ -54,6 +54,8 @@ const FilterSection = (openFilter: any) => {
   const [selectedLarval, setSelectedLarval] = useState("");
   const [isLarvalSelected, setIsLarvalSelected] = useState(false);
 
+  
+
   const handleDiseaseChange = (
     _: React.SyntheticEvent<Element, Event>,
     value: string[]
