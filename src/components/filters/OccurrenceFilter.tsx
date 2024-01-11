@@ -21,7 +21,11 @@ const getCountries = async () => {
 
 }
 
-export default function OccurrenceFilter({open, handleFilterConditions}: { open: boolean, handleFilterConditions: any }) {
+export default function OccurrenceFilter({open, handleFilterConditions, handleSpeciesColor}: {
+    open: boolean,
+    handleFilterConditions: any,
+    handleSpeciesColor: any
+}) {
     const queryClient = useQueryClient()
     const [selectedSpecies, setSelectedSpecies] = useState<string>(null)
     const [openCountries, setOpenCountries] = useState(false)
@@ -39,9 +43,6 @@ export default function OccurrenceFilter({open, handleFilterConditions}: { open:
             queryKey: ['countries'],
             queryFn: getCountries
         })
-    function isEmpty(value) {
-        return (value == null || (typeof value === "string" && value.trim().length === 0));
-    }
 
     const composeFilterConditions = (): string => {
         const filterConditions = [];
@@ -74,13 +75,6 @@ export default function OccurrenceFilter({open, handleFilterConditions}: { open:
     }, [isFetchingCountries])
 
 
-    // useEffect(() => {
-    //     if (!openCountries) {
-    //         setCountriesOptions([]);
-    //     }
-    // }, [openCountries]);
-
-
     const handleSpecies = (values) => {
         setSelectedSpecies(values);
     }
@@ -91,7 +85,7 @@ export default function OccurrenceFilter({open, handleFilterConditions}: { open:
     }
 
 
-    const handleCountries= (values) => {
+    const handleCountries = (values) => {
         const simplifiedGeoms = values.map(value => simplifyGeometry((value.geometry)))
         const wktGeoms = simplifiedGeoms.map(geom => wellknown.stringify(geom)) // changing geojson geometry to well know text representation
         //TODO handle multiple countries
@@ -101,6 +95,11 @@ export default function OccurrenceFilter({open, handleFilterConditions}: { open:
     useEffect(() => {
         const filterParams = composeFilterConditions()
         handleFilterConditions(filterParams)
+        if (selectedSpecies.length > 0) {
+            const arrayOfSpecies:
+                [] = String(selectedSpecies).split(',') //
+            handleSpeciesColor(arrayOfSpecies)
+        }
     }, [selectedSpecies, selectedCountries]);
 
     return (
