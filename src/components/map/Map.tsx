@@ -38,6 +38,7 @@ const getOccurrences = async (queryKey) => {
         const response = await fetch(url)
         return response.json();
     }
+    console.log('Loading all occurrence')
     const response = await fetch(`${OCCURRENCE_API}`)
     return response.json();
 }
@@ -52,6 +53,7 @@ function Newmap() {
     const mapElement = useRef<HTMLDivElement>(null);
     const [filterOpen, setFilterOpen] = useState(false);
     const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
+    const [filterConditions, setFilterContions] = useState<[]>(null);
     const [cqlFilter, setCqlFilter] = useState(null)
 
 
@@ -59,6 +61,14 @@ function Newmap() {
         1970,
         new Date().getFullYear(),
     ]);
+
+    const [occurrenceSource2, setOccurrenceSource2] = useState(
+        new VectorSource({
+            format: new GeoJSON(),
+            features: [],
+            strategy: bboxStrategy,
+        })
+    );
 
     const {
         status,
@@ -72,11 +82,15 @@ function Newmap() {
         queryFn: ({queryKey}) => getOccurrences(queryKey)
     });
 
-    const updateFilterConditions = (filterConditions: any) => {
+    useEffect(() => {
 
+
+    }, [filterConditions]);
+
+    const updateFilterConditions = (conditions: any) => {
         //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
-        console.log('Conditions', filterConditions)
-        const cql_filter = filterConditions.join('AND');
+        console.log('Conditions', conditions)
+        const cql_filter = conditions.join('AND');
         console.log('CQL Filter', cql_filter)
         setCqlFilter(cql_filter)
     }
@@ -92,34 +106,26 @@ function Newmap() {
     };
 
 
-
     if (isFetching) {
         console.log('Loading occurrences...')
     }
     if (isError) {
         console.log('Error', error)
     }
+
     if (status === 'success') {
         const total = occurrenceData['totalFeatures']
         const returned = occurrenceData['numberReturned']
         console.log(`${returned} out of ${total} features`)
 
-
-        const occLayer = new VectorLayer({
-            source: new VectorSource({
-                features: new GeoJSON().readFeatures(occurrenceData),
-            }),
-
-        })
-        console.log('Occurrence Layer', occLayer)
-        const occurrence2 = new LayerGroup({
-            title: "Occurrence 2",
-            layers: [occLayer],
-        } as GroupLayerOptions);
-        console.log('Adding occurrence to map', mapRef.current)
-        if (map && map instanceof Map) {
-            map.addLayer(occurrence2)
-        }
+        occurrenceSource2?.clear()
+        occurrenceSource2?.addFeatures(
+            new GeoJSON().readFeatures(occurrenceData,
+                {
+                    featureProjection: 'EPSG:3857'
+                })
+        )
+        //setOccurrenceSource2()
     }
 
     const occurrenceSource = new VectorSource({
@@ -144,7 +150,7 @@ function Newmap() {
         title: "Occurrence Layer",
         visible: true,
         preload: Infinity,
-        source: occurrenceSource,
+        source: occurrenceSource2,
         style: new Style({
             image: new Circle({
                 fill: fill,
@@ -164,6 +170,10 @@ function Newmap() {
     const handleClosePopup = () => {
         setShowOccurrencePopup(false);
     };
+
+    const handleSpeciesStyling = (species): Style => {
+
+    }
 
     useEffect(() => {
         getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
@@ -226,7 +236,8 @@ function Newmap() {
                 id="map-container"
             >
                 <div>
-                    {filterOpen && <OccurrenceFilter open={filterOpen} handleFilterConditions={updateFilterConditions}/>}
+                    {filterOpen &&
+                        <OccurrenceFilter open={filterOpen} handleFilterConditions={() => updateFilterConditions} handleSpeciesColor={()=> handleSpeciesStyling}/>}
 
                     <div className="filter-section">
                         <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>
