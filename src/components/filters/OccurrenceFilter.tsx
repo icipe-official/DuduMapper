@@ -21,12 +21,14 @@ const getCountries = async () => {
 
 }
 
-export default function OccurrenceFilter({open, handleFilterParams}: { open: boolean, handleFilterParams: any }) {
+export default function OccurrenceFilter({open, handleFilterConditions}: { open: boolean, handleFilterConditions: any }) {
     const queryClient = useQueryClient()
     const [selectedSpecies, setSelectedSpecies] = useState<string>(null)
     const [openCountries, setOpenCountries] = useState(false)
-    const [countriesOptions, setCountriesOptions] = useState<[]>([])
     const [selectedCountries, setSelectedCountries] = useState(null)
+
+    const [countriesOptions, setCountriesOptions] = useState<[]>([])
+
     const {
         isFetching: isFetchingCountries,
         data: countriesData,
@@ -41,19 +43,22 @@ export default function OccurrenceFilter({open, handleFilterParams}: { open: boo
         return (value == null || (typeof value === "string" && value.trim().length === 0));
     }
 
-    const composeFilterParams = (): string => {
+    const composeFilterConditions = (): string => {
         const filterConditions = [];
         if (selectedSpecies) {
-            const arrayOfSpecies: [] = String(selectedSpecies).split(',')
+            console.log('Selected Species', selectedSpecies)
+            const arrayOfSpecies: [] = String(selectedSpecies).split(',') //
             const quotedSpecies = `'${arrayOfSpecies.join("', '")}'`
             const speciesFilter: string = `species IN(${quotedSpecies}) `
             filterConditions.push(speciesFilter)
         }
         if (selectedCountries) {
+            console.log('Selected Countries', selectedCountries)
             const cFilter = ` WITHIN(the_geom, ${selectedCountries})`
             filterConditions.push(cFilter)
         }
 
+        //season, larvae, adult,
         return filterConditions
     }
 
@@ -88,13 +93,14 @@ export default function OccurrenceFilter({open, handleFilterParams}: { open: boo
 
     const handleCountries= (values) => {
         const simplifiedGeoms = values.map(value => simplifyGeometry((value.geometry)))
-        const wktGeoms = simplifiedGeoms.map(geom => wellknown.stringify(geom))
+        const wktGeoms = simplifiedGeoms.map(geom => wellknown.stringify(geom)) // changing geojson geometry to well know text representation
+        //TODO handle multiple countries
         setSelectedCountries(wktGeoms)
     }
 
     useEffect(() => {
-        const filterParams = composeFilterParams()
-        handleFilterParams(filterParams)
+        const filterParams = composeFilterConditions()
+        handleFilterConditions(filterParams)
     }, [selectedSpecies, selectedCountries]);
 
     return (

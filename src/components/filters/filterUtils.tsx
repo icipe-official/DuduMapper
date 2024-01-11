@@ -1,5 +1,3 @@
-import countries from '../../../public/countries.json'
-
 export const speciesList = [
     'coustani',
     'pauliani',
