@@ -44,7 +44,7 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { countryList, speciesList } from "../filters/filterUtils";
 import Control from "ol/control/Control";
-
+import { TimeSlider } from "../filters/timeslider";
 
 function Newmap() {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
@@ -58,6 +58,40 @@ function Newmap() {
   const mapRef = useRef<Map | undefined>(undefined);
   const [expanded, setExpanded] = React.useState<string | false>(false);
   const [occurrenceData, setOccurrenceData] = useState<any[]>([]);
+
+  const [selectedPeriod, setSelectedPeriod] = useState<[number, number]>([
+    1970,
+    new Date().getFullYear(),
+  ]);
+
+  const handleTimeChange = (startDate: Date, endDate: Date) => {
+    if (!isValidDate(startDate) || !isValidDate(endDate)) {
+      return;
+    }
+
+    // Update the occurrenceSource URL with the new date range parameters
+    const formattedStartDate = startDate.getFullYear();
+    const formattedEndDate = endDate.getFullYear();
+    setSelectedPeriod([formattedStartDate, formattedEndDate]);
+   
+  };
+  const handleYearsChange = (startYear: number, endYear: number) => {
+    // Add logic to handle the changes in selected years
+    console.log("Selected years changed:", startYear, endYear);
+
+    // Convert the start and end years to Date objects
+    const startDate = new Date(startYear, 0);
+    const endDate = new Date(endYear, 11, 31);
+
+    // Call handleTimeChange with the correct argument types
+    handleTimeChange(startDate, endDate);
+  };
+
+ 
+  const isValidDate = (date: Date) => {
+    return !isNaN(date.getTime());
+  };
+  console.log(selectedPeriod)
 
   const [popen, setPOpen] = useState(false);
   const [selectedDisease, setSelectedDisease] = useState<string[]>([]);
@@ -87,9 +121,7 @@ function Newmap() {
 
 
   const [filterOpen, setFilterOpen] = useState(false);
-  // const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
-  // const [isSpeciesSelected, setIsSpeciesSelected] = useState(false);
-
+ 
   const handleChange =
   (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false);
@@ -166,16 +198,6 @@ mapRef.current = map;
   };
   mapRef.current = map;
 
-  // const occurrenceSource = new VectorSource({
-  //   format: new GeoJSON(),
-  //   url:
-  //     geoServerBaseUrl +
-  //     "/geoserver/vector/ows?service=WFS&version=" +
-  //     "1.0.0&request=GetFeature&typeName" +
-  //     "=vector%3Aoccurrence&maxFeatures=50&outputFormat=application%2Fjson",
-  //   strategy: bboxStrategy,
-  // });
-
   const fill = new Fill({
     color: "rgba(2,255,2,1)",
   });
@@ -212,6 +234,41 @@ mapRef.current = map;
       strategy: bboxStrategy,
     })
     );
+
+    useEffect(() =>{
+      const fetchOccurrenceData = async () => {
+        try {
+          const response = await fetch(
+            geoServerBaseUrl +
+            "/geoserver/vector/ows?service=WFS&version=" +
+            "1.0.0&request=GetFeature&typeName" +
+            "=vector%3Aoccurrence&maxFeatures=20000&outputFormat=application%2Fjson"
+          );
+  
+          const data = await response.json();
+  
+          console.log("Fetched data:", data);
+          const featuresArray = data.features || [];
+  
+          if (Array.isArray(featuresArray)) {
+            // Update the occurrence source with the fetched features
+            occurrenceSource.clear();
+            occurrenceSource.addFeatures(
+              new GeoJSON().readFeatures(responseToGEOJSON(featuresArray), {
+                featureProjection: 'EPSG:3857',
+              })
+            );
+          
+            setOccurrenceData(featuresArray);
+            
+          }
+        
+      }catch (error) {
+        console.error("Error fetching occurrence data:", error);
+      }
+      }
+      fetchOccurrenceData();
+    },[])
   
   useEffect(() => {
     const occurrenceLayer = new VectorLayer({
@@ -223,7 +280,7 @@ mapRef.current = map;
         image: new Circle({
           fill: fill,
           stroke: stroke,
-          radius: 8,
+          radius: 6,
         }),
         fill: fill,
         stroke: stroke,
@@ -232,33 +289,31 @@ mapRef.current = map;
     occurrenceLayer.set('occurrence-data', true);
     
 
-    const fetchOccurrenceData = async () => {
-      try {
-        const response = await fetch(
-          geoServerBaseUrl +
-          "/geoserver/vector/ows?service=WFS&version=" +
-          "1.0.0&request=GetFeature&typeName" +
-          "=vector%3Aoccurrence&maxFeatures=5000&outputFormat=application%2Fjson"
-        );
+    // const fetchOccurrenceData = async () => {
+    //   try {
+    //     const response = await fetch(
+    //       geoServerBaseUrl +
+    //       "/geoserver/vector/ows?service=WFS&version=" +
+    //       "1.0.0&request=GetFeature&typeName" +
+    //       "=vector%3Aoccurrence&maxFeatures=20000&outputFormat=application%2Fjson"
+    //     );
 
-        const data = await response.json();
+    //     const data = await response.json();
 
-        console.log("Fetched data:", data);
-        const featuresArray = data.features || [];
+    //     console.log("Fetched data:", data);
+    //     const featuresArray = data.features || [];
 
-        if (Array.isArray(featuresArray)) {
-          // Update the occurrence source with the fetched features
-          occurrenceSource.clear();
-          occurrenceSource.addFeatures(
-            new GeoJSON().readFeatures(responseToGEOJSON(featuresArray), {
-              featureProjection: 'EPSG:3857',
-            })
-          );
-          occurrenceLayer.changed();
+    //     if (Array.isArray(featuresArray)) {
+    //       // Update the occurrence source with the fetched features
+    //       occurrenceSource.clear();
+    //       occurrenceSource.addFeatures(
+    //         new GeoJSON().readFeatures(responseToGEOJSON(featuresArray), {
+    //           featureProjection: 'EPSG:3857',
+    //         })
+    //       );
+    //       occurrenceLayer.changed();
 
-          setOccurrenceData(featuresArray);
-
-          console.log(selectedSpecies)
+    //       setOccurrenceData(featuresArray);
 
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
       getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
@@ -354,13 +409,13 @@ mapRef.current = map;
     if (map) {
       map.addControl(layerSwitcher);
     }
-  }
-}
-catch (error) {
-  console.error("Error fetching occurrence data:", error);
-}
-}
-fetchOccurrenceData();
+  
+
+// catch (error) {
+//   console.error("Error fetching occurrence data:", error);
+// }
+// }
+// fetchOccurrenceData();
     
   }, []);
 
@@ -372,7 +427,7 @@ fetchOccurrenceData();
       image: new Circle({
         fill: fill,
         stroke: stroke,
-        radius: 8,
+        radius: 6,
       }),
       fill: fill,
       stroke: stroke,
@@ -437,13 +492,11 @@ fetchOccurrenceData();
         const adult = feature.properties.adult;
         const larval = feature.properties.larval;
 
-        console.log(season)
-
         const isSpeciesSelected = selectedSpecies.includes(species);
-        const isSeasonSelected = selectedSeason === season;
         const isControlSelected =selectedControl.includes(control);
         const isAdultSelected = selectedAdult.includes(adult);
         const isLarvalSelected = selectedLarval.includes(larval);
+        const isSeasonSelected = selectedSeason === season;
 
         console.log(selectedSeason)
 
@@ -464,7 +517,14 @@ fetchOccurrenceData();
           map?.removeControl(existingLegendControl);
         }
 
-        if (selectedSpecies.length === 0) {
+        const allFiltersEmpty =
+          selectedSpecies.length === 0 &&
+          selectedSeason === "" &&
+          selectedControl === "" &&
+          selectedAdult === "" &&
+          selectedLarval === "";
+
+        if (allFiltersEmpty) {
           // If no species selected, show the original data with default style
           occurrenceSource.clear();
           occurrenceSource.addFeatures(new GeoJSON().readFeatures(responseToGEOJSON(occurrenceData), {
@@ -477,7 +537,11 @@ fetchOccurrenceData();
           // Update the occurrence source with the filtered features and apply styles
           const filteredFeatures = occurrenceData.filter((feature) => {
             const species = feature.properties.species;
-            return selectedSpecies.includes(species);
+            const isSpeciesSelected = selectedSpecies.includes(species);
+            const season = feature.properties.season_given;
+            const isSeasonSelected = selectedSeason === season;
+
+            return selectedSpecies.includes(species) ;
           });
     
           console.log('Filtered Features:', filteredFeatures);
@@ -551,6 +615,117 @@ fetchOccurrenceData();
 
   }, [selectedSpecies, setOccurrenceSource, speciesColors, selectedSeason, selectedControl, selectedAdult, selectedLarval]);
 
+  useEffect(() => {
+    console.log('selected country', selectedCountry);
+
+    const getFeatureStyle = (feature: any) => {
+      const style = new Style({
+        image: new Circle({
+          radius: 8,
+          fill: new Fill({
+            color: 'green',
+          }),
+          stroke: new Stroke({
+            color: 'black',
+            width: 2,
+          }),
+        }),
+      });
+    
+      return style;
+    };
+  
+    const existingOccurrenceLayer = map?.getLayers().getArray().find((layer) => {
+      return layer.get('occurrence-data') === true;
+    });
+  
+    if (existingOccurrenceLayer && existingOccurrenceLayer instanceof VectorLayer) {
+      const occurrenceSource = existingOccurrenceLayer.getSource();
+  
+      const filteredFeatures = occurrenceData.filter((feature) => {
+        const countries = feature.properties.country;
+      
+        // Check for equality instead of using includes
+        return selectedCountry.includes(countries);
+      });
+
+      console.log('filtered countries', filteredFeatures)
+  
+      // Filter features based on selectedCountry
+      occurrenceSource.clear();
+      occurrenceSource.addFeatures(
+        new GeoJSON().readFeatures(responseToGEOJSON(filteredFeatures), {
+          featureProjection: 'EPSG:3857',
+        }).map((feature) => {
+          feature.setStyle(getFeatureStyle(feature));
+          return feature;
+        })
+      );
+  
+      // Refresh the map
+      map?.render();
+    }
+  }, [selectedCountry,]);
+
+  useEffect(() => {
+    console.log('selected country', selectedPeriod);
+
+    const getFeatureStyle = (feature: any) => {
+      const style = new Style({
+        image: new Circle({
+          radius: 8,
+          fill: new Fill({
+            color: 'green',
+          }),
+          stroke: new Stroke({
+            color: 'black',
+            width: 2,
+          }),
+        }),
+      });
+    
+      return style;
+    };
+  
+    const existingOccurrenceLayer = map?.getLayers().getArray().find((layer) => {
+      return layer.get('occurrence-data') === true;
+    });
+  
+    if (existingOccurrenceLayer && existingOccurrenceLayer instanceof VectorLayer) {
+      const occurrenceSource = existingOccurrenceLayer.getSource();
+  
+      const filteredFeatures = occurrenceData.filter((feature) => {
+        const startYear = parseInt(feature.properties.start_year);
+        const endYear = parseInt(feature.properties.end_year);
+      
+       
+      
+        // Check if every year in selectedPeriod is within the feature's range
+        const isEveryYearWithinRange = selectedPeriod.some((year) => year >= startYear && year <= endYear);
+      
+        console.log('Is every year within range:', isEveryYearWithinRange);
+      
+        return isEveryYearWithinRange;
+      });
+
+      console.log('filtered years', filteredFeatures)
+  
+      // Filter features based on selectedCountry
+      occurrenceSource.clear();
+      occurrenceSource.addFeatures(
+        new GeoJSON().readFeatures(responseToGEOJSON(filteredFeatures), {
+          featureProjection: 'EPSG:3857',
+        }).map((feature) => {
+          feature.setStyle(getFeatureStyle(feature));
+          return feature;
+        })
+      );
+  
+      // Refresh the map
+      map?.render();
+    }
+  }, [selectedPeriod,]);
+ 
   return (
     <>
       <div
@@ -559,6 +734,7 @@ fetchOccurrenceData();
         className="map-container"
         id="map-container"
       >
+          <TimeSlider onChange={handleTimeChange} />
         {/* <div>
           {filterOpen && <FilterSection 
           
@@ -1078,7 +1254,7 @@ fetchOccurrenceData();
           </div>
         </div>
       
-
+      
       <OccurrencePopup
         id={id}
         open={open}
@@ -1088,6 +1264,7 @@ fetchOccurrenceData();
         expanded={expanded}
         handleChange={handleChange}
       />
+     
     </>
   );
 }
