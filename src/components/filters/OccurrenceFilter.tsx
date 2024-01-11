@@ -46,14 +46,14 @@ export default function OccurrenceFilter({open, handleFilterConditions, handleSp
 
     const composeFilterConditions = (): string => {
         const filterConditions = [];
-        if (selectedSpecies) {
+        if (selectedSpecies && selectedSpecies.length > 0) {
             console.log('Selected Species', selectedSpecies)
             const arrayOfSpecies: [] = String(selectedSpecies).split(',') //
             const quotedSpecies = `'${arrayOfSpecies.join("', '")}'`
             const speciesFilter: string = `species IN(${quotedSpecies}) `
             filterConditions.push(speciesFilter)
         }
-        if (selectedCountries) {
+        if (selectedCountries && selectedCountries.length > 0) {
             console.log('Selected Countries', selectedCountries)
             const cFilter = ` WITHIN(the_geom, ${selectedCountries})`
             filterConditions.push(cFilter)
@@ -87,7 +87,8 @@ export default function OccurrenceFilter({open, handleFilterConditions, handleSp
 
     const handleCountries = (values) => {
         const simplifiedGeoms = values.map(value => simplifyGeometry((value.geometry)))
-        const wktGeoms = simplifiedGeoms.map(geom => wellknown.stringify(geom)) // changing geojson geometry to well know text representation
+        //const wktGeoms = simplifiedGeoms.map(geom => wellknown.stringify(geom)) // changing geojson geometry to well know text representation
+        const wktGeoms = wellknown.stringify(simplifiedGeoms) // changing geojson geometry to well know text representation
         //TODO handle multiple countries
         setSelectedCountries(wktGeoms)
     }
@@ -95,11 +96,11 @@ export default function OccurrenceFilter({open, handleFilterConditions, handleSp
     useEffect(() => {
         const filterParams = composeFilterConditions()
         handleFilterConditions(filterParams)
-        if (selectedSpecies.length > 0) {
-            const arrayOfSpecies:
-                [] = String(selectedSpecies).split(',') //
-            handleSpeciesColor(arrayOfSpecies)
-        }
+        // if (selectedSpecies.length > 0) {
+        //     const arrayOfSpecies:
+        //         [] = String(selectedSpecies).split(',') //
+        //     handleSpeciesColor(arrayOfSpecies)
+        // }
     }, [selectedSpecies, selectedCountries]);
 
     return (
@@ -107,7 +108,7 @@ export default function OccurrenceFilter({open, handleFilterConditions, handleSp
             <Collapse in={open}>
                 <Stack spacing={3} sx={{width: 500}}>
                     <Autocomplete
-                        multiple
+                        //multiple
                         id="species-filter"
                         options={speciesList.map(species => species.properties.species)}
                         freeSolo

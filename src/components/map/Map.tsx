@@ -62,7 +62,7 @@ function Newmap() {
         new Date().getFullYear(),
     ]);
 
-    const [occurrenceSource2, setOccurrenceSource2] = useState(
+    const [occurrenceSource, setOccurrenceSource] = useState(
         new VectorSource({
             format: new GeoJSON(),
             features: [],
@@ -118,25 +118,14 @@ function Newmap() {
         const returned = occurrenceData['numberReturned']
         console.log(`${returned} out of ${total} features`)
 
-        occurrenceSource2?.clear()
-        occurrenceSource2?.addFeatures(
+        occurrenceSource?.clear()
+        occurrenceSource?.addFeatures(
             new GeoJSON().readFeatures(occurrenceData,
                 {
                     featureProjection: 'EPSG:3857'
                 })
         )
-        //setOccurrenceSource2()
     }
-
-    const occurrenceSource = new VectorSource({
-        format: new GeoJSON(),
-        url:
-            geoServerBaseUrl +
-            "/geoserver/vector/ows?service=WFS&version=" +
-            "1.0.0&request=GetFeature&typeName" +
-            "=vector%3Aoccurrence&maxFeatures=10000&outputFormat=application%2Fjson",
-        strategy: bboxStrategy,
-    });
 
     const fill = new Fill({
         color: "rgba(2,255,2,1)",
@@ -150,7 +139,7 @@ function Newmap() {
         title: "Occurrence Layer",
         visible: true,
         preload: Infinity,
-        source: occurrenceSource2,
+        source: occurrenceSource,
         style: new Style({
             image: new Circle({
                 fill: fill,
@@ -171,6 +160,7 @@ function Newmap() {
         setShowOccurrencePopup(false);
     };
 
+    //TODO Styling
     const handleSpeciesStyling = (species): Style => {
 
     }
@@ -237,7 +227,7 @@ function Newmap() {
             >
                 <div>
                     {filterOpen &&
-                        <OccurrenceFilter open={filterOpen} handleFilterConditions={() => updateFilterConditions} handleSpeciesColor={()=> handleSpeciesStyling}/>}
+                        <OccurrenceFilter open={filterOpen} handleFilterConditions={updateFilterConditions} handleSpeciesColor={handleSpeciesStyling}/>}
 
                     <div className="filter-section">
                         <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>
