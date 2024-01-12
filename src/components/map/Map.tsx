@@ -17,29 +17,17 @@ import {
 import { Stroke, Fill, Style, Circle } from "ol/style";
 import "../shared/CSS/LayerSwitcherStyles.css";
 import OccurrencePopup from "../popup/OccurrenceDrawer";
-import FilterSection from "../filters/filtersection";
 import { IconButton, Tooltip } from "@mui/material";
 import "../filters/filterSectionStyles.css";
 import TuneIcon from "@mui/icons-material/Tune";
 import {
-  QueryClient,
-  QueryClientProvider,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
-import TimeSlider from "@/components/filters/TimeSlider";
-import { transform } from "ol/proj";
-import { Coordinate } from "ol/coordinate";
-import SimpleGeometry from "ol/geom/SimpleGeometry";
-import { Draw, Modify, Snap } from "ol/interaction.js";
-import turf from "@turf/turf";
-
-const queryClient = new QueryClient();
 
 const OCCURRENCE_API = `${geoServerBaseUrl}/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:occurrence&maxFeatures=10000&outputFormat=application/json`;
 const getOccurrences = async (queryKey) => {
-  console.log(queryKey[1]);
   const params: string = queryKey[1];
   if (params) {
     console.log("Filtering occurrence on: ", params);
@@ -48,7 +36,6 @@ const getOccurrences = async (queryKey) => {
     const response = await fetch(url);
     return response.json();
   }
-  console.log("Loading all occurrence");
   const response = await fetch(`${OCCURRENCE_API}`);
   return response.json();
 };
@@ -65,14 +52,7 @@ function Newmap() {
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
   const [filterConditions, setFilterContions] = useState<[]>();
   const [cqlFilter, setCqlFilter] = useState<string>();
-  const [areaSelected, setAreaSelected] = useState<string>("");
-  const [cordinateArray, setCordinateArray] = useState<Coordinate[][]>([]);
-  
 
-  const [selectedPeriod, setSelectedPeriod] = useState<[number, number]>([
-    1970,
-    new Date().getFullYear(),
-  ]);
 
   const [occurrenceSource, setOccurrenceSource] = useState(
     new VectorSource({
@@ -90,39 +70,24 @@ function Newmap() {
     isFetching,
   } = useQuery({
     queryKey: ["occurrences", cqlFilter], //Example CQl filter species IN ('gambie', 'finiestus', 'fini') AND WITHIN (the_geom, MULTIPOLYGON((22,22,223,223))) AND adult =true AND season=dry
-    //queryFn: getOccurrences
     queryFn: ({ queryKey }) => getOccurrences(queryKey),
   });
 
   useEffect(() => {
     console.log("Conditions", filterConditions);
-    const cql_filter = filterConditions?.join("AND");
+    const cql_filter = filterConditions?.join("AND"); //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
     console.log("CQL Filter", cql_filter);
     setCqlFilter(cql_filter);
   }, [filterConditions]);
 
   const updateFilterConditions = (conditions: any) => {
-    //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
     setFilterContions(conditions);
   };
 
-  const isValidDate = (date: Date) => {
-    return !isNaN(date.getTime());
-  };
-  const handleTimeChange = (startDate: Date, endDate: Date) => {
-    if (!isValidDate(startDate) || !isValidDate(endDate)) {
-      return;
-    }
-    setSelectedPeriod([startDate.getFullYear(), endDate.getFullYear()]);
-  };
 
   if (isFetching) {
     console.log("Loading occurrences...");
   }
-  if (isError) {
-    console.log("Error", error);
-  }
-
   if (status === "success") {
     const total = occurrenceData["totalFeatures"];
     const returned = occurrenceData["numberReturned"];
@@ -156,7 +121,7 @@ function Newmap() {
         radius: 8,
       }),
       fill: fill,
-      stroke: stroke,
+      //stroke: stroke,
     }),
   } as BaseLayerOptions);
   occurrenceLayer.set("occurrence-data", true);
@@ -170,10 +135,6 @@ function Newmap() {
     setShowOccurrencePopup(false);
   };
 
-  //TODO Styling
-  const handleSpeciesStyling = (species: string[]) => {
-
-  };
 
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
@@ -223,128 +184,6 @@ function Newmap() {
     });
   };
 
-  useEffect(() => {
-    if (!map) {
-      return;
-    }
-
-    const addAreaInteractions = (selectedByArea: any) => {
-      const areaSelect = map
-        ?.getAllLayers()
-        .find((l) => l.get("occurrence-data"));
-      const source = areaSelect?.getSource() as VectorSource;
-
-      let draw = new Draw({
-        source: source,
-        type: selectedByArea,
-        // freehandCondition: never,
-      });
-
-      draw.on("drawend", (e) => {
-        const geom = e.feature.getGeometry() as SimpleGeometry;
-        //const coords = geom?.getCoordinates();
-
-        const shapewgs84 = turf.toWgs84(geom);
-        console.log("WGS84 shape", shapewgs84);
-        const shapeWkt = wellknown.stringify(shapewgs84);
-        console.log("WKT shape", shapeWkt);
-        filterConditions?.push(shapeWkt);
-        // if (coords && coords.length > 0) {
-        //   setCordinateArray(
-        //     coords[0].map((c: Coordinate) =>
-        //       transform(c, "EPSG:3857", "EPSG:4326")
-        //     )
-        //   );
-        // }
-      });
-      map?.addInteraction(draw);
-      //   let snap = new Snap({ source: source });
-      //   map?.addInteraction(snap);
-    };
-
-    // const removeAreaInteractions = (map: Map) => {
-    //   map.removeInteraction(modify);
-    //   map.removeInteraction(draw);
-    //   map.removeInteraction(snap);
-    // };
-
-    console.log("Selected Area Type:", areaSelected);
-    // console.log("selectedByArea:", selectedByArea);
-    const areaTypes = ["Polygon", "Circle", "Rectangle"];
-    //if (areaSelected && areaTypes.includes(areaSelected)) {
-    addAreaInteractions("Polygon");
-    console.log("Added Interaction");
-    // }
-
-    //else {
-    //   console.log("Value Not Passed...");
-    //   // removeAreaInteractions(map);
-    // }
-  }, [areaSelected, map]);
-
-  const handleAreaDrawn = (areaType: string) => {
-    setAreaSelected(areaType);
-  };
-
-  //   useEffect(() => {
-  //     console.log("selected coordinates", cordinateArray);
-  //     const getFeatureStyle = (feature: any) => {
-  //       const style = new Style({
-  //         image: new Circle({
-  //           radius: 8,
-  //           fill: new Fill({
-  //             color: "green",
-  //           }),
-  //           stroke: new Stroke({
-  //             color: "black",
-  //             width: 2,
-  //           }),
-  //         }),
-  //       });
-  //       return style;
-  //     };
-  //     const existingOccurrenceLayer = map
-  //       ?.getLayers()
-  //       .getArray()
-  //       .find((layer) => {
-  //         return layer.get("occurrence-data") === true;
-  //       });
-  //     if (
-  //       existingOccurrenceLayer &&
-  //       existingOccurrenceLayer instanceof VectorLayer
-  //     ) {
-  //       const occurrenceSource = existingOccurrenceLayer.getSource();
-  //       const filteredFeatures = occurrenceData.filter((feature) => {
-  //         const cordinates = feature.geometry.coordinates;
-  //         //Check for equality instead of using includes
-
-  //         const isInBound = booleanPointInPolygon(
-  //           turf.point(cordinates),
-  //           turf.polygon([cordinateArray])
-  //         );
-
-  //         if (isInBound) {
-  //           return cordinates;
-  //         }
-  //       });
-  //       console.log("filtered Coordinates", filteredFeatures);
-  //       // Filter features based on selectedCountry
-  //       occurrenceSource.clear();
-  //       occurrenceSource.addFeatures(
-  //         new GeoJSON()
-  //           .readFeatures(responseToGEOJSON(filteredFeatures), {
-  //             featureProjection: "EPSG:3857",
-  //           })
-  //           .map((feature) => {
-  //             feature.setStyle(getFeatureStyle(feature));
-  //             return feature;
-  //           })
-  //       );
-  //       // Refresh the map
-  //       map?.render();
-  //     }
-  //   }, [cordinateArray]);
-
   return (
     <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
       <div
@@ -358,8 +197,6 @@ function Newmap() {
             <OccurrenceFilter
               open={filterOpen}
               handleFilterConditions={updateFilterConditions}
-              handleSelectedSpecies={handleSpeciesStyling}
-              handleDrawArea={handleAreaDrawn}
             />
           )}
 
@@ -384,9 +221,6 @@ function Newmap() {
           popoverContent={popoverContent}
         />
       )}
-      {/*<div className="time-slider-container">*/}
-      {/*    <TimeSlider onChange={handleTimeChange}/>*/}
-      {/*</div>*/}
     </div>
   );
 }
