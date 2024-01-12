@@ -557,10 +557,15 @@ function Newmap() {
         legendContainer.appendChild(legendItem);
       });
 
+      // Log the SVG content
+      const svgString = new XMLSerializer().serializeToString(legendContainer);
+      console.log("SVG content:", svgString);
+
       return legendContainer;
     };
 
     const legendDiv = createLegendDiv();
+
     document.body.appendChild(legendDiv);
     // Set the occurrenceSource state with initial features
     setOccurrenceSource(
@@ -596,64 +601,111 @@ function Newmap() {
   const printToScale = () => {
     console.log("Button clicked!");
 
-    if (map && mapElement.current) {
-      console.log("Map and mapElement are available");
+    if (map) {
+      console.log("Map is available");
 
-      const mapView = map.getView();
-      console.log("Current map view:", mapView);
+      const resolutionChangeListener = () => {
+        console.log("Inside resolutionChangeListener");
 
-      const printMap = new Map({
-        layers: map.getLayers().getArray(),
-        view: new View({
-          center: mapView.getCenter(),
-          zoom: mapView.getZoom(),
-        }),
-        controls: map.getControls().getArray(),
-      });
+        const mapCanvas = document.createElement("canvas");
+        const size = map.getSize();
+        if (!size || size.length < 2) {
+          return;
+        }
+        mapCanvas.width = size[0];
+        mapCanvas.height = size[1];
+        const mapContext = mapCanvas.getContext("2d");
+        if (!mapContext) {
+          return;
+        }
 
-      console.log("Print map created:", printMap);
+        // Draw the legend onto the map canvas
+        const legendDiv = document.querySelector(".legend-container");
+        if (legendDiv) {
+          // Create a temporary anchor element
+          const tempAnchor = document.createElement("a");
+          tempAnchor.href = `data:image/svg+xml;base64,${btoa(
+            new XMLSerializer().serializeToString(legendDiv)
+          )}`;
+          tempAnchor.download = "legend.png"; // Specify the download filename
 
-      const canvas = document.createElement("canvas");
-      canvas.width = mapElement.current.offsetWidth;
-      canvas.height = mapElement.current.offsetHeight;
-      const context = canvas.getContext("2d");
+          // Append the anchor to the document body
+          document.body.appendChild(tempAnchor);
 
-      if (context) {
-        console.log("Canvas and context are available");
+          // Trigger a click event to initiate the download
+          tempAnchor.click();
 
-        printMap.once("rendercomplete", async () => {
-          console.log("Render complete");
+          // Remove the temporary anchor from the document body
+          document.body.removeChild(tempAnchor);
+        }
 
-          // Draw the map onto the canvas
-          const mapCanvas = printMap.getViewport().querySelector("canvas");
-          if (mapCanvas) {
-            console.log("Map canvas found:", mapCanvas.width, mapCanvas.height);
-            context.drawImage(mapCanvas, 0, 0, canvas.width, canvas.height);
+        // Capture other layers
+        Array.prototype.forEach.call(
+          map
+            .getViewport()
+            .querySelectorAll(".ol-layer canvas, canvas.ol-layer"),
+          function (canvas) {
+            if (canvas.width > 0) {
+              const opacity =
+                canvas.parentNode?.style.opacity || canvas.style.opacity;
+              mapContext.globalAlpha = opacity === "" ? 1 : Number(opacity);
+              let matrix;
+              const transform = canvas.style.transform;
 
-            // Export the canvas as PNG
-            const pngDataUrl = canvas.toDataURL("image/png");
-            console.log("PNG Data URL:", pngDataUrl);
+              if (transform) {
+                matrix = transform
+                  .match(/^matrix\(([^\(]*)\)$/)[1]
+                  .split(",")
+                  .map(Number);
+              } else {
+                matrix = [
+                  parseFloat(canvas.style.width) / canvas.width,
+                  0,
+                  0,
+                  parseFloat(canvas.style.height) / canvas.height,
+                  0,
+                  0,
+                ];
+              }
+              CanvasRenderingContext2D.prototype.setTransform.apply(
+                mapContext,
+                matrix
+              );
+              const backgroundColor = canvas.parentNode?.style.backgroundColor;
+              if (backgroundColor) {
+                mapContext.fillStyle = backgroundColor;
+                mapContext.fillRect(0, 0, canvas.width, canvas.height);
+              }
 
-            // Create a link element and trigger download
-            const downloadLink = document.createElement("a");
-            downloadLink.href = pngDataUrl;
-            downloadLink.download = "printed_map.png";
-            downloadLink.click();
-          } else {
-            console.log("Map canvas is not found");
+              mapContext.drawImage(canvas, 0, 0);
+            }
           }
-        });
+        );
 
-        setTimeout(() => {
-          // Trigger the rendering of the map
-          printMap.render();
-          console.log("After render call");
-        }, 1000); // Adjust the delay as needed
-      } else {
-        console.log("Canvas context is not available");
-      }
+        mapContext.globalAlpha = 1;
+        mapContext.setTransform(1, 0, 0, 1, 0, 0);
+
+        // Set the download link's href attribute
+        const link = document.getElementById(
+          "image-download"
+        ) as HTMLAnchorElement | null;
+        if (link != null) {
+          link.href = mapCanvas.toDataURL();
+          // Trigger a click event to download
+          link.click();
+        }
+
+        // Remove the listener after capturing the map
+        map.un("postrender", resolutionChangeListener);
+      };
+
+      // Attach the listener to 'postrender' event
+      map.on("postrender", resolutionChangeListener);
+
+      // Trigger a render to ensure the listener is called
+      map.renderSync();
     } else {
-      console.log("Map or mapElement is not available");
+      console.log("Map is not available");
     }
   };
 
@@ -1233,11 +1285,22 @@ function Newmap() {
       </div>
 
       <div className="print-section">
-        <Tooltip title="Print to Scale" arrow>
+        <Tooltip title="Download map image" arrow>
           <IconButton onClick={printToScale}>
-            <PrintIcon style={{ color: "#ebbd40" }} />
+            <PrintIcon
+              style={{
+                color: "#ebbd40",
+                fontWeight: "bold",
+                // border: "2px solid white",
+              }}
+            />
           </IconButton>
         </Tooltip>
+        <a
+          id="image-download"
+          style={{ display: "none" }}
+          download="printed_map.png"
+        ></a>
       </div>
 
       <OccurrencePopup
