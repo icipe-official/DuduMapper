@@ -63,7 +63,7 @@ export default function OccurrenceFilter({
   handleFilterConditions: any;
 }) {
   const queryClient = useQueryClient();
-  const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
+  const [selectedSpecies, setSelectedSpecies] = React.useState<string[]>([]);
   const [openCountries, setOpenCountries] = useState(false);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [countriesOptions, setCountriesOptions] = useState<[]>([]);
@@ -93,20 +93,28 @@ export default function OccurrenceFilter({
 
   const composeFilterConditions = (): string[] => {
     const filterConditions = [];
-    if (selectedSpecies && selectedSpecies.length > 0) {
-      console.log("Selected Species", selectedSpecies);
-      const arrayOfSpecies: string[] = String(selectedSpecies).split(","); //
-      const quotedSpecies = `'${arrayOfSpecies.join("', '")}'`;
-      const speciesFilter: string = `species IN(${quotedSpecies}) `;
 
+    if (selectedSpecies.length > 0) {
+      const quotedSpecies = `'${selectedSpecies.join("', '")}'`;
+      const speciesFilter: string = `species IN(${quotedSpecies}) `;
       filterConditions.push(speciesFilter);
     }
-    if (selectedCountries && selectedCountries.length > 0) {
-      console.log("Selected Countries", selectedCountries);
-      const cFilter = ` WITHIN(the_geom, ${selectedCountries})`;
-      filterConditions.push(cFilter);
+
+    if (selectedCountries.length > 0) {
+      // Assuming selectedCountries contains string representations of GeoJSON geometries
+      const countryFilters = selectedCountries.map((countryGeometryString) => {
+        const countryGeometry = JSON.parse(countryGeometryString);
+        const cFilter = `WITHIN(the_geom, ${wellknown.stringify(
+          countryGeometry
+        )})`;
+        return cFilter;
+      });
+
+      filterConditions.push(...countryFilters);
     }
-    //Add other condition check here {season, larvae, adult, shape, dates}
+
+    // Add other condition checks here {season, larvae, adult, shape, dates}
+
     return filterConditions;
   };
 
@@ -142,11 +150,10 @@ export default function OccurrenceFilter({
 
   const handleSpeciesChange = (
     _: React.SyntheticEvent<Element, Event>,
-    value: string[]
+    values: string[]
   ) => {
-    const selectedValues = [...value];
-    setSelectedSpecies(selectedValues);
-    setIsSpeciesSelected(selectedValues.length > 0);
+    setSelectedSpecies(values);
+    setIsSpeciesSelected(values.length > 0);
   };
 
   const handleDeleteSpecies = (index: number) => {
@@ -179,16 +186,29 @@ export default function OccurrenceFilter({
       | GeometryCollection
   ) => {
     const options = { tolerance: 0.1, highQuality: false };
-    return simplify(geometry, options.tolerance, options.highQuality);
+
+    // Convert the GeoJSON geometry to a string and parse it back
+    const geoJsonString = JSON.stringify(geometry);
+    const geo = JSON.parse(geoJsonString);
+
+    // Use type assertion to handle the type mismatch
+    return simplify(geo as any, options.tolerance, options.highQuality);
   };
 
-  const handleCountries = (values: any[] | null) => {
-    if (values) {
-      const simplifiedGeoms = values.map((value) =>
-        simplifyGeometry(value.geometry)
-      );
-      const wktGeoms = simplifiedGeoms.map((geom) => wellknown.stringify(geom));
-      setSelectedCountries(wktGeoms);
+  const handleCountries = (
+    value: {
+      geometry?:
+        | Feature<any, GeoJsonProperties>
+        | FeatureCollection<any, GeoJsonProperties>
+        | GeometryCollection;
+    } | null
+  ) => {
+    if (value?.geometry) {
+      const simplifiedGeoms = simplifyGeometry(value.geometry);
+      const wktGeoms = wellknown.stringify(simplifiedGeoms);
+
+      // Assuming selectedCountry is supposed to be an array of strings
+      setSelectedCountry([wktGeoms]);
     }
   };
 
@@ -274,8 +294,8 @@ export default function OccurrenceFilter({
                         setOpenCountries(false);
                       }}
                       //isOptionEqualToValue={(option, value) => option === value}
-                      getOptionLabel={(option) => option.properties.name}
-                      getOptionKey={(option) => option.properties.id}
+                      getOptionLabel={(option) => option["properties"]["name"]}
+                      getOptionKey={(option) => option["properties"]["id"]}
                       options={countriesOptions}
                       loading={isFetchingCountries}
                       renderInput={(params) => (
