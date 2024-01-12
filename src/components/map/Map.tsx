@@ -20,14 +20,14 @@ import OccurrencePopup from "../popup/OccurrenceDrawer";
 import { IconButton, Tooltip } from "@mui/material";
 import "../filters/filterSectionStyles.css";
 import TuneIcon from "@mui/icons-material/Tune";
-import {
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
+
+const queryClient = new QueryClient();
 
 const OCCURRENCE_API = `${geoServerBaseUrl}/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:occurrence&maxFeatures=10000&outputFormat=application/json`;
 const getOccurrences = async (queryKey) => {
+  console.log(queryKey[1]);
   const params: string = queryKey[1];
   if (params) {
     console.log("Filtering occurrence on: ", params);
@@ -36,6 +36,7 @@ const getOccurrences = async (queryKey) => {
     const response = await fetch(url);
     return response.json();
   }
+  console.log("Loading all occurrence");
   const response = await fetch(`${OCCURRENCE_API}`);
   return response.json();
 };
@@ -50,9 +51,15 @@ function Newmap() {
   const mapElement = useRef<HTMLDivElement>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
-  const [filterConditions, setFilterContions] = useState<[]>();
-  const [cqlFilter, setCqlFilter] = useState<string>();
+  const [filterConditions, setFilterConditions] = useState<string[] | null>(
+    null
+  );
+  const [cqlFilter, setCqlFilter] = useState(null);
 
+  const [selectedPeriod, setSelectedPeriod] = useState<[number, number]>([
+    1970,
+    new Date().getFullYear(),
+  ]);
 
   const [occurrenceSource, setOccurrenceSource] = useState(
     new VectorSource({
@@ -70,24 +77,38 @@ function Newmap() {
     isFetching,
   } = useQuery({
     queryKey: ["occurrences", cqlFilter], //Example CQl filter species IN ('gambie', 'finiestus', 'fini') AND WITHIN (the_geom, MULTIPOLYGON((22,22,223,223))) AND adult =true AND season=dry
+    //queryFn: getOccurrences
     queryFn: ({ queryKey }) => getOccurrences(queryKey),
   });
 
-  useEffect(() => {
-    console.log("Conditions", filterConditions);
-    const cql_filter = filterConditions?.join("AND"); //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
-    console.log("CQL Filter", cql_filter);
-    setCqlFilter(cql_filter);
-  }, [filterConditions]);
+  useEffect(() => {}, [filterConditions]);
 
   const updateFilterConditions = (conditions: any) => {
-    setFilterContions(conditions);
+    if (Array.isArray(conditions)) {
+      const cql_filter = conditions.join(" AND ");
+      setFilterConditions([cql_filter]); // Wrap the string in an array
+    } else {
+      console.error("Invalid conditions format:", conditions);
+    }
   };
 
+  const isValidDate = (date: Date) => {
+    return !isNaN(date.getTime());
+  };
+  const handleTimeChange = (startDate: Date, endDate: Date) => {
+    if (!isValidDate(startDate) || !isValidDate(endDate)) {
+      return;
+    }
+    setSelectedPeriod([startDate.getFullYear(), endDate.getFullYear()]);
+  };
 
   if (isFetching) {
     console.log("Loading occurrences...");
   }
+  if (isError) {
+    console.log("Error", error);
+  }
+
   if (status === "success") {
     const total = occurrenceData["totalFeatures"];
     const returned = occurrenceData["numberReturned"];
@@ -121,10 +142,9 @@ function Newmap() {
         radius: 8,
       }),
       fill: fill,
-      //stroke: stroke,
+      stroke: stroke,
     }),
   } as BaseLayerOptions);
-  occurrenceLayer.set("occurrence-data", true);
 
   const occurrenceGroup = new LayerGroup({
     title: "Occurrence",
@@ -135,6 +155,8 @@ function Newmap() {
     setShowOccurrencePopup(false);
   };
 
+  //TODO Styling
+  const handleSpeciesStyling = (species): Style => {};
 
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
@@ -197,6 +219,7 @@ function Newmap() {
             <OccurrenceFilter
               open={filterOpen}
               handleFilterConditions={updateFilterConditions}
+              handleSpeciesColor={handleSpeciesStyling}
             />
           )}
 
@@ -221,6 +244,9 @@ function Newmap() {
           popoverContent={popoverContent}
         />
       )}
+      {/*<div className="time-slider-container">*/}
+      {/*    <TimeSlider onChange={handleTimeChange}/>*/}
+      {/*</div>*/}
     </div>
   );
 }
