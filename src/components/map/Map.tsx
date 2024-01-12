@@ -207,7 +207,6 @@ function Newmap() {
                 if (layer === occurrenceLayer) {
                     console.log("Point clicked");
 
-
                     setPopoverContent(feature.getProperties());
                     setShowOccurrencePopup(true);
                     // Return true to stop the forEach loop if needed
