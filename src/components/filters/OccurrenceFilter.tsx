@@ -70,12 +70,12 @@ export default function OccurrenceFilter({
   handleFilterConditions: any;
   handleSpeciesColor: any;
   handleDrawArea: any;
-  handleSelectedSpecies: any
+  handleSelectedSpecies: any;
 }) {
   const queryClient = useQueryClient();
-  const [selectedSpecies, setSelectedSpecies] = useState<string>();
+  const [selectedSpecies, setSelectedSpecies] = useState<string>([]);
   const [openCountries, setOpenCountries] = useState(false);
-  const [selectedCountries, setSelectedCountries] = useState();
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [countriesOptions, setCountriesOptions] = useState<[]>([]);
   const [selectedDisease, setSelectedDisease] = useState<string[]>([]);
   const [isDiseaseSelected, setIsDiseaseSelected] = useState(false);
@@ -208,170 +208,177 @@ export default function OccurrenceFilter({
     const filterParams = composeFilterConditions();
     handleFilterConditions(filterParams);
     if (selectedSpecies.length > 0) {
-
-            handleSelectedSpecies(selectedSpecies)
+      handleSelectedSpecies(selectedSpecies);
     }
   }, [selectedSpecies, selectedCountries]);
 
   return (
     <div className="filter-section">
       <Collapse in={open}>
-        <div className="filter-section">
-          <div className="flex-container">
-            <Box className="container-style">
+        <div className="flex-container">
+          <Box className="container-style">
+            <Grid
+              container
+              spacing={1}
+              style={{ marginTop: "10px", display: "flex" }}
+            >
+              <Grid item xs={12} sm={4}>
+                <FormControl fullWidth>
+                  <Autocomplete
+                    multiple
+                    id="disease-select"
+                    options={["Malaria", "Chikungunya"]}
+                    value={selectedDisease}
+                    onChange={(event, value) =>
+                      handleDiseaseChange(event, value)
+                    }
+                    getOptionLabel={(option) => option}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={`Disease (${selectedDisease.length} selected)`}
+                        InputLabelProps={{ sx: { fontSize: "0.8rem" } }}
+                      />
+                    )}
+                    renderTags={() => null}
+                    renderOption={(props, option, { selected }) => (
+                      <li {...props}>
+                        <Checkbox
+                          icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                          checkedIcon={<CheckBoxIcon fontSize="small" />}
+                          style={{ marginRight: 8 }}
+                          checked={selected}
+                        />
+                        {option}
+                      </li>
+                    )}
+                    ListboxComponent={(props) => <ul {...props} />}
+                  />
+                </FormControl>
+                <div
+                  style={{
+                    marginTop: "4px",
+                    display: "flex",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {selectedDisease.map((value, index) => (
+                    <Chip
+                      key={value}
+                      label={value}
+                      style={{
+                        marginRight: "4px",
+                        marginBottom: "4px",
+                        fontSize: "0.7rem",
+                      }}
+                      onDelete={() => handleDeleteDisease(index)}
+                    />
+                  ))}
+                </div>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <FormControl fullWidth>
+                  <Autocomplete
+                    id="asynchronous-demo"
+                    multiple
+                    open={openCountries}
+                    onOpen={() => {
+                      setOpenCountries(true);
+                    }}
+                    onClose={() => {
+                      setOpenCountries(false);
+                    }}
+                    //isOptionEqualToValue={(option, value) => option === value}
+                    getOptionLabel={(option) => option["properties"]["name"]}
+                    getOptionKey={(option) => option.properties.id}
+                    options={countriesOptions}
+                    loading={isFetchingCountries}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Countries"
+                        InputProps={{
+                          ...params.InputProps,
+                          endAdornment: (
+                            <React.Fragment>
+                              {isFetchingCountries ? (
+                                <CircularProgress color="inherit" size={20} />
+                              ) : null}
+                              {params.InputProps.endAdornment}
+                            </React.Fragment>
+                          ),
+                        }}
+                      />
+                    )}
+                    onChange={(event, values) => handleCountries(values)}
+                  />
+                </FormControl>
+                <div
+                  style={{
+                    marginTop: "4px",
+                    display: "flex",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {selectedCountry.slice(0, 4).map((value, index) => (
+                    <Chip
+                      key={value}
+                      label={value}
+                      style={{
+                        marginRight: "4px",
+                        marginBottom: "4px",
+                        fontSize: "0.7rem",
+                      }}
+                      onDelete={() => handleDeleteCountry(index)}
+                    />
+                  ))}
+                </div>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <FormControl fullWidth>
+                  <Autocomplete
+                    //multiple
+                    id="species-filter"
+                    options={speciesList.map(
+                      (species) => species.properties.species
+                    )}
+                    freeSolo
+                    limitTags={3}
+                    filterSelectedOptions
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="filled"
+                        label="Species"
+                        placeholder="Select Species"
+                      />
+                    )}
+                    onChange={(event, values) => handleSpecies(values)}
+                  />
+                </FormControl>
+                <div
+                  style={{
+                    marginTop: "4px",
+                    display: "flex",
+                    flexWrap: "wrap",
+                  }}
+                ></div>
+              </Grid>
               <Grid
                 container
-                spacing={1}
-                style={{ marginTop: "10px", display: "flex" }}
+                alignItems="center"
+                direction="row"
+                justifyContent="space-between"
+                p="6px"
               >
-                <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <Autocomplete
-                      multiple
-                      id="disease-select"
-                      options={["Malaria", "Chikungunya"]}
-                      value={selectedDisease}
-                      onChange={(event, value) =>
-                        handleDiseaseChange(event, value)
-                      }
-                      getOptionLabel={(option) => option}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={`Disease (${selectedDisease.length} selected)`}
-                          InputLabelProps={{ sx: { fontSize: "0.8rem" } }}
-                        />
-                      )}
-                      renderTags={() => null}
-                      renderOption={(props, option, { selected }) => (
-                        <li {...props}>
-                          <Checkbox
-                            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                            checkedIcon={<CheckBoxIcon fontSize="small" />}
-                            style={{ marginRight: 8 }}
-                            checked={selected}
-                          />
-                          {option}
-                        </li>
-                      )}
-                      ListboxComponent={(props) => <ul {...props} />}
-                    />
-                  </FormControl>
-                  <div
-                    style={{
-                      marginTop: "4px",
-                      display: "flex",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    {selectedDisease.map((value, index) => (
-                      <Chip
-                        key={value}
-                        label={value}
-                        style={{
-                          marginRight: "4px",
-                          marginBottom: "4px",
-                          fontSize: "0.7rem",
-                        }}
-                        onDelete={() => handleDeleteDisease(index)}
-                      />
-                    ))}
-                  </div>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <Autocomplete
-                      id="asynchronous-demo"
-                      multiple
-                      open={openCountries}
-                      onOpen={() => {
-                        setOpenCountries(true);
-                      }}
-                      onClose={() => {
-                        setOpenCountries(false);
-                      }}
-                      //isOptionEqualToValue={(option, value) => option === value}
-                      getOptionLabel={(option) => option["properties"]["name"]}
-                      getOptionKey={(option) => option.properties.id}
-                      options={countriesOptions}
-                      loading={isFetchingCountries}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Countries"
-                          InputProps={{
-                            ...params.InputProps,
-                            endAdornment: (
-                              <React.Fragment>
-                                {isFetchingCountries ? (
-                                  <CircularProgress color="inherit" size={20} />
-                                ) : null}
-                                {params.InputProps.endAdornment}
-                              </React.Fragment>
-                            ),
-                          }}
-                        />
-                      )}
-                      onChange={(event, values) => handleCountries(values)}
-                    />
-                  </FormControl>
-                  <div
-                    style={{
-                      marginTop: "4px",
-                      display: "flex",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    {selectedCountry.slice(0, 4).map((value, index) => (
-                      <Chip
-                        key={value}
-                        label={value}
-                        style={{
-                          marginRight: "4px",
-                          marginBottom: "4px",
-                          fontSize: "0.7rem",
-                        }}
-                        onDelete={() => handleDeleteCountry(index)}
-                      />
-                    ))}
-                  </div>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <FormControl fullWidth>
-                    <Autocomplete
-                      //multiple
-                      id="species-filter"
-                      options={speciesList.map(
-                        (species) => species.properties.species
-                      )}
-                      freeSolo
-                      limitTags={3}
-                      filterSelectedOptions
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          variant="filled"
-                          label="Species"
-                          placeholder="Select Species"
-                        />
-                      )}
-                      onChange={(event, values) => handleSpecies(values)}
-                    />
-                  </FormControl>
-                  <div
-                    style={{
-                      marginTop: "4px",
-                      display: "flex",
-                      flexWrap: "wrap",
-                    }}
-                  ></div>
-                </Grid>
                 <Grid
-                  container
-                  alignItems="center"
-                  direction="row"
-                  justifyContent="space-between"
-                  p="6px"
+                  item
+                  xs={12}
+                  sm={4}
+                  sx={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
                 >
                   <Grid
                     item
@@ -522,6 +529,16 @@ export default function OccurrenceFilter({
                       </IconButton>
                     </Tooltip>
                   </Grid>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={4}
+                  sx={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
                   <Grid
                     item
                     xs={12}
@@ -668,149 +685,131 @@ export default function OccurrenceFilter({
                       </IconButton>
                     </Tooltip>
                   </Grid>
-                  <Grid
-                    item
-                    xs={12}
-                    sm={4}
-                    sx={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography sx={{ color: "green", fontSize: 15 }}>
-                      Select by Area
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontStyle: "italic",
-                        marginRight: "5px",
-                        color: "black",
-                      }}
-                    >
-                      Rectangle:{" "}
-                      <IconButton
-                        onClick={() => toggleSelectedByArea("Box")}
-                        color={selectedByArea === "Box" ? "success" : "default"}
-                        sx={{
-                          fontSize: "1.5rem",
-                          "&:hover": {
-                            color:
-                              selectedByArea === "Box" ? "#2e7d32" : "primary",
-                          },
-                        }}
-                      >
-                        <RectangleOutlinedIcon />
-                      </IconButton>
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontStyle: "italic",
-                        marginRight: "5px",
-                        color: "black",
-                      }}
-                    >
-                      Circle:{" "}
-                      <IconButton
-                        onClick={() => toggleSelectedByArea("Circle")}
-                        color={
-                          selectedByArea === "Circle" ? "success" : "default"
-                        }
-                        sx={{
-                          fontSize: "1.5rem",
-                          "&:hover": {
-                            color:
-                              selectedByArea === "Circle"
-                                ? "#2e7d32"
-                                : "primary",
-                          },
-                        }}
-                      >
-                        <CircleOutlinedIcon />
-                      </IconButton>
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontStyle: "italic",
-                        marginRight: "5px",
-                        color: "black",
-                      }}
-                    >
-                      Free Hand:{" "}
-                      <IconButton
-                        onClick={() => toggleSelectedByArea("Polygon")}
-                        color={
-                          selectedByArea === "Polygon" ? "success" : "default"
-                        }
-                        sx={{
-                          fontSize: "1.5rem",
-                          "&:hover": {
-                            color:
-                              selectedByArea === "Polygon"
-                                ? "#2e7d32"
-                                : "primary",
-                          },
-                        }}
-                      >
-                        <FormatShapesIcon />
-                      </IconButton>
-                    </Typography>
-                  </Grid>
                 </Grid>
-                {/* <div style={buttonContainerStyle}>
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: "#2e7d32",
-                  "&:hover": {
-                    backgroundColor: colors.grey[500], // Background color on hover
-                  },
-                }}
-                size="small"
-                style={{ fontSize: "0.6rem" }}
-                onClick={handleApplyFilters}
-              >
-                Apply
-              </Button>
-            </div> */}
-                <div className="button-container-style">
-                  <Button
-                    variant="contained"
+                <Grid
+                  item
+                  xs={12}
+                  sm={4}
+                  sx={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography sx={{ color: "green", fontSize: 15 }}>
+                    Select by Area
+                  </Typography>
+                  <Typography
+                    variant="caption"
                     sx={{
-                      backgroundColor: "#2e7d32",
-                      "&:hover": {
-                        backgroundColor: colors.grey[500], // Background color on hover
-                      },
-                    }}
-                    size="small"
-                    style={{ fontSize: "0.6rem" }}
-                    onClick={() => {
-                      setSelectedDisease([] as string[]);
-                      setIsDiseaseSelected(false);
-                      setSelectedCountry([] as string[]);
-                      setIsCountrySelected(false);
-                      //   setSelectedSpecies([] as string[]);
-                      setIsSpeciesSelected(false);
-                      setSelectedSeason("");
-                      setIsSeasonSelected(false);
-                      setSelectedAdult("");
-                      setIsAdultSelected(false);
-                      setSelectedControl("");
-                      setIsControlSelected(false);
-                      setSelectedLarval("");
-                      setIsLarvalSelected(false);
-
-                      // Reset other state variables as needed
+                      fontStyle: "italic",
+                      marginRight: "5px",
+                      color: "black",
                     }}
                   >
-                    Clear Selection
-                  </Button>
-                </div>
+                    Rectangle:{" "}
+                    <IconButton
+                      onClick={() => toggleSelectedByArea("Box")}
+                      color={selectedByArea === "Box" ? "success" : "default"}
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedByArea === "Box" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <RectangleOutlinedIcon />
+                    </IconButton>
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontStyle: "italic",
+                      marginRight: "5px",
+                      color: "black",
+                    }}
+                  >
+                    Circle:{" "}
+                    <IconButton
+                      onClick={() => toggleSelectedByArea("Circle")}
+                      color={
+                        selectedByArea === "Circle" ? "success" : "default"
+                      }
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedByArea === "Circle" ? "#2e7d32" : "primary",
+                        },
+                      }}
+                    >
+                      <CircleOutlinedIcon />
+                    </IconButton>
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontStyle: "italic",
+                      marginRight: "5px",
+                      color: "black",
+                    }}
+                  >
+                    Free Hand:{" "}
+                    <IconButton
+                      onClick={() => toggleSelectedByArea("Polygon")}
+                      color={
+                        selectedByArea === "Polygon" ? "success" : "default"
+                      }
+                      sx={{
+                        fontSize: "1.5rem",
+                        "&:hover": {
+                          color:
+                            selectedByArea === "Polygon"
+                              ? "#2e7d32"
+                              : "primary",
+                        },
+                      }}
+                    >
+                      <FormatShapesIcon />
+                    </IconButton>
+                  </Typography>
+                </Grid>
               </Grid>
-            </Box>
-          </div>
+              <div className="button-container-style">
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#2e7d32",
+                    "&:hover": {
+                      backgroundColor: colors.grey[500], // Background color on hover
+                    },
+                  }}
+                  size="small"
+                  style={{ fontSize: "0.6rem" }}
+                  onClick={() => {
+                    setSelectedDisease([] as string[]);
+                    setIsDiseaseSelected(false);
+                    setSelectedCountry([] as string[]);
+                    setIsCountrySelected(false);
+                    setSelectedSpecies([] as string[]);
+                    setIsSpeciesSelected(false);
+                    setSelectedSeason("");
+                    setIsSeasonSelected(false);
+                    setSelectedAdult("");
+                    setIsAdultSelected(false);
+                    setSelectedControl("");
+                    setIsControlSelected(false);
+                    setSelectedLarval("");
+                    setIsLarvalSelected(false);
+
+                    // Reset other state variables as needed
+                  }}
+                >
+                  Clear Selection
+                </Button>
+              </div>
+            </Grid>
+          </Box>
         </div>
       </Collapse>
     </div>
