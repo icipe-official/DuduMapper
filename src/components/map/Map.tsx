@@ -20,10 +20,12 @@ import OccurrencePopup from "../popup/OccurrenceDrawer";
 import FilterSection from "../filters/filtersection";
 import {IconButton, Tooltip} from "@mui/material";
 import "../filters/filterSectionStyles.css";
+import "../filters/filter_section_dev.css";
 import TuneIcon from "@mui/icons-material/Tune";
 import {QueryClient, QueryClientProvider, useQuery, useQueryClient} from "@tanstack/react-query";
 import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
+import OpenFilterButton from "@/components/filters/OpenFilterButton";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,7 @@ const getOccurrences = async (queryKey) => {
         const response = await fetch(url)
         return response.json();
     }
+    console.log('Loading all occurrence')
     const response = await fetch(`${OCCURRENCE_API}`)
     return response.json();
 }
@@ -52,13 +55,16 @@ function Newmap() {
     const mapElement = useRef<HTMLDivElement>(null);
     const [filterOpen, setFilterOpen] = useState(false);
     const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
+    const [filterConditionsObj, setFilterConditionsObj] = useState({})
     const [cqlFilter, setCqlFilter] = useState(null)
 
-
-    const [selectedPeriod, setSelectedPeriod] = useState<[number, number]>([
-        1970,
-        new Date().getFullYear(),
-    ]);
+    const [occurrenceSource, setOccurrenceSource] = useState(
+        new VectorSource({
+            format: new GeoJSON(),
+            features: [],
+            strategy: bboxStrategy,
+        })
+    );
 
     const {
         status,
@@ -72,65 +78,55 @@ function Newmap() {
         queryFn: ({queryKey}) => getOccurrences(queryKey)
     });
 
-    const updateFilterConditions = (filterConditions: any) => {
-
-        //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
-        console.log('Conditions', filterConditions)
-        const cql_filter = filterConditions.join('AND');
-        console.log('CQL Filter', cql_filter)
-        setCqlFilter(cql_filter)
-    }
-
-    const isValidDate = (date: Date) => {
-        return !isNaN(date.getTime());
-    };
-    const handleTimeChange = (startDate: Date, endDate: Date) => {
-        if (!isValidDate(startDate) || !isValidDate(endDate)) {
+    useEffect(() => {
+        if (Object.keys(filterConditionsObj).length === 0) {
             return;
         }
-        setSelectedPeriod([startDate.getFullYear(), endDate.getFullYear()]);
+        //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
+        let filterConditions: string [] = Object.values(filterConditionsObj)
+        filterConditions = filterConditions.filter(c => c)
+        const cql_filter = filterConditions.join(' AND ');
+        setCqlFilter(cql_filter)
+    }, [filterConditionsObj]);
+
+    const updateFilterConditions = (conditions: {}) => {
+        setFilterConditionsObj({
+                ...filterConditionsObj,
+                species: conditions['species'] ,
+                country: conditions['country']
+            }
+        )
+    }
+
+    const handleTimeChange = (startYear: number, endYear: number) => {
+        const condition = `start_year >= ${startYear} AND end_year <= ${endYear} `
+        setFilterConditionsObj({
+                ...filterConditionsObj,
+                period: condition
+            }
+        )
     };
 
-
-
     if (isFetching) {
-        console.log('Loading occurrences...')
+        console.log('Loading occurrences...') //Implement a progress bar as Toast
     }
     if (isError) {
-        console.log('Error', error)
+        console.log('Error', error) //TODO implement Toast
     }
+
     if (status === 'success') {
         const total = occurrenceData['totalFeatures']
         const returned = occurrenceData['numberReturned']
         console.log(`${returned} out of ${total} features`)
 
-
-        const occLayer = new VectorLayer({
-            source: new VectorSource({
-                features: new GeoJSON().readFeatures(occurrenceData),
-            }),
-
-        })
-        console.log('Occurrence Layer', occLayer)
-        const occurrence2 = new LayerGroup({
-            title: "Occurrence 2",
-            layers: [occLayer],
-        } as GroupLayerOptions);
-        console.log('Adding occurrence to map', mapRef.current)
-        if (map && map instanceof Map) {
-            map.addLayer(occurrence2)
-        }
+        occurrenceSource?.clear()
+        occurrenceSource?.addFeatures(
+            new GeoJSON().readFeatures(occurrenceData,
+                {
+                    featureProjection: 'EPSG:3857'
+                })
+        )
     }
-
-    const occurrenceSource = new VectorSource({
-        format: new GeoJSON(),
-        url:
-            geoServerBaseUrl +
-            "/geoserver/vector/ows?service=WFS&version=" +
-            "1.0.0&request=GetFeature&typeName" +
-            "=vector%3Aoccurrence&maxFeatures=10000&outputFormat=application%2Fjson",
-        strategy: bboxStrategy,
-    });
 
     const fill = new Fill({
         color: "rgba(2,255,2,1)",
@@ -164,6 +160,11 @@ function Newmap() {
     const handleClosePopup = () => {
         setShowOccurrencePopup(false);
     };
+
+    //TODO Styling
+    const handleSpeciesStyling = (species): Style => {
+
+    }
 
     useEffect(() => {
         getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
@@ -207,7 +208,6 @@ function Newmap() {
                 if (layer === occurrenceLayer) {
                     console.log("Point clicked");
 
-
                     setPopoverContent(feature.getProperties());
                     setShowOccurrencePopup(true);
                     // Return true to stop the forEach loop if needed
@@ -225,20 +225,14 @@ function Newmap() {
                 className="map-container"
                 id="map-container"
             >
+                <div className="filter-dev-button">
+                    <OpenFilterButton filterOpen={filterOpen} onClick={() => setFilterOpen(!filterOpen)}/>
+                </div>
                 <div>
-                    {filterOpen && <OccurrenceFilter open={filterOpen} handleFilterConditions={updateFilterConditions}/>}
+                    {filterOpen &&
+                        <OccurrenceFilter open={filterOpen} handleFilterConditions={updateFilterConditions}
+                                          handleSpeciesColor={handleSpeciesStyling}/>}
 
-                    <div className="filter-section">
-                        <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>
-                            <IconButton
-                                className="custom-icon-button"
-                                style={{color: "white"}}
-                                onClick={() => setFilterOpen(!filterOpen)}
-                            >
-                                <TuneIcon/>
-                            </IconButton>
-                        </Tooltip>
-                    </div>
                 </div>
             </div>
 
@@ -249,9 +243,9 @@ function Newmap() {
                     popoverContent={popoverContent}
                 />
             )}
-            {/*<div className="time-slider-container">*/}
-            {/*    <TimeSlider onChange={handleTimeChange}/>*/}
-            {/*</div>*/}
+            <div>
+                <TimeSlider onChange={handleTimeChange}/>
+            </div>
 
         </div>
     );
