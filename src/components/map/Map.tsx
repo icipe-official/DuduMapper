@@ -83,18 +83,16 @@ function Newmap() {
             return;
         }
         //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
-        console.log('Conditions', filterConditionsObj)
-        const filterConditions: string [] = Object.values(filterConditionsObj)
-        console.log('Conditions values', filterConditions)
+        let filterConditions: string [] = Object.values(filterConditionsObj)
+        filterConditions = filterConditions.filter(c => c)
         const cql_filter = filterConditions.join(' AND ');
-        console.log('CQL Filter', cql_filter)
-        setCqlFilter(cql_filter.trim('AND'))
+        setCqlFilter(cql_filter)
     }, [filterConditionsObj]);
 
     const updateFilterConditions = (conditions: {}) => {
         setFilterConditionsObj({
                 ...filterConditionsObj,
-                species: conditions['species'],
+                species: conditions['species'] ,
                 country: conditions['country']
             }
         )
