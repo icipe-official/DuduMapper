@@ -68,7 +68,6 @@ export default function OccurrenceFilter({
 }: {
   open: boolean;
   handleFilterConditions: any;
-  handleSpeciesColor: any;
   handleDrawArea: any;
   handleSelectedSpecies: any;
 }) {

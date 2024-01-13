@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Map, View } from "ol";
+import Map from "ol/Map.js";
 import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
@@ -17,7 +17,6 @@ import {
 import { Stroke, Fill, Style, Circle } from "ol/style";
 import "../shared/CSS/LayerSwitcherStyles.css";
 import OccurrencePopup from "../popup/OccurrenceDrawer";
-import FilterSection from "../filters/filtersection";
 import { IconButton, Tooltip } from "@mui/material";
 import "../filters/filterSectionStyles.css";
 import TuneIcon from "@mui/icons-material/Tune";
@@ -32,10 +31,14 @@ import TimeSlider from "@/components/filters/TimeSlider";
 import { transform } from "ol/proj";
 import { Coordinate } from "ol/coordinate";
 import SimpleGeometry from "ol/geom/SimpleGeometry";
-import { Draw, Modify, Snap } from "ol/interaction.js";
-import turf from "@turf/turf";
+import Draw from "ol/interaction/Draw.js";
+import * as turf from "@turf/turf";
+import { never } from "ol/events/condition";
+import wellknown from "wellknown";
+import View from "ol/View";
+import toWgs84 from "@turf/projection";
 
-const queryClient = new QueryClient();
+let draw: Draw;
 
 const OCCURRENCE_API = `${geoServerBaseUrl}/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:occurrence&maxFeatures=10000&outputFormat=application/json`;
 const getOccurrences = async (queryKey) => {
@@ -59,15 +62,14 @@ function Newmap() {
   const [popoverContent, setPopoverContent] = React.useState<{
     [x: string]: any;
   }>({});
-  const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
+  const [map, setMap] = useState<Map>(); // Specify the type using a generic type argument
   const mapElement = useRef<HTMLDivElement>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
-  const [filterConditions, setFilterContions] = useState<[]>();
+  const [filterConditions, setFilterContions] = useState<string[]>([]);
   const [cqlFilter, setCqlFilter] = useState<string>();
   const [areaSelected, setAreaSelected] = useState<string>("");
   const [cordinateArray, setCordinateArray] = useState<Coordinate[][]>([]);
-  
 
   const [selectedPeriod, setSelectedPeriod] = useState<[number, number]>([
     1970,
@@ -96,14 +98,22 @@ function Newmap() {
 
   useEffect(() => {
     console.log("Conditions", filterConditions);
-    const cql_filter = filterConditions?.join("AND");
-    console.log("CQL Filter", cql_filter);
-    setCqlFilter(cql_filter);
+
+    if (filterConditions?.length > 0) {
+      const cql_filter = filterConditions.join(" AND ");
+      console.log("CQL Filter", cql_filter);
+      setCqlFilter(cql_filter);
+    }
   }, [filterConditions]);
 
   const updateFilterConditions = (conditions: any) => {
     //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
-    setFilterContions(conditions);
+    if (filterConditions.length > 0) {
+      const newFilterConditionsValue = [...filterConditions, conditions];
+      setFilterContions(newFilterConditionsValue);
+    } else {
+      setFilterContions(conditions);
+    }
   };
 
   const isValidDate = (date: Date) => {
@@ -171,9 +181,8 @@ function Newmap() {
   };
 
   //TODO Styling
-  const handleSpeciesStyling = (species: string[]) => {
-
-  };
+  const handleSpeciesStyling = (species: string[]) => {};
+  let mapLayers: Array<any> = [];
 
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
@@ -190,9 +199,10 @@ function Newmap() {
 
         if (BaseMaps) {
           if (Overlays) {
+            mapLayers = [BaseMaps, Overlays, occurrenceGroup];
             const initialMap = new Map({
               target: "map-container",
-              layers: [BaseMaps, Overlays, occurrenceGroup],
+              layers: mapLayers,
               view: new View({
                 center: [0, 0],
                 zoom: 4,
@@ -203,6 +213,56 @@ function Newmap() {
             initialMap.on("singleclick", handleMapClick);
             mapRef.current = initialMap;
             setMap(initialMap);
+
+            //Area Interaction Test
+            const addAreaInteractions = (initialMap: Map) => {
+              const areaSelect = initialMap
+                ?.getAllLayers()
+                .find((l) => l.get("occurrence-data"));
+              const source = areaSelect?.getSource() as VectorSource;
+
+              draw = new Draw({
+                source: source,
+                type: "Polygon",
+                //freehandCondition: never,
+              });
+
+              draw.on("drawend", (e) => {
+                const geom = e.feature.getGeometry() as SimpleGeometry;
+                const coords = geom?.getCoordinates();
+                console.log("Geom", geom);
+
+                if (coords && coords.length > 0) {
+                  let thecordinateArray = [];
+
+                  thecordinateArray = coords[0].map((c: Coordinate) =>
+                    transform(c, "EPSG:3857", "EPSG:4326")
+                  );
+
+                  console.log("Coordinate...", thecordinateArray);
+                  if (thecordinateArray.length > 0) {
+                    const wktString = `MULTIPOLYGON(((${thecordinateArray
+                      .map((coord: any) => coord.join(" "))
+                      .join(", ")})))`;
+
+                    const wktStringEdited = ` WITHIN(the_geom, ${wktString})`;
+                    const updatedFilterCondition = [
+                      ...filterConditions,
+                      wktStringEdited,
+                    ];
+                    setFilterContions(updatedFilterCondition);
+                  }
+                }
+              });
+              initialMap?.addInteraction(draw);
+            };
+
+            // const areaTypes = ["Polygon", "Circle", "Box"];
+            // if (areaSelected && areaTypes.includes(areaSelected)) {
+            addAreaInteractions(initialMap);
+            // } else {
+            //   initialMap?.removeInteraction(draw);
+            // }
           }
         }
       });
@@ -223,127 +283,64 @@ function Newmap() {
     });
   };
 
-  useEffect(() => {
-    if (!map) {
-      return;
-    }
+  //   useEffect(() => {
+  //     if (!map) {
+  //       return;
+  //     }
 
-    const addAreaInteractions = (selectedByArea: any) => {
-      const areaSelect = map
-        ?.getAllLayers()
-        .find((l) => l.get("occurrence-data"));
-      const source = areaSelect?.getSource() as VectorSource;
+  //     const addAreaInteractions = (map: Map) => {
+  //       const areaSelect = map
+  //         ?.getAllLayers()
+  //         .find((l) => l.get("occurrence-data"));
+  //       const source = areaSelect?.getSource() as VectorSource;
 
-      let draw = new Draw({
-        source: source,
-        type: selectedByArea,
-        // freehandCondition: never,
-      });
+  //       draw = new Draw({
+  //         source: source,
+  //         type: "Polygon",
+  //         //freehandCondition: never,
+  //       });
 
-      draw.on("drawend", (e) => {
-        const geom = e.feature.getGeometry() as SimpleGeometry;
-        //const coords = geom?.getCoordinates();
+  //       draw.on("drawend", (e) => {
+  //         const geom = e.feature.getGeometry() as SimpleGeometry;
+  //         const coords = geom?.getCoordinates();
+  //         console.log("Geom", geom);
 
-        const shapewgs84 = turf.toWgs84(geom);
-        console.log("WGS84 shape", shapewgs84);
-        const shapeWkt = wellknown.stringify(shapewgs84);
-        console.log("WKT shape", shapeWkt);
-        filterConditions?.push(shapeWkt);
-        // if (coords && coords.length > 0) {
-        //   setCordinateArray(
-        //     coords[0].map((c: Coordinate) =>
-        //       transform(c, "EPSG:3857", "EPSG:4326")
-        //     )
-        //   );
-        // }
-      });
-      map?.addInteraction(draw);
-      //   let snap = new Snap({ source: source });
-      //   map?.addInteraction(snap);
-    };
+  //         if (coords && coords.length > 0) {
+  //           let thecordinateArray = [];
 
-    // const removeAreaInteractions = (map: Map) => {
-    //   map.removeInteraction(modify);
-    //   map.removeInteraction(draw);
-    //   map.removeInteraction(snap);
-    // };
+  //           thecordinateArray = coords[0].map((c: Coordinate) =>
+  //             transform(c, "EPSG:3857", "EPSG:4326")
+  //           );
 
-    console.log("Selected Area Type:", areaSelected);
-    // console.log("selectedByArea:", selectedByArea);
-    const areaTypes = ["Polygon", "Circle", "Rectangle"];
-    //if (areaSelected && areaTypes.includes(areaSelected)) {
-    addAreaInteractions("Polygon");
-    console.log("Added Interaction");
-    // }
+  //           console.log("Coordinate...", thecordinateArray);
+  //           if (thecordinateArray.length > 0) {
+  //             const wktString = `MULTIPOLYGON(((${thecordinateArray
+  //               .map((coord: any) => coord.join(" "))
+  //               .join(", ")})))`;
 
-    //else {
-    //   console.log("Value Not Passed...");
-    //   // removeAreaInteractions(map);
-    // }
-  }, [areaSelected, map]);
+  //             const wktStringEdited = ` WITHIN(the_geom, ${wktString})`;
+  //             const updatedFilterCondition = [
+  //               ...filterConditions,
+  //               wktStringEdited,
+  //             ];
+  //             setFilterContions(updatedFilterCondition);
+  //           }
+  //         }
+  //       });
+  //       map?.addInteraction(draw);
+  //     };
+
+  //     const areaTypes = ["Polygon", "Circle", "Box"];
+  //     if (areaSelected && areaTypes.includes(areaSelected)) {
+  //       addAreaInteractions(map);
+  //     } else {
+  //       map?.removeInteraction(draw);
+  //     }
+  //   }, [areaSelected, map]);
 
   const handleAreaDrawn = (areaType: string) => {
     setAreaSelected(areaType);
   };
-
-  //   useEffect(() => {
-  //     console.log("selected coordinates", cordinateArray);
-  //     const getFeatureStyle = (feature: any) => {
-  //       const style = new Style({
-  //         image: new Circle({
-  //           radius: 8,
-  //           fill: new Fill({
-  //             color: "green",
-  //           }),
-  //           stroke: new Stroke({
-  //             color: "black",
-  //             width: 2,
-  //           }),
-  //         }),
-  //       });
-  //       return style;
-  //     };
-  //     const existingOccurrenceLayer = map
-  //       ?.getLayers()
-  //       .getArray()
-  //       .find((layer) => {
-  //         return layer.get("occurrence-data") === true;
-  //       });
-  //     if (
-  //       existingOccurrenceLayer &&
-  //       existingOccurrenceLayer instanceof VectorLayer
-  //     ) {
-  //       const occurrenceSource = existingOccurrenceLayer.getSource();
-  //       const filteredFeatures = occurrenceData.filter((feature) => {
-  //         const cordinates = feature.geometry.coordinates;
-  //         //Check for equality instead of using includes
-
-  //         const isInBound = booleanPointInPolygon(
-  //           turf.point(cordinates),
-  //           turf.polygon([cordinateArray])
-  //         );
-
-  //         if (isInBound) {
-  //           return cordinates;
-  //         }
-  //       });
-  //       console.log("filtered Coordinates", filteredFeatures);
-  //       // Filter features based on selectedCountry
-  //       occurrenceSource.clear();
-  //       occurrenceSource.addFeatures(
-  //         new GeoJSON()
-  //           .readFeatures(responseToGEOJSON(filteredFeatures), {
-  //             featureProjection: "EPSG:3857",
-  //           })
-  //           .map((feature) => {
-  //             feature.setStyle(getFeatureStyle(feature));
-  //             return feature;
-  //           })
-  //       );
-  //       // Refresh the map
-  //       map?.render();
-  //     }
-  //   }, [cordinateArray]);
 
   return (
     <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
