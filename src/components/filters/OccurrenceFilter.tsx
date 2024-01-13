@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Autocomplete, CircularProgress, Collapse, Stack, TextField} from "@mui/material";
+import {Autocomplete, CircularProgress, Collapse, Divider, Grid, Stack, TextField} from "@mui/material";
 import {GEOSERVER_BASE_PATH} from "@/lib/constants";
 import axios from "axios";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
@@ -21,11 +21,15 @@ const getCountries = async () => {
 
 }
 
-export default function OccurrenceFilter({open, handleFilterConditions}: { open: boolean, handleFilterConditions: any }) {
+export default function OccurrenceFilter({open, handleFilterConditions, handleSelectedSpeciesStyle}: {
+    open: boolean,
+    handleFilterConditions: any,
+    handleSpeciesColor: any
+}) {
     const queryClient = useQueryClient()
     const [selectedSpecies, setSelectedSpecies] = useState<string>(null)
     const [openCountries, setOpenCountries] = useState(false)
-    const [selectedCountries, setSelectedCountries] = useState(null)
+    const [selectedCountry, setSelectedCountry] = useState(null)
 
     const [countriesOptions, setCountriesOptions] = useState<[]>([])
 
@@ -39,23 +43,20 @@ export default function OccurrenceFilter({open, handleFilterConditions}: { open:
             queryKey: ['countries'],
             queryFn: getCountries
         })
-    function isEmpty(value) {
-        return (value == null || (typeof value === "string" && value.trim().length === 0));
-    }
 
-    const composeFilterConditions = (): string => {
-        const filterConditions = [];
-        if (selectedSpecies) {
+    const composeFilterConditions = (): {} => {
+        const filterConditions: {} = {};
+        if (selectedSpecies && selectedSpecies.length > 0) {
             console.log('Selected Species', selectedSpecies)
             const arrayOfSpecies: [] = String(selectedSpecies).split(',') //
             const quotedSpecies = `'${arrayOfSpecies.join("', '")}'`
             const speciesFilter: string = `species IN(${quotedSpecies}) `
-            filterConditions.push(speciesFilter)
+            filterConditions['species'] = speciesFilter
         }
-        if (selectedCountries) {
-            console.log('Selected Countries', selectedCountries)
-            const cFilter = ` WITHIN(the_geom, ${selectedCountries})`
-            filterConditions.push(cFilter)
+        if (selectedCountry && selectedCountry.length > 0) {
+            console.log('Selected Countries', selectedCountry)
+            const cFilter = ` WITHIN(the_geom, ${selectedCountry})`
+            filterConditions['country'] = cFilter
         }
 
         //season, larvae, adult,
@@ -74,13 +75,6 @@ export default function OccurrenceFilter({open, handleFilterConditions}: { open:
     }, [isFetchingCountries])
 
 
-    // useEffect(() => {
-    //     if (!openCountries) {
-    //         setCountriesOptions([]);
-    //     }
-    // }, [openCountries]);
-
-
     const handleSpecies = (values) => {
         setSelectedSpecies(values);
     }
@@ -91,28 +85,30 @@ export default function OccurrenceFilter({open, handleFilterConditions}: { open:
     }
 
 
-    const handleCountries= (values) => {
-        const simplifiedGeoms = values.map(value => simplifyGeometry((value.geometry)))
-        const wktGeoms = simplifiedGeoms.map(geom => wellknown.stringify(geom)) // changing geojson geometry to well know text representation
-        //TODO handle multiple countries
-        setSelectedCountries(wktGeoms)
+    const handleCountries = (value) => {
+        const simplifiedGeoms = simplifyGeometry((value.geometry))
+        const wktGeoms = wellknown.stringify(simplifiedGeoms) // changing geojson geometry to well know text representation
+        setSelectedCountry(wktGeoms)
     }
 
     useEffect(() => {
-        const filterParams = composeFilterConditions()
-        handleFilterConditions(filterParams)
-    }, [selectedSpecies, selectedCountries]);
+        const filterParams: {} = composeFilterConditions()
+        if (filterParams && Object.keys(filterParams).length > 0) {
+            handleFilterConditions(filterParams)
+        }
+
+    }, [selectedSpecies, selectedCountry]);
 
     return (
-        <div className="filter-section">
+        <div className="filter-dev-section">
             <Collapse in={open}>
-                <Stack spacing={3} sx={{width: 500}}>
+                <Stack direction='column' spacing={3} sx={{width: 450, m: 2}} divider={<Divider orientation="horizontal" flexItem />}>
                     <Autocomplete
                         multiple
                         id="species-filter"
                         options={speciesList.map(species => species.properties.species)}
                         freeSolo
-                        limitTags={3}
+                        limitTags={4}
                         filterSelectedOptions
                         renderInput={(params) => (
                             <TextField
@@ -126,9 +122,7 @@ export default function OccurrenceFilter({open, handleFilterConditions}: { open:
                     />
 
                     <Autocomplete
-                        id="asynchronous-demo"
-                        multiple
-                        sx={{width: 300}}
+                        id="filter-by-country"
                         open={openCountries}
                         onOpen={() => {
                             setOpenCountries(true);
@@ -156,9 +150,8 @@ export default function OccurrenceFilter({open, handleFilterConditions}: { open:
                                 }}
                             />
                         )}
-                        onChange={(event, values) => (handleCountries(values))}
+                        onChange={(event, value) => (handleCountries(value))}
                     />
-                    );
                 </Stack>
             </Collapse>
         </div>
