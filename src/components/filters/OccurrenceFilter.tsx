@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Autocomplete, CircularProgress, Collapse, Stack, TextField} from "@mui/material";
+import {Autocomplete, CircularProgress, Collapse, Divider, Grid, Stack, TextField} from "@mui/material";
 import {GEOSERVER_BASE_PATH} from "@/lib/constants";
 import axios from "axios";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
@@ -21,7 +21,7 @@ const getCountries = async () => {
 
 }
 
-export default function OccurrenceFilter({open, handleFilterConditions, handleSpeciesColor}: {
+export default function OccurrenceFilter({open, handleFilterConditions, handleSelectedSpeciesStyle}: {
     open: boolean,
     handleFilterConditions: any,
     handleSpeciesColor: any
@@ -44,19 +44,19 @@ export default function OccurrenceFilter({open, handleFilterConditions, handleSp
             queryFn: getCountries
         })
 
-    const composeFilterConditions = (): string => {
-        const filterConditions = [];
+    const composeFilterConditions = (): {} => {
+        const filterConditions: {} = {};
         if (selectedSpecies && selectedSpecies.length > 0) {
             console.log('Selected Species', selectedSpecies)
             const arrayOfSpecies: [] = String(selectedSpecies).split(',') //
             const quotedSpecies = `'${arrayOfSpecies.join("', '")}'`
             const speciesFilter: string = `species IN(${quotedSpecies}) `
-            filterConditions.push(speciesFilter)
+            filterConditions['species'] = speciesFilter
         }
         if (selectedCountry && selectedCountry.length > 0) {
             console.log('Selected Countries', selectedCountry)
             const cFilter = ` WITHIN(the_geom, ${selectedCountry})`
-            filterConditions.push(cFilter)
+            filterConditions['country'] = cFilter
         }
 
         //season, larvae, adult,
@@ -92,21 +92,23 @@ export default function OccurrenceFilter({open, handleFilterConditions, handleSp
     }
 
     useEffect(() => {
-        const filterParams = composeFilterConditions()
-        handleFilterConditions(filterParams)
+        const filterParams: {} = composeFilterConditions()
+        if (filterParams && Object.keys(filterParams).length > 0) {
+            handleFilterConditions(filterParams)
+        }
 
     }, [selectedSpecies, selectedCountry]);
 
     return (
-        <div className="filter-section">
+        <div className="filter-dev-section">
             <Collapse in={open}>
-                <Stack spacing={3} sx={{width: 500}}>
+                <Stack direction='column' spacing={3} sx={{width: 450, m: 2}} divider={<Divider orientation="horizontal" flexItem />}>
                     <Autocomplete
-                        //multiple
+                        multiple
                         id="species-filter"
                         options={speciesList.map(species => species.properties.species)}
                         freeSolo
-                        limitTags={3}
+                        limitTags={4}
                         filterSelectedOptions
                         renderInput={(params) => (
                             <TextField
@@ -121,8 +123,6 @@ export default function OccurrenceFilter({open, handleFilterConditions, handleSp
 
                     <Autocomplete
                         id="filter-by-country"
-                        //multiple
-                        sx={{width: 300}}
                         open={openCountries}
                         onOpen={() => {
                             setOpenCountries(true);
@@ -152,7 +152,6 @@ export default function OccurrenceFilter({open, handleFilterConditions, handleSp
                         )}
                         onChange={(event, value) => (handleCountries(value))}
                     />
-                    );
                 </Stack>
             </Collapse>
         </div>

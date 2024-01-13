@@ -20,10 +20,12 @@ import OccurrencePopup from "../popup/OccurrenceDrawer";
 import FilterSection from "../filters/filtersection";
 import {IconButton, Tooltip} from "@mui/material";
 import "../filters/filterSectionStyles.css";
+import "../filters/filter_section_dev.css";
 import TuneIcon from "@mui/icons-material/Tune";
 import {QueryClient, QueryClientProvider, useQuery, useQueryClient} from "@tanstack/react-query";
 import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
+import OpenFilterButton from "@/components/filters/OpenFilterButton";
 
 const queryClient = new QueryClient();
 
@@ -53,14 +55,8 @@ function Newmap() {
     const mapElement = useRef<HTMLDivElement>(null);
     const [filterOpen, setFilterOpen] = useState(false);
     const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
-    const [filterConditions, setFilterContions] = useState<[]>(null);
+    const [filterConditionsObj, setFilterConditionsObj] = useState({})
     const [cqlFilter, setCqlFilter] = useState(null)
-
-
-    const [selectedPeriod, setSelectedPeriod] = useState<[number, number]>([
-        1970,
-        new Date().getFullYear(),
-    ]);
 
     const [occurrenceSource, setOccurrenceSource] = useState(
         new VectorSource({
@@ -83,34 +79,41 @@ function Newmap() {
     });
 
     useEffect(() => {
-
-
-    }, [filterConditions]);
-
-    const updateFilterConditions = (conditions: any) => {
-        //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
-        console.log('Conditions', conditions)
-        const cql_filter = conditions.join('AND');
-        console.log('CQL Filter', cql_filter)
-        setCqlFilter(cql_filter)
-    }
-
-    const isValidDate = (date: Date) => {
-        return !isNaN(date.getTime());
-    };
-    const handleTimeChange = (startDate: Date, endDate: Date) => {
-        if (!isValidDate(startDate) || !isValidDate(endDate)) {
+        if (Object.keys(filterConditionsObj).length === 0) {
             return;
         }
-        setSelectedPeriod([startDate.getFullYear(), endDate.getFullYear()]);
+        //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
+        console.log('Conditions', filterConditionsObj)
+        const filterConditions: string [] = Object.values(filterConditionsObj)
+        console.log('Conditions values', filterConditions)
+        const cql_filter = filterConditions.join(' AND ');
+        console.log('CQL Filter', cql_filter)
+        setCqlFilter(cql_filter.trim('AND'))
+    }, [filterConditionsObj]);
+
+    const updateFilterConditions = (conditions: {}) => {
+        setFilterConditionsObj({
+                ...filterConditionsObj,
+                species: conditions['species'],
+                country: conditions['country']
+            }
+        )
+    }
+
+    const handleTimeChange = (startYear: number, endYear: number) => {
+        const condition = `start_year >= ${startYear} AND end_year <= ${endYear} `
+        setFilterConditionsObj({
+                ...filterConditionsObj,
+                period: condition
+            }
+        )
     };
 
-
     if (isFetching) {
-        console.log('Loading occurrences...')
+        console.log('Loading occurrences...') //Implement a progress bar as Toast
     }
     if (isError) {
-        console.log('Error', error)
+        console.log('Error', error) //TODO implement Toast
     }
 
     if (status === 'success') {
@@ -224,21 +227,14 @@ function Newmap() {
                 className="map-container"
                 id="map-container"
             >
+                <div className="filter-dev-button">
+                    <OpenFilterButton filterOpen={filterOpen} onClick={() => setFilterOpen(!filterOpen)}/>
+                </div>
                 <div>
                     {filterOpen &&
-                        <OccurrenceFilter open={filterOpen} handleFilterConditions={updateFilterConditions} handleSpeciesColor={handleSpeciesStyling}/>}
+                        <OccurrenceFilter open={filterOpen} handleFilterConditions={updateFilterConditions}
+                                          handleSpeciesColor={handleSpeciesStyling}/>}
 
-                    <div className="filter-section">
-                        <Tooltip title={filterOpen ? "Hide Filters" : "Show Filters"} arrow>
-                            <IconButton
-                                className="custom-icon-button"
-                                style={{color: "white"}}
-                                onClick={() => setFilterOpen(!filterOpen)}
-                            >
-                                <TuneIcon/>
-                            </IconButton>
-                        </Tooltip>
-                    </div>
                 </div>
             </div>
 
@@ -249,9 +245,9 @@ function Newmap() {
                     popoverContent={popoverContent}
                 />
             )}
-            {/*<div className="time-slider-container">*/}
-            {/*    <TimeSlider onChange={handleTimeChange}/>*/}
-            {/*</div>*/}
+            <div>
+                <TimeSlider onChange={handleTimeChange}/>
+            </div>
 
         </div>
     );

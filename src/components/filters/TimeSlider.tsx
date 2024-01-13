@@ -1,21 +1,39 @@
-import {Slider} from "@mui/material";
-import {useState} from "react";
-import './times_slide.css'
+// TimeSlider.tsx
+import React, { useEffect } from "react";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
+import "./times_slide.css";
 
-export default function TimeSlider ({ onChange }) {
+interface TimeSliderProps {
+    onChange: (startDate: number, endDate: number) => void;
+}
+
+const TimeSlider: React.FC<TimeSliderProps> = ({ onChange }) => {
     const currentYear = new Date().getFullYear();
-    const [startYear, setStartYear] = useState(1970);
-    const [endYear, setEndYear] = useState(currentYear);
+    const [startYear, setStartYear] = React.useState(1970);
+    const [endYear, setEndYear] = React.useState(currentYear);
 
+    const minYear = 1970;
+
+    const isValidDate = (date: Date) => {
+        return !isNaN(date.getTime());
+    };
     const handleChange = (values: number | number[]) => {
         const selectedValues = Array.isArray(values) ? values : [values, values];
+
+        console.log('Dates selected', values)
         setStartYear(selectedValues[0]);
         setEndYear(selectedValues[1]);
-        onChange(
-            new Date(selectedValues[0], 0),
-            new Date(selectedValues[1], 11, 31)
-        );
     };
+
+    const handleChangeCommitted = (values: number | number []) => {
+        const selectedValues = Array.isArray(values) ? values : [values, values];
+        console.log('Change committed with', startYear, endYear)
+        onChange(
+            selectedValues[0],
+            selectedValues[1]
+        );
+    }
 
     return (
         <div className="time-slider">
@@ -27,7 +45,9 @@ export default function TimeSlider ({ onChange }) {
                     min={1970}
                     max={currentYear}
                     defaultValue={[1970, currentYear]}
-                    onChange={handleChange}
+                    //onChange={handleChange}
+                    onChangeComplete={handleChangeCommitted}
+                    valueLabelDisplay="auto"
                     marks={{
                         1970: "1970",
                         1980: "1980",
@@ -41,4 +61,6 @@ export default function TimeSlider ({ onChange }) {
             </div>
         </div>
     );
-}
+};
+
+export default TimeSlider;
