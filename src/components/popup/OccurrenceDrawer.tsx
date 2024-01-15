@@ -11,12 +11,12 @@ import { fetchSiteInfo } from "@/api/occurrence";
 import '../map/accordion-style.css'
 import { CSSProperties } from 'react';
 import { useQuery } from "@tanstack/react-query";
-
+import { fetchBionomics } from '@/api/occurrence';
 const borderStyle = {
-    borderStyle: 'solid',
-    borderColor: 'green',
-    borderWidth: '2px 2px 2px 2px',
-    borderRadius: '5px'
+    // borderStyle: 'solid',
+    // borderColor: 'green',
+    // borderWidth: '2px 2px 2px 2px',
+    // borderRadius: '5px'
 };
 
 const scrollableStyle: CSSProperties = {
@@ -48,6 +48,16 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
         queryFn: ({ queryKey }) => fetchSiteInfo(queryKey[1])
     });
 
+    const {
+        status: bionomics_fetch_status,
+        data: bionomicsData,
+        error: bionomics_fetch_error,
+        isFetching: bionomics_is_fetching,
+    } = useQuery({
+        queryKey: ["bionomicsInfo", popoverContent['bionomics_id']],
+        queryFn: ({ queryKey }) => fetchBionomics(queryKey[1])
+    });
+
     if (!open) {
         return null;
     }
@@ -66,7 +76,7 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
             <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')} disabled={!bionomicsEnabled}>
                 <CustomAccordionSummary title={"Bionomics"} desc={"Vector behavioral information"} />
                 <AccordionDetails>
-                    <BionomicsDetails bioData={{}} />
+                    <BionomicsDetails bioData={bionomicsData} isfetching={bionomics_is_fetching} status={bionomics_fetch_status} />
                 </AccordionDetails>
             </Accordion>
             <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')} disabled={!irEnabled}>
