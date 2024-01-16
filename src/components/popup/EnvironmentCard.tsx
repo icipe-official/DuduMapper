@@ -83,6 +83,7 @@ export default function EnvironmentCard({
                     </AccordionSummary>
                     <AccordionDetails
                         sx={{
+                            backgroundColor: " #f5f7c5 ", // Set yellow background color for expanded content
                             color: "#1B5E20", // Set green font color for expanded content
                         }}
                     >
@@ -115,7 +116,7 @@ export default function EnvironmentCard({
                     </AccordionSummary>
                     <AccordionDetails
                         sx={{
-                            backgroundColor: "#FDD835", // Set yellow background color for expanded content
+                            backgroundColor: " #f5f7c5 ", // Set yellow background color for expanded content
                             color: "#1B5E20", // Set green font color for expanded content
                         }}
                     >
