@@ -1,28 +1,28 @@
 .filter-dev-button {
-    position: absolute;
-    top: 100px;
-    left: 9px;
-    align-items: center;
-    transform: translateX(0%);
-    z-index: 1000;
-    background-color: #ebbd40 !important;
-    color: white !important;
-    border-radius: 1px;
+  position: absolute;
+  top: 100px;
+  left: 9px;
+  align-items: center;
+  transform: translateX(0%);
+  z-index: 1000;
+  background-color: #ebbd40 !important;
+  color: white !important;
+  border-radius: 1px;
 }
 
 .filter-dev-section {
-    display: flow;
-    position: absolute;
-    top: 100px;
-    left: 3%;
-    align-items: center;
-    transform: translateX(0%);
-    z-index: 1000;
-    background-color: #ebbd40 !important;
-    color: #ebbd40 !important;
-    border-radius: 1px;
-    width: 500px;
-    height: 400px;
-    overflow-y: auto;
-    padding: 5px;
+  display: flow;
+  position: absolute;
+  top: 100px;
+  left: 3%;
+  align-items: center;
+  transform: translateX(0%);
+  z-index: 1000;
+  background-color: white !important;
+  color: #ebbd40 !important;
+  border-radius: 1px;
+  width: 500px;
+  height: 400px;
+  overflow-y: auto;
+  padding: 5px;
 }

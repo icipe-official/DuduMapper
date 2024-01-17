@@ -3,14 +3,38 @@
 }
 .filter-section {
   position: absolute;
-  top: 170px;
+  top: 180px;
   left: 17px;
   align-items: center;
   transform: translateX(0%);
   z-index: 1000;
-  background-color: #ebbd40 !important;
+  background-color: white !important;
   color: white !important;
   border-radius: 1px;
+}
+.container-style {
+  background-color: #f4f4f4;
+  border-radius: 3px;
+  padding: 15px;
+  display: flex;
+
+  border: 1px solid #ccc;
+  margin: 0 auto;
+  max-width: 980px;
+  margin-left: 350px;
+  position: absolute;
+  width: 400px;
+  top: -30px;
+}
+
+.print-section {
+  position: absolute;
+  top: 210px;
+  left: 12px;
+  align-items: center;
+  transform: translateX(0%);
+  z-index: 1000;
+  border-radius: 15px;
 }
 .form-control {
   margin-bottom: 5px;
@@ -24,6 +48,13 @@
 /* iconButtonStyles.css */
 
 .custom-icon-button {
+  width: 26px;
+  height: 26px;
+  background-color: #4caf50;
+  color: white;
+}
+
+.custom-icon-print {
   width: 26px;
   height: 26px;
   background-color: #4caf50;
@@ -51,7 +82,7 @@
   margin: 0 auto 0 350px;
   position: absolute;
   width: 600px;
-  top: -70px;
+  top: -240px;
 }
 
 .button-container-style {
