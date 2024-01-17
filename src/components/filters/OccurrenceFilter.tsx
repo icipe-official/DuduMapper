@@ -1,18 +1,38 @@
 import React, { useEffect, useState } from "react";
 import {
   Autocomplete,
+  Box,
+  Button,
+  Checkbox,
   CircularProgress,
   Collapse,
   Divider,
+  FormControl,
   Grid,
+  IconButton,
   Stack,
   TextField,
+  Tooltip,
+  Typography,
+  colors,
 } from "@mui/material";
 import { GEOSERVER_BASE_PATH } from "@/lib/constants";
 import axios from "axios";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import wellknown from "wellknown";
 import { simplify } from "@turf/turf";
+import TuneIcon from "@mui/icons-material/Tune";
+import ThunderstormIcon from "@mui/icons-material/Thunderstorm";
+import WbSunnyIcon from "@mui/icons-material/WbSunny";
+import DataArrayIcon from "@mui/icons-material/DataArray";
+import EmojiNatureIcon from "@mui/icons-material/EmojiNature";
+import BugReportIcon from "@mui/icons-material/BugReport";
+import PestControlIcon from "@mui/icons-material/PestControl";
+import EggIcon from "@mui/icons-material/Egg";
+import DoneIcon from "@mui/icons-material/Done";
+import CloseIcon from "@mui/icons-material/Close";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import {
   Feature,
   GeoJsonProperties,
@@ -23,7 +43,6 @@ import {
 interface FilterConditions {
   species?: string;
   country?: string;
-  // Add other properties as needed
 }
 
 const reqParams = {
@@ -49,11 +68,23 @@ export default function OccurrenceFilter({
   handleSpeciesColor: any;
 }) {
   const queryClient = useQueryClient();
+  // const [open, setOpen] = useState(false);
   const [selectedSpecies, setSelectedSpecies] = useState<string | string[]>([]);
   const [openCountries, setOpenCountries] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState<string>();
-
+  const [selectedCountry, setSelectedCountry] = useState<string | string[]>([]);
+  const [selectedDisease, setSelectedDisease] = useState<string[]>([]);
+  const [isDiseaseSelected, setIsDiseaseSelected] = useState(false);
+  const [isCountrySelected, setIsCountrySelected] = useState(false);
+  const [isSpeciesSelected, setIsSpeciesSelected] = useState(false);
   const [countriesOptions, setCountriesOptions] = useState<[]>([]);
+  const [selectedSeason, setSelectedSeason] = useState("");
+  const [isSeasonSelected, setIsSeasonSelected] = useState(false);
+  const [selectedControl, setSelectedControl] = useState("");
+  const [isControlSelected, setIsControlSelected] = useState(false);
+  const [selectedAdult, setSelectedAdult] = useState("");
+  const [isAdultSelected, setIsAdultSelected] = useState(false);
+  const [selectedLarval, setSelectedLarval] = useState("");
+  const [isLarvalSelected, setIsLarvalSelected] = useState(false);
 
   const {
     isFetching: isFetchingCountries,
@@ -96,9 +127,18 @@ export default function OccurrenceFilter({
       active = false;
     };
   }, [isFetchingCountries]);
+  const handleDiseaseChange = (
+    _: React.SyntheticEvent<Element, Event>,
+    value: string[]
+  ) => {
+    const selectedValues = [...value];
+    setSelectedDisease(selectedValues);
+    setIsDiseaseSelected(selectedValues.length > 0);
+  };
 
   const handleSpecies = (values: React.SetStateAction<string | string[]>) => {
     setSelectedSpecies(values);
+    setIsSpeciesSelected(values.length > 0);
   };
 
   const simplifyGeometry = (geometry: any) => {
@@ -121,64 +161,409 @@ export default function OccurrenceFilter({
   return (
     <div className="filter-dev-section">
       <Collapse in={open}>
-        <Stack
-          direction="column"
-          spacing={3}
+        <Box
+          // className="container-style"
+          // direction="column"
+          // spacing={3}
           sx={{ width: 450, m: 2 }}
-          divider={<Divider orientation="horizontal" flexItem />}
+          // divider={<Divider orientation="horizontal" flexItem />}
         >
-          <Autocomplete
-            multiple
-            id="species-filter"
-            options={speciesList.map((species) => species.properties.species)}
-            freeSolo
-            limitTags={4}
-            filterSelectedOptions
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="filled"
-                label="Species"
-                placeholder="Select Species"
-              />
-            )}
-            onChange={(event, values) => handleSpecies(values)}
-          />
-
-          <Autocomplete
-            id="filter-by-country"
-            open={openCountries}
-            onOpen={() => {
-              setOpenCountries(true);
-            }}
-            onClose={() => {
-              setOpenCountries(false);
-            }}
-            //isOptionEqualToValue={(option, value) => option === value}
-            getOptionLabel={(option) => option["properties"]["name"]}
-            getOptionKey={(option) => option["properties"]["id"]}
-            options={countriesOptions}
-            loading={isFetchingCountries}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Countries"
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <React.Fragment>
-                      {isFetchingCountries ? (
-                        <CircularProgress color="inherit" size={20} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </React.Fragment>
-                  ),
+          <Grid
+            container
+            spacing={2}
+            style={{ marginTop: "10px", display: "flex" }}
+          >
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <Autocomplete
+                  multiple
+                  id="disease-select"
+                  options={["Malaria", "Chikungunya"]} //needs to change
+                  freeSolo
+                  filterSelectedOptions
+                  value={selectedDisease}
+                  onChange={(event, value) => handleDiseaseChange(event, value)}
+                  getOptionLabel={(option) => option}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="filled"
+                      label={`Disease (${selectedDisease.length} selected)`}
+                      InputLabelProps={{ sx: { fontSize: "0.8rem" } }}
+                    />
+                  )}
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <Autocomplete
+                  multiple
+                  id="species-filter"
+                  options={speciesList.map(
+                    (species) => species.properties.species
+                  )}
+                  freeSolo
+                  limitTags={4}
+                  filterSelectedOptions
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="filled"
+                      label={`Species (${selectedSpecies.length} selected)`}
+                      InputLabelProps={{ sx: { fontSize: "0.8rem" } }}
+                      // placeholder="Select Species"
+                    />
+                  )}
+                  onChange={(event, values) => handleSpecies(values)}
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <Autocomplete
+                  multiple
+                  id="filter-by-country"
+                  open={openCountries}
+                  onOpen={() => {
+                    setOpenCountries(true);
+                  }}
+                  onClose={() => {
+                    setOpenCountries(false);
+                  }}
+                  //isOptionEqualToValue={(option, value) => option === value}
+                  getOptionLabel={(option) => option["properties"]["name"]}
+                  getOptionKey={(option) => option["properties"]["id"]}
+                  options={countriesOptions}
+                  loading={isFetchingCountries}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={`Countries (${selectedCountry.length} selected)`}
+                      variant="filled"
+                      InputLabelProps={{ sx: { fontSize: "0.8rem" } }}
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <React.Fragment>
+                            {isFetchingCountries ? (
+                              <CircularProgress color="inherit" size={10} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </React.Fragment>
+                        ),
+                      }}
+                    />
+                  )}
+                  onChange={(event, value) => handleCountries(value)}
+                />
+              </FormControl>
+            </Grid>
+            <Grid
+              container
+              alignItems="center"
+              direction="row"
+              justifyContent="space-between"
+              p="45px"
+            >
+              <Grid
+                item
+                xs={12}
+                sm={4}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
                 }}
-              />
-            )}
-            onChange={(event, value) => handleCountries(value)}
-          />
-        </Stack>
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontStyle: "italic",
+                    marginRight: ".5px",
+                    fontSize: "0.98rem",
+                  }}
+                >
+                  Season:{" "}
+                </Typography>
+                <Tooltip title="Rainy" arrow>
+                  <IconButton
+                    onClick={() => setSelectedSeason("Rainy")}
+                    color={selectedSeason === "Rainy" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color: "#2e7d32", // Green color on hover
+                      },
+                    }}
+                  >
+                    <ThunderstormIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Dry" arrow>
+                  <IconButton
+                    onClick={() => setSelectedSeason("Dry")}
+                    color={selectedSeason === "Dry" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color: selectedSeason === "Dry" ? "default" : "#2e7d32",
+                      },
+                    }}
+                  >
+                    <WbSunnyIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Empty" arrow>
+                  <IconButton
+                    onClick={() => setSelectedSeason("Empty")}
+                    color={selectedSeason === "Empty" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color:
+                          selectedSeason === "Empty" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <DataArrayIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontStyle: "italic",
+                    marginRight: "0.5px",
+                    fontSize: "1rem",
+                  }}
+                >
+                  Control:{" "}
+                </Typography>
+                <Tooltip title="True" arrow>
+                  <IconButton
+                    onClick={() => setSelectedControl("True")}
+                    color={selectedControl === "True" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color:
+                          selectedControl === "True" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <DoneIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="False" arrow>
+                  <IconButton
+                    onClick={() => setSelectedControl("False")}
+                    color={selectedControl === "False" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color:
+                          selectedControl === "False" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Empty" arrow>
+                  <IconButton
+                    onClick={() => setSelectedControl("Empty")}
+                    color={selectedControl === "Empty" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color:
+                          selectedControl === "Empty" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <DataArrayIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontStyle: "italic",
+                    marginRight: "10px",
+                    fontSize: "1rem",
+                  }}
+                >
+                  Adult:{" "}
+                </Typography>
+                <Tooltip title="True" arrow>
+                  <IconButton
+                    onClick={() => setSelectedAdult("True")}
+                    color={selectedAdult === "True" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color: selectedAdult === "True" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <EmojiNatureIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="False" arrow>
+                  <IconButton
+                    onClick={() => setSelectedAdult("False")}
+                    color={selectedAdult === "False" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color:
+                          selectedAdult === "False" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <BugReportIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Empty" arrow>
+                  <IconButton
+                    onClick={() => setSelectedAdult("Empty")}
+                    color={selectedAdult === "Empty" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color:
+                          selectedAdult === "Empty" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <DataArrayIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontStyle: "italic",
+                    marginRight: "5px",
+                    fontSize: "1rem",
+                  }}
+                >
+                  Larval:{" "}
+                </Typography>
+                <Tooltip title="True" arrow>
+                  <IconButton
+                    onClick={() => setSelectedLarval("True")}
+                    color={selectedLarval === "True" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color:
+                          selectedLarval === "True" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <PestControlIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="False" arrow>
+                  <IconButton
+                    onClick={() => setSelectedLarval("False")}
+                    color={selectedLarval === "False" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color:
+                          selectedLarval === "False" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <EggIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Empty" arrow>
+                  <IconButton
+                    onClick={() => setSelectedLarval("Empty")}
+                    color={selectedLarval === "Empty" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color:
+                          selectedLarval === "Empty" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <DataArrayIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Grid>
+            <div className="button-container-style">
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: "#2e7d32",
+                  "&:hover": {
+                    backgroundColor: colors.grey[500],
+                    // Background color on hover
+                  },
+                }}
+                size="small"
+                style={{ fontSize: "0.7rem" }}
+                onClick={() => {
+                  setSelectedDisease([] as string[]);
+                  setIsDiseaseSelected(false);
+                  setSelectedCountry([] as string[]);
+                  setIsCountrySelected(false);
+                  setSelectedSpecies([] as string[]);
+                  setIsSpeciesSelected(false);
+                  setSelectedSeason("");
+                  setIsSeasonSelected(false);
+                  setSelectedAdult("");
+                  setIsAdultSelected(false);
+                  setSelectedControl("");
+                  setIsControlSelected(false);
+                  setSelectedLarval("");
+                  setIsLarvalSelected(false);
+
+                  // Reset other state variables as needed
+                }}
+              >
+                Clear Selection
+              </Button>
+            </div>
+          </Grid>
+        </Box>
       </Collapse>
     </div>
   );

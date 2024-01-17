@@ -8,10 +8,25 @@
   align-items: center;
   transform: translateX(0%);
   z-index: 1000;
-  background-color: #ebbd40 !important;
+  background-color: white !important;
   color: white !important;
   border-radius: 1px;
 }
+.container-style {
+  background-color: #f4f4f4;
+  border-radius: 3px;
+  padding: 15px;
+  display: flex;
+
+  border: 1px solid #ccc;
+  margin: 0 auto;
+  max-width: 980px;
+  margin-left: 350px;
+  position: absolute;
+  width: 400px;
+  top: -30px;
+}
+
 .print-section {
   position: absolute;
   top: 210px;
