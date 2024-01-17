@@ -1,6 +1,6 @@
 "use client";
 import React, {useEffect, useRef, useState} from "react";
-import {Map, View} from "ol";
+import {Feature, Map as OlMap, View} from "ol";
 import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
@@ -11,60 +11,47 @@ import GeoJSON from "ol/format/GeoJSON.js";
 import {bbox as bboxStrategy} from "ol/loadingstrategy.js";
 import {Vector as VectorLayer} from "ol/layer.js";
 import {
-    geoServerBaseUrl,
     getBasemapOverlaysLayersArray,
 } from "@/api/requests";
 import {Stroke, Fill, Style, Circle} from "ol/style";
 import "../shared/CSS/LayerSwitcherStyles.css";
 import OccurrencePopup from "../popup/OccurrenceDrawer";
-import FilterSection from "../filters/filtersection";
-import {IconButton, Tooltip} from "@mui/material";
 import "../filters/filterSectionStyles.css";
 import "../filters/filter_section_dev.css";
-import TuneIcon from "@mui/icons-material/Tune";
-import {QueryClient, QueryClientProvider, useQuery, useQueryClient} from "@tanstack/react-query";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
 import OpenFilterButton from "@/components/filters/OpenFilterButton";
-
-const queryClient = new QueryClient();
-
-const OCCURRENCE_API = `${geoServerBaseUrl}/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:occurrence&maxFeatures=10000&outputFormat=application/json`;
-const getOccurrences = async (queryKey) => {
-    console.log(queryKey[1])
-    const params: string = queryKey[1]
-    if (params) {
-        console.log('Filtering occurrence on: ', params)
-        const url = `${OCCURRENCE_API}&cql_filter=${params}`;
-        console.log(url)
-        const response = await fetch(url)
-        return response.json();
-    }
-    console.log('Loading all occurrence')
-    const response = await fetch(`${OCCURRENCE_API}`)
-    return response.json();
-}
+import {getOccurrence} from '../../api/occurrence'
+import {Alert, Snackbar} from "@mui/material";
+import RenderFeature from "ol/render/Feature";
+import {Geometry} from "ol/geom";
 
 function Newmap() {
     const queryClient = useQueryClient();
-    const mapRef = useRef<Map>()
+    const mapRef = useRef<OlMap>()
     const [popoverContent, setPopoverContent] = React.useState<{
         [x: string]: any;
     }>({});
-    const [map, setMap] = useState<Map | undefined>(); // Specify the type using a generic type argument
+    const [map, setMap] = useState<OlMap | undefined>(); // Specify the type using a generic type argument
     const mapElement = useRef<HTMLDivElement>(null);
     const [filterOpen, setFilterOpen] = useState(false);
     const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
-    const [filterConditionsObj, setFilterConditionsObj] = useState({})
-    const [cqlFilter, setCqlFilter] = useState(null)
-
-    const [occurrenceSource, setOccurrenceSource] = useState(
+    const [filterConditionsObj, setFilterConditionsObj] = useState<{ [keys: string]: any }>({
+        species: '',
+        period: '',
+        country: ''
+    })
+    const [cqlFilter, setCqlFilter] = useState('')
+    const speciesColors = ['#b48ead', '#a3be8c', '#a3be8c', '#d08770', '#bf616a', '#5e81ac', '#5e81ac']
+    const [occurrenceSource, setOccurrenceSource] = useState<VectorSource>(
         new VectorSource({
             format: new GeoJSON(),
             features: [],
             strategy: bboxStrategy,
         })
     );
+    const [zoomArea, setZoomArea] = useState<[number, number, number, number]>()
 
     const {
         status,
@@ -75,7 +62,7 @@ function Newmap() {
     } = useQuery({
         queryKey: ["occurrences", cqlFilter], //Example CQl filter species IN ('gambie', 'finiestus', 'fini') AND WITHIN (the_geom, MULTIPOLYGON((22,22,223,223))) AND adult =true AND season=dry
         //queryFn: getOccurrences
-        queryFn: ({queryKey}) => getOccurrences(queryKey)
+        queryFn: ({queryKey}) => getOccurrence(queryKey)
     });
 
     useEffect(() => {
@@ -89,13 +76,17 @@ function Newmap() {
         setCqlFilter(cql_filter)
     }, [filterConditionsObj]);
 
-    const updateFilterConditions = (conditions: {}) => {
+    const updateFilterConditions = (conditions: any) => {
         setFilterConditionsObj({
                 ...filterConditionsObj,
-                species: conditions['species'] ,
+                species: conditions['species'],
                 country: conditions['country']
             }
         )
+    }
+
+    const resetOccurrence = () => {
+        setCqlFilter('')
     }
 
     const handleTimeChange = (startYear: number, endYear: number) => {
@@ -107,25 +98,29 @@ function Newmap() {
         )
     };
 
-    if (isFetching) {
-        console.log('Loading occurrences...') //Implement a progress bar as Toast
-    }
-    if (isError) {
-        console.log('Error', error) //TODO implement Toast
-    }
-
     if (status === 'success') {
         const total = occurrenceData['totalFeatures']
         const returned = occurrenceData['numberReturned']
         console.log(`${returned} out of ${total} features`)
 
         occurrenceSource?.clear()
-        occurrenceSource?.addFeatures(
-            new GeoJSON().readFeatures(occurrenceData,
-                {
-                    featureProjection: 'EPSG:3857'
-                })
-        )
+        const geoJsonFormat = new GeoJSON({
+            extractGeometryName: true,
+            featureClass: Feature,
+            featureProjection: 'EPSG:3857'
+        })
+        //Externalize this to a utils service file somewhere else
+        const geojsonData = geoJsonFormat.readFeatures(occurrenceData,
+            {
+                featureProjection: 'EPSG:3857'
+            }) as unknown
+        const featureGeojson = geojsonData as Feature<Geometry>[]
+
+        occurrenceSource?.addFeatures(featureGeojson)
+        //TODO zoom to occurrenceSource extent can also be implemented here
+        const extent = occurrenceSource.getExtent();
+        mapRef.current?.getView().fit(extent)
+        //END alternative to funtion handleSelectedCountryBbox below
     }
 
     const fill = new Fill({
@@ -161,10 +156,13 @@ function Newmap() {
         setShowOccurrencePopup(false);
     };
 
-    //TODO Styling
-    const handleSpeciesStyling = (species): Style => {
-
-    }
+    // const handleSelectedCountryBbox = (countryBbox: [number, number, number, number]) => {
+    //     if(countryBbox) {
+    //         setZoomArea(countryBbox)
+    //         //TODO implement zoom to country
+    //         mapRef.current?.getView().fit(countryBbox)
+    //     }
+    // }
 
     useEffect(() => {
         getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
@@ -181,7 +179,7 @@ function Newmap() {
 
                 if (BaseMaps) {
                     if (Overlays) {
-                        const initialMap = new Map({
+                        const initialMap = new OlMap({
                             target: "map-container",
                             layers: [BaseMaps, Overlays, occurrenceGroup],
                             view: new View({
@@ -231,7 +229,7 @@ function Newmap() {
                 <div>
                     {filterOpen &&
                         <OccurrenceFilter open={filterOpen} handleFilterConditions={updateFilterConditions}
-                                          handleSpeciesColor={handleSpeciesStyling}/>}
+                                          onClearFilter={resetOccurrence}/>}
 
                 </div>
             </div>
@@ -246,6 +244,22 @@ function Newmap() {
             <div>
                 <TimeSlider onChange={handleTimeChange}/>
             </div>
+            <Snackbar
+                anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+                open={isFetching}
+                message="Loading occurrence..."
+            />
+            <Snackbar
+                anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+                open={isError}
+                message="Error Loading occurrence!"
+            >
+                <Alert severity="error"
+                       variant="filled"
+                       sx={{width: '100%'}}>
+                    Error while fetching occurrence
+                </Alert>
+            </Snackbar>
 
         </div>
     );
