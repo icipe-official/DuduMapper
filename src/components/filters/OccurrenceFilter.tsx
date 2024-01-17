@@ -21,10 +21,10 @@ const getCountries = async () => {
 
 }
 
-export default function OccurrenceFilter({open, handleFilterConditions, handleSelectedSpeciesStyle}: {
+export default function OccurrenceFilter({open, handleFilterConditions, handleSelectedSpecies}: {
     open: boolean,
     handleFilterConditions: any,
-    handleSpeciesColor: any
+    handleSelectedSpecies: any,
 }) {
     const queryClient = useQueryClient()
     const [selectedSpecies, setSelectedSpecies] = useState<string>(null)
@@ -46,13 +46,13 @@ export default function OccurrenceFilter({open, handleFilterConditions, handleSe
 
     const composeFilterConditions = (): {} => {
         const filterConditions: {} = {};
-        if (selectedSpecies && selectedSpecies.length > 0) {
-            console.log('Selected Species', selectedSpecies)
-            const arrayOfSpecies: [] = String(selectedSpecies).split(',') //
-            const quotedSpecies = `'${arrayOfSpecies.join("', '")}'`
-            const speciesFilter: string = `species IN(${quotedSpecies}) `
-            filterConditions['species'] = speciesFilter
-        }
+        // if (selectedSpecies && selectedSpecies.length > 0) {
+        //     console.log('Selected Species', selectedSpecies)
+        //     const arrayOfSpecies: [] = String(selectedSpecies).split(',') //
+        //     const quotedSpecies = `'${arrayOfSpecies.join("', '")}'`
+        //     const speciesFilter: string = `species IN(${quotedSpecies}) `
+        //     filterConditions['species'] = speciesFilter
+        // }
         if (selectedCountry && selectedCountry.length > 0) {
             console.log('Selected Countries', selectedCountry)
             const cFilter = ` WITHIN(the_geom, ${selectedCountry})`
@@ -77,6 +77,7 @@ export default function OccurrenceFilter({open, handleFilterConditions, handleSe
 
     const handleSpecies = (values) => {
         setSelectedSpecies(values);
+        handleSelectedSpecies(values);
     }
 
     const simplifyGeometry = (geometry) => {
@@ -97,7 +98,7 @@ export default function OccurrenceFilter({open, handleFilterConditions, handleSe
             handleFilterConditions(filterParams)
         }
 
-    }, [selectedSpecies, selectedCountry]);
+    }, [selectedCountry]);
 
     return (
         <div className="filter-dev-section">

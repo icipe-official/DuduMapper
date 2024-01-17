@@ -26,6 +26,7 @@ import {QueryClient, QueryClientProvider, useQuery, useQueryClient} from "@tanst
 import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
 import OpenFilterButton from "@/components/filters/OpenFilterButton";
+import { features } from "process";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,19 @@ function Newmap() {
     const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
     const [filterConditionsObj, setFilterConditionsObj] = useState({})
     const [cqlFilter, setCqlFilter] = useState(null)
+    const [selectedSpecies, setSelectedSpecies] = useState([])
+    const [occurrences, setOccurrences] = useState<any[]>([]);
+
+    const [speciesColors, setSpeciesColors] = useState<string[]>([
+        '#dc267f',
+        '#648fff',
+        '#785ef0',
+        '#fe6100',
+        '#ffb000',
+        '#000000',
+        '#ffffff',
+      ]);
+    
 
     const [occurrenceSource, setOccurrenceSource] = useState(
         new VectorSource({
@@ -78,6 +92,32 @@ function Newmap() {
         queryFn: ({queryKey}) => getOccurrences(queryKey)
     });
 
+    // creating feature array
+   const featureArray = occurrenceData?.features || [];
+   console.log('featureArray',featureArray)
+
+   function responseToGEOJSON(occurrenceData: any) {
+    const geoJSONPoints = (occurrenceData || []).map((d: any) => {
+      const coordinates = d.geometry.coordinates;
+      return {
+        type: 'Feature',
+        geometry: {
+          type: d.geometry.type,
+          coordinates: coordinates,
+        },
+        properties: d.properties
+        
+      };
+    });
+   
+    const geoJSONFeatureCollection = {
+      type: 'FeatureCollection',
+      features: geoJSONPoints,
+    };
+    return geoJSONFeatureCollection;
+  }
+
+
     useEffect(() => {
         if (Object.keys(filterConditionsObj).length === 0) {
             return;
@@ -97,6 +137,10 @@ function Newmap() {
             }
         )
     }
+
+    const handleSelectedSpecies = (selectedSpecies: any) => {
+        setSelectedSpecies(selectedSpecies);
+      };
 
     const handleTimeChange = (startYear: number, endYear: number) => {
         const condition = `start_year >= ${startYear} AND end_year <= ${endYear} `
@@ -121,12 +165,15 @@ function Newmap() {
 
         occurrenceSource?.clear()
         occurrenceSource?.addFeatures(
-            new GeoJSON().readFeatures(occurrenceData,
+            new GeoJSON().readFeatures(responseToGEOJSON(featureArray),
                 {
                     featureProjection: 'EPSG:3857'
                 })
         )
+        
+        // setOccurrences(featureArray)
     }
+    
 
     const fill = new Fill({
         color: "rgba(2,255,2,1)",
@@ -136,6 +183,16 @@ function Newmap() {
         width: 1.25,
     });
 
+    const colorArray = [
+        '#648fff',
+        '#785ef0',
+        '#fe6100',
+        '#ffb000',
+        '#000000',
+        '#ffffff',
+        '#dc267f',
+      ];
+  
     const occurrenceLayer = new VectorLayer({
         title: "Occurrence Layer",
         visible: true,
@@ -151,20 +208,17 @@ function Newmap() {
             stroke: stroke,
         }),
     } as BaseLayerOptions);
+    occurrenceLayer.set('occurrence-data', true);
 
-    const occurrenceGroup = new LayerGroup({
-        title: "Occurrence",
-        layers: [occurrenceLayer],
-    } as GroupLayerOptions);
+    // const occurrenceGroup = new LayerGroup({
+    //     title: "Occurrence",
+    //     layers: [occurrenceLayer],
+    // } as GroupLayerOptions);
 
     const handleClosePopup = () => {
         setShowOccurrencePopup(false);
     };
 
-    //TODO Styling
-    const handleSpeciesStyling = (species): Style => {
-
-    }
 
     useEffect(() => {
         getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
@@ -183,7 +237,7 @@ function Newmap() {
                     if (Overlays) {
                         const initialMap = new Map({
                             target: "map-container",
-                            layers: [BaseMaps, Overlays, occurrenceGroup],
+                            layers: [BaseMaps, Overlays, occurrenceLayer],
                             view: new View({
                                 center: [0, 0],
                                 zoom: 4,
@@ -217,6 +271,166 @@ function Newmap() {
         );
     };
 
+    useEffect(() => {
+        console.log('use inarun')
+
+        const defaultStyle = new Style({
+            image: new Circle({
+                fill: fill,
+                stroke: stroke,
+                radius: 8,
+            }),
+            fill: fill,
+            stroke: stroke,
+        })
+
+        const getFeatureStyle = (feature: any) => {
+            const species = feature.getProperties().species;
+            const speciesIndex = selectedSpecies.indexOf(species);
+
+
+            if (speciesIndex !== -1) {
+                if (speciesIndex < speciesColors.length) {
+                    // If the species is selected and color exists in the array, use it
+                    return new Style({
+                        image: new Circle({
+                            radius: 8,
+                            stroke: new Stroke({
+                                color: 'black',
+                                width: 1.25,
+                            }),
+                            fill: new Fill({
+                                color: speciesColors[speciesIndex],
+                            }),
+                        }),
+                    });
+                } else {
+                    // If the species is selected but exceeds color array length, add a new color to the array
+                    const newColor = getRandomColor();
+                    setSpeciesColors((prevColors) => [...prevColors, newColor]);
+                    return new Style({
+                        image: new Circle({
+                            radius: 8,
+                            stroke: new Stroke({
+                                color: 'black',
+                                width: 1.25,
+                            }),
+                            fill: new Fill({
+                                color: newColor,
+                            }),
+                        }),
+                    });
+                }
+            }
+
+            // Default style for unselected species
+            return defaultStyle;
+        };
+
+        const getRandomColor = () => {
+            const r = Math.floor(Math.random() * 255);
+            const g = Math.floor(Math.random() * 255);
+            const b = Math.floor(Math.random() * 255);
+
+            return `rgb(${r},${g},${b})`;
+        };
+
+        const filteredData = occurrenceData?.features.filter((feature): feature is { properties: { species: string } } => {
+            const species = feature.properties.species.trim(); // Assuming species is a string
+            return species && selectedSpecies.includes(species);
+        }) || [];
+
+        console.log('filtered species', filteredData)
+
+        const existingOccurrenceLayer = map?.getLayers().getArray().find((layer) => {
+            return layer.get('occurrence-data') === true;
+        });
+
+
+        if (existingOccurrenceLayer && existingOccurrenceLayer instanceof VectorLayer) {
+            const occurrenceSource = existingOccurrenceLayer.getSource();
+
+            const existingLegendControl = map?.getControls().getArray().find(control => control.get('name') === 'legend');
+            if (existingLegendControl) {
+                map?.removeControl(existingLegendControl);
+            }
+
+            if (selectedSpecies.length === 0) {
+                // If no species selected, show the original data with default style
+                occurrenceSource.clear();
+                occurrenceSource.addFeatures(new GeoJSON().readFeatures(responseToGEOJSON(featureArray), {
+                    featureProjection: 'EPSG:3857',
+                }).map(feature => {
+                    feature.setStyle(defaultStyle);
+                    return feature;
+                }));
+            } else {
+                // Update the occurrence source with the filtered features and apply styles
+                occurrenceSource.clear();
+                const filteredData = occurrenceData?.features.filter((feature): feature is { properties: { species: string } } => {
+                    const species = feature.properties.species.trim(); // Assuming species is a string
+                    return species && selectedSpecies.includes(species);
+                }) || [];
+
+                console.log('Filtered Features:', filteredData);
+
+                occurrenceSource.clear();
+                occurrenceSource.addFeatures(new GeoJSON().readFeatures(responseToGEOJSON(filteredData), {
+                    featureProjection: 'EPSG:3857',
+                }).map(feature => {
+                    feature.setStyle(getFeatureStyle(feature));
+                    return feature;
+                }));
+            }
+
+            // Refresh the map
+            map?.render();
+        }
+
+        const createLegendDiv = () => {
+            const legendContainer = document.createElement('div');
+            legendContainer.className = 'legend-container';
+            legendContainer.style.position = 'absolute';
+            legendContainer.style.bottom = '16px';
+            legendContainer.style.right = '16px';
+            legendContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+            legendContainer.style.padding = '8px';
+            legendContainer.style.border = '1px solid #ccc';
+            legendContainer.style.borderRadius = '5px';
+
+            const legendTitle = document.createElement('div');
+            legendTitle.style.textDecoration = 'underline';
+            legendTitle.style.fontWeight = 'bold';
+            legendTitle.textContent = 'Legend';
+
+            legendContainer.appendChild(legendTitle);
+
+            selectedSpecies.forEach((species, index) => {
+                const legendItem = document.createElement('div');
+                legendItem.style.fontStyle = 'italic';
+                legendItem.style.fontWeight = 'bold';
+                legendItem.style.color = speciesColors[index];
+                legendItem.textContent = `an. ${species}`;
+
+                legendContainer.appendChild(legendItem);
+            });
+
+            return legendContainer;
+        };
+
+        const legendDiv = createLegendDiv();
+        document.body.appendChild(legendDiv);
+        // Set the occurrenceSource state with initial features
+
+
+        return () => {
+            if (document.body.contains(legendDiv)) {
+                document.body.removeChild(legendDiv);
+              }
+        };
+
+    }, [selectedSpecies])
+
     return (
         <div style={{display: 'flex', height: 'calc(100vh - 70px)'}}>
             <div
@@ -231,7 +445,7 @@ function Newmap() {
                 <div>
                     {filterOpen &&
                         <OccurrenceFilter open={filterOpen} handleFilterConditions={updateFilterConditions}
-                                          handleSpeciesColor={handleSpeciesStyling}/>}
+                                        handleSelectedSpecies={handleSelectedSpecies}/>}
 
                 </div>
             </div>
