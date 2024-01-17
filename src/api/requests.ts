@@ -3,16 +3,11 @@ import WMTSCapabilities from "ol/format/WMTSCapabilities";
 import VectorTileLayer from "ol/layer/VectorTile";
 import VectorTileSource from "ol/source/VectorTile";
 import MVT from "ol/format/MVT";
-import { BaseLayerOptions, GroupLayerOptions } from "ol-layerswitcher";
+import { BaseLayerOptions} from "ol-layerswitcher";
 import Stroke from "ol/style/Stroke";
 import Fill from "ol/style/Fill";
 import Style from "ol/style/Style";
-import LayerGroup from "ol/layer/Group";
 import TileLayer from "ol/layer/Tile";
-import Map from "ol/Map.js";
-import OSM from "ol/source/OSM.js";
-
-import View from "ol/View.js";
 import WMTS from "ol/source/WMTS.js";
 import WMTSTileGrid from "ol/tilegrid/WMTS.js";
 import { get as getProjection } from "ol/proj.js";
@@ -277,6 +272,7 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
         } else if (layerType === "overlays") {
           theTile = new TileLayer({
             title: displayName,
+            visible: false,
             source: new WMTS({
               url: geoServerBaseUrl + "/geoserver/basemap/gwc/service/wmts",
               layer: layerName,
