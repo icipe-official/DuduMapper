@@ -23,8 +23,13 @@ import OpenFilterButton from "@/components/filters/OpenFilterButton";
 import { getOccurrence } from "../../api/occurrence";
 import { Alert, Snackbar } from "@mui/material";
 import RenderFeature from "ol/render/Feature";
-import { Geometry } from "ol/geom";
+import { Geometry, Polygon, SimpleGeometry } from "ol/geom";
+import { transform } from "ol/proj";
+import { Coordinate } from "ol/coordinate";
+import { Draw, Modify, Snap } from "ol/interaction.js";
+import Map from "ol/Map";
 
+let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
   const queryClient = useQueryClient();
   const mapRef = useRef<OlMap>();
@@ -35,6 +40,8 @@ function Newmap() {
   const mapElement = useRef<HTMLDivElement>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
+  const [areaSelected, setAreaSelected] = useState("");
+  const [cordinateArray, setCordinateArray] = useState([]);
   const [filterConditionsObj, setFilterConditionsObj] = useState<{
     [keys: string]: any;
   }>({
@@ -152,10 +159,18 @@ function Newmap() {
     }),
   } as BaseLayerOptions);
 
+  const VSource = new VectorSource({ wrapX: false });
+  const areaSelectLayer = new VectorLayer({
+    source: VSource,
+  });
+  areaSelectLayer.set("area-select", true);
+
   const occurrenceGroup = new LayerGroup({
     title: "Occurrence",
-    layers: [occurrenceLayer],
+    layers: [areaSelectLayer, occurrenceLayer],
   } as GroupLayerOptions);
+  const [theOverlaysArray, setTheOverlaysArray] = useState<any>([]);
+  const [theBaseMapsArray, setTheBaseMapsArray] = useState<any>([]);
 
   const handleClosePopup = () => {
     setShowOccurrencePopup(false);
@@ -169,39 +184,155 @@ function Newmap() {
   //     }
   // }
 
+  const createCircleCoordinates = (
+    center: any,
+    radius: any,
+    numSegments = 64
+  ) => {
+    const circleCoords = [];
+    for (let i = 0; i < numSegments; i++) {
+      const angle = (Math.PI * 2 * i) / numSegments;
+      const x = center[0] + radius * Math.cos(angle);
+      const y = center[1] + radius * Math.sin(angle);
+      circleCoords.push(transform([x, y], "EPSG:3857", "EPSG:4326"));
+    }
+    circleCoords.push(circleCoords[0]); // Close the circle
+    return circleCoords;
+  };
+
+  const addAreaInteractions = (map: Map, shapeType: any) => {
+    draw = new Draw({
+      source: VSource,
+      type: shapeType,
+      //freehandCondition: never,
+    });
+
+    let coordinates;
+
+    draw.on("drawend", (e) => {
+      const geometry = e.feature.getGeometry();
+      // const geometry = e.feature.getGeometry() as SimpleGeometry;
+      let coordinates: any;
+
+      if (shapeType === "Circle") {
+        // Handle Circle geometry
+        const center = geometry.getCenter();
+        const radius = geometry.getRadius();
+        coordinates = createCircleCoordinates(center, radius);
+      } else if (shapeType === "Polygon" && geometry instanceof Polygon) {
+        // Handle Polygon geometry
+        coordinates = geometry
+          ?.getCoordinates()[0]
+          .map((coord: any) => transform(coord, "EPSG:3857", "EPSG:4326"));
+      }
+
+      console.log("Coordinates:", coordinates);
+
+      if (coordinates) {
+        const wktString = `MULTIPOLYGON(((${coordinates
+          .map((coord: any) => coord.join(" "))
+          .join(", ")})))`;
+
+        setCordinateArray(coordinates);
+        const wktStringEdited = ` WITHIN(the_geom, ${wktString})`;
+        const updatedFilterCondition = {
+          ...filterConditionsObj,
+          wktStringEdited,
+        };
+        setFilterConditionsObj(updatedFilterCondition);
+        map?.addInteraction(draw);
+      }
+    });
+    map?.addInteraction(draw);
+  };
+  const updateSelectedPolygons = (map: Map, areaCoordinates: Coordinate) => {
+    // clear out old polygons
+    const areaSelectLayer = map
+      .getAllLayers()
+      .find((l) => l.get("area-select"));
+    const source = areaSelectLayer?.getSource();
+    (source as VectorSource)
+      .getFeatures()
+      .forEach((f) => (source as VectorSource).removeFeature(f));
+
+    // draw the new one if it exists
+    if (areaCoordinates.length > 0) {
+      const polygon = new Polygon(areaCoordinates);
+      (source as VectorSource).addFeature(new Feature({ geometry: polygon }));
+    }
+  };
+
+  //   const raster = new TileLayer({
+  //     source: new OSM(),
+  //   });
+
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
       getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
-        const BaseMaps = new LayerGroup({
-          title: "Basemaps",
-          layers: baseMapsArray,
-        } as GroupLayerOptions);
-
-        const Overlays = new LayerGroup({
-          title: "Labels",
-          layers: overlaysArray,
-        } as GroupLayerOptions);
-
-        if (BaseMaps) {
-          if (Overlays) {
-            const initialMap = new OlMap({
-              target: "map-container",
-              layers: [BaseMaps, Overlays, occurrenceGroup],
-              view: new View({
-                center: [0, 0],
-                zoom: 4,
-              }),
-            });
-            const layerSwitcher = new LayerSwitcher();
-            initialMap.addControl(layerSwitcher);
-            initialMap.on("singleclick", handleMapClick);
-            mapRef.current = initialMap;
-            setMap(initialMap);
-          }
+        if (overlaysArray) {
+          setTheOverlaysArray(overlaysArray);
+        }
+        if (baseMapsArray) {
+          setTheBaseMapsArray(baseMapsArray);
         }
       });
     });
   }, []);
+
+  useEffect(() => {
+    const initializeMap = async () => {
+      if (theBaseMapsArray.length > 0 || theOverlaysArray.length > 0) {
+        const BaseMaps = new LayerGroup({
+          title: "Basemaps",
+          layers: theBaseMapsArray,
+        } as GroupLayerOptions);
+
+        const Overlays = new LayerGroup({
+          title: "Labels",
+          layers: theOverlaysArray,
+        } as GroupLayerOptions);
+
+        const initialMap = new OlMap({
+          target: "map-container",
+          layers: [BaseMaps, Overlays, occurrenceGroup],
+          view: new View({
+            center: [0, 0],
+            zoom: 4,
+          }),
+        });
+        const layerSwitcher = new LayerSwitcher();
+        initialMap.addControl(layerSwitcher);
+        initialMap.on("singleclick", handleMapClick);
+        mapRef.current = initialMap;
+        setMap(initialMap);
+        // Initialise map
+        return () => initialMap.setTarget(undefined);
+      }
+    };
+
+    initializeMap();
+  }, [theBaseMapsArray, theOverlaysArray]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+    const areaTypes = ["Polygon", "Circle"];
+    if (areaSelected && areaTypes.includes(areaSelected)) {
+      addAreaInteractions(map, areaSelected);
+      console.log("Added Interaction");
+    } else {
+      map?.removeInteraction(draw);
+    }
+  }, [areaSelected, map]);
+
+  //   useEffect(() => {
+  //     if (!map) {
+  //       return;
+  //     }
+
+  //     updateSelectedPolygons(map, cordinateArray);
+  //   }, [map, cordinateArray]);
 
   const handleMapClick = (event: any) => {
     console.log("Map single click triggered");
@@ -225,6 +356,17 @@ function Newmap() {
         className="map-container"
         id="map-container"
       >
+        <button
+          onClick={() => {
+            if (areaSelected === "Polygon") {
+              setAreaSelected("Circle");
+            } else {
+              setAreaSelected("Polygon");
+            }
+          }}
+        >
+          Toggle
+        </button>
         <div className="filter-dev-button">
           <OpenFilterButton
             filterOpen={filterOpen}
