@@ -2,6 +2,7 @@ import { geoServerBaseUrl } from "@/api/requests";
 const OCCURRENCE_API = `${geoServerBaseUrl}/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:occurrence&maxFeatures=10000&outputFormat=application/json`;
 const SITE_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Asite&maxFeatures=50&outputFormat=application/json&cql_filter=site_id=SITE_ID";
 const BIONOMICS_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Abionomics&maxFeatures=50&outputFormat=application/json"
+const REFERENCE_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Areference_v&maxFeatures=50&outputFormat=application/json";
 export const fetchSiteInfo = async (siteId: any) => {
     const url = geoServerBaseUrl + SITE_URL.replace("SITE_ID", siteId);
     const response = await fetch(url);
@@ -24,6 +25,15 @@ export const getOccurrence = async (queryKey: any) => {
 }
 export const fetchBionomics = async (bioId: number) => {
     fetch(geoServerBaseUrl + BIONOMICS_URL + "&cql_filter=bionomics_id=" + bioId)
+        .then(response => response.json())
+        .then(json => {
+            return json;
+        })
+        .catch(error => console.error(error));
+}
+
+export const fetchReference = (referenceId: number) => {
+    fetch(geoServerBaseUrl + REFERENCE_URL + "&cql_filter=id=" + referenceId)
         .then(response => response.json())
         .then(json => {
             return json;

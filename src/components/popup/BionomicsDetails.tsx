@@ -88,7 +88,8 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({ bionomicsData, bion
 
     // Render error state
     if (bionomics_fetch_status === "error") {
-        return <div>Error fetching data</div>;
+        console.log(bionomics_fetch_status)
+        // return <div>Error fetching data</div>;
     }
 
     // Render content when data is available
