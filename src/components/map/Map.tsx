@@ -20,8 +20,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
 import OpenFilterButton from "@/components/filters/OpenFilterButton";
-import { getOccurrence } from "../../api/occurrence";
-import { Alert, Snackbar } from "@mui/material";
+import { getOccurrence } from "@/api/occurrence";
+import {Alert, IconButton, Snackbar, Tooltip} from "@mui/material";
 import RenderFeature from "ol/render/Feature";
 import { Geometry, Polygon, SimpleGeometry } from "ol/geom";
 import { transform } from "ol/proj";
@@ -30,9 +30,11 @@ import { Draw, Modify, Snap } from "ol/interaction.js";
 import Map from "ol/Map";
 import { never } from "ol/events/condition";
 import colormap from "colormap";
+import PrintIcon from '@mui/icons-material/Print'
 
 let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
+
   const queryClient = useQueryClient();
   const mapRef = useRef<OlMap>();
   const [popoverContent, setPopoverContent] = React.useState<{
@@ -44,7 +46,6 @@ function Newmap() {
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
   const [areaSelected, setAreaSelected] = useState("");
   const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
-  const [cordinateArray, setCordinateArray] = useState([]);
   const [filterConditionsObj, setFilterConditionsObj] = useState<{
     [keys: string]: any;
   }>({
@@ -137,6 +138,7 @@ function Newmap() {
 
   const resetOccurrence = () => {
     setCqlFilter("");
+    setSelectedSpecies([])
   };
 
   const handleTimeChange = (startYear: number, endYear: number) => {
@@ -201,16 +203,9 @@ function Newmap() {
   } as BaseLayerOptions);
   occurrenceLayer.set("occurrence-data", true);
 
-  //   const VSource = new VectorSource({ wrapX: false });
-  //   const areaSelectLayer = new VectorLayer({
-    //     source: VSource,
-    //   });
-  //   areaSelectLayer.set("area-select", true);
-
   const handleClosePopup = () => {
     setShowOccurrencePopup(false);
   };
-
 
   const createCircleCoordinates = (
     center: any,
@@ -271,8 +266,6 @@ function Newmap() {
           .map((coord: any) => coord.join(" "))
           .join(", ")})))`;
 
-        setCordinateArray(coordinates);
-
         const wktStringEdited = ` WITHIN(the_geom, ${wktString})`;
         const updatedFilterCondition = {
           ...filterConditionsObj,
@@ -309,7 +302,7 @@ function Newmap() {
         } as GroupLayerOptions);
 
         const Overlays = new LayerGroup({
-          title: "Labels",
+          title: "Overlays",
           layers: theOverlaysArray,
         } as GroupLayerOptions);
 
@@ -362,6 +355,134 @@ function Newmap() {
       }
     });
   };
+
+  const handleAreaDrawn = (areaType: string) => {
+    setAreaSelected(areaType);
+  };
+
+  const handleSelectedSpecies = (selectedSpecies: any) => {
+    setSelectedSpecies(selectedSpecies);
+  };
+
+  useEffect(() => {
+    const defaultStyle = new Style({
+      image: new Circle({
+        fill: fill,
+        stroke: stroke,
+        radius: 8,
+      }),
+    });
+    const getFeatureStyle = (feature: any) => {
+      const species = feature.getProperties().species;
+      const speciesIndex = selectedSpecies.indexOf(species);
+      if (speciesIndex !== -1) {
+        if (speciesIndex < speciesColors.length) {
+          // If the species is selected and color exists in the array, use it
+          return new Style({
+            image: new Circle({
+              radius: 8,
+              stroke: new Stroke({
+                color: "black",
+                width: 1.25,
+              }),
+              fill: new Fill({
+                color: speciesColors[speciesIndex],
+              }),
+            }),
+          });
+        } else {
+          // If the species is selected but exceeds color array length, add a new color to the array
+          const newColor = speciesColors[speciesColors.length - 1];
+          setSpeciesColors((prevColors) => [...prevColors, newColor]);
+          return new Style({
+            image: new Circle({
+              radius: 8,
+              stroke: new Stroke({
+                color: "black",
+                width: 1.25,
+              }),
+              fill: new Fill({
+                color: newColor,
+              }),
+            }),
+          });
+        }
+      }
+      // Default style for unselected species
+      return defaultStyle;
+    };
+
+    const existingOccurrenceLayer = map
+        ?.getLayers()
+        .getArray()
+        .find((layer) => {
+          return layer.get("occurrence-data") === true;
+        });
+    if (
+        existingOccurrenceLayer &&
+        existingOccurrenceLayer instanceof VectorLayer
+    ) {
+      const occurrenceSource = existingOccurrenceLayer.getSource();
+      const existingLegendControl = map
+          ?.getControls()
+          .getArray()
+          .find((control) => control.get("name") === "legend");
+      if (existingLegendControl) {
+        map?.removeControl(existingLegendControl);
+      }
+      if (selectedSpecies.length === 0) {
+        // If no species selected, show the original data with default style
+        occurrenceSource.getFeatures().forEach((feature: any) => {
+          feature.setStyle(defaultStyle);
+        });
+      } else {
+        // Update the style of features in the occurrence source based on selected species
+        occurrenceSource.getFeatures().forEach((feature: any) => {
+          const species = feature.getProperties().species as string;
+          const speciesIndex = selectedSpecies.indexOf(species);
+          if (speciesIndex !== -1) {
+            feature.setStyle(getFeatureStyle(feature));
+          } else {
+            feature.setStyle(defaultStyle);
+          }
+        });
+      }
+      // Refresh the map
+      map?.render();
+    }
+    const createLegendDiv = () => {
+      const legendContainer = document.createElement("div");
+      legendContainer.className = "legend-container";
+      legendContainer.style.position = "absolute";
+      legendContainer.style.bottom = "16px";
+      legendContainer.style.right = "16px";
+      legendContainer.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+      legendContainer.style.padding = "8px";
+      legendContainer.style.border = "1px solid #ccc";
+      legendContainer.style.borderRadius = "5px";
+      const legendTitle = document.createElement("div");
+      legendTitle.style.textDecoration = "underline";
+      legendTitle.style.fontWeight = "bold";
+      legendTitle.textContent = "Legend";
+      legendContainer.appendChild(legendTitle);
+      selectedSpecies.forEach((species, index) => {
+        const legendItem = document.createElement("div");
+        legendItem.style.fontStyle = "italic";
+        legendItem.style.fontWeight = "bold";
+        legendItem.style.color = speciesColors[index];
+        legendItem.textContent = `an. ${species}`;
+        legendContainer.appendChild(legendItem);
+      });
+      return legendContainer;
+    };
+    const legendDiv = createLegendDiv();
+    document.body.appendChild(legendDiv);
+    return () => {
+      if (document.body.contains(legendDiv)) {
+        document.body.removeChild(legendDiv);
+      }
+    };
+  }, [occurrenceData]);
 
   const printToScale = () => {
     console.log("Button clicked!");
