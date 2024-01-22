@@ -28,6 +28,8 @@ import { transform } from "ol/proj";
 import { Coordinate } from "ol/coordinate";
 import { Draw, Modify, Snap } from "ol/interaction.js";
 import Map from "ol/Map";
+import { never } from "ol/events/condition";
+import colormap from "colormap";
 
 let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
@@ -41,6 +43,7 @@ function Newmap() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
   const [areaSelected, setAreaSelected] = useState("");
+  const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
   const [cordinateArray, setCordinateArray] = useState([]);
   const [filterConditionsObj, setFilterConditionsObj] = useState<{
     [keys: string]: any;
@@ -50,15 +53,9 @@ function Newmap() {
     country: "",
   });
   const [cqlFilter, setCqlFilter] = useState("");
-  const speciesColors = [
-    "#b48ead",
-    "#a3be8c",
-    "#a3be8c",
-    "#d08770",
-    "#bf616a",
-    "#5e81ac",
-    "#5e81ac",
-  ];
+  const [theOverlaysArray, setTheOverlaysArray] = useState<any>([]);
+  const [theBaseMapsArray, setTheBaseMapsArray] = useState<any>([]);
+
   const [occurrenceSource, setOccurrenceSource] = useState<VectorSource>(
     new VectorSource({
       format: new GeoJSON(),
@@ -67,6 +64,26 @@ function Newmap() {
     })
   );
   const [zoomArea, setZoomArea] = useState<[number, number, number, number]>();
+
+  const [speciesColors, setSpeciesColors] = useState<string[]>([
+    "#DC267F",
+    "#648FFF",
+    "#785EF0",
+    "#FE6100",
+    "#FFB000",
+    "#000000",
+    "#FFFFFF",
+  ]);
+  const getColormapColors = (numColors: number): string[] => {
+    return colormap({ colormap: "jet", nshades: numColors, format: "hex" });
+  };
+  const addColormapColorsIfNeeded = () => {
+    const remainingColors = selectedSpecies.length - speciesColors.length;
+    if (remainingColors > 0) {
+      const newColors = getColormapColors(remainingColors);
+      setSpeciesColors((prevColors) => [...prevColors, ...newColors]);
+    }
+  };
 
   const {
     status,
@@ -79,6 +96,25 @@ function Newmap() {
     //queryFn: getOccurrences
     queryFn: ({ queryKey }) => getOccurrence(queryKey),
   });
+
+  function responseToGEOJSON(occurrenceData: any) {
+    const geoJSONPoints = (occurrenceData || []).map((d: any) => {
+      const coordinates = d.geometry.coordinates;
+      return {
+        type: "Feature",
+        geometry: {
+          type: d.geometry.type,
+          coordinates: coordinates,
+        },
+        properties: d.properties,
+      };
+    });
+    const geoJSONFeatureCollection = {
+      type: "FeatureCollection",
+      features: geoJSONPoints,
+    };
+    return geoJSONFeatureCollection;
+  }
 
   useEffect(() => {
     if (Object.keys(filterConditionsObj).length === 0) {
@@ -115,6 +151,7 @@ function Newmap() {
     const total = occurrenceData["totalFeatures"];
     const returned = occurrenceData["numberReturned"];
     console.log(`${returned} out of ${total} features`);
+    const featureArray = occurrenceData?.features || [];
 
     occurrenceSource?.clear();
     const geoJsonFormat = new GeoJSON({
@@ -123,16 +160,20 @@ function Newmap() {
       featureProjection: "EPSG:3857",
     });
     //Externalize this to a utils service file somewhere else
-    const geojsonData = geoJsonFormat.readFeatures(occurrenceData, {
-      featureProjection: "EPSG:3857",
-    }) as unknown;
+    const geojsonData = geoJsonFormat.readFeatures(
+      responseToGEOJSON(featureArray),
+      {
+        featureProjection: "EPSG:3857",
+      }
+    ) as unknown;
     const featureGeojson = geojsonData as Feature<Geometry>[];
 
     occurrenceSource?.addFeatures(featureGeojson);
-    //TODO zoom to occurrenceSource extent can also be implemented here
+
     const extent = occurrenceSource.getExtent();
-    mapRef.current?.getView().fit(extent);
-    //END alternative to funtion handleSelectedCountryBbox below
+    if (returned != 0) {
+      mapRef.current?.getView().fit(extent);
+    }
   }
 
   const fill = new Fill({
@@ -158,19 +199,13 @@ function Newmap() {
       stroke: stroke,
     }),
   } as BaseLayerOptions);
+  occurrenceLayer.set("occurrence-data", true);
 
-  const VSource = new VectorSource({ wrapX: false });
-  const areaSelectLayer = new VectorLayer({
-    source: VSource,
-  });
-  areaSelectLayer.set("area-select", true);
-
-  const occurrenceGroup = new LayerGroup({
-    title: "Occurrence",
-    layers: [areaSelectLayer, occurrenceLayer],
-  } as GroupLayerOptions);
-  const [theOverlaysArray, setTheOverlaysArray] = useState<any>([]);
-  const [theBaseMapsArray, setTheBaseMapsArray] = useState<any>([]);
+  //   const VSource = new VectorSource({ wrapX: false });
+  //   const areaSelectLayer = new VectorLayer({
+  //     source: VSource,
+  //   });
+  //   areaSelectLayer.set("area-select", true);
 
   const handleClosePopup = () => {
     setShowOccurrencePopup(false);
@@ -200,27 +235,37 @@ function Newmap() {
     return circleCoords;
   };
 
+  const removeAreaInteractions = (map: Map) => {
+    map.removeInteraction(modify);
+    map.removeInteraction(draw);
+    map.removeInteraction(snap);
+    console.log("Removed Interactions...");
+  };
+
   const addAreaInteractions = (map: Map, shapeType: any) => {
     draw = new Draw({
-      source: VSource,
+      source: occurrenceSource,
       type: shapeType,
-      //freehandCondition: never,
+      freehandCondition: never,
     });
 
     let coordinates;
 
     draw.on("drawend", (e) => {
-      const geometry = e.feature.getGeometry();
+      const geometry: any = e.feature.getGeometry();
       // const geometry = e.feature.getGeometry() as SimpleGeometry;
       let coordinates: any;
 
       if (shapeType === "Circle") {
         // Handle Circle geometry
+
         const center = geometry.getCenter();
         const radius = geometry.getRadius();
+
         coordinates = createCircleCoordinates(center, radius);
       } else if (shapeType === "Polygon" && geometry instanceof Polygon) {
         // Handle Polygon geometry
+
         coordinates = geometry
           ?.getCoordinates()[0]
           .map((coord: any) => transform(coord, "EPSG:3857", "EPSG:4326"));
@@ -234,6 +279,7 @@ function Newmap() {
           .join(", ")})))`;
 
         setCordinateArray(coordinates);
+
         const wktStringEdited = ` WITHIN(the_geom, ${wktString})`;
         const updatedFilterCondition = {
           ...filterConditionsObj,
@@ -243,28 +289,11 @@ function Newmap() {
         map?.addInteraction(draw);
       }
     });
+
     map?.addInteraction(draw);
+    snap = new Snap({ source: occurrenceSource });
+    map.addInteraction(snap);
   };
-  const updateSelectedPolygons = (map: Map, areaCoordinates: Coordinate) => {
-    // clear out old polygons
-    const areaSelectLayer = map
-      .getAllLayers()
-      .find((l) => l.get("area-select"));
-    const source = areaSelectLayer?.getSource();
-    (source as VectorSource)
-      .getFeatures()
-      .forEach((f) => (source as VectorSource).removeFeature(f));
-
-    // draw the new one if it exists
-    if (areaCoordinates.length > 0) {
-      const polygon = new Polygon(areaCoordinates);
-      (source as VectorSource).addFeature(new Feature({ geometry: polygon }));
-    }
-  };
-
-  //   const raster = new TileLayer({
-  //     source: new OSM(),
-  //   });
 
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
@@ -294,7 +323,7 @@ function Newmap() {
 
         const initialMap = new OlMap({
           target: "map-container",
-          layers: [BaseMaps, Overlays, occurrenceGroup],
+          layers: [BaseMaps, Overlays, occurrenceLayer],
           view: new View({
             center: [0, 0],
             zoom: 4,
@@ -319,20 +348,13 @@ function Newmap() {
     }
     const areaTypes = ["Polygon", "Circle"];
     if (areaSelected && areaTypes.includes(areaSelected)) {
+      removeAreaInteractions(map);
       addAreaInteractions(map, areaSelected);
       console.log("Added Interaction");
     } else {
-      map?.removeInteraction(draw);
+      removeAreaInteractions(map);
     }
   }, [areaSelected, map]);
-
-  //   useEffect(() => {
-  //     if (!map) {
-  //       return;
-  //     }
-
-  //     updateSelectedPolygons(map, cordinateArray);
-  //   }, [map, cordinateArray]);
 
   const handleMapClick = (event: any) => {
     console.log("Map single click triggered");
@@ -348,6 +370,139 @@ function Newmap() {
     });
   };
 
+  const handleAreaDrawn = (areaType: string) => {
+    setAreaSelected(areaType);
+  };
+
+  const handleSelectedSpecies = (selectedSpecies: any) => {
+    setSelectedSpecies(selectedSpecies);
+  };
+
+  useEffect(() => {
+    const defaultStyle = new Style({
+      image: new Circle({
+        fill: fill,
+        stroke: stroke,
+        radius: 8,
+      }),
+    });
+    const getFeatureStyle = (feature: any) => {
+      const species = feature.getProperties().species;
+      const speciesIndex = selectedSpecies.indexOf(species);
+      if (speciesIndex !== -1) {
+        if (speciesIndex < speciesColors.length) {
+          // If the species is selected and color exists in the array, use it
+          return new Style({
+            image: new Circle({
+              radius: 8,
+              stroke: new Stroke({
+                color: "black",
+                width: 1.25,
+              }),
+              fill: new Fill({
+                color: speciesColors[speciesIndex],
+              }),
+            }),
+          });
+        } else {
+          // If the species is selected but exceeds color array length, add a new color to the array
+          const newColor = speciesColors[speciesColors.length - 1];
+          setSpeciesColors((prevColors) => [...prevColors, newColor]);
+          return new Style({
+            image: new Circle({
+              radius: 8,
+              stroke: new Stroke({
+                color: "black",
+                width: 1.25,
+              }),
+              fill: new Fill({
+                color: newColor,
+              }),
+            }),
+          });
+        }
+      }
+      // Default style for unselected species
+      return defaultStyle;
+    };
+    const getRandomColor = () => {
+      const r = Math.floor(Math.random() * 255);
+      const g = Math.floor(Math.random() * 255);
+      const b = Math.floor(Math.random() * 255);
+      return `rgb(${r},${g},${b})`;
+    };
+    const existingOccurrenceLayer = map
+      ?.getLayers()
+      .getArray()
+      .find((layer) => {
+        return layer.get("occurrence-data") === true;
+      });
+    if (
+      existingOccurrenceLayer &&
+      existingOccurrenceLayer instanceof VectorLayer
+    ) {
+      const occurrenceSource = existingOccurrenceLayer.getSource();
+      const existingLegendControl = map
+        ?.getControls()
+        .getArray()
+        .find((control) => control.get("name") === "legend");
+      if (existingLegendControl) {
+        map?.removeControl(existingLegendControl);
+      }
+      if (selectedSpecies.length === 0) {
+        // If no species selected, show the original data with default style
+        occurrenceSource.getFeatures().forEach((feature: any) => {
+          feature.setStyle(defaultStyle);
+        });
+      } else {
+        // Update the style of features in the occurrence source based on selected species
+        occurrenceSource.getFeatures().forEach((feature: any) => {
+          const species = feature.getProperties().species as string;
+          const speciesIndex = selectedSpecies.indexOf(species);
+          if (speciesIndex !== -1) {
+            feature.setStyle(getFeatureStyle(feature));
+          } else {
+            feature.setStyle(defaultStyle);
+          }
+        });
+      }
+      // Refresh the map
+      map?.render();
+    }
+    const createLegendDiv = () => {
+      const legendContainer = document.createElement("div");
+      legendContainer.className = "legend-container";
+      legendContainer.style.position = "absolute";
+      legendContainer.style.bottom = "16px";
+      legendContainer.style.right = "16px";
+      legendContainer.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+      legendContainer.style.padding = "8px";
+      legendContainer.style.border = "1px solid #ccc";
+      legendContainer.style.borderRadius = "5px";
+      const legendTitle = document.createElement("div");
+      legendTitle.style.textDecoration = "underline";
+      legendTitle.style.fontWeight = "bold";
+      legendTitle.textContent = "Legend";
+      legendContainer.appendChild(legendTitle);
+      selectedSpecies.forEach((species, index) => {
+        const legendItem = document.createElement("div");
+        legendItem.style.fontStyle = "italic";
+        legendItem.style.fontWeight = "bold";
+        legendItem.style.color = speciesColors[index];
+        legendItem.textContent = `an. ${species}`;
+        legendContainer.appendChild(legendItem);
+      });
+      return legendContainer;
+    };
+    const legendDiv = createLegendDiv();
+    document.body.appendChild(legendDiv);
+    return () => {
+      if (document.body.contains(legendDiv)) {
+        document.body.removeChild(legendDiv);
+      }
+    };
+  }, [occurrenceData]);
+
   return (
     <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
       <div
@@ -356,17 +511,6 @@ function Newmap() {
         className="map-container"
         id="map-container"
       >
-        <button
-          onClick={() => {
-            if (areaSelected === "Polygon") {
-              setAreaSelected("Circle");
-            } else {
-              setAreaSelected("Polygon");
-            }
-          }}
-        >
-          Toggle
-        </button>
         <div className="filter-dev-button">
           <OpenFilterButton
             filterOpen={filterOpen}
@@ -379,6 +523,8 @@ function Newmap() {
               open={filterOpen}
               handleFilterConditions={updateFilterConditions}
               onClearFilter={resetOccurrence}
+              handleDrawArea={handleAreaDrawn}
+              handleSelectedSpecies={handleSelectedSpecies}
             />
           )}
         </div>

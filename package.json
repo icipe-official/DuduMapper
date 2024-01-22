@@ -20,6 +20,7 @@
     "@types/react-date-range": "^1.4.9",
     "axios": "^1.6.0",
     "betterknown": "^1.0.3",
+    "colormap": "^2.3.2",
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "next": "^14.0.2",
     "ol": "^8.1.0",
@@ -32,6 +33,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@types/colormap": "^2.3.4",
     "@types/node": "^20.8.9",
     "@types/ol-ext": "npm:@siedlerchr/types-ol-ext@^3.2.4",
     "@types/react": "^18.2.37",
