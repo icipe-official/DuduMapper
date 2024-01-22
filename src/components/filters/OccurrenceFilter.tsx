@@ -59,7 +59,7 @@ export default function OccurrenceFilter({
   // const [open, setOpen] = useState(false);
   const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
   const [openCountries, setOpenCountries] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState<string | string[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
   const [selectedDisease, setSelectedDisease] = useState<string[]>([]);
   const [isDiseaseSelected, setIsDiseaseSelected] = useState(false);
   const [isCountrySelected, setIsCountrySelected] = useState(false);
@@ -134,11 +134,25 @@ export default function OccurrenceFilter({
   };
 
   const handleCountries = (feature: any) => {
-    //const simplifiedGeoms = simplifyGeometry(feature) //Simplification is skipped, we might use bbox instead on country boundary
-    console.log("Geojson", feature);
-    const wktGeoms = geoJSONToWkt(feature.geometry); //changing geojson geometry to well know text representation
-    console.log("WKT", feature.geometry);
-    setSelectedCountry(wktGeoms);
+    try {
+      if (!feature || !feature.geometry) {
+        throw new Error("Invalid feature or missing geometry property");
+      }
+
+      console.log("Geojson", feature);
+
+      // Assuming that geoJSONToWkt is a function that converts GeoJSON to WKT
+      const wktGeoms = geoJSONToWkt(feature.geometry);
+
+      if (!wktGeoms) {
+        throw new Error("Failed to convert GeoJSON to WKT");
+      }
+
+      console.log("WKT", wktGeoms);
+      setSelectedCountry(wktGeoms);
+    } catch (error: any) {
+      console.error(error.message);
+    }
   };
 
   //Send clear filter signal to map to remove cql_filter
@@ -226,10 +240,10 @@ export default function OccurrenceFilter({
             <Grid item xs={12} sm={4} md={12}>
               <FormControl fullWidth style={{ width: "100%" }}>
                 <Autocomplete
-                  //multiple
+                  multiple
                   id="filter-by-country"
                   open={openCountries}
-                  // value={selectedCountry}
+                  value={selectedCountry}
                   onOpen={() => {
                     setOpenCountries(true);
                   }}
@@ -237,8 +251,8 @@ export default function OccurrenceFilter({
                     setOpenCountries(false);
                   }}
                   //isOptionEqualToValue={(option, value) => option === value}
-                  getOptionLabel={(option) => option["properties"]["name"]}
-                  getOptionKey={(option) => option["properties"]["id"]}
+                  getOptionLabel={(option) => (option as any).properties.name}
+                  getOptionKey={(option) => (option as any).properties.id}
                   options={countriesOptions}
                   loading={isFetchingCountries}
                   renderInput={(params) => (
