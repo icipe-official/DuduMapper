@@ -22,7 +22,6 @@ import TimeSlider from "@/components/filters/TimeSlider";
 import OpenFilterButton from "@/components/filters/OpenFilterButton";
 import { getOccurrence } from "../../api/occurrence";
 import { Alert, Snackbar } from "@mui/material";
-import RenderFeature from "ol/render/Feature";
 import { Geometry } from "ol/geom";
 
 function Newmap() {
@@ -43,15 +42,6 @@ function Newmap() {
     country: "",
   });
   const [cqlFilter, setCqlFilter] = useState("");
-  const speciesColors = [
-    "#b48ead",
-    "#a3be8c",
-    "#a3be8c",
-    "#d08770",
-    "#bf616a",
-    "#5e81ac",
-    "#5e81ac",
-  ];
   const [occurrenceSource, setOccurrenceSource] = useState<VectorSource>(
     new VectorSource({
       format: new GeoJSON(),
@@ -59,7 +49,6 @@ function Newmap() {
       strategy: bboxStrategy,
     })
   );
-  const [zoomArea, setZoomArea] = useState<[number, number, number, number]>();
 
   const {
     status,
@@ -115,17 +104,17 @@ function Newmap() {
       featureClass: Feature,
       featureProjection: "EPSG:3857",
     });
-    //Externalize this to a utils service file somewhere else
     const geojsonData = geoJsonFormat.readFeatures(occurrenceData, {
       featureProjection: "EPSG:3857",
     }) as unknown;
     const featureGeojson = geojsonData as Feature<Geometry>[];
 
     occurrenceSource?.addFeatures(featureGeojson);
-    //TODO zoom to occurrenceSource extent can also be implemented here
-    //const extent = occurrenceSource.getExtent();
-    //mapRef.current?.getView().fit(extent)
-    //END alternative to funtion handleSelectedCountryBbox below
+
+    if (returned != 0) {
+      const extent = occurrenceSource.getExtent();
+      mapRef.current?.getView().fit(extent)
+    }
   }
 
   const fill = new Fill({
@@ -161,13 +150,6 @@ function Newmap() {
     setShowOccurrencePopup(false);
   };
 
-  // const handleSelectedCountryBbox = (countryBbox: [number, number, number, number]) => {
-  //     if(countryBbox) {
-  //         setZoomArea(countryBbox)
-  //         //TODO implement zoom to country
-  //         mapRef.current?.getView().fit(countryBbox)
-  //     }
-  // }
 
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
