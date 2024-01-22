@@ -59,7 +59,7 @@ export default function OccurrenceFilter({
   // const [open, setOpen] = useState(false);
   const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
   const [openCountries, setOpenCountries] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState<string | string[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string>();
   const [selectedDisease, setSelectedDisease] = useState<string[]>([]);
   const [isDiseaseSelected, setIsDiseaseSelected] = useState(false);
   const [isCountrySelected, setIsCountrySelected] = useState(false);
@@ -229,7 +229,7 @@ export default function OccurrenceFilter({
                   //multiple
                   id="filter-by-country"
                   open={openCountries}
-                  // value={selectedCountry}
+                  //value={selectedCountry}
                   onOpen={() => {
                     setOpenCountries(true);
                   }}
@@ -548,7 +548,7 @@ export default function OccurrenceFilter({
                 onClick={() => {
                   setSelectedDisease([] as string[]);
                   setIsDiseaseSelected(false);
-                  setSelectedCountry([] as string[]);
+                  setSelectedCountry('');
                   setIsCountrySelected(false);
                   setSelectedSpecies([] as string[]);
                   setIsSpeciesSelected(false);
