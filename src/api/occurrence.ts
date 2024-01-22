@@ -24,19 +24,23 @@ export const getOccurrence = async (queryKey: any) => {
     return response.json();
 }
 export const fetchBionomics = async (bioId: number) => {
-    fetch(geoServerBaseUrl + BIONOMICS_URL + "&cql_filter=bionomics_id=" + bioId)
-        .then(response => response.json())
-        .then(json => {
-            return json;
-        })
-        .catch(error => console.error(error));
+    // fetch(geoServerBaseUrl + BIONOMICS_URL + "&cql_filter=bionomics_id=" + bioId)
+    //     .then(response => response.json())
+    //     .then(json => {
+    //         return json;
+    //     })
+    //     .catch(error => console.error(error));
+    const response = await fetch(geoServerBaseUrl + BIONOMICS_URL + "&cql_filter=bionomics_id=" + bioId);
+    return await response.json();
 }
 
-export const fetchReference = (referenceId: number) => {
-    fetch(geoServerBaseUrl + REFERENCE_URL + "&cql_filter=id=" + referenceId)
-        .then(response => response.json())
-        .then(json => {
-            return json;
-        })
-        .catch(error => console.error(error));
+export const fetchReference = async (referenceId: any) => {
+    // fetch(geoServerBaseUrl + REFERENCE_URL + "&cql_filter=id=" + referenceId)
+    //     .then(response => response.json())
+    //     .then(json => {
+    //         return json;
+    //     })
+    //     .catch(error => console.error(error));
+    const response = await fetch(geoServerBaseUrl + REFERENCE_URL + "&cql_filter=id=" + referenceId);
+    return await response.json();
 }

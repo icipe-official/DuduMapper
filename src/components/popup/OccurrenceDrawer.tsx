@@ -69,7 +69,7 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
         queryFn: ({ queryKey }) => fetchReference(queryKey[1])
     });
 
-
+    console.log(referenceData);
     console.log("Bionomics fetch error", bionomics_fetch_error)
 
     if (!open) {
