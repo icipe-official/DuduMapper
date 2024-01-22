@@ -21,8 +21,9 @@ import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
 import OpenFilterButton from "@/components/filters/OpenFilterButton";
 import { getOccurrence } from "../../api/occurrence";
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, IconButton, Snackbar, Tooltip } from "@mui/material";
 import { Geometry } from "ol/geom";
+import PrintIcon from "@mui/icons-material/Print";
 
 function Newmap() {
   const queryClient = useQueryClient();
@@ -32,7 +33,8 @@ function Newmap() {
   }>({});
   const [map, setMap] = useState<OlMap | undefined>(); // Specify the type using a generic type argument
   const mapElement = useRef<HTMLDivElement>(null);
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = React.useState(false);
+
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
   const [filterConditionsObj, setFilterConditionsObj] = useState<{
     [keys: string]: any;
@@ -104,6 +106,7 @@ function Newmap() {
       featureClass: Feature,
       featureProjection: "EPSG:3857",
     });
+    //Externalize this to a utils service file somewhere else
     const geojsonData = geoJsonFormat.readFeatures(occurrenceData, {
       featureProjection: "EPSG:3857",
     }) as unknown;
@@ -199,6 +202,117 @@ function Newmap() {
     });
   };
 
+  const printToScale = () => {
+    console.log("Button clicked!");
+
+    if (map) {
+      console.log("Map is available");
+
+      const resolutionChangeListener = () => {
+        console.log("Inside resolutionChangeListener");
+
+        const mapCanvas = document.createElement("canvas");
+        const size = map.getSize();
+        if (!size || size.length < 2) {
+          return;
+        }
+        mapCanvas.width = size[0];
+        mapCanvas.height = size[1];
+        const mapContext = mapCanvas.getContext("2d");
+        if (!mapContext) {
+          return;
+        }
+
+        // Draw the legend onto the map canvas
+        const legendDiv = document.querySelector(".legend-container");
+        if (legendDiv) {
+          // Create a temporary anchor element
+          const tempAnchor = document.createElement("a");
+          tempAnchor.href = `data:image/svg+xml;base64,${btoa(
+            new XMLSerializer().serializeToString(legendDiv)
+          )}`;
+          tempAnchor.download = "legend.png"; // Specify the download filename
+
+          // Append the anchor to the document body
+          document.body.appendChild(tempAnchor);
+
+          // Trigger a click event to initiate the download
+          tempAnchor.click();
+
+          // Remove the temporary anchor from the document body
+          document.body.removeChild(tempAnchor);
+        }
+
+        // Capture other layers
+        Array.prototype.forEach.call(
+          map
+            .getViewport()
+            .querySelectorAll(".ol-layer canvas, canvas.ol-layer"),
+          function (canvas) {
+            if (canvas.width > 0) {
+              const opacity =
+                canvas.parentNode?.style.opacity || canvas.style.opacity;
+              mapContext.globalAlpha = opacity === "" ? 1 : Number(opacity);
+              let matrix;
+              const transform = canvas.style.transform;
+
+              if (transform) {
+                matrix = transform
+                  .match(/^matrix\(([^\(]*)\)$/)[1]
+                  .split(",")
+                  .map(Number);
+              } else {
+                matrix = [
+                  parseFloat(canvas.style.width) / canvas.width,
+                  0,
+                  0,
+                  parseFloat(canvas.style.height) / canvas.height,
+                  0,
+                  0,
+                ];
+              }
+              CanvasRenderingContext2D.prototype.setTransform.apply(
+                mapContext,
+                matrix
+              );
+              const backgroundColor = canvas.parentNode?.style.backgroundColor;
+              if (backgroundColor) {
+                mapContext.fillStyle = backgroundColor;
+                mapContext.fillRect(0, 0, canvas.width, canvas.height);
+              }
+
+              mapContext.drawImage(canvas, 0, 0);
+            }
+          }
+        );
+
+        mapContext.globalAlpha = 1;
+        mapContext.setTransform(1, 0, 0, 1, 0, 0);
+
+        // Set the download link's href attribute
+        const link = document.getElementById(
+          "image-download"
+        ) as HTMLAnchorElement | null;
+        if (link != null) {
+          link.href = mapCanvas.toDataURL();
+          // Trigger a click event to download
+          link.click();
+        }
+
+        // Remove the listener after capturing the map
+        map.un("postrender", resolutionChangeListener);
+      };
+
+      // Attach the listener to 'postrender' event
+      map.on("postrender", resolutionChangeListener);
+
+      // Trigger a render to ensure the listener is called
+      map.renderSync();
+    } else {
+      console.log("Map is not available");
+    }
+  };
+
   return (
     <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
       <div
@@ -222,6 +336,36 @@ function Newmap() {
             />
           )}
         </div>
+      </div>
+      <div
+        className="print-section"
+        style={{
+          position: "absolute",
+          top: "270px",
+          left: "12px",
+          alignItems: "center",
+          transform: "translateX(0%)",
+          zIndex: 900,
+          borderRadius: "15px",
+        }}
+      >
+        <Tooltip title="Print map image" arrow>
+          <IconButton onClick={printToScale}>
+            <PrintIcon
+              style={{
+                color: "#ebbd40",
+                fontWeight: "bold",
+
+                // border: "2px solid white",
+              }}
+            />
+          </IconButton>
+        </Tooltip>
+        <a
+          id="image-download"
+          style={{ display: "none" }}
+          download="printed_map.png"
+        ></a>
       </div>
 
       {showOccurrencePopup && (
