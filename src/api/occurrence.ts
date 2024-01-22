@@ -1,21 +1,14 @@
-import {geoServerBaseUrl} from "@/api/requests";
-
+import { geoServerBaseUrl } from "@/api/requests";
 const OCCURRENCE_API = `${geoServerBaseUrl}/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:occurrence&maxFeatures=10000&outputFormat=application/json`;
-const SITE_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:site_v&maxFeatures=50&outputFormat=application/json&cql_filter=site_id=SITE_ID";
-
-const BIONOMICS_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:bionomics_v&maxFeatures=50&outputFormat=application/json&cql_filter=bionomics_id=BIO_ID"
+const SITE_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Asite&maxFeatures=50&outputFormat=application/json&cql_filter=site_id=SITE_ID";
+const BIONOMICS_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Abionomics&maxFeatures=50&outputFormat=application/json"
+const REFERENCE_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Areference_v&maxFeatures=50&outputFormat=application/json";
 export const fetchSiteInfo = async (siteId: any) => {
     const url = geoServerBaseUrl + SITE_URL.replace("SITE_ID", siteId);
     const response = await fetch(url);
     return await response.json();
-
 }
-export const fetchBionomics = async (bioId: any) => {
-    const url = geoServerBaseUrl + BIONOMICS_URL.replace('BIO_ID', bioId);
-    const res = await fetch(url)
-    return res.json()
 
-}
 export const getOccurrence = async (queryKey: any) => {
     console.log(queryKey[1])
     const params: string = queryKey[1]
@@ -29,4 +22,25 @@ export const getOccurrence = async (queryKey: any) => {
     console.log('Loading all occurrence')
     const response = await fetch(`${OCCURRENCE_API}`)
     return response.json();
+}
+export const fetchBionomics = async (bioId: number) => {
+    // fetch(geoServerBaseUrl + BIONOMICS_URL + "&cql_filter=bionomics_id=" + bioId)
+    //     .then(response => response.json())
+    //     .then(json => {
+    //         return json;
+    //     })
+    //     .catch(error => console.error(error));
+    const response = await fetch(geoServerBaseUrl + BIONOMICS_URL + "&cql_filter=bionomics_id=" + bioId);
+    return await response.json();
+}
+
+export const fetchReference = async (referenceId: any) => {
+    // fetch(geoServerBaseUrl + REFERENCE_URL + "&cql_filter=id=" + referenceId)
+    //     .then(response => response.json())
+    //     .then(json => {
+    //         return json;
+    //     })
+    //     .catch(error => console.error(error));
+    const response = await fetch(geoServerBaseUrl + REFERENCE_URL + "&cql_filter=id=" + referenceId);
+    return await response.json();
 }
