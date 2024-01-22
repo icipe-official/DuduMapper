@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   LinearProgress,
@@ -8,7 +9,7 @@ import {
   Box,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { FaBook, FaFileAlt, FaInfoCircle, FaUser } from 'react-icons/fa'; // Import icons
+import { FaBook, FaCalendar, FaFileAlt, FaInfoCircle, FaLink, FaNewspaper, FaStickyNote, FaUser } from 'react-icons/fa'; // Import icons
 
 interface ReferenceDetailsProps {
   referenceData: any;
@@ -34,7 +35,7 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
   const referenceProperties = referenceData?.features[0].properties || {};
   console.log("article_title: ", referenceProperties["article_title"])
   // Render loading state
-  if (reference_is_fetching || reference_fetch_status === "loading") {
+  if (reference_fetch_status === "pending" || reference_is_fetching) {
     return <LinearProgress />;
   }
 
@@ -46,14 +47,21 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
 
   // Configuration object for explicit keys, icons, and display names
   const keyConfig = [
-    { key: "article_title", icon: <FaBook />, displayName: "Article Title" },
-    { key: "author", icon: <FaUser />, displayName: "Author" },
-    { key: "contact_author", icon: <FaInfoCircle />, displayName: "Contact Author" },
-    { key: "publication_year", icon: <FaFileAlt />, displayName: "Publication Year" },
+    { key: "article_title", icon: <FaBook />, displayName: "Article Title", shouldRender: true },
+    { key: "author", icon: <FaUser />, displayName: "Author", shouldRender: true },
+    { key: "contact_author", icon: <FaInfoCircle />, displayName: "Contact Author", shouldRender: true },
+    { key: "publication_year", icon: <FaFileAlt />, displayName: "Publication Year", shouldRender: true },
+    { key: "journal_title", icon: <FaNewspaper />, displayName: "Journal Title", shouldRender: true },
+    { key: "year", icon: <FaCalendar />, displayName: "Year", shouldRender: true },
+    { key: "doi", icon: <FaLink />, displayName: "DOI", shouldRender: true },
+    { key: "source_notes", icon: <FaStickyNote />, displayName: "Source Notes", shouldRender: true },
   ];
 
   // Generic icon for keys not explicitly listed in the configuration
   const genericIcon = <span>&#x1F4AC;</span>; // You can replace this with your desired generic icon
+
+  // List of keys to ignore in rendering
+  const ignoreCategoryList = ["id"];
 
   // Render content when data is available
   return (
@@ -75,21 +83,21 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
             color: "#1B5E20",
           }}
         >
-          {keyConfig.map(({ key, icon, displayName }) => (
-            <Typography key={key}>
-              {icon} {displayName}: {referenceProperties[key] !== null ? referenceProperties[key] : "NA"}
-            </Typography>
-          ))}
-          {Object.keys(referenceProperties).map((key) => {
-            // Check if the key is not in the configuration
-            const isKeyNotInConfig = !keyConfig.some((config) => config.key === key);
-
-            return (
+          {keyConfig
+            .filter(({ key }) => !ignoreCategoryList.includes(key))
+            .map(({ key, icon, displayName }) => (
               <Typography key={key}>
-                {isKeyNotInConfig ? genericIcon : null} {key}: {referenceProperties[key] !== null ? referenceProperties[key] : "NA"}
+                {icon} {displayName}: {referenceProperties[key] !== null ? referenceProperties[key] : "NA"}
               </Typography>
-            );
-          })}
+            ))}
+
+          {Object.keys(referenceProperties)
+            .filter((key) => !keyConfig.some((config) => config.key === key) && !ignoreCategoryList.includes(key))
+            .map((key) => (
+              <Typography key={key}>
+                {genericIcon} {key}: {referenceProperties[key] !== null ? referenceProperties[key] : "NA"}
+              </Typography>
+            ))}
         </AccordionDetails>
       </Accordion>
     </Box>
