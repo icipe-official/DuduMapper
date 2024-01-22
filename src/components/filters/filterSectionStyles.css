@@ -12,6 +12,7 @@
   color: white !important;
   border-radius: 1px;
 }
+
 .container-style {
   background-color: #f4f4f4;
   border-radius: 3px;
@@ -27,15 +28,6 @@
   top: -30px;
 }
 
-.print-section {
-  position: absolute;
-  top: 210px;
-  left: 12px;
-  align-items: center;
-  transform: translateX(0%);
-  z-index: 1000;
-  border-radius: 15px;
-}
 .form-control {
   margin-bottom: 5px;
   min-width: 200px;
