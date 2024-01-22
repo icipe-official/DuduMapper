@@ -21,10 +21,17 @@ import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
 import OpenFilterButton from "@/components/filters/OpenFilterButton";
 import { getOccurrence } from "../../api/occurrence";
-import { Alert, IconButton, Snackbar, Tooltip } from "@mui/material";
-import { Geometry } from "ol/geom";
-import PrintIcon from "@mui/icons-material/Print";
+import { Alert, Snackbar } from "@mui/material";
+import RenderFeature from "ol/render/Feature";
+import { Geometry, Polygon, SimpleGeometry } from "ol/geom";
+import { transform } from "ol/proj";
+import { Coordinate } from "ol/coordinate";
+import { Draw, Modify, Snap } from "ol/interaction.js";
+import Map from "ol/Map";
+import { never } from "ol/events/condition";
+import colormap from "colormap";
 
+let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
   const queryClient = useQueryClient();
   const mapRef = useRef<OlMap>();
@@ -33,9 +40,11 @@ function Newmap() {
   }>({});
   const [map, setMap] = useState<OlMap | undefined>(); // Specify the type using a generic type argument
   const mapElement = useRef<HTMLDivElement>(null);
-  const [filterOpen, setFilterOpen] = React.useState(false);
-
+  const [filterOpen, setFilterOpen] = useState(false);
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
+  const [areaSelected, setAreaSelected] = useState("");
+  const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
+  const [cordinateArray, setCordinateArray] = useState([]);
   const [filterConditionsObj, setFilterConditionsObj] = useState<{
     [keys: string]: any;
   }>({
@@ -44,6 +53,9 @@ function Newmap() {
     country: "",
   });
   const [cqlFilter, setCqlFilter] = useState("");
+  const [theOverlaysArray, setTheOverlaysArray] = useState<any>([]);
+  const [theBaseMapsArray, setTheBaseMapsArray] = useState<any>([]);
+
   const [occurrenceSource, setOccurrenceSource] = useState<VectorSource>(
     new VectorSource({
       format: new GeoJSON(),
@@ -51,6 +63,27 @@ function Newmap() {
       strategy: bboxStrategy,
     })
   );
+  const [zoomArea, setZoomArea] = useState<[number, number, number, number]>();
+
+  const [speciesColors, setSpeciesColors] = useState<string[]>([
+    "#DC267F",
+    "#648FFF",
+    "#785EF0",
+    "#FE6100",
+    "#FFB000",
+    "#000000",
+    "#FFFFFF",
+  ]);
+  const getColormapColors = (numColors: number): string[] => {
+    return colormap({ colormap: "jet", nshades: numColors, format: "hex" });
+  };
+  const addColormapColorsIfNeeded = () => {
+    const remainingColors = selectedSpecies.length - speciesColors.length;
+    if (remainingColors > 0) {
+      const newColors = getColormapColors(remainingColors);
+      setSpeciesColors((prevColors) => [...prevColors, ...newColors]);
+    }
+  };
 
   const {
     status,
@@ -63,6 +96,25 @@ function Newmap() {
     //queryFn: getOccurrences
     queryFn: ({ queryKey }) => getOccurrence(queryKey),
   });
+
+  function responseToGEOJSON(occurrenceData: any) {
+    const geoJSONPoints = (occurrenceData || []).map((d: any) => {
+      const coordinates = d.geometry.coordinates;
+      return {
+        type: "Feature",
+        geometry: {
+          type: d.geometry.type,
+          coordinates: coordinates,
+        },
+        properties: d.properties,
+      };
+    });
+    const geoJSONFeatureCollection = {
+      type: "FeatureCollection",
+      features: geoJSONPoints,
+    };
+    return geoJSONFeatureCollection;
+  }
 
   useEffect(() => {
     if (Object.keys(filterConditionsObj).length === 0) {
@@ -99,6 +151,7 @@ function Newmap() {
     const total = occurrenceData["totalFeatures"];
     const returned = occurrenceData["numberReturned"];
     console.log(`${returned} out of ${total} features`);
+    const featureArray = occurrenceData?.features || [];
 
     occurrenceSource?.clear();
     const geoJsonFormat = new GeoJSON({
@@ -107,16 +160,19 @@ function Newmap() {
       featureProjection: "EPSG:3857",
     });
     //Externalize this to a utils service file somewhere else
-    const geojsonData = geoJsonFormat.readFeatures(occurrenceData, {
-      featureProjection: "EPSG:3857",
-    }) as unknown;
+    const geojsonData = geoJsonFormat.readFeatures(
+      responseToGEOJSON(featureArray),
+      {
+        featureProjection: "EPSG:3857",
+      }
+    ) as unknown;
     const featureGeojson = geojsonData as Feature<Geometry>[];
 
     occurrenceSource?.addFeatures(featureGeojson);
 
+    const extent = occurrenceSource.getExtent();
     if (returned != 0) {
-      const extent = occurrenceSource.getExtent();
-      mapRef.current?.getView().fit(extent)
+      mapRef.current?.getView().fit(extent);
     }
   }
 
@@ -143,35 +199,124 @@ function Newmap() {
       stroke: stroke,
     }),
   } as BaseLayerOptions);
+  occurrenceLayer.set("occurrence-data", true);
 
-  const occurrenceGroup = new LayerGroup({
-    title: "Occurrence",
-    layers: [occurrenceLayer],
-  } as GroupLayerOptions);
+  //   const VSource = new VectorSource({ wrapX: false });
+  //   const areaSelectLayer = new VectorLayer({
+    //     source: VSource,
+    //   });
+  //   areaSelectLayer.set("area-select", true);
 
   const handleClosePopup = () => {
     setShowOccurrencePopup(false);
   };
 
 
+  const createCircleCoordinates = (
+    center: any,
+    radius: any,
+    numSegments = 64
+  ) => {
+    const circleCoords = [];
+    for (let i = 0; i < numSegments; i++) {
+      const angle = (Math.PI * 2 * i) / numSegments;
+      const x = center[0] + radius * Math.cos(angle);
+      const y = center[1] + radius * Math.sin(angle);
+      circleCoords.push(transform([x, y], "EPSG:3857", "EPSG:4326"));
+    }
+    circleCoords.push(circleCoords[0]); // Close the circle
+    return circleCoords;
+  };
+
+  const removeAreaInteractions = (map: Map) => {
+    map.removeInteraction(modify);
+    map.removeInteraction(draw);
+    map.removeInteraction(snap);
+    console.log("Removed Interactions...");
+  };
+
+  const addAreaInteractions = (map: Map, shapeType: any) => {
+    draw = new Draw({
+      source: occurrenceSource,
+      type: shapeType,
+      freehandCondition: never,
+    });
+
+    let coordinates;
+
+    draw.on("drawend", (e) => {
+      const geometry: any = e.feature.getGeometry();
+      // const geometry = e.feature.getGeometry() as SimpleGeometry;
+      let coordinates: any;
+
+      if (shapeType === "Circle") {
+        // Handle Circle geometry
+
+        const center = geometry.getCenter();
+        const radius = geometry.getRadius();
+
+        coordinates = createCircleCoordinates(center, radius);
+      } else if (shapeType === "Polygon" && geometry instanceof Polygon) {
+        // Handle Polygon geometry
+
+        coordinates = geometry
+          ?.getCoordinates()[0]
+          .map((coord: any) => transform(coord, "EPSG:3857", "EPSG:4326"));
+      }
+
+      console.log("Coordinates:", coordinates);
+
+      if (coordinates) {
+        const wktString = `MULTIPOLYGON(((${coordinates
+          .map((coord: any) => coord.join(" "))
+          .join(", ")})))`;
+
+        setCordinateArray(coordinates);
+
+        const wktStringEdited = ` WITHIN(the_geom, ${wktString})`;
+        const updatedFilterCondition = {
+          ...filterConditionsObj,
+          wktStringEdited,
+        };
+        setFilterConditionsObj(updatedFilterCondition);
+        map?.addInteraction(draw);
+      }
+    });
+
+    map?.addInteraction(draw);
+    snap = new Snap({ source: occurrenceSource });
+    map.addInteraction(snap);
+  };
+
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
-      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
+      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {if (overlaysArray) {
+          setTheOverlaysArray(overlaysArray);
+        }
+        if (baseMapsArray) {
+          setTheBaseMapsArray(baseMapsArray);
+        }
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    const initializeMap = async () => {
+      if (theBaseMapsArray.length > 0 || theOverlaysArray.length > 0) {
         const BaseMaps = new LayerGroup({
           title: "Basemaps",
-          layers: baseMapsArray,
+          layers: theBaseMapsArray,
         } as GroupLayerOptions);
 
         const Overlays = new LayerGroup({
           title: "Labels",
-          layers: overlaysArray,
+          layers: theOverlaysArray,
         } as GroupLayerOptions);
 
-        if (BaseMaps) {
-          if (Overlays) {
+
             const initialMap = new OlMap({
               target: "map-container",
-              layers: [BaseMaps, Overlays, occurrenceGroup],
+              layers: [BaseMaps, Overlays, occurrenceLayer],
               view: new View({
                 center: [0, 0],
                 zoom: 4,
@@ -182,11 +327,27 @@ function Newmap() {
             initialMap.on("singleclick", handleMapClick);
             mapRef.current = initialMap;
             setMap(initialMap);
-          }
-        }
-      });
-    });
-  }, []);
+          // Initialise map
+        return () => initialMap.setTarget(undefined);
+      }
+    };
+
+    initializeMap();
+  }, [theBaseMapsArray, theOverlaysArray]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+    const areaTypes = ["Polygon", "Circle"];
+    if (areaSelected && areaTypes.includes(areaSelected)) {
+      removeAreaInteractions(map);
+      addAreaInteractions(map, areaSelected);
+      console.log("Added Interaction");
+        }else {
+      removeAreaInteractions(map);
+    }
+  }, [areaSelected, map]);
 
   const handleMapClick = (event: any) => {
     console.log("Map single click triggered");
@@ -333,6 +494,8 @@ function Newmap() {
               open={filterOpen}
               handleFilterConditions={updateFilterConditions}
               onClearFilter={resetOccurrence}
+              handleDrawArea={handleAreaDrawn}
+              handleSelectedSpecies={handleSelectedSpecies}
             />
           )}
         </div>

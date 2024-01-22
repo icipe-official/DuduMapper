@@ -26,6 +26,8 @@ import PestControlIcon from "@mui/icons-material/PestControl";
 import EggIcon from "@mui/icons-material/Egg";
 import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
+import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
+import FormatShapesIcon from "@mui/icons-material/FormatShapes";
 
 interface FilterConditions {
   species?: string;
@@ -50,10 +52,12 @@ export default function OccurrenceFilter({
   open,
   handleFilterConditions,
   onClearFilter,
-}: {
+handleDrawArea,
+  handleSelectedSpecies,}: {
   open: boolean;
   handleFilterConditions: any;
-  onClearFilter: any;
+  onClearFilter: any;handleDrawArea: any;
+  handleSelectedSpecies: any;
 }) {
   const queryClient = useQueryClient();
   // const [open, setOpen] = useState(false);
@@ -73,6 +77,7 @@ export default function OccurrenceFilter({
   const [isAdultSelected, setIsAdultSelected] = useState(false);
   const [selectedLarval, setSelectedLarval] = useState("");
   const [isLarvalSelected, setIsLarvalSelected] = useState(false);
+  const [selectedByArea, setSelectedByArea] = useState<string>("");
 
   const {
     isFetching: isFetchingCountries,
@@ -131,6 +136,7 @@ export default function OccurrenceFilter({
   const handleSpecies = (values: React.SetStateAction<string[]>) => {
     setSelectedSpecies(values);
     setIsSpeciesSelected(Boolean(values));
+  handleSelectedSpecies(values);
   };
 
   const handleCountries = (feature: any) => {
@@ -167,7 +173,18 @@ export default function OccurrenceFilter({
     }
   }, [selectedSpecies, selectedCountry, selectedSeason]);
 
-  return (
+  const toggleSelectedByArea = (shape: string) => {
+    if (selectedByArea === "") {
+      handleDrawArea(shape);
+      setSelectedByArea(shape);
+    } else if (selectedByArea != shape && selectedByArea != "") {
+      handleDrawArea(shape);
+      setSelectedByArea(shape);
+    } else {
+      handleDrawArea("");
+      setSelectedByArea("");
+    }
+  };return (
     <div className="filter-dev-section">
       <Collapse in={open}>
         <Box
@@ -545,6 +562,65 @@ export default function OccurrenceFilter({
                     <DataArrayIcon />
                   </IconButton>
                 </Tooltip>
+              </Grid>
+            <Grid
+                item
+                xs={12}
+                sm={12}
+                sx={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Typography sx={{ color: "green", fontSize: 15 }}>
+                  Select by Area
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontStyle: "italic",
+                    marginRight: "5px",
+                    color: "black",
+                  }}
+                >
+                  Circle:{" "}
+                  <IconButton
+                    onClick={() => toggleSelectedByArea("Circle")}
+                    color={selectedByArea === "Circle" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color:
+                          selectedByArea === "Circle" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <CircleOutlinedIcon />
+                  </IconButton>
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontStyle: "italic",
+                    marginRight: "5px",
+                    color: "black",
+                  }}
+                >
+                  Polygon:{" "}
+                  <IconButton
+                    onClick={() => toggleSelectedByArea("Polygon")}
+                    color={selectedByArea === "Polygon" ? "success" : "default"}
+                    sx={{
+                      fontSize: "1.5rem",
+                      "&:hover": {
+                        color:
+                          selectedByArea === "Polygon" ? "#2e7d32" : "primary",
+                      },
+                    }}
+                  >
+                    <FormatShapesIcon />
+                  </IconButton>
+                </Typography>
               </Grid>
             </Grid>
             <div className="button-container-style">
