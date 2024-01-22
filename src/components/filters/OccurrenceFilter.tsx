@@ -562,7 +562,7 @@ export default function OccurrenceFilter({
                 onClick={() => {
                   setSelectedDisease([] as string[]);
                   setIsDiseaseSelected(false);
-                  setSelectedCountry([] as string[]);
+                  setSelectedCountry('');
                   setIsCountrySelected(false);
                   setSelectedSpecies([] as string[]);
                   setIsSpeciesSelected(false);
