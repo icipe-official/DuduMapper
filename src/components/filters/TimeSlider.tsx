@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
-import "./times_slide.css";
+import "./time_slider.css";
 
 interface TimeSliderProps {
   onChange: (startDate: number, endDate: number) => void;
