@@ -79,7 +79,7 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({ bionomicsData, bion
     };
 
     // Check if bionomicsData exists, and extract properties
-    const bionomicsProperties = bionomicsData?.properties || {};
+    const bionomicsProperties = bionomicsData?.features[0].properties || {};
 
     // Render loading state
     if (bionomics_is_fetching || bionomics_fetch_status === "loading") {
@@ -116,7 +116,7 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({ bionomicsData, bion
                     >
                         {properties.map((property) => (
                             <Typography key={property}>
-                                {property}: {bionomicsProperties[property] !== null ? bionomicsProperties[property] : "NA"}
+                                {property}: {bionomicsProperties[property] != null ? bionomicsProperties[property] : "NA"}
                             </Typography>
                         ))}
                     </AccordionDetails>
