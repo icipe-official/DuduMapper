@@ -115,9 +115,11 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({ bionomicsData, bion
                         }}
                     >
                         {properties.map((property) => (
-                            <Typography key={property}>
-                                {property}: {bionomicsProperties[property] != null ? bionomicsProperties[property] : "NA"}
-                            </Typography>
+                            bionomicsProperties[property] !== null && (
+                                <Typography key={property}>
+                                    {property}: {bionomicsProperties[property]}
+                                </Typography>
+                            )
                         ))}
                     </AccordionDetails>
                 </Accordion>
