@@ -89,9 +89,11 @@ export default function EnvironmentCard({
                     >
                         <Box>
                             {categories[category].map((key) => (
-                                <Typography key={key}>
-                                    {convertToSensibleName(key)}: {siteProps[key] || 'NA'}
-                                </Typography>
+                                siteProps[key] !== null && (
+                                    <Typography key={key}>
+                                        {convertToSensibleName(key)}: {siteProps[key]}
+                                    </Typography>
+                                )
                             ))}
                         </Box>
                     </AccordionDetails>
@@ -114,6 +116,7 @@ export default function EnvironmentCard({
                             Other
                         </Typography>
                     </AccordionSummary>
+
                     <AccordionDetails
                         sx={{
                             backgroundColor: " #f5f7c5 ", // Set yellow background color for expanded content
@@ -122,9 +125,11 @@ export default function EnvironmentCard({
                     >
                         <Box>
                             {otherCategory.map((key) => (
-                                <Typography key={key}>
-                                    {convertToSensibleName(key)}: {siteProps[key] || 'NA'}
-                                </Typography>
+                                siteProps[key] !== null && (
+                                    <Typography key={key}>
+                                        {convertToSensibleName(key)}: {siteProps[key]}
+                                    </Typography>
+                                )
                             ))}
                         </Box>
                     </AccordionDetails>
