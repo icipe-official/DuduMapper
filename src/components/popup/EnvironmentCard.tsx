@@ -47,7 +47,7 @@ export default function EnvironmentCard({
         "People's Lifestyle": ["average_awake_time", "sleeping_outdoors", "farming_notes", "land_use", "livestock", "livestock_notes", "plants_species"],
     };
 
-    const ignoreCategory = ["admin_1", "admin_2", "area_type", "confidence", "georef_source", "name", "id"];
+    const ignoreCategory = ["admin_1", "admin_2", "area_type", "confidence", "georef_source", "name", "id", "site_id", "environment_id"];
 
     const otherCategory = Object.keys(siteProps).filter(
         (key) =>
@@ -60,7 +60,6 @@ export default function EnvironmentCard({
             <Card sx={{ backgroundColor: "#1c1c1c", color: "#9E9E9E" }}>
                 <CardHeader
                     title={`${siteProps["country"]} `}
-                    subheader={"Notes: " + siteProps["site_notes"]}
                     sx={{ backgroundColor: "#212121", color: "#9E9E9E", borderBottom: '1px solid #424242' }} // Updated CardHeader styles
                 />
             </Card>
