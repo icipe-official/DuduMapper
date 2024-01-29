@@ -15,7 +15,17 @@ interface BionomicsDetailsProps {
     bionomics_is_fetching: boolean;
 }
 
-const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({ bionomicsData, bionomics_fetch_status, bionomics_is_fetching }) => {
+const convertToSensibleName = (key: string) => {
+    return key
+        .replace(/[_-]/g, " ") // Replace underscores and hyphens with spaces
+        .replace(/\w\S*/g, (txt: string) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()); // Capitalize first letter of each word
+};
+
+const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({
+    bionomicsData,
+    bionomics_fetch_status,
+    bionomics_is_fetching,
+}) => {
     const [activeCategory, setActiveCategory] = useState("Temporal");
 
     useEffect(() => {
@@ -88,7 +98,7 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({ bionomicsData, bion
 
     // Render error state
     if (bionomics_fetch_status === "error") {
-        console.log(bionomics_fetch_status)
+        console.log(bionomics_fetch_status);
         // return <div>Error fetching data</div>;
     }
 
@@ -106,7 +116,7 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({ bionomicsData, bion
                     }}
                 >
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">{category}</Typography>
+                        <Typography variant="h6">{convertToSensibleName(category)}</Typography>
                     </AccordionSummary>
                     <AccordionDetails
                         sx={{
@@ -115,9 +125,11 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({ bionomicsData, bion
                         }}
                     >
                         {properties.map((property) => (
-                            <Typography key={property}>
-                                {property}: {bionomicsProperties[property] != null ? bionomicsProperties[property] : "NA"}
-                            </Typography>
+                            bionomicsProperties[property] !== null && (
+                                <Typography key={property}>
+                                    {convertToSensibleName(property)}: {bionomicsProperties[property]}
+                                </Typography>
+                            )
                         ))}
                     </AccordionDetails>
                 </Accordion>

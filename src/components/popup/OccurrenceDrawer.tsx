@@ -13,6 +13,7 @@ import { CSSProperties } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { fetchBionomics } from '@/api/occurrence';
 import ReferenceDetails from './referenceBox';
+import "./OccurrencePopup.css";
 const borderStyle = {
     // borderStyle: 'solid',
     // borderColor: 'green',
@@ -77,7 +78,7 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
     }
     return (
 
-        <div id={id} style={{ ...scrollableStyle, ...borderStyle, ...{ width: '30%', overflowY: 'auto', transitionDuration: '4s' } }}>
+        <div className={`occurrence-popup ${open ? "show" : "hide"}`} id={id} style={{ ...scrollableStyle, ...borderStyle, ...{ width: '30%', overflowY: 'auto', transitionDuration: '4s' } }}>
             <IconButton style={{ right: '0px' }} onClick={handleClose}>
                 <CloseRoundedIcon />
             </IconButton>
