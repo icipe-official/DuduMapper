@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   LinearProgress,
@@ -10,6 +9,12 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { FaBook, FaCalendar, FaFileAlt, FaInfoCircle, FaLink, FaNewspaper, FaStickyNote, FaUser } from 'react-icons/fa'; // Import icons
+
+const convertToSensibleName = (key: string) => {
+  return key
+    .replace(/[_-]/g, " ") // Replace underscores and hyphens with spaces
+    .replace(/\w\S*/g, (txt: string) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()); // Capitalize first letter of each word
+};
 
 interface ReferenceDetailsProps {
   referenceData: any;
@@ -83,12 +88,15 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
             color: "#1B5E20",
           }}
         >
+
+// ...
+
           {keyConfig
             .filter(({ key }) => !ignoreCategoryList.includes(key))
             .map(({ key, icon, displayName }) => (
               referenceProperties[key] !== null && (
                 <Typography key={key}>
-                  {icon} {displayName}: {referenceProperties[key]}
+                  {icon} {convertToSensibleName(displayName)}: {referenceProperties[key]}
                 </Typography>
               )
             ))}
@@ -98,10 +106,11 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
             .map(([key, value]) => (
               value !== null && (
                 <Typography key={key}>
-                  {genericIcon} {key}: {referenceProperties[key]}
+                  {genericIcon} {convertToSensibleName(key)}: {referenceProperties[key]}
                 </Typography>
               )
             ))}
+
         </AccordionDetails>
       </Accordion>
     </Box>
