@@ -89,7 +89,6 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
           }}
         >
 
-// ...
 
           {keyConfig
             .filter(({ key }) => !ignoreCategoryList.includes(key))
