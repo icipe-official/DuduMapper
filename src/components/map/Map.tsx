@@ -21,7 +21,7 @@ import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
 import OpenFilterButton from "@/components/filters/OpenFilterButton";
 import { getOccurrence } from "@/api/occurrence";
-import {Alert, IconButton, Snackbar, Tooltip} from "@mui/material";
+import { Alert, IconButton, Snackbar, Tooltip } from "@mui/material";
 import RenderFeature from "ol/render/Feature";
 import { Geometry, Polygon, SimpleGeometry } from "ol/geom";
 import { transform } from "ol/proj";
@@ -30,11 +30,10 @@ import { Draw, Modify, Snap } from "ol/interaction.js";
 import Map from "ol/Map";
 import { never } from "ol/events/condition";
 import colormap from "colormap";
-import PrintIcon from '@mui/icons-material/Print'
+import PrintIcon from "@mui/icons-material/Print";
 
 let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
-
   const queryClient = useQueryClient();
   const mapRef = useRef<OlMap>();
   const [popoverContent, setPopoverContent] = React.useState<{
@@ -45,6 +44,7 @@ function Newmap() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
   const [areaSelected, setAreaSelected] = useState("");
+  const [cordinateArray, setCordinateArray] = useState([]);
   const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
   const [filterConditionsObj, setFilterConditionsObj] = useState<{
     [keys: string]: any;
@@ -95,7 +95,7 @@ function Newmap() {
   } = useQuery({
     queryKey: ["occurrences", cqlFilter], //Example CQl filter species IN ('gambie', 'finiestus', 'fini') AND WITHIN (the_geom, MULTIPOLYGON((22,22,223,223))) AND adult =true AND season=dry
     //queryFn: getOccurrences
-    queryFn: ({ queryKey }) => getOccurrence(queryKey),
+    queryFn: ({ queryKey }: any) => getOccurrence(queryKey),
   });
 
   function responseToGEOJSON(occurrenceData: any) {
@@ -138,7 +138,7 @@ function Newmap() {
 
   const resetOccurrence = () => {
     setCqlFilter("");
-    setSelectedSpecies([])
+    setSelectedSpecies([]);
   };
 
   const handleTimeChange = (startYear: number, endYear: number) => {
@@ -203,6 +203,13 @@ function Newmap() {
   } as BaseLayerOptions);
   occurrenceLayer.set("occurrence-data", true);
 
+  const VSource = new VectorSource({ wrapX: false });
+  const areaSelectLayer = new VectorLayer({
+    title: "Area Select",
+    source: VSource,
+  } as BaseLayerOptions);
+  areaSelectLayer.set("area-select", true);
+
   const handleClosePopup = () => {
     setShowOccurrencePopup(false);
   };
@@ -230,9 +237,33 @@ function Newmap() {
     console.log("Removed Interactions...");
   };
 
+  const updateSelectedPolygons = (map: Map, areaCoordinates: any) => {
+    console.log("Called Update Array of Coordinates....");
+    // clear out old polygons
+    const areaSelectLayer = map
+      .getAllLayers()
+      .find((l) => l.get("area-select"));
+    const source = areaSelectLayer?.getSource();
+    (source as VectorSource)
+      .getFeatures()
+      .forEach((f) => (source as VectorSource).removeFeature(f));
+
+    // draw the new one if it exists
+    if (areaCoordinates.length > 0) {
+      const coordinates = areaCoordinates.map((c: any) =>
+        transform(c, "EPSG:4326", "EPSG:3857")
+      );
+      const polygon = new Polygon([coordinates]);
+      (source as VectorSource).addFeature(new Feature({ geometry: polygon }));
+    }
+  };
+
   const addAreaInteractions = (map: Map, shapeType: any) => {
+    const areaSelect = map.getAllLayers().find((l) => l.get("area-select"));
+    const source = areaSelect?.getSource() as VectorSource;
+
     draw = new Draw({
-      source: occurrenceSource,
+      source: source,
       type: shapeType,
       freehandCondition: never,
     });
@@ -266,6 +297,8 @@ function Newmap() {
           .map((coord: any) => coord.join(" "))
           .join(", ")})))`;
 
+        setCordinateArray(coordinates);
+
         const wktStringEdited = ` WITHIN(the_geom, ${wktString})`;
         const updatedFilterCondition = {
           ...filterConditionsObj,
@@ -283,7 +316,8 @@ function Newmap() {
 
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
-      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {if (overlaysArray) {
+      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
+        if (overlaysArray) {
           setTheOverlaysArray(overlaysArray);
         }
         if (baseMapsArray) {
@@ -306,21 +340,20 @@ function Newmap() {
           layers: theOverlaysArray,
         } as GroupLayerOptions);
 
-
-            const initialMap = new OlMap({
-              target: "map-container",
-              layers: [BaseMaps, Overlays, occurrenceLayer],
-              view: new View({
-                center: [0, 0],
-                zoom: 4,
-              }),
-            });
-            const layerSwitcher = new LayerSwitcher();
-            initialMap.addControl(layerSwitcher);
-            initialMap.on("singleclick", handleMapClick);
-            mapRef.current = initialMap;
-            setMap(initialMap);
-          // Initialise map
+        const initialMap = new OlMap({
+          target: "map-container",
+          layers: [BaseMaps, Overlays, occurrenceLayer, areaSelectLayer],
+          view: new View({
+            center: [0, 0],
+            zoom: 4,
+          }),
+        });
+        const layerSwitcher = new LayerSwitcher();
+        initialMap.addControl(layerSwitcher);
+        initialMap.on("singleclick", handleMapClick);
+        mapRef.current = initialMap;
+        setMap(initialMap);
+        // Initialise map
         return () => initialMap.setTarget(undefined);
       }
     };
@@ -337,10 +370,18 @@ function Newmap() {
       removeAreaInteractions(map);
       addAreaInteractions(map, areaSelected);
       console.log("Added Interaction");
-        }else {
+    } else {
       removeAreaInteractions(map);
     }
   }, [areaSelected, map]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    updateSelectedPolygons(map, cordinateArray);
+  }, [map, cordinateArray]);
 
   const handleMapClick = (event: any) => {
     console.log("Map single click triggered");
@@ -358,6 +399,19 @@ function Newmap() {
 
   const handleAreaDrawn = (areaType: string) => {
     setAreaSelected(areaType);
+  };
+
+  const handleClearSelectedAreaShape = () => {
+    if (map) {
+      updateSelectedPolygons(map, []);
+      setCordinateArray([]);
+      setCqlFilter("");
+      setFilterConditionsObj({
+        species: "", // Reset species filter
+        period: "", // Reset period filter
+        country: "", // Reset country filter
+      });
+    }
   };
 
   const handleSelectedSpecies = (selectedSpecies: any) => {
@@ -413,20 +467,20 @@ function Newmap() {
     };
 
     const existingOccurrenceLayer = map
-        ?.getLayers()
-        .getArray()
-        .find((layer) => {
-          return layer.get("occurrence-data") === true;
-        });
+      ?.getLayers()
+      .getArray()
+      .find((layer) => {
+        return layer.get("occurrence-data") === true;
+      });
     if (
-        existingOccurrenceLayer &&
-        existingOccurrenceLayer instanceof VectorLayer
+      existingOccurrenceLayer &&
+      existingOccurrenceLayer instanceof VectorLayer
     ) {
       const occurrenceSource = existingOccurrenceLayer.getSource();
       const existingLegendControl = map
-          ?.getControls()
-          .getArray()
-          .find((control) => control.get("name") === "legend");
+        ?.getControls()
+        .getArray()
+        .find((control) => control.get("name") === "legend");
       if (existingLegendControl) {
         map?.removeControl(existingLegendControl);
       }
@@ -617,6 +671,8 @@ function Newmap() {
               onClearFilter={resetOccurrence}
               handleDrawArea={handleAreaDrawn}
               handleSelectedSpecies={handleSelectedSpecies}
+              cordinateArrayFromParent={cordinateArray}
+              clearSelectedAreaShape={handleClearSelectedAreaShape}
             />
           )}
         </div>
