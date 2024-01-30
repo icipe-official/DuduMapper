@@ -201,11 +201,12 @@ function Newmap() {
   } as BaseLayerOptions);
   occurrenceLayer.set("occurrence-data", true);
 
-  //   const VSource = new VectorSource({ wrapX: false });
-  //   const areaSelectLayer = new VectorLayer({
-  //     source: VSource,
-  //   });
-  //   areaSelectLayer.set("area-select", true);
+  const VSource = new VectorSource({ wrapX: false });
+  const areaSelectLayer = new VectorLayer({
+    title: "Area Select",
+    source: VSource,
+  } as BaseLayerOptions);
+  areaSelectLayer.set("area-select", true);
 
   const handleClosePopup = () => {
     setShowOccurrencePopup(false);
@@ -242,9 +243,33 @@ function Newmap() {
     console.log("Removed Interactions...");
   };
 
+  const updateSelectedPolygons = (map: Map, areaCoordinates: any) => {
+    console.log("Called Update Array of Coordinates....");
+    // clear out old polygons
+    const areaSelectLayer = map
+      .getAllLayers()
+      .find((l) => l.get("area-select"));
+    const source = areaSelectLayer?.getSource();
+    (source as VectorSource)
+      .getFeatures()
+      .forEach((f) => (source as VectorSource).removeFeature(f));
+
+    // draw the new one if it exists
+    if (areaCoordinates.length > 0) {
+      const coordinates = areaCoordinates.map((c: any) =>
+        transform(c, "EPSG:4326", "EPSG:3857")
+      );
+      const polygon = new Polygon([coordinates]);
+      (source as VectorSource).addFeature(new Feature({ geometry: polygon }));
+    }
+  };
+
   const addAreaInteractions = (map: Map, shapeType: any) => {
+    const areaSelect = map.getAllLayers().find((l) => l.get("area-select"));
+    const source = areaSelect?.getSource() as VectorSource;
+
     draw = new Draw({
-      source: occurrenceSource,
+      source: source,
       type: shapeType,
       freehandCondition: never,
     });
@@ -323,7 +348,7 @@ function Newmap() {
 
         const initialMap = new OlMap({
           target: "map-container",
-          layers: [BaseMaps, Overlays, occurrenceLayer],
+          layers: [BaseMaps, Overlays, occurrenceLayer, areaSelectLayer],
           view: new View({
             center: [0, 0],
             zoom: 4,
@@ -350,11 +375,18 @@ function Newmap() {
     if (areaSelected && areaTypes.includes(areaSelected)) {
       removeAreaInteractions(map);
       addAreaInteractions(map, areaSelected);
-      console.log("Added Interaction");
     } else {
       removeAreaInteractions(map);
     }
   }, [areaSelected, map]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    updateSelectedPolygons(map, cordinateArray);
+  }, [map, cordinateArray]);
 
   const handleMapClick = (event: any) => {
     console.log("Map single click triggered");
@@ -526,6 +558,20 @@ function Newmap() {
               handleDrawArea={handleAreaDrawn}
               handleSelectedSpecies={handleSelectedSpecies}
             />
+          )}
+          {cordinateArray && (
+            <button
+              onClick={() => {
+                if (map) {
+                  updateSelectedPolygons(map, []);
+                  setCordinateArray([]);
+                  setCqlFilter("");
+                  console.log("Clicked Btn...", cordinateArray);
+                }
+              }}
+            >
+              Clear
+            </button>
           )}
         </div>
       </div>
