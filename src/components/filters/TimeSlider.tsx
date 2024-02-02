@@ -44,6 +44,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({ onChange }) => {
           defaultValue={[1970, currentYear]}
           //onChange={handleChange}
           onChangeComplete={handleChangeCommitted}
+          onChange={handleChange}
           // valueLabelDisplay="auto"
           marks={{
             1970: "1970",
