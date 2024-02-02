@@ -21,7 +21,7 @@ import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
 import OpenFilterButton from "@/components/filters/OpenFilterButton";
 import { getOccurrence } from "@/api/occurrence";
-import {Alert, IconButton, Snackbar, Tooltip} from "@mui/material";
+import { Alert, IconButton, Snackbar, Tooltip } from "@mui/material";
 import RenderFeature from "ol/render/Feature";
 import { Geometry, Polygon, SimpleGeometry } from "ol/geom";
 import { transform } from "ol/proj";
@@ -283,7 +283,8 @@ function Newmap() {
 
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
-      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {if (overlaysArray) {
+      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
+        if (overlaysArray) {
           setTheOverlaysArray(overlaysArray);
         }
         if (baseMapsArray) {
@@ -307,20 +308,20 @@ function Newmap() {
         } as GroupLayerOptions);
 
 
-            const initialMap = new OlMap({
-              target: "map-container",
-              layers: [BaseMaps, Overlays, occurrenceLayer],
-              view: new View({
-                center: [0, 0],
-                zoom: 4,
-              }),
-            });
-            const layerSwitcher = new LayerSwitcher();
-            initialMap.addControl(layerSwitcher);
-            initialMap.on("singleclick", handleMapClick);
-            mapRef.current = initialMap;
-            setMap(initialMap);
-          // Initialise map
+        const initialMap = new OlMap({
+          target: "map-container",
+          layers: [BaseMaps, Overlays, occurrenceLayer],
+          view: new View({
+            center: [0, 0],
+            zoom: 4,
+          }),
+        });
+        const layerSwitcher = new LayerSwitcher();
+        initialMap.addControl(layerSwitcher);
+        initialMap.on("singleclick", handleMapClick);
+        mapRef.current = initialMap;
+        setMap(initialMap);
+        // Initialise map
         return () => initialMap.setTarget(undefined);
       }
     };
@@ -337,7 +338,7 @@ function Newmap() {
       removeAreaInteractions(map);
       addAreaInteractions(map, areaSelected);
       console.log("Added Interaction");
-        }else {
+    } else {
       removeAreaInteractions(map);
     }
   }, [areaSelected, map]);
@@ -413,20 +414,20 @@ function Newmap() {
     };
 
     const existingOccurrenceLayer = map
-        ?.getLayers()
-        .getArray()
-        .find((layer) => {
-          return layer.get("occurrence-data") === true;
-        });
+      ?.getLayers()
+      .getArray()
+      .find((layer) => {
+        return layer.get("occurrence-data") === true;
+      });
     if (
-        existingOccurrenceLayer &&
-        existingOccurrenceLayer instanceof VectorLayer
+      existingOccurrenceLayer &&
+      existingOccurrenceLayer instanceof VectorLayer
     ) {
       const occurrenceSource = existingOccurrenceLayer.getSource();
       const existingLegendControl = map
-          ?.getControls()
-          .getArray()
-          .find((control) => control.get("name") === "legend");
+        ?.getControls()
+        .getArray()
+        .find((control) => control.get("name") === "legend");
       if (existingLegendControl) {
         map?.removeControl(existingLegendControl);
       }
@@ -530,7 +531,7 @@ function Newmap() {
           map
             .getViewport()
             .querySelectorAll(".ol-layer canvas, canvas.ol-layer"),
-          function (canvas) {
+          function(canvas) {
             if (canvas.width > 0) {
               const opacity =
                 canvas.parentNode?.style.opacity || canvas.style.opacity;
@@ -598,7 +599,7 @@ function Newmap() {
   return (
     <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
       <div
-        style={{ flexGrow: 1, width: showOccurrencePopup ? "70%" : "100%" }}
+        style={{ flexGrow: 1, transition: "width 4s", width: showOccurrencePopup ? "70%" : "100%" }}
         ref={mapElement}
         className="map-container"
         id="map-container"

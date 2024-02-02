@@ -1,15 +1,11 @@
 .occurrence-popup {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 10s ease-in-out, visibility 10s ease-in-out;
+ transition: "width 4s";
 }
 
-.occurrence-popup.show {
-  opacity: 1;
-  visibility: visible;
+.show {
+  /* Additional styles for the "show" state if needed */
 }
 
-.occurrence-popup.hide {
-  opacity: 0;
-  visibility: hidden;
+.hide {
+  /* Additional styles for the "hide" state if needed */
 }

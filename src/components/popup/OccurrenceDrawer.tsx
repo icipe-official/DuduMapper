@@ -78,7 +78,7 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
     }
     return (
 
-        <div className={`occurrence-popup ${open ? "show" : "hide"}`} id={id} style={{ ...scrollableStyle, ...borderStyle, ...{ width: '30%', overflowY: 'auto', transitionDuration: '4s' } }}>
+        <div className={`occurrence-popup ${open ? "show" : "hide"}`} id={id} style={{ ...scrollableStyle, ...borderStyle, ...{ width: '30%', overflowY: 'auto', transition: 'width 4s' } }}>
             <IconButton style={{ right: '0px' }} onClick={handleClose}>
                 <CloseRoundedIcon />
             </IconButton>
