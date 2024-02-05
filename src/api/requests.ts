@@ -274,7 +274,7 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
             title: displayName,
             visible: false,
             source: new WMTS({
-              url: geoServerBaseUrl + "/geoserver/overlays/gwc/service/wmts",
+              url: geoServerBaseUrl + "/geoserver/gwc/service/wmts",
               layer: layerName,
               matrixSet: "EPSG:900913",
               format: "image/png",
