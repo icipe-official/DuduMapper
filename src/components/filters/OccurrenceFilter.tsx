@@ -54,11 +54,14 @@ export default function OccurrenceFilter({
                                              onClearFilter,
                                              handleDrawArea,
                                              handleSelectedSpecies,
+                                             onResetFilter
                                          }: {
     open: boolean;
     handleFilterConditions: any;
     onClearFilter: any; handleDrawArea: any;
     handleSelectedSpecies: any;
+    onResetFilter: any
+    
 }) {
     const queryClient = useQueryClient();
     // const [open, setOpen] = useState(false);
@@ -79,6 +82,7 @@ export default function OccurrenceFilter({
     const [selectedLarval, setSelectedLarval] = useState("");
     const [isLarvalSelected, setIsLarvalSelected] = useState(false);
     const [selectedByArea, setSelectedByArea] = useState<string>("");
+    const [selectedCountryName, setSelectedCountryName] = useState('');
 
     const {
         isFetching: isFetchingCountries,
@@ -139,6 +143,10 @@ export default function OccurrenceFilter({
         setIsSpeciesSelected(Boolean(values));
         handleSelectedSpecies(values);
     };
+    const clearSelectedSpecies = () => {
+        setSelectedSpecies([]);
+    };
+    console.log('selected country',selectedCountry)
 
     const handleCountries = (feature: any) => {
         try {
@@ -156,16 +164,25 @@ export default function OccurrenceFilter({
             }
 
             console.log("WKT", wktGeoms);
-            setSelectedCountry(wktGeoms);
+            if (wktGeoms.trim() === '') {
+                setSelectedCountry('');
+            } else {
+                setSelectedCountry(wktGeoms);
+            }
         } catch (error: any) {
             console.error(error.message);
         }
     };
-
+    const clearSelectedCountries = () => {
+        setSelectedCountry('');
+      };
     //Send clear filter signal to map to remove cql_filter
     const handleClearFilter = () => {
         onClearFilter();
     };
+    const handleResetFilter = () =>{
+        onResetFilter();
+    }
 
     useEffect(() => {
         const filterParams: {} = composeFilterConditions();
@@ -252,7 +269,15 @@ export default function OccurrenceFilter({
                                             // placeholder="Select Species"
                                         />
                                     )}
-                                    onChange={(event, values) => handleSpecies(values)}
+                                    onChange={(event, values) => {
+                                        // Check if values are null or an empty array
+                                        if (!values || values.length === 0) {
+                                            handleSpecies([]);
+                                            handleResetFilter();
+                                        } else {
+                                            handleSpecies(values);
+                                        }
+                                    }}
                                 />
                             </FormControl>
                         </Grid>
@@ -293,7 +318,17 @@ export default function OccurrenceFilter({
                                             }}
                                         />
                                     )}
-                                    onChange={(event, value) => handleCountries(value)}
+                                    onChange={(event, values) => {
+                                        // Check if values are null or an empty array
+                                        if (!values || values.length === 0) {
+                                            // clearSelectedCountries();// Clear selected countries
+                                            setSelectedCountry('');
+                                            handleResetFilter(); // Clear filter associated with countries
+                                        } else {
+                                            handleCountries(values); // Update selected countries
+                                        }
+                                    }}
+                                    
                                 />
                             </FormControl>
                         </Grid>
@@ -658,6 +693,7 @@ export default function OccurrenceFilter({
                                     setIsLarvalSelected(false);
                                     setSelectedByArea("");
                                     handleClearFilter();
+                                    clearSelectedCountries();
                                     // Reset other state variables as needed
                                 }}
                             >
