@@ -94,9 +94,13 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
             .filter(({ key }) => !ignoreCategoryList.includes(key))
             .map(({ key, icon, displayName }) => (
               referenceProperties[key] !== null && (
-                <Typography key={key}>
-                  {icon} {convertToSensibleName(displayName)}: {referenceProperties[key]}
-                </Typography>
+                <>
+                  <span style={{ fontWeight: '900' }}>
+                    {icon} {convertToSensibleName(displayName)}:
+                  </span>
+                  <span style={{ fontWeight: '200' }}> {referenceProperties[key]}</span>
+                  <br></br>
+                </>
               )
             ))}
 
