@@ -136,10 +136,29 @@ function Newmap() {
     });
   };
 
-  const resetOccurrence = () => {
+  // const clearDropdown = () =>{
+  //   setSelectedSpecies([]);
+  // }
+
+  const removeOccurence = ()=> {
     setCqlFilter("");
     setSelectedSpecies([])
-  };
+    setFilterConditionsObj({
+        species: "", // Reset species filter
+        period: "", // Reset period filter
+        country: "", // Reset country filter
+    });
+  }
+
+  const resetOccurrence = () => {
+    setCqlFilter("");
+    setFilterConditionsObj({
+        species: selectedSpecies, // Reset species filter
+        period: "", // Reset period filter
+        country: "", // Reset country filter
+    });
+    // Additional logic to clear any other filter-related state variables if needed
+};
 
   const handleTimeChange = (startYear: number, endYear: number) => {
     const condition = `start_year >= ${startYear} AND end_year <= ${endYear} `;
@@ -312,7 +331,7 @@ function Newmap() {
               layers: [BaseMaps, Overlays, occurrenceLayer],
               view: new View({
                 center: [0, 0],
-                zoom: 4,
+                zoom: 2,
               }),
             });
             const layerSwitcher = new LayerSwitcher();
@@ -614,9 +633,12 @@ function Newmap() {
             <OccurrenceFilter
               open={filterOpen}
               handleFilterConditions={updateFilterConditions}
-              onClearFilter={resetOccurrence}
+              onClearFilter={() => {
+                removeOccurence();
+              }}
               handleDrawArea={handleAreaDrawn}
               handleSelectedSpecies={handleSelectedSpecies}
+              onResetFilter={resetOccurrence}
             />
           )}
         </div>
