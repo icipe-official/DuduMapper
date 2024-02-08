@@ -27,11 +27,16 @@ import EggIcon from "@mui/icons-material/Egg";
 import DoneIcon from "@mui/icons-material/Done";
 import CloseIcon from "@mui/icons-material/Close";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import FormatShapesIcon from "@mui/icons-material/FormatShapes";
 
 interface FilterConditions {
     species?: string;
     country?: string;
+    bionomics?: string;
 }
 
 const reqParams = {
@@ -83,6 +88,8 @@ export default function OccurrenceFilter({
     const [isLarvalSelected, setIsLarvalSelected] = useState(false);
     const [selectedByArea, setSelectedByArea] = useState<string>("");
     const [selectedCountryName, setSelectedCountryName] = useState('');
+    const [bionomicsData, setBionomicsData] = useState('');
+    const [insecticideResistance, setInsecticideResistance] = useState('');
 
     const {
         isFetching: isFetchingCountries,
@@ -114,6 +121,12 @@ export default function OccurrenceFilter({
         //   console.log("Selected Season", selectedSeason);
         //   const cFilter = ` `;
         // }
+
+        if (bionomicsData && bionomicsData.length > 0) {
+            console.log('bionomic prescence', bionomicsData);
+            const bioFilter = `bionomics_present = '${bionomicsData}'`;
+            filterConditions['bionomics'] = bioFilter;
+        }
 
         //season, larvae, adult,
         return filterConditions;
@@ -189,7 +202,7 @@ export default function OccurrenceFilter({
         if (filterParams && Object.keys(filterParams).length > 0) {
             handleFilterConditions(filterParams);
         }
-    }, [selectedSpecies, selectedCountry, selectedSeason]);
+    }, [selectedSpecies, selectedCountry, selectedSeason, bionomicsData]);
 
     const toggleSelectedByArea = (shape: string) => {
         if (selectedByArea === "") {
@@ -240,7 +253,7 @@ export default function OccurrenceFilter({
                                             {...params}
                                             variant="filled"
                                             label={`Disease (${selectedDisease.length} selected)`}
-                                            InputLabelProps={{sx: {fontSize: "0.8rem"}}}
+                                            InputLabelProps={{sx: {fontSize: "0.9rem"}}}
                                             style={{width: "100%"}}
                                         />
                                     )}
@@ -265,7 +278,7 @@ export default function OccurrenceFilter({
                                             {...params}
                                             variant="filled"
                                             label={`Species (${selectedSpecies.length} selected)`}
-                                            InputLabelProps={{sx: {fontSize: "0.8rem"}}}
+                                            InputLabelProps={{sx: {fontSize: "0.9rem"}}}
                                             // placeholder="Select Species"
                                         />
                                     )}
@@ -304,7 +317,7 @@ export default function OccurrenceFilter({
                                             {...params}
                                             label={`Countries`}
                                             variant="filled"
-                                            InputLabelProps={{sx: {fontSize: "0.8rem"}}}
+                                            InputLabelProps={{sx: {fontSize: "0.9rem"}}}
                                             InputProps={{
                                                 ...params.InputProps,
                                                 endAdornment: (
@@ -331,7 +344,141 @@ export default function OccurrenceFilter({
                                     
                                 />
                             </FormControl>
+                            </Grid>
+                        <Grid item xs={12} sm={4} md={12}>
+                            <Typography variant="caption" sx={{ fontStyle: "italic", marginRight: "5px", color: "#555", fontSize: 15, fontWeight: "550", }}>
+                                Bionomics Data:
+                            </Typography>
+                            <Grid container direction="row" alignItems="center" >
+                            
+                                <Grid item xs={4} textAlign="center"> 
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => setBionomicsData('true')}
+                                        fullWidth
+                                        sx={{
+                                            display: 'flex',
+                                            fontSize: '0.7rem',
+                                            flexDirection: 'column',
+                                            justifyContent: 'center',
+                                            padding: '8px 12px',
+                                            marginBottom: '2px',
+                                            color: bionomicsData === 'true' ? '89C6A7' : 'text.primary',
+                                            backgroundColor: bionomicsData === 'true' ? 'success.light' : 'background.default',
+                                            '&:hover': {
+                                                backgroundColor: bionomicsData === 'true' ? '#ebbd40' : 'background.default',
+                                            },
+                                        }}
+                                    >
+                                        < LinkIcon />
+                                        True 
+                                    </Button>
+                                    
+                                </Grid>
+                                <Grid item xs={4} textAlign="center">
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => setBionomicsData('false')}
+                                        fullWidth
+                                        sx={{
+                                            display: 'flex',
+                                            fontSize: '0.7rem',
+                                            flexDirection: 'column',
+                                            justifyContent: 'center',
+                                            padding: '8px 12px',
+                                            marginBottom: '2px',
+                                            color: bionomicsData === 'false' ? '89C6A7' : 'text.primary',
+                                            backgroundColor: bionomicsData === 'false' ? 'success.light' : 'background.default',
+                                            '&:hover': {
+                                                backgroundColor: bionomicsData === 'false' ? '#ebbd40' : 'background.default',
+                                            },
+                                        }}
+                                    >
+                                        <LinkOffIcon />
+                                        False
+                                    </Button>
+                                </Grid>
+                                
+                            </Grid>
                         </Grid>
+
+                        <Grid item xs={12} sm={4} md={12}>
+    <Typography variant="caption" sx={{ fontStyle: "italic", marginRight: "5px", color: "#555" , fontSize: 15, fontWeight: "550", }}>
+      Insecticide Resistance:
+    </Typography>
+    <Grid container direction="row" alignItems="center">
+      <Grid item xs={4} textAlign="center">
+        <Button
+          variant="contained"
+          onClick={() => setInsecticideResistance('phenotypic')}
+          fullWidth
+          sx={{
+            display: 'flex',
+            fontSize: '0.7rem',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            padding: '8px 12px',
+            marginBottom: '2px',
+            color: insecticideResistance === 'phenotypic' ? '89C6A7' : 'text.primary',
+            backgroundColor: insecticideResistance === 'phenotypic' ? 'success.light' : 'background.default',
+            '&:hover': {
+              backgroundColor: insecticideResistance === 'phenotypic' ? '#ebbd40' : 'background.default',
+            },
+          }}
+        >
+            <FingerprintIcon />
+          Phenotypic
+        </Button>
+      </Grid>
+      <Grid item xs={4} textAlign="center">
+        <Button
+          variant="contained"
+          onClick={() => setInsecticideResistance('genotypic')}
+          fullWidth
+          sx={{
+              display: 'flex',
+              fontSize: '0.7rem',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              padding: '8px 12px',
+              marginBottom: '2px',
+            color: insecticideResistance === 'genotypic' ? '89C6A7' : 'text.primary',
+            backgroundColor: insecticideResistance === 'genotypic' ? 'success.light' : 'background.default',
+            '&:hover': {
+              backgroundColor: insecticideResistance === 'genotypic' ? '#ebbd40' : 'background.default',
+            },
+          }}
+        >
+            <HourglassEmptyIcon />
+          Genotypic
+        </Button>
+      </Grid>
+      <Grid item xs={4} textAlign="center">
+        <Button
+          variant="contained"
+          onClick={() => setInsecticideResistance('empty')}
+          fullWidth
+          sx={{
+              display: 'flex',
+              fontSize: '0.7rem',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              padding: '8px 12px',
+              marginBottom: '2px',
+            color: insecticideResistance === 'empty' ? '89C6A7' : 'text.primary',
+            backgroundColor: insecticideResistance === 'empty' ? 'success.light' : 'background.default',
+            '&:hover': {
+              backgroundColor: insecticideResistance === 'empty' ? '#ebbd40' : 'background.default',
+            },
+          }}
+        >
+            <DataArrayIcon />
+          Empty
+        </Button>
+      </Grid>
+    </Grid>
+  </Grid>
+
                         <Grid
                             container
                             alignItems="center"
@@ -600,8 +747,8 @@ export default function OccurrenceFilter({
                                     </IconButton>
                                 </Tooltip>
                             </Grid>
-                            <Typography sx={{color: "green", fontSize: 15, mt: 4}}>
-                                Select by Area
+                            <Typography sx={{color: "#2e7d32", fontSize: 17, mt: 4, fontWeight: "550",}}>
+                                Select by area
                             </Typography>
                             <Grid container rowSpacing={8} direction='row' sx={{flexDirection: 'row'}}>
                                 <Grid
@@ -615,6 +762,9 @@ export default function OccurrenceFilter({
                                             fontStyle: "italic",
                                             marginRight: "5px",
                                             color: "black",
+                                            fontSize: ".9rem",
+                                            
+                                            
                                         }}
                                     >
                                         Circle:{" "}
@@ -622,7 +772,7 @@ export default function OccurrenceFilter({
                                             onClick={() => toggleSelectedByArea("Circle")}
                                             color={selectedByArea === "Circle" ? "success" : "default"}
                                             sx={{
-                                                fontSize: "1.5rem",
+                                                
                                                 "&:hover": {
                                                     color:
                                                         selectedByArea === "Circle" ? "#2e7d32" : "primary",
@@ -644,6 +794,7 @@ export default function OccurrenceFilter({
                                             fontStyle: "italic",
                                             marginRight: "5px",
                                             color: "black",
+                                            fontSize: ".9rem",
                                         }}
                                     >
                                         Polygon:{" "}
@@ -651,7 +802,7 @@ export default function OccurrenceFilter({
                                             onClick={() => toggleSelectedByArea("Polygon")}
                                             color={selectedByArea === "Polygon" ? "success" : "default"}
                                             sx={{
-                                                fontSize: "1.5rem",
+                                                
                                                 "&:hover": {
                                                     color:
                                                         selectedByArea === "Polygon" ? "#2e7d32" : "primary",
@@ -694,6 +845,8 @@ export default function OccurrenceFilter({
                                     setSelectedByArea("");
                                     handleClearFilter();
                                     clearSelectedCountries();
+                                    setBionomicsData('');
+                                    setInsecticideResistance('');
                                     // Reset other state variables as needed
                                 }}
                             >
