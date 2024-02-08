@@ -126,9 +126,13 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({
                     >
                         {properties.map((property) => (
                             bionomicsProperties[property] !== null && (
-                                <Typography key={property}>
-                                    {convertToSensibleName(property)}: {bionomicsProperties[property]}
-                                </Typography>
+                                <>
+                                    <span style={{ fontWeight: '900' }}>
+                                        {convertToSensibleName(property)}:
+                                    </span>
+                                    <span style={{ fontWeight: '200' }}> {bionomicsProperties[property]}</span>
+                                    <br></br>
+                                </>
                             )
                         ))}
                     </AccordionDetails>
