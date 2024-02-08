@@ -133,6 +133,7 @@ function Newmap() {
       ...filterConditionsObj,
       species: conditions["species"],
       country: conditions["country"],
+      bionomics: conditions["bionomics"],
     });
   };
 
@@ -147,6 +148,7 @@ function Newmap() {
         species: "", // Reset species filter
         period: "", // Reset period filter
         country: "", // Reset country filter
+        bionomics: "",
     });
   }
 
