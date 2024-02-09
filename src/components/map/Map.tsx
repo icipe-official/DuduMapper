@@ -599,7 +599,7 @@ function Newmap() {
   return (
     <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
       <div
-        style={{ flexGrow: 1, transition: "width 4s", width: showOccurrencePopup ? "70%" : "100%" }}
+        style={{ flexGrow: 1, transition: "width 0.3s", width: showOccurrencePopup ? "70%" : "100%" }}
         ref={mapElement}
         className="map-container"
         id="map-container"
@@ -653,13 +653,33 @@ function Newmap() {
         ></a>
       </div>
 
-      {showOccurrencePopup && (
-        <OccurrencePopup
-          id={"feature_popover"}
-          handleClose={handleClosePopup}
-          popoverContent={popoverContent}
-        />
-      )}
+      <div
+        className="occurrence-popup"
+        style={{
+          // position: "fixed",
+          // top: "0",
+          // right: "0",
+          width: "30%",
+          // height: "100%",
+          background: "white",
+          // zIndex: "999",
+          transition: "transform 0.3s ease-out  0.3s ease-in",
+          transform: `translateX(${showOccurrencePopup ? "0%" : "100%"})`,
+        }}
+      >
+        {showOccurrencePopup && (
+          <>
+            <OccurrencePopup
+              id={"feature_popover"}
+              handleClose={handleClosePopup}
+              popoverContent={popoverContent}
+            />
+            <div style={{ textAlign: "right", padding: "10px", cursor: "pointer" }}>
+              <span onClick={handleClosePopup}>Close</span>
+            </div>
+          </>
+        )}
+      </div>
       <div>
         <TimeSlider onChange={handleTimeChange} />
       </div>
