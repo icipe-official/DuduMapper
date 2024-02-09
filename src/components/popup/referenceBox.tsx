@@ -95,24 +95,26 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
             .map(({ key, icon, displayName }) => (
               referenceProperties[key] !== null && (
                 <>
-                  <span style={{ fontWeight: '900' }}>
-                    {icon} {convertToSensibleName(displayName)}:
+                  <span style={{ fontWeight: '600' }}>
+                    {icon} {key == 'doi' ? displayName.toUpperCase() : convertToSensibleName(key)}:
                   </span>
-                  <span style={{ fontWeight: '200' }}> {referenceProperties[key]}</span>
+                  <span style={{ fontWeight: '350' }}> {referenceProperties[key]}</span>
                   <br></br>
                 </>
               )
             ))}
+
 
           {Object.entries(referenceProperties)
             .filter(([key]) => !keyConfig.some((config) => config.key === key) && !ignoreCategoryList.includes(key))
             .map(([key, value]) => (
               value !== null && (
                 <Typography key={key}>
-                  {genericIcon} {convertToSensibleName(key)}: {referenceProperties[key]}
+                  {genericIcon} {key == 'doi' ? key.toUpperCase() : convertToSensibleName(key)}: {referenceProperties[key]}
                 </Typography>
               )
             ))}
+
 
         </AccordionDetails>
       </Accordion>

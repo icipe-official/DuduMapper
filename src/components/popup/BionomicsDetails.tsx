@@ -111,8 +111,8 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({
                     expanded={activeCategory === category}
                     onChange={() => setActiveCategory(category)}
                     sx={{
-                        backgroundColor: activeCategory === category ? "#424242" : "#1c1c1c",
-                        color: activeCategory === category ? "#00E676" : "#9E9E9E",
+                        backgroundColor: activeCategory === category ? "#aaa" : "#ddd",
+                        color: activeCategory === category ? "#fff" : "#222",
                     }}
                 >
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
