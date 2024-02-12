@@ -82,7 +82,7 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
             <IconButton style={{ right: '0px' }} onClick={handleClose}>
                 <CloseRoundedIcon />
             </IconButton>
-            <Accordion defaultExpanded expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
+            <Accordion sx={{ color: '#fff' }} defaultExpanded expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
                 <CustomAccordionSummary title={"Occurrence"} desc={"Vector occurrence information"} />
                 <AccordionDetails>
                     <SpeciesInfoBox speciesInfo={popoverContent} />
