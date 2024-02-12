@@ -20,6 +20,25 @@ const convertToSensibleName = (key: string) => {
         .replace(/[_-]/g, " ") // Replace underscores and hyphens with spaces
         .replace(/\w\S*/g, (txt: string) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()); // Capitalize first letter of each word
 };
+const toTitleCase = (name: string) => {
+    if (!name) {
+        return "";
+    }
+
+    // Use a regular expression to split the name by capital letters
+    const words = name.split(/(?=[A-Z])/);
+
+    // Capitalize the first letter of each word except for "and"
+    const titleCasedWords = words.map(word => {
+        const lowerCasedWord = word.toLowerCase();
+        return lowerCasedWord === "and" ? lowerCasedWord : lowerCasedWord.charAt(0).toUpperCase() + lowerCasedWord.slice(1);
+    });
+
+    // Join the words back into a single string
+    const titleCasedName = titleCasedWords.join(" ");
+
+    return titleCasedName;
+}
 
 const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({
     bionomicsData,
@@ -111,26 +130,26 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({
                     expanded={activeCategory === category}
                     onChange={() => setActiveCategory(category)}
                     sx={{
-                        backgroundColor: activeCategory === category ? "#aaa" : "#ddd",
-                        color: activeCategory === category ? "#fff" : "#222",
+                        backgroundColor: activeCategory === category ? "#c4c4c4" : "#ddd",
+                        color: activeCategory === category ? "#666" : "#222",
                     }}
                 >
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">{convertToSensibleName(category)}</Typography>
+                        <Typography variant="h6">{toTitleCase(category)}</Typography>
                     </AccordionSummary>
                     <AccordionDetails
                         sx={{
                             backgroundColor: "#ffffff",
-                            color: "#000",
+                            color: "#333",
                         }}
                     >
                         {properties.map((property) => (
                             bionomicsProperties[property] !== null && (
                                 <>
-                                    <span style={{ fontWeight: '900' }}>
+                                    <span style={{ fontWeight: '750' }}>
                                         {convertToSensibleName(property)}:
                                     </span>
-                                    <span style={{ fontWeight: '200' }}> {bionomicsProperties[property]}</span>
+                                    <span style={{ fontWeight: '400' }}> {bionomicsProperties[property]}</span>
                                     <br></br>
                                 </>
                             )
