@@ -5,7 +5,7 @@
   align-items: center;
   transform: translateX(0%);
   z-index: 1000;
-  background-color: #ebbd40 !important;
+  background-color: #038543 !important;
   color: white !important;
   border-radius: 1px;
 }
@@ -19,7 +19,7 @@
   transform: translateX(0%);
   z-index: 1000;
   background-color: white !important;
-  color: #ebbd40 !important;
+  color: #038543 !important;
   border-radius: 1px;
   width: 500px;
   height: 600px;

@@ -403,81 +403,81 @@ export default function OccurrenceFilter({
                         </Grid>
 
                         <Grid item xs={12} sm={4} md={12}>
-    <Typography variant="caption" sx={{ fontStyle: "italic", marginRight: "5px", color: "#555" , fontSize: 15, fontWeight: "550", }}>
-      Insecticide Resistance:
-    </Typography>
-    <Grid container direction="row" alignItems="center">
-      <Grid item xs={4} textAlign="center">
-        <Button
-          variant="contained"
-          onClick={() => setInsecticideResistance('phenotypic')}
-          fullWidth
-          sx={{
-            display: 'flex',
-            fontSize: '0.7rem',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            padding: '8px 12px',
-            marginBottom: '2px',
-            color: insecticideResistance === 'phenotypic' ? '89C6A7' : 'text.primary',
-            backgroundColor: insecticideResistance === 'phenotypic' ? 'success.light' : 'background.default',
-            '&:hover': {
-              backgroundColor: insecticideResistance === 'phenotypic' ? '#ebbd40' : 'background.default',
-            },
-          }}
-        >
-            <FingerprintIcon />
-          Phenotypic
-        </Button>
-      </Grid>
-      <Grid item xs={4} textAlign="center">
-        <Button
-          variant="contained"
-          onClick={() => setInsecticideResistance('genotypic')}
-          fullWidth
-          sx={{
-              display: 'flex',
-              fontSize: '0.7rem',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              padding: '8px 12px',
-              marginBottom: '2px',
-            color: insecticideResistance === 'genotypic' ? '89C6A7' : 'text.primary',
-            backgroundColor: insecticideResistance === 'genotypic' ? 'success.light' : 'background.default',
-            '&:hover': {
-              backgroundColor: insecticideResistance === 'genotypic' ? '#ebbd40' : 'background.default',
-            },
-          }}
-        >
-            <HourglassEmptyIcon />
-          Genotypic
-        </Button>
-      </Grid>
-      <Grid item xs={4} textAlign="center">
-        <Button
-          variant="contained"
-          onClick={() => setInsecticideResistance('empty')}
-          fullWidth
-          sx={{
-              display: 'flex',
-              fontSize: '0.7rem',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              padding: '8px 12px',
-              marginBottom: '2px',
-            color: insecticideResistance === 'empty' ? '89C6A7' : 'text.primary',
-            backgroundColor: insecticideResistance === 'empty' ? 'success.light' : 'background.default',
-            '&:hover': {
-              backgroundColor: insecticideResistance === 'empty' ? '#ebbd40' : 'background.default',
-            },
-          }}
-        >
-            <DataArrayIcon />
-          Empty
-        </Button>
-      </Grid>
-    </Grid>
-  </Grid>
+                            <Typography variant="caption" sx={{ fontStyle: "italic", marginRight: "5px", color: "#555", fontSize: 15, fontWeight: "550", }}>
+                                Insecticide Resistance:
+                            </Typography>
+                            <Grid container direction="row" alignItems="center">
+                                <Grid item xs={4} textAlign="center">
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => setInsecticideResistance('phenotypic')}
+                                        fullWidth
+                                        sx={{
+                                            display: 'flex',
+                                            fontSize: '0.7rem',
+                                            flexDirection: 'column',
+                                            justifyContent: 'center',
+                                            padding: '8px 12px',
+                                            marginBottom: '2px',
+                                            color: insecticideResistance === 'phenotypic' ? '89C6A7' : 'text.primary',
+                                            backgroundColor: insecticideResistance === 'phenotypic' ? 'success.light' : 'background.default',
+                                            '&:hover': {
+                                                backgroundColor: insecticideResistance === 'phenotypic' ? '#ebbd40' : 'background.default',
+                                            },
+                                        }}
+                                    >
+                                        <FingerprintIcon />
+                                        Phenotypic
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={4} textAlign="center">
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => setInsecticideResistance('genotypic')}
+                                        fullWidth
+                                        sx={{
+                                            display: 'flex',
+                                            fontSize: '0.7rem',
+                                            flexDirection: 'column',
+                                            justifyContent: 'center',
+                                            padding: '8px 12px',
+                                            marginBottom: '2px',
+                                            color: insecticideResistance === 'genotypic' ? '89C6A7' : 'text.primary',
+                                            backgroundColor: insecticideResistance === 'genotypic' ? 'success.light' : 'background.default',
+                                            '&:hover': {
+                                                backgroundColor: insecticideResistance === 'genotypic' ? '#ebbd40' : 'background.default',
+                                            },
+                                        }}
+                                    >
+                                        <HourglassEmptyIcon />
+                                        Genotypic
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={4} textAlign="center">
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => setInsecticideResistance('empty')}
+                                        fullWidth
+                                        sx={{
+                                            display: 'flex',
+                                            fontSize: '0.7rem',
+                                            flexDirection: 'column',
+                                            justifyContent: 'center',
+                                            padding: '8px 12px',
+                                            marginBottom: '2px',
+                                            color: insecticideResistance === 'empty' ? '89C6A7' : 'text.primary',
+                                            backgroundColor: insecticideResistance === 'empty' ? 'success.light' : 'background.default',
+                                            '&:hover': {
+                                                backgroundColor: insecticideResistance === 'empty' ? '#ebbd40' : 'background.default',
+                                            },
+                                        }}
+                                    >
+                                        <DataArrayIcon />
+                                        Empty
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Grid>
 
                         <Grid
                             container
@@ -502,6 +502,7 @@ export default function OccurrenceFilter({
                                         fontStyle: "italic",
                                         marginRight: ".5px",
                                         fontSize: "0.98rem",
+                                        fontWeight: "550",
                                     }}
                                 >
                                     Season:{" "}
@@ -512,8 +513,10 @@ export default function OccurrenceFilter({
                                         color={selectedSeason === "Rainy" ? "success" : "default"}
                                         sx={{
                                             fontSize: "1.5rem",
+                                            
                                             "&:hover": {
                                                 color: "#2e7d32", // Green color on hover
+                                              
                                             },
                                         }}
                                     >
@@ -566,6 +569,7 @@ export default function OccurrenceFilter({
                                         fontStyle: "italic",
                                         marginRight: "0.5px",
                                         fontSize: "1rem",
+                                        fontWeight: "550",
                                     }}
                                 >
                                     Control:{" "}
@@ -632,6 +636,7 @@ export default function OccurrenceFilter({
                                         fontStyle: "italic",
                                         marginRight: "10px",
                                         fontSize: "1rem",
+                                        fontWeight: "550",
                                     }}
                                 >
                                     Adult:{" "}
@@ -697,6 +702,7 @@ export default function OccurrenceFilter({
                                         fontStyle: "italic",
                                         marginRight: "5px",
                                         fontSize: "1rem",
+                                        fontWeight: "550",
                                     }}
                                 >
                                     Larval:{" "}
@@ -821,7 +827,7 @@ export default function OccurrenceFilter({
                                 sx={{
                                     backgroundColor: "#2e7d32",
                                     "&:hover": {
-                                        backgroundColor: colors.grey[500],
+                                        backgroundColor: '#ebbd40',
                                         // Background color on hover
                                     },
                                 }}
