@@ -120,8 +120,8 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({
                     </AccordionSummary>
                     <AccordionDetails
                         sx={{
-                            backgroundColor: "#f5f7c5",
-                            color: "#1B5E20",
+                            backgroundColor: "#ffffff",
+                            color: "#000",
                         }}
                     >
                         {properties.map((property) => (
