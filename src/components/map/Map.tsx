@@ -661,7 +661,7 @@ function Newmap() {
           <IconButton onClick={printToScale}>
             <PrintIcon
               style={{
-                color: "#ebbd40",
+                color: "#038543",
                 fontWeight: "bold",
 
                 // border: "2px solid white",
