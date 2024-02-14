@@ -1,6 +1,6 @@
 .filter-dev-button {
   position: absolute;
-  top: 100px;
+  top: 30px;
   left: 5px;
   align-items: center;
   transform: translateX(0%);
@@ -10,19 +10,39 @@
   border-radius: 1px;
 }
 
+.print-dev-button {
+  position: absolute;
+  top: 100px;
+  left: 3px;
+  align-items: center;
+  transform: translateX(0%);
+  z-index: 1000;
+  color: white !important;
+  border-radius: 1px;
+}
+.dummy-dev-button {
+  position: relative;
+  top: 520px;
+  right: 0.9em;
+  align-items: center;
+  transform: translateX(0%);
+  z-index: 1000;
+  color: white !important;
+  border-radius: 1px;
+}
 .filter-dev-section {
   display: flow;
   position: absolute;
   top: 100px;
-  left: 3%;
+  left: 3.5%;
   align-items: center;
   transform: translateX(0%);
   z-index: 1000;
   background-color: white !important;
   color: #038543 !important;
-  border-radius: 1px;
+  border-radius: 10px;
   width: 500px;
-  height: 600px;
+  height: 560px;
   overflow-y: auto;
   padding: 5px;
 }

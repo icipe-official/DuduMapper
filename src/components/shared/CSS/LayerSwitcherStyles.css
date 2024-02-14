@@ -141,7 +141,7 @@ button {
   float: left !important;
   z-index: 10;
   position: relative;
-  font-size: 1.7em;
+  font-size: 1.7rem;
   padding-right: 10px !important;
 }
 .ol-layerswitcher .layerup {
@@ -154,7 +154,7 @@ button {
 }
 .ol-layerswitcher.ol-forceopen .panel-container {
   display: block;
-  margin-left: 30px;
+  margin-left: 40px;
 }
 .ol-layerswitcher .panel {
   list-style: none;
@@ -162,7 +162,7 @@ button {
   margin: 0;
   overflow: hidden;
   font-family: Tahoma, Geneva, sans-serif;
-  font-size: 0.9em;
+  font-size: 0.9rem;
   -webkit-transition: top 0.3s;
   transition: top 0.3s;
   position: relative;
