@@ -47,7 +47,7 @@ export default function EnvironmentCard({
         "People's Lifestyle": ["average_awake_time", "sleeping_outdoors", "farming_notes", "land_use", "livestock", "livestock_notes", "plants_species"],
     };
 
-    const ignoreCategory = ["admin_1", "admin_2", "area_type", "confidence", "georef_source", "name", "id", "site_id", "environment_id"];
+    const ignoreCategory = ["admin_1", "admin_2", "area_type", "confidence", "georef_source", "name", "id", "site_id", "environment_id", "country"];
 
     const otherCategory = Object.keys(siteProps).filter(
         (key) =>
@@ -59,8 +59,8 @@ export default function EnvironmentCard({
 
             <Card sx={{ backgroundColor: "#1c1c1c", color: "#9E9E9E" }}>
                 <CardHeader
-                    title={`${siteProps["country"]} `}
-                    sx={{ backgroundColor: "#212121", color: "#9E9E9E", borderBottom: '1px solid #424242' }} // Updated CardHeader styles
+                    title={<span style={{ fontWeight: '600', fontSize: '1.25rem' }}>Country: {siteProps["country"]}</span>}
+                    sx={{ backgroundColor: "#ddd", color: "#333", fontWeight: '200', }} // Updated CardHeader styles
                 />
             </Card>
             {Object.keys(categories).map((category) => (
@@ -69,8 +69,8 @@ export default function EnvironmentCard({
                     expanded={activeCategory === category}
                     onChange={() => setActiveCategory(category)}
                     sx={{
-                        backgroundColor: activeCategory === category ? "#424242" : "#1c1c1c", // Set a darker color for active and non-active tabs
-                        color: activeCategory === category ? "#00E676" : "#9E9E9E", // Set green font color for active tab and grey for non-active tabs
+                        backgroundColor: activeCategory === category ? "#c4c4c4" : "#ddd", // Set a darker color for active and non-active tabs
+                        color: activeCategory === category ? "#666" : "#222", // Set green font color for active tab and grey for non-active tabs
                     }}
                 >
                     <AccordionSummary
@@ -82,18 +82,18 @@ export default function EnvironmentCard({
                     </AccordionSummary>
                     <AccordionDetails
                         sx={{
-                            backgroundColor: " #f5f7c5 ", // Set yellow background color for expanded content
-                            color: "#1B5E20", // Set green font color for expanded content
+                            backgroundColor: " #fff ", // Set yellow background color for expanded content
+                            color: "#333", // Set green font color for expanded content
                         }}
                     >
                         <Box>
                             {categories[category].map((key) => (
                                 siteProps[key] !== null && (
                                     <>
-                                        <span style={{ fontWeight: '900' }}>
+                                        <span style={{ fontWeight: '750' }}>
                                             {convertToSensibleName(key)}:
                                         </span>
-                                        <span style={{ fontWeight: '200' }}> {siteProps[key]}</span>
+                                        <span style={{ fontWeight: '400' }}> {siteProps[key]}</span>
                                         <br></br>
                                     </>
 
@@ -109,8 +109,8 @@ export default function EnvironmentCard({
                     expanded={activeCategory === "Other"}
                     onChange={() => setActiveCategory("Other")}
                     sx={{
-                        backgroundColor: activeCategory === "Other" ? "#424242" : "#1c1c1c", // Set a darker color for active and non-active tabs
-                        color: activeCategory === "Other" ? "#00E676" : "#9E9E9E", // Set green font color for active tab and grey for non-active tabs
+                        backgroundColor: activeCategory === "Other" ? "#c4c4c4" : "#ddd", // Set a darker color for active and non-active tabs
+                        color: activeCategory === "Other" ? "#666" : "#222", // Set green font color for active tab and grey for non-active tabs
                     }}
                 >
                     <AccordionSummary
@@ -123,18 +123,18 @@ export default function EnvironmentCard({
 
                     <AccordionDetails
                         sx={{
-                            backgroundColor: " #f5f7c5 ", // Set yellow background color for expanded content
-                            color: "#1B5E20", // Set green font color for expanded content
+                            backgroundColor: " #fff ", // Set yellow background color for expanded content
+                            color: "#333", // Set green font color for expanded content
                         }}
                     >
                         <Box>
                             {otherCategory.map((key) => (
                                 siteProps[key] !== null && (
                                     <>
-                                        <span style={{ fontWeight: '900' }}>
+                                        <span style={{ fontWeight: '750' }}>
                                             {convertToSensibleName(key)}:
                                         </span>
-                                        <span style={{ fontWeight: '200' }}> {siteProps[key]}</span>
+                                        <span style={{ fontWeight: '400' }}> {siteProps[key]}</span>
                                         <br></br>
                                     </>
                                 )
