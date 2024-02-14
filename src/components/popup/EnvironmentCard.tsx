@@ -89,9 +89,14 @@ export default function EnvironmentCard({
                         <Box>
                             {categories[category].map((key) => (
                                 siteProps[key] !== null && (
-                                    <Typography key={key}>
-                                        {convertToSensibleName(key)}: {siteProps[key]}
-                                    </Typography>
+                                    <>
+                                        <span style={{ fontWeight: '900' }}>
+                                            {convertToSensibleName(key)}:
+                                        </span>
+                                        <span style={{ fontWeight: '200' }}> {siteProps[key]}</span>
+                                        <br></br>
+                                    </>
+
                                 )
                             ))}
                         </Box>
@@ -125,9 +130,13 @@ export default function EnvironmentCard({
                         <Box>
                             {otherCategory.map((key) => (
                                 siteProps[key] !== null && (
-                                    <Typography key={key}>
-                                        {convertToSensibleName(key)}: {siteProps[key]}
-                                    </Typography>
+                                    <>
+                                        <span style={{ fontWeight: '900' }}>
+                                            {convertToSensibleName(key)}:
+                                        </span>
+                                        <span style={{ fontWeight: '200' }}> {siteProps[key]}</span>
+                                        <br></br>
+                                    </>
                                 )
                             ))}
                         </Box>
