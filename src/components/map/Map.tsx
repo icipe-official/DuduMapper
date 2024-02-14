@@ -21,7 +21,7 @@ import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
 import OpenFilterButton from "@/components/filters/OpenFilterButton";
 import { getOccurrence } from "@/api/occurrence";
-import { Alert, Drawer, IconButton, Snackbar, Tooltip } from "@mui/material";
+import {Alert, IconButton, Snackbar, Tooltip} from "@mui/material";
 import RenderFeature from "ol/render/Feature";
 import { Geometry, Polygon, SimpleGeometry } from "ol/geom";
 import { transform } from "ol/proj";
@@ -30,12 +30,11 @@ import { Draw, Modify, Snap } from "ol/interaction.js";
 import Map from "ol/Map";
 import { never } from "ol/events/condition";
 import colormap from "colormap";
-import PrintIcon from "@mui/icons-material/Print";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import MenuIcon from "@mui/icons-material/Menu";
+import PrintIcon from '@mui/icons-material/Print'
 
 let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
+
   const queryClient = useQueryClient();
   const mapRef = useRef<OlMap>();
   const [popoverContent, setPopoverContent] = React.useState<{
@@ -57,13 +56,6 @@ function Newmap() {
   const [cqlFilter, setCqlFilter] = useState("");
   const [theOverlaysArray, setTheOverlaysArray] = useState<any>([]);
   const [theBaseMapsArray, setTheBaseMapsArray] = useState<any>([]);
-
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [showBackButton, setShowBackButton] = useState(false);
-  const handleToggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
-    setShowBackButton(!showBackButton);
-  };
 
   const [occurrenceSource, setOccurrenceSource] = useState<VectorSource>(
     new VectorSource({
@@ -141,13 +133,34 @@ function Newmap() {
       ...filterConditionsObj,
       species: conditions["species"],
       country: conditions["country"],
+      bionomics: conditions["bionomics"],
     });
   };
 
+  // const clearDropdown = () =>{
+  //   setSelectedSpecies([]);
+  // }
+
+  const removeOccurence = ()=> {
+    setCqlFilter("");
+    setSelectedSpecies([])
+    setFilterConditionsObj({
+        species: "", // Reset species filter
+        period: "", // Reset period filter
+        country: "", // Reset country filter
+        bionomics: "",
+    });
+  }
+
   const resetOccurrence = () => {
     setCqlFilter("");
-    setSelectedSpecies([]);
-  };
+    setFilterConditionsObj({
+        species: selectedSpecies, // Reset species filter
+        period: "", // Reset period filter
+        country: "", // Reset country filter
+    });
+    // Additional logic to clear any other filter-related state variables if needed
+};
 
   const handleTimeChange = (startYear: number, endYear: number) => {
     const condition = `start_year >= ${startYear} AND end_year <= ${endYear} `;
@@ -291,8 +304,7 @@ function Newmap() {
 
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
-      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
-        if (overlaysArray) {
+      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {if (overlaysArray) {
           setTheOverlaysArray(overlaysArray);
         }
         if (baseMapsArray) {
@@ -315,20 +327,21 @@ function Newmap() {
           layers: theOverlaysArray,
         } as GroupLayerOptions);
 
-        const initialMap = new OlMap({
-          target: "map-container",
-          layers: [BaseMaps, Overlays, occurrenceLayer],
-          view: new View({
-            center: [0, 0],
-            zoom: 4,
-          }),
-        });
-        const layerSwitcher = new LayerSwitcher();
-        initialMap.addControl(layerSwitcher);
-        initialMap.on("singleclick", handleMapClick);
-        mapRef.current = initialMap;
-        setMap(initialMap);
-        // Initialise map
+
+            const initialMap = new OlMap({
+              target: "map-container",
+              layers: [BaseMaps, Overlays, occurrenceLayer],
+              view: new View({
+                center: [0, 0],
+                zoom: 2,
+              }),
+            });
+            const layerSwitcher = new LayerSwitcher();
+            initialMap.addControl(layerSwitcher);
+            initialMap.on("singleclick", handleMapClick);
+            mapRef.current = initialMap;
+            setMap(initialMap);
+          // Initialise map
         return () => initialMap.setTarget(undefined);
       }
     };
@@ -345,7 +358,7 @@ function Newmap() {
       removeAreaInteractions(map);
       addAreaInteractions(map, areaSelected);
       console.log("Added Interaction");
-    } else {
+        }else {
       removeAreaInteractions(map);
     }
   }, [areaSelected, map]);
@@ -421,20 +434,20 @@ function Newmap() {
     };
 
     const existingOccurrenceLayer = map
-      ?.getLayers()
-      .getArray()
-      .find((layer) => {
-        return layer.get("occurrence-data") === true;
-      });
+        ?.getLayers()
+        .getArray()
+        .find((layer) => {
+          return layer.get("occurrence-data") === true;
+        });
     if (
-      existingOccurrenceLayer &&
-      existingOccurrenceLayer instanceof VectorLayer
+        existingOccurrenceLayer &&
+        existingOccurrenceLayer instanceof VectorLayer
     ) {
       const occurrenceSource = existingOccurrenceLayer.getSource();
       const existingLegendControl = map
-        ?.getControls()
-        .getArray()
-        .find((control) => control.get("name") === "legend");
+          ?.getControls()
+          .getArray()
+          .find((control) => control.get("name") === "legend");
       if (existingLegendControl) {
         map?.removeControl(existingLegendControl);
       }
@@ -606,93 +619,61 @@ function Newmap() {
   return (
     <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
       <div
-        style={{
-          position: "absolute",
-          left: drawerOpen ? "1.5%" : "0",
-          zIndex: 1200,
-          top: "55%",
-        }}
+        style={{ flexGrow: 1, width: showOccurrencePopup ? "70%" : "100%" }}
+        ref={mapElement}
+        className="map-container"
+        id="map-container"
       >
-        <IconButton onClick={handleToggleDrawer}>
-          {drawerOpen ? <ArrowBackIcon /> : <MenuIcon />}
-        </IconButton>
-      </div>
-      <Drawer
-        anchor="left"
-        open={drawerOpen}
-        onClose={handleToggleDrawer}
-        variant="persistent"
-        PaperProps={{
-          style: {
-            backgroundColor: "#f0f0f0",
-            width: "1.5%", // Adjust the width as needed
-            height: "50%",
-            padding: "10px",
-            borderRight: "1px solid #ccc",
-            boxShadow: "2px 0 5px rgba(0, 0, 0, 0.2)",
-            transition: "width 0.4s ease",
-            zIndex: 1000,
-          },
-        }}
-      >
-        <div
-          className="filter-dev-button"
-          style={{ borderBottom: "1px solid #ccc", marginBottom: "10px" }}
-        >
+        <div className="filter-dev-button">
           <OpenFilterButton
             filterOpen={filterOpen}
             onClick={() => setFilterOpen(!filterOpen)}
           />
         </div>
-        <div
-          className="print-section"
-          style={{
-            position: "absolute",
-            top: "270px",
-            left: "5px",
-            alignItems: "center",
-            transform: "translateX(0%)",
-            zIndex: 900,
-            borderRadius: "15px",
-            borderBottom: "1px solid #ccc",
-          }}
-        >
-          <Tooltip title="Print map image" arrow>
-            <IconButton onClick={printToScale}>
-              <PrintIcon
-                style={{
-                  color: "#ebbd40",
-                  fontWeight: "bold",
-
-                  // border: "2px solid white",
-                }}
-              />
-            </IconButton>
-          </Tooltip>
-          <a
-            id="image-download"
-            style={{ display: "none" }}
-            download="printed_map.png"
-          ></a>
+        <div>
+          {filterOpen && (
+            <OccurrenceFilter
+              open={filterOpen}
+              handleFilterConditions={updateFilterConditions}
+              onClearFilter={() => {
+                removeOccurence();
+              }}
+              handleDrawArea={handleAreaDrawn}
+              handleSelectedSpecies={handleSelectedSpecies}
+              onResetFilter={resetOccurrence}
+            />
+          )}
         </div>
-      </Drawer>
+      </div>
       <div
-        style={{ flexGrow: 1, width: showOccurrencePopup ? "70%" : "100%" }}
-        ref={mapElement}
-        className="map-container"
-        id="map-container"
-      ></div>
+        className="print-section"
+        style={{
+          position: "absolute",
+          top: "270px",
+          left: "12px",
+          alignItems: "center",
+          transform: "translateX(0%)",
+          zIndex: 900,
+          borderRadius: "15px",
+        }}
+      >
+        <Tooltip title="Print map image" arrow>
+          <IconButton onClick={printToScale}>
+            <PrintIcon
+              style={{
+                color: "#038543",
+                fontWeight: "bold",
 
-      <div>
-        {filterOpen && (
-          <OccurrenceFilter
-            open={filterOpen}
-            handleFilterConditions={updateFilterConditions}
-            onClearFilter={resetOccurrence}
-            handleDrawArea={handleAreaDrawn}
-            handleSelectedSpecies={handleSelectedSpecies}
-          />
-        )}
+                // border: "2px solid white",
+              }}
+            />
+          </IconButton>
+        </Tooltip>
+        <a
+          id="image-download"
+          style={{ display: "none" }}
+          download="printed_map.png"
+        ></a>
       </div>
 
       {showOccurrencePopup && (

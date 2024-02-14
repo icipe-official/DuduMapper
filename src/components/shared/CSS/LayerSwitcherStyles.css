@@ -32,12 +32,12 @@ button {
 .ol-layerswitcher > button:after {
   top: 0.22em;
   left: 0.34em;
-  background: #ebbd40;
+  background: #038543;
   background-image: radial-gradient(
     circle at 0.85em 0.6em,
-    #ebbd40 0,
-    #ebbd40 0.65em,
-    #ebbd40 0.65em
+    #038543 0,
+    #038543 0.65em,
+    #038543 0.65em
   );
 }
 
@@ -112,12 +112,12 @@ button {
 
 .ol-zoom .ol-zoom-out {
   border-radius: 2px 2px 0 0;
-  background-color: #ebbd40 !important;
+  background-color: #038543 !important;
 }
 
 .ol-zoom .ol-zoom-in {
   border-radius: 2px 2px 0 0;
-  background-color: #ebbd40 !important;
+  background-color: #038543 !important;
 }
 
 .ol-layerswitcher .expend-layers,
@@ -175,7 +175,7 @@ button {
 
 .ol-layerswitcher .layerup:before,
 .ol-layerswitcher .layerup:after {
-  border-color: #ebbd40 #fff !important;
+  border-color: #038543 #fff !important;
   border-style: solid;
   border-width: 0.4em 0.4em 0;
   content: "";
@@ -190,11 +190,11 @@ button {
 .ol-layerswitcher > button:after {
   top: 0.22em;
   left: 0.34em;
-  background: #ebbd40 !important;
+  background: #038543 !important;
   background-image: radial-gradient(
     circle at 0.85em 0.6em,
-    #ebbd40 0,
-    #ebbd40 0.65em,
-    #ebbd40 0.65em
+    #038543 0,
+    #038543 0.65em,
+    #038543 0.65em
   );
 }
