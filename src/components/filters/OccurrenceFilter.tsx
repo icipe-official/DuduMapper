@@ -47,7 +47,7 @@ const reqParams = {
     maxFeatures: 100,
     outputFormat: "application/json",
 };
-const COUNTRIES_API = `${GEOSERVER_BASE_PATH}/geoserver/basemap/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=basemap:countries&maxFeatures=100&outputFormat=application/json`;
+const COUNTRIES_API = `${GEOSERVER_BASE_PATH}/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=overlays:countries&maxFeatures=70&outputFormat=application/json`;
 const getCountries = async () => {
     const res = await axios.get(COUNTRIES_API);
     return res.data;
@@ -309,7 +309,7 @@ export default function OccurrenceFilter({
                                     }}
                                     //isOptionEqualToValue={(option, value) => option === value}
                                     getOptionLabel={(option) => (option as any).properties.name}
-                                    getOptionKey={(option) => (option as any).properties.id}
+                                    getOptionKey={(option) => (option as any).id}
                                     options={countriesOptions}
                                     loading={isFetchingCountries}
                                     renderInput={(params) => (
