@@ -29,11 +29,15 @@ const DrawerComponent: React.FC<DrawerProps> = ({
 }) => {
   return (
     <Box sx={{ zIndex: 1, overflow: "auto" }}>
+      {sidebarOpen && (
+        <div className="drawer-overlay" onClick={toggleSidebar}></div>
+      )}
       <Drawer
         variant="persistent"
         anchor="left"
         open={sidebarOpen}
-        className={sidebarOpen ? "drawer" : "drawer closed"}
+        className={`drawer ${sidebarOpen ? "" : "closed"}`}
+        sx={{ width: sidebarOpen ? "250px" : "55px" }}
       >
         <div>
           <List

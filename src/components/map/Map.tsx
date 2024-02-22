@@ -77,7 +77,7 @@ function Newmap() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // Function to toggle sidebar open/close
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    setShowDrawer(!showDrawer);
   };
 
   const MenuIconButton = (
@@ -691,8 +691,8 @@ function Newmap() {
       >
         {MenuIconButton}
         <DrawerComponent
-          sidebarOpen={sidebarOpen}
-          toggleSidebar={toggleSidebar}
+          sidebarOpen={showDrawer}
+          toggleSidebar={() => setShowDrawer(!showDrawer)}
           filterOpen={filterOpen}
           setFilterOpen={setFilterOpen}
           printToScale={printToScale}
