@@ -1,0 +1,10 @@
+.drawer {
+  width: 55px;
+  overflow: auto;
+  transition: width 0.2s ease, transform 0.7s ease; /* Define the transition */
+}
+
+.drawer.closed {
+  width: 0;
+  /* transform: translateX(-100%); */
+}

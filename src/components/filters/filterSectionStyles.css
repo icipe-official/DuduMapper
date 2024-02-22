@@ -3,11 +3,11 @@
 }
 .filter-section {
   position: absolute;
-  top: 180px;
+  top: 140px;
   left: 17px;
   align-items: center;
   transform: translateX(0%);
-  z-index: 1000;
+  z-index: 1001;
   background-color: white !important;
   color: white !important;
   border-radius: 1px;

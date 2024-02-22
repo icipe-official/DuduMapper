@@ -16,6 +16,7 @@ import "../shared/CSS/LayerSwitcherStyles.css";
 import OccurrencePopup from "../popup/OccurrenceDrawer";
 import "../filters/filterSectionStyles.css";
 import "../filters/filter_section_dev.css";
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
@@ -23,13 +24,18 @@ import OpenFilterButton from "@/components/filters/OpenFilterButton";
 import { getOccurrence } from "@/api/occurrence";
 import {
   Alert,
+  AppBar,
+  Box,
+  CssBaseline,
   Drawer,
   IconButton,
   List,
   ListItem,
   ListItemText,
   Snackbar,
+  Toolbar,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import RenderFeature from "ol/render/Feature";
 import { Geometry, Polygon, SimpleGeometry } from "ol/geom";
@@ -45,6 +51,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Settings";
+import DrawerComponent from "./DrawerComponent";
 
 let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
@@ -57,6 +64,7 @@ function Newmap() {
   const mapElement = useRef<HTMLDivElement>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
   const [areaSelected, setAreaSelected] = useState("");
   const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
   const [filterConditionsObj, setFilterConditionsObj] = useState<{
@@ -71,6 +79,25 @@ function Newmap() {
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+
+  const MenuIconButton = (
+    <Tooltip title="More Options" arrow>
+      <IconButton
+        style={{
+          backgroundColor: "#038543", // Adjust background color as needed
+          borderRadius: "5%", // Make the button circular
+          padding: "6px", // Optional: Add padding for spacing
+        }}
+        onClick={toggleSidebar}
+      >
+        {sidebarOpen ? (
+          <CloseIcon style={{ color: "#038543 !important" }} />
+        ) : (
+          <MenuIcon style={{ color: "white" }} />
+        )}
+      </IconButton>
+    </Tooltip>
+  );
 
   const [cqlFilter, setCqlFilter] = useState("");
   const [theOverlaysArray, setTheOverlaysArray] = useState<any>([]);
@@ -160,7 +187,7 @@ function Newmap() {
   //   setSelectedSpecies([]);
   // }
 
-  const removeOccurence = () => {
+  const removeOccurrence = () => {
     setCqlFilter("");
     setSelectedSpecies([]);
     setFilterConditionsObj({
@@ -635,108 +662,63 @@ function Newmap() {
     }
   };
 
+  function calculateWidth() {
+    if (showOccurrencePopup && showDrawer) {
+      // If both are open, adjust width accordingly
+      return "60%"; // For example, map container width is 100% - (30% + 10%)
+    } else if (showOccurrencePopup) {
+      // If only occurrence popup is open
+      return "70%"; // For example, map container width is 100% - 30%
+    } else if (showDrawer) {
+      // If only drawer is open
+      return "90%"; // For example, map container width is 100% - 10%
+    } else {
+      // If neither is open
+      return "100%"; // Default width
+    }
+  }
+
   return (
     <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
+      {/* Toggle sidebar button */}
+      <div
+        style={{
+          position: "absolute",
+          top: "170px",
+          left: "13px",
+          zIndex: "1",
+        }}
+      >
+        {MenuIconButton}
+        <DrawerComponent
+          sidebarOpen={sidebarOpen}
+          toggleSidebar={toggleSidebar}
+          filterOpen={filterOpen}
+          setFilterOpen={setFilterOpen}
+          printToScale={printToScale}
+        />
+      </div>
       {/* Sidebar */}
 
-      <Drawer variant="persistent" anchor="left" open={sidebarOpen}>
-        <div style={{ width: "50px" }}>
-          <List>
-            <ListItem button onClick={toggleSidebar}>
-              <Tooltip title="Close" arrow>
-                <ArrowBackIcon />
-              </Tooltip>
-            </ListItem>
-            {/* OpenFilterButton and OccurrenceFilter */}
-            <ListItem>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <div className="filter-dev-button">
-                  <OpenFilterButton
-                    filterOpen={filterOpen}
-                    onClick={() => setFilterOpen(!filterOpen)}
-                  />
-                </div>
-              </div>
-            </ListItem>
-
-            {/* Print map button */}
-            <ListItem>
-              <div
-                className="print-dev-button"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <Tooltip title="Print map image" arrow>
-                  <IconButton onClick={printToScale}>
-                    <PrintIcon
-                      style={{
-                        color: "#038543",
-                        fontWeight: "bold",
-                        left: "10px",
-                        fontSize: "1.85rem",
-                      }}
-                    />
-                  </IconButton>
-                </Tooltip>
-                <a
-                  id="image-download"
-                  style={{ display: "none" }}
-                  download="printed_map.png"
-                ></a>
-              </div>
-            </ListItem>
-            {/* Profile */}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <div className="dummy-dev-button">
-                <ListItem>
-                  <Tooltip title="User Profile" arrow>
-                    <IconButton>
-                      <PersonIcon
-                        style={{
-                          color: "#038543",
-                          fontWeight: "bold",
-                          fontSize: "1.7rem",
-                        }}
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </ListItem>
-              </div>
-            </div>
-
-            {/* Settings */}
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <div className="dummy-dev-button">
-                <ListItem>
-                  <Tooltip title="Settings" arrow>
-                    <IconButton>
-                      <SettingsIcon
-                        style={{
-                          color: "#038543",
-                          fontWeight: "bold",
-                          fontSize: "1.7rem",
-                        }}
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </ListItem>
-              </div>
-            </div>
-          </List>
-        </div>
-      </Drawer>
       <div
-        style={{ flexGrow: 1, width: showOccurrencePopup ? "70%" : "100%" }}
+        style={{
+          flexGrow: 1,
+          width: calculateWidth(),
+          position: "relative",
+          zIndex: 0,
+        }}
         ref={mapElement}
         className="map-container"
         id="map-container"
       >
+        {/* Occurrence filter */}
         <div>
           {filterOpen && (
             <OccurrenceFilter
               open={filterOpen}
               handleFilterConditions={updateFilterConditions}
               onClearFilter={() => {
-                removeOccurence();
+                removeOccurrence();
               }}
               handleDrawArea={handleAreaDrawn}
               handleSelectedSpecies={handleSelectedSpecies}
@@ -744,26 +726,6 @@ function Newmap() {
             />
           )}
         </div>
-      </div>
-
-      {/* Toggle sidebar button */}
-      <div style={{ position: "absolute", top: "170px", left: "13px" }}>
-        <Tooltip title="More Options" arrow>
-          <IconButton
-            style={{
-              backgroundColor: "#038543", // Adjust background color as needed
-              borderRadius: "50%", // Make the button circular
-              padding: "6px", // Optional: Add padding for spacing
-            }}
-            onClick={toggleSidebar}
-          >
-            {sidebarOpen ? (
-              <CloseIcon style={{ color: "#038543 !important" }} />
-            ) : (
-              <MenuIcon style={{ color: "white" }} />
-            )}
-          </IconButton>
-        </Tooltip>
       </div>
 
       {showOccurrencePopup && (
