@@ -1,5 +1,5 @@
 import React from 'react';
-import { Accordion, AccordionDetails } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { IconButton } from "@mui/material";
 import CustomAccordionSummary from "@/components/popup/CustomAccordionSummary";
@@ -14,6 +14,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchBionomics } from '@/api/occurrence';
 import ReferenceDetails from './referenceBox';
 import "./OccurrencePopup.css";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
 const borderStyle = {
     // borderStyle: 'solid',
     // borderColor: 'green',
@@ -83,14 +85,38 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
                 <CloseRoundedIcon />
             </IconButton>
             <Accordion sx={{ color: '#fff' }} defaultExpanded expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
-                <CustomAccordionSummary title={"Occurrence"} desc={"Vector occurrence information"} />
+                {/* <CustomAccordionSummary title={"Occurrence"} desc={"Vector occurrence information"} /> */}
+                <AccordionSummary expandIcon={<ExpandMoreIcon sx={{
+                    color: "#038543", "&:active": {
+                        color: "#0d0", // Change color during click
+                        transition: "color 0.0s ease-in-out",
+                    },
+                }} />}>
+                    <span style={{ flexWrap: 'nowrap', display: 'flex' }}>                    <span style={{ fontWeight: 'bold', color: '#000' }}><h4>Occurrence</h4></span>
+                        {/* <span style={{ display: 'inline-block', width: '20px' }}></span> */}
+                        <span style={{ color: '#777' }}><h4>Vector occurrence information</h4></span>
+                    </span>
+
+                </AccordionSummary>
+
                 <AccordionDetails>
                     <SpeciesInfoBox speciesInfo={popoverContent} />
                     <ReferenceDetails referenceData={referenceData} reference_fetch_status={reference_fetch_status} reference_is_fetching={reference_is_fetching} />
                 </AccordionDetails>
             </Accordion>
             <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')} disabled={!bionomicsEnabled}>
-                <CustomAccordionSummary title={"Bionomics"} desc={"Vector behavioral information"} />
+                <AccordionSummary expandIcon={<ExpandMoreIcon sx={{
+                    color: "#038543", "&:active": {
+                        color: "#0d0", // Change color during click
+                        transition: "color 0.0s ease-in-out",
+                    },
+                }} />}>
+                    <span style={{ flexWrap: 'nowrap', display: 'flex' }}>                    <span style={{ fontWeight: 'bold', color: '#000' }}><h4>Bionomics</h4></span>
+                        {/* <span style={{ display: 'inline-block', width: '20px' }}></span> */}
+                        <span style={{ color: '#777' }}><h4>Vector behavioral information</h4></span>
+                    </span>
+
+                </AccordionSummary>
                 <AccordionDetails>
                     <BionomicsDetails bionomicsData={bionomicsData} bionomics_is_fetching={bionomics_is_fetching} bionomics_fetch_status={bionomics_fetch_status} />
                 </AccordionDetails>
@@ -103,8 +129,18 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
             </Accordion>
             <Accordion expanded={expanded === 'panel4'} onChange={handleChange('panel4')}
                 disabled={!environmentEnabled}>
-                <CustomAccordionSummary title={"Environment"}
-                    desc={"Specimen collection site and environment data"} />
+                <AccordionSummary expandIcon={<ExpandMoreIcon sx={{
+                    color: "#038543", "&:active": {
+                        color: "#0d0", // Change color during click
+                        transition: "color 0.0s ease-in-out",
+                    },
+                }} />}>
+                    <span style={{ flexWrap: 'nowrap', display: 'flex' }}>                    <span style={{ fontWeight: 'bold', color: '#000' }}><h4>Environment</h4></span>
+                        {/* <span style={{ display: 'inline-block', width: '20px' }}></span> */}
+                        <span style={{ color: '#777' }}><h4>Specimen collection site and environment data</h4></span>
+                    </span>
+
+                </AccordionSummary>
                 <AccordionDetails>
                     <EnvironmentCard siteInfo={siteData} isFetching={isFetching} status={status} />
                 </AccordionDetails>
