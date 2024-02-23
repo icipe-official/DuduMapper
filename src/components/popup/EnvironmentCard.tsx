@@ -69,12 +69,30 @@ export default function EnvironmentCard({
                     expanded={activeCategory === category}
                     onChange={() => setActiveCategory(category)}
                     sx={{
-                        backgroundColor: activeCategory === category ? "#c4c4c4" : "#ddd", // Set a darker color for active and non-active tabs
-                        color: activeCategory === category ? "#666" : "#222", // Set green font color for active tab and grey for non-active tabs
+                        backgroundColor: activeCategory === category ? "#c4c4c4" : "#ddd",
+                        color:
+                            activeCategory === category
+                                ? "#666"
+                                : "#222",
+                        "&:hover": {
+                            color: "#038543",
+                            transition: "color 0.3s ease-in-out",
+                        },
+
+                        "&:active": {
+                            color: "#0d0", // Change color during click
+                            transition: "color 0.0s ease-in-out",
+                        },
                     }}
+
                 >
                     <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
+                        expandIcon={<ExpandMoreIcon sx={{
+                            color: "#038543", "&:active": {
+                                color: "#0d0", // Change color during click
+                                transition: "color 0.0s ease-in-out",
+                            },
+                        }} />}
                     >
                         <Typography variant="h6">
                             {category}
@@ -109,12 +127,29 @@ export default function EnvironmentCard({
                     expanded={activeCategory === "Other"}
                     onChange={() => setActiveCategory("Other")}
                     sx={{
-                        backgroundColor: activeCategory === "Other" ? "#c4c4c4" : "#ddd", // Set a darker color for active and non-active tabs
-                        color: activeCategory === "Other" ? "#666" : "#222", // Set green font color for active tab and grey for non-active tabs
+                        backgroundColor: activeCategory === "other" ? "#c4c4c4" : "#ddd",
+                        color:
+                            activeCategory === "other"
+                                ? "#666"
+                                : "#222",
+                        "&:hover": {
+                            color: "#038543",
+                            transition: "color 0.3s ease-in-out",
+                        },
+
+                        "&:active": {
+                            color: "#0d0", // Change color during click
+                            transition: "color 0.0s ease-in-out",
+                        },
                     }}
                 >
                     <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
+                        expandIcon={<ExpandMoreIcon sx={{
+                            color: "#038543", "&:active": {
+                                color: "#0d0", // Change color during click
+                                transition: "color 0.0s ease-in-out",
+                            },
+                        }} />}
                     >
                         <Typography variant="h6">
                             Other

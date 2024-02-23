@@ -53,7 +53,7 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({
             setActiveCategory(Object.keys(categories)[0]); // Set to the first category
         }
     }, [bionomicsData]);
-
+    const [clickedCategory, setClickedCategory] = useState("");
     // Group the properties into categories
     const categories = {
         Temporal: [
@@ -131,10 +131,27 @@ const BionomicsDetails: React.FC<BionomicsDetailsProps> = ({
                     onChange={() => setActiveCategory(category)}
                     sx={{
                         backgroundColor: activeCategory === category ? "#c4c4c4" : "#ddd",
-                        color: activeCategory === category ? "#666" : "#222",
+                        color:
+                            activeCategory === category
+                                ? "#666"
+                                : "#222",
+                        "&:hover": {
+                            color: "#038543",
+                            transition: "color 0.3s ease-in-out",
+                        },
+
+                        "&:active": {
+                            color: "#0d0", // Change color during click
+                            transition: "color 0.0s ease-in-out",
+                        },
                     }}
                 >
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon sx={{
+                        color: "#038543", "&:active": {
+                            color: "#0d0", // Change color during click
+                            transition: "color 0.0s ease-in-out",
+                        },
+                    }} />}>
                         <Typography variant="h6">{toTitleCase(category)}</Typography>
                     </AccordionSummary>
                     <AccordionDetails
