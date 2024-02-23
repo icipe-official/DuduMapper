@@ -1,10 +1,9 @@
 import Newmap from "../components/map/Map";
-import NavBar from "../components/shared/navbar";
 
 export default function Home() {
     return (
-            <div style={{overflow: "hidden", height: "100%", width: "100%"}}>
-                <NavBar/>
+            <div style={{overflow: "hidden", height: "100%", width: "100%", margin: 0}}>
+                {/*<NavBar/>*/}
                 <div style={{marginTop: "50px"}}>
                     <Newmap/>
                 </div>

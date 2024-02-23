@@ -13,6 +13,7 @@ import { Vector as VectorLayer } from "ol/layer.js";
 import { getBasemapOverlaysLayersArray } from "@/api/requests";
 import { Stroke, Fill, Style, Circle } from "ol/style";
 import "../shared/CSS/LayerSwitcherStyles.css";
+import "../shared/CSS/olzoom.css";
 import OccurrencePopup from "../popup/OccurrenceDrawer";
 import "../filters/filterSectionStyles.css";
 import "../filters/filter_section_dev.css";
@@ -22,10 +23,8 @@ import TimeSlider from "@/components/filters/TimeSlider";
 import OpenFilterButton from "@/components/filters/OpenFilterButton";
 import { getOccurrence } from "@/api/occurrence";
 import {Alert, IconButton, Snackbar, Tooltip} from "@mui/material";
-import RenderFeature from "ol/render/Feature";
-import { Geometry, Polygon, SimpleGeometry } from "ol/geom";
+import { Geometry, Polygon } from "ol/geom";
 import { transform } from "ol/proj";
-import { Coordinate } from "ol/coordinate";
 import { Draw, Modify, Snap } from "ol/interaction.js";
 import Map from "ol/Map";
 import { never } from "ol/events/condition";
@@ -64,7 +63,6 @@ function Newmap() {
       strategy: bboxStrategy,
     })
   );
-  const [zoomArea, setZoomArea] = useState<[number, number, number, number]>();
 
   const [speciesColors, setSpeciesColors] = useState<string[]>([
     "#DC267F",
@@ -78,13 +76,6 @@ function Newmap() {
   const getColormapColors = (numColors: number): string[] => {
     return colormap({ colormap: "jet", nshades: numColors, format: "hex" });
   };
-  const addColormapColorsIfNeeded = () => {
-    const remainingColors = selectedSpecies.length - speciesColors.length;
-    if (remainingColors > 0) {
-      const newColors = getColormapColors(remainingColors);
-      setSpeciesColors((prevColors) => [...prevColors, ...newColors]);
-    }
-  };
 
   const {
     status,
@@ -93,35 +84,14 @@ function Newmap() {
     error,
     isFetching,
   } = useQuery({
-    queryKey: ["occurrences", cqlFilter], //Example CQl filter species IN ('gambie', 'finiestus', 'fini') AND WITHIN (the_geom, MULTIPOLYGON((22,22,223,223))) AND adult =true AND season=dry
-    //queryFn: getOccurrences
+    queryKey: ["occurrences", cqlFilter],
     queryFn: ({ queryKey }) => getOccurrence(queryKey),
   });
-
-  function responseToGEOJSON(occurrenceData: any) {
-    const geoJSONPoints = (occurrenceData || []).map((d: any) => {
-      const coordinates = d.geometry.coordinates;
-      return {
-        type: "Feature",
-        geometry: {
-          type: d.geometry.type,
-          coordinates: coordinates,
-        },
-        properties: d.properties,
-      };
-    });
-    const geoJSONFeatureCollection = {
-      type: "FeatureCollection",
-      features: geoJSONPoints,
-    };
-    return geoJSONFeatureCollection;
-  }
 
   useEffect(() => {
     if (Object.keys(filterConditionsObj).length === 0) {
       return;
     }
-    //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
     let filterConditions: string[] = Object.values(filterConditionsObj);
     filterConditions = filterConditions.filter((c) => c);
     const cql_filter = filterConditions.join(" AND ");
@@ -136,10 +106,6 @@ function Newmap() {
       bionomics: conditions["bionomics"],
     });
   };
-
-  // const clearDropdown = () =>{
-  //   setSelectedSpecies([]);
-  // }
 
   const removeOccurence = ()=> {
     setCqlFilter("");
@@ -174,7 +140,6 @@ function Newmap() {
     const total = occurrenceData["totalFeatures"];
     const returned = occurrenceData["numberReturned"];
     console.log(`${returned} out of ${total} features`);
-    const featureArray = occurrenceData?.features || [];
 
     occurrenceSource?.clear();
     const geoJsonFormat = new GeoJSON({
@@ -184,7 +149,7 @@ function Newmap() {
     });
     //Externalize this to a utils service file somewhere else
     const geojsonData = geoJsonFormat.readFeatures(
-      responseToGEOJSON(featureArray),
+      occurrenceData,
       {
         featureProjection: "EPSG:3857",
       }
@@ -208,7 +173,7 @@ function Newmap() {
   });
 
   const occurrenceLayer = new VectorLayer({
-    title: "Occurrence Layer",
+    title: "Occurrence",
     visible: true,
     preload: Infinity,
     source: occurrenceSource,
@@ -216,7 +181,7 @@ function Newmap() {
       image: new Circle({
         fill: fill,
         stroke: stroke,
-        radius: 8,
+        radius: 6,
       }),
       fill: fill,
       stroke: stroke,
