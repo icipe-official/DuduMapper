@@ -104,6 +104,9 @@ function Newmap() {
       species: conditions["species"],
       country: conditions["country"],
       bionomics: conditions["bionomics"],
+      larval: conditions["larvae"],
+      adult: conditions["adult"],
+      season: conditions["season"],
     });
   };
 
@@ -115,6 +118,9 @@ function Newmap() {
         period: "", // Reset period filter
         country: "", // Reset country filter
         bionomics: "",
+        larval: "",
+        adult: "",
+        season: "",
     });
   }
 
@@ -124,6 +130,10 @@ function Newmap() {
         species: selectedSpecies, // Reset species filter
         period: "", // Reset period filter
         country: "", // Reset country filter
+        bionomics: "",
+        larval: "",
+        adult: "",
+        season: "",
     });
     // Additional logic to clear any other filter-related state variables if needed
 };
@@ -439,8 +449,8 @@ function Newmap() {
     const createLegendDiv = () => {
       const legendContainer = document.createElement("div");
       legendContainer.className = "legend-container";
-      legendContainer.style.position = "absolute";
-      legendContainer.style.bottom = "16px";
+      legendContainer.style.position = "absolute"; 
+      legendContainer.style.bottom = "20px";
       legendContainer.style.right = "16px";
       legendContainer.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
       legendContainer.style.padding = "8px";
@@ -606,6 +616,7 @@ function Newmap() {
               handleDrawArea={handleAreaDrawn}
               handleSelectedSpecies={handleSelectedSpecies}
               onResetFilter={resetOccurrence}
+              
             />
           )}
         </div>
