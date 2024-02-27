@@ -1,5 +1,5 @@
 import React from 'react';
-import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Box } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { IconButton } from "@mui/material";
 import CustomAccordionSummary from "@/components/popup/CustomAccordionSummary";
@@ -93,8 +93,8 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
                     },
                 }} />}>
                     <span style={{ flexWrap: 'nowrap', display: 'flex' }}>                    <span style={{ fontWeight: 'bold', color: '#000' }}><h4>Occurrence</h4></span>
-                        {/* <span style={{ display: 'inline-block', width: '20px' }}></span> */}
-                        <span style={{ color: '#777' }}><h4>Vector occurrence information</h4></span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <Box component="div" sx={{ color: '#777', display: { xs: 'none', sm: 'none', md: 'flex' } }}><h4>Vector occurrence information</h4></Box>
                     </span>
 
                 </AccordionSummary>
@@ -113,7 +113,8 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
                 }} />}>
                     <span style={{ flexWrap: 'nowrap', display: 'flex' }}>                    <span style={{ fontWeight: 'bold', color: '#000' }}><h4>Bionomics</h4></span>
                         {/* <span style={{ display: 'inline-block', width: '20px' }}></span> */}
-                        <span style={{ color: '#777' }}><h4>Vector behavioral information</h4></span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <Box component="div" sx={{ color: '#777', display: { xs: 'none', sm: 'none', md: 'flex' } }}><h4>Vector behavioral information</h4></Box>
                     </span>
 
                 </AccordionSummary>
@@ -122,7 +123,18 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
                 </AccordionDetails>
             </Accordion>
             <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')} disabled={!irEnabled}>
-                <CustomAccordionSummary title={"Insecticide Resistance"} desc={"Insecticide Resistance data"} />
+                <AccordionSummary expandIcon={<ExpandMoreIcon sx={{
+                    color: "#038543", "&:active": {
+                        color: "#0d0", // Change color during click
+                        transition: "color 0.0s ease-in-out",
+                    },
+                }} />}>
+                    <span style={{ flexWrap: 'nowrap', display: 'flex' }}>
+                        <span style={{ fontWeight: 'bold', color: '#000' }}><h4>Insecticide Resistance</h4></span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <Box component="div" sx={{ color: '#777', display: { xs: 'none', sm: 'none', md: 'flex' } }}><h4>Insecticide Resistance data</h4></Box>
+                    </span>
+                </AccordionSummary>
                 <AccordionDetails>
                     <IrDetails irData={{}} />
                 </AccordionDetails>
@@ -137,7 +149,10 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
                 }} />}>
                     <span style={{ flexWrap: 'nowrap', display: 'flex' }}>                    <span style={{ fontWeight: 'bold', color: '#000' }}><h4>Environment</h4></span>
                         {/* <span style={{ display: 'inline-block', width: '20px' }}></span> */}
-                        <span style={{ color: '#777' }}><h4>Specimen collection site and environment data</h4></span>
+                        {/* <span sx={{ color: '#777', display: { xs: 'none', sm: 'none', md: 'flex' } as any, }}><h4>Specimen collection site and environment data</h4></span> */}
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <Box component="div" sx={{ color: '#777', display: { xs: 'none', sm: 'none', md: 'flex' } }}><h4>Specimen collection site and environment data</h4></Box>
+
                     </span>
 
                 </AccordionSummary>
