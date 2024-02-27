@@ -10,20 +10,18 @@ import {
   colors,
 } from "@mui/material";
 import UploadFile from "@mui/icons-material/UploadFile";
-import x from "@mui/icons-material/FileDownload";
 import { FormEvent, useRef, useState } from "react";
 import { FilePond, registerPlugin } from "react-filepond";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import Swal from "sweetalert2";
 import "filepond/dist/filepond.min.css";
 import FileDownload from "@mui/icons-material/FileDownload";
+import { BASE_SERVER_API } from "@/lib/constants";
 
 registerPlugin(FilePondPluginFileValidateType);
 
-const SERVER_URI = process.env.NEXT_PUBLIC_API_SERVER;
-
 const DataUploadForm = () => {
-  const UPLOAD_URI = SERVER_URI + "/ingest/template/generic";
+  const UPLOAD_URI = BASE_SERVER_API + "/ingest/template/generic";
   const [files, setFiles] = useState<any[]>([]);
   const pond = useRef<FilePond>(null);
 
@@ -32,19 +30,27 @@ const DataUploadForm = () => {
     event.preventDefault();
 
     if (pond.current) {
-      pond.current.processFiles().then(() => {
-        // reset files
-        setFiles([]);
-        // upload successfull
-        Swal.fire({
-          title: "Successfully uploaded",
-          text: "File was uploaded successfully, data may take a few minutes to update.",
-          icon: "success",
-          showCancelButton: false,
-          showCloseButton: false,
-          showConfirmButton: false,
+      pond.current
+        .processFiles()
+        .then(() => {
+          // reset files
+          setFiles([]);
+          // upload successfull
+          Swal.fire({
+            title: "Successfully Uploaded!",
+            text: "File was uploaded successfully, data may take a few minutes to update.",
+            icon: "success",
+            showConfirmButton: false,
+          });
+        })
+        .catch((error): any => {
+          Swal.fire({
+            title: "Upload Failed!",
+            text: `File failed to upload, responded with '${error.message}'`,
+            icon: "error",
+            showConfirmButton: false,
+          });
         });
-      });
     }
   };
 
