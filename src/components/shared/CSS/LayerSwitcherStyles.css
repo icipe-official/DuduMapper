@@ -1,200 +1,105 @@
-/* Custom styles for the LayerSwitcher container */
 .ol-layerswitcher {
   border-top: transparent !important;
   background-color: transparent !important;
-  margin-top: 18px;
-  position: absolute; /* Position the LayerSwitcher absolutely */
-  left: 9px; /* Align it to the left side of the screen */
-  z-index: 1000; /* Adjust the z-index to ensure it's above other content */
-  width: 320px;
-}
-
-/* Custom styles for the checkboxes */
-.ol-layerswitcher-input {
-  margin-right: 5px;
-}
-
-.ol-visible {
+  margin-top: 25px;
+  position: absolute;
+  left: auto !important;
+  right: 10px;
+  z-index: 1000;
   color: #038543;
-  margin-left: 20px;
-  width: "auto";
-  font-size: 17px;
 }
 
-button {
-  display: hidden !important;
-}
-.panel-container {
-  background-color: white !important;
+.ol-layerswitcher,
+.ol-layerswitcher.ol-forceopen {
+  min-width: 20em;
 }
 
-.ol-layerswitcher-image > button:after,
-.ol-layerswitcher > button:after {
-  top: 0.22em;
-  left: 0.34em;
-  background: #038543;
-  background-image: radial-gradient(
-    circle at 0.85em 0.6em,
-    #038543 0,
-    #038543 0.65em,
-    #038543 0.65em
-  );
-}
-
-.ol-layerswitcher [type="radio"]:checked + label:after,
-.ol-layerswitcher [type="checkbox"]:checked + label:after {
-  content: "";
-  position: absolute;
-  left: 0.1em;
-  top: 0.1em;
-  width: 1.2em;
-  height: 1.2em;
-  color: green;
-  background: whitesmoke;
-  box-sizing: border-box;
-}
-
-.ol-layerswitcher [type="radio"] + label:before,
-.ol-layerswitcher [type="checkbox"] + label:before {
-  content: "";
-  position: absolute;
-  left: 0.1em;
-  top: 0.1em;
-  width: 1.2em;
-  height: 1.2em;
-  border-color: #787878;
-  background: whitesmoke;
-  box-sizing: border-box;
-}
-
-.ol-layerswitcher [type="checkbox"]:checked + label:after {
-  color: #038543 !important;
-  /* border-width: 0 3px 3px 0; */
-  border-style: solid;
-  width: 0.7em;
-  height: 1em;
-  transform: rotate(45deg);
-  left: 0.55em;
-  top: -0.05em;
-  /* box-shadow: 1px 0px 1px 1px #fff; */
-}
-.ol-layerswitcher .layerswitcher-opacity {
-  position: relative;
-  border: 1px solid #369 !important;
-  height: 3px;
-  width: 120px;
-  margin: 5px 1em 10px 7px;
-  box-sizing: border-box;
-  border-radius: 3px;
-  background: #038543 !important;
-  cursor: pointer;
-  box-shadow: 1px 1px 1px #038543 !important;
-}
-.ol-touch .ol-control button {
-  font-size: 1.5em;
-  background-color: transparent !important;
-}
-
-.ol-control button {
-  display: block;
-  margin: 1px;
-  color: #fff !important;
-  background-color: transparent !important;
-  font-weight: 700;
-  text-decoration: none;
-  font-size: inherit;
-  text-align: center;
-  height: 1.375em !important;
-  width: 1.375em !important;
-  line-height: 0.4em;
-  border-radius: 2px;
-}
-
-.ol-zoom .ol-zoom-out {
-  border-radius: 2px 2px 0 0;
-  background-color: #038543 !important;
-}
-
-.ol-zoom .ol-zoom-in {
-  border-radius: 2px 2px 0 0;
-  background-color: #038543 !important;
-}
-
-.ol-layerswitcher .expend-layers,
-.ol-layerswitcher .collapse-layers {
-  margin: 0 2px;
+.ol-layerswitcher [type="checkbox"] + label:before,
+.ol-layerswitcher [type="radio"] + label:before {
+  content: "\2713";
+  border: 2px solid #ccc;
   background-color: transparent;
 }
+.ol-control.ol-layerswitcher [type="checkbox"]:checked + label:before,
+.ol-control.ol-layerswitcher [type="radio"]:checked + label:before {
+  background: #038543;
+  border-color: #038543;
+}
 
-.ol-layerswitcher .expend-layers:after .expend-layers:before {
-  content: "";
+.ol-control.ol-layerswitcher [type="checkbox"]:checked + label:after {
+  content: "\2713";
+  color: #fff;
   position: absolute;
-  left: 50%;
-  top: 0;
-  margin-left: -2px;
-  width: 1px !important;
-  height: 100%;
+  top: -0.15em;
+  left: 0.25em;
+  cursor: pointer;
+  font-weight: 900;
+  text-shadow: 1px 1px #fff;
+  font-size: 1.2em;
+  transform: none;
+  border: 0;
+  box-shadow: unset;
+}
+.ol-control.ol-layerswitcher [type="radio"]:checked + label:after {
+  content: none;
 }
 
-.ol-layerswitcher-image > button,
-.ol-layerswitcher > button {
-  float: left !important;
-  z-index: 10;
-  position: relative;
-  font-size: 1.7em;
-  padding-right: 10px !important;
-}
-.ol-layerswitcher .layerup {
-  float: right;
-  height: 2.5em;
-  background-color: #b8dfcc !important;
-  opacity: 0.5;
-  cursor: move;
-  cursor: ns-resize;
-}
-.ol-layerswitcher.ol-forceopen .panel-container {
-  display: block;
-  margin-left: 30px;
-}
-.ol-layerswitcher .panel {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  overflow: hidden;
-  font-family: Tahoma, Geneva, sans-serif;
-  font-size: 0.9em;
-  -webkit-transition: top 0.3s;
-  transition: top 0.3s;
-  position: relative;
-  top: 0;
-  background-color: whitesmoke;
-  border: 1px solid #038543;
-  border-radius: 5px;
-  padding: 2px;
-}
-
-.ol-layerswitcher .layerup:before,
-.ol-layerswitcher .layerup:after {
-  border-color: #038543 #fff !important;
-  border-style: solid;
-  border-width: 0.4em 0.4em 0;
-  content: "";
-  height: 0;
-  position: absolute;
-  bottom: 3px;
-  left: 0.1em;
-  width: 0;
-}
-
-.ol-layerswitcher-image > button:after,
-.ol-layerswitcher > button:after {
-  top: 0.22em;
-  left: 0.34em;
+.ol-control.ol-layerswitcher button {
+  margin-top: 25px;
+  pointer-events: auto;
   background: #038543 !important;
-  background-image: radial-gradient(
-    circle at 0.85em 0.6em,
-    #038543 0,
-    #038543 0.65em,
-    #038543 0.65em
-  );
+  border: 0;
+  user-select: none;
+  outline: none;
+  font-size: 1.5em;
+  right: 0.15em;
+  left: auto !important;
+}
+.ol-control.ol-layerswitcher button:before {
+  background: #038543;
+  -webkit-box-shadow: 0.1em 0.1em #fff;
+  box-shadow: 0.1em 0.1em #fff;
+}
+.ol-control.ol-layerswitcher button:after {
+  background: #fff none;
+}
+.ol-layerswitcher .layerswitcher-opacity {
+  border: 0;
+  background: none;
+  height: 1em;
+  box-shadow: none;
+}
+.ol-layerswitcher .layerswitcher-opacity:before {
+  content: "";
+  width: 100%;
+  height: 3px;
+  background: #038543;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  border: 1px solid #038543;
+  box-sizing: border-box;
+}
+
+.ol-layerswitcher .layerswitcher-opacity .layerswitcher-opacity-cursor {
+  width: auto;
+  transform: translateY(-50%);
+  height: 3px;
+  right: 0;
+  background: #666;
+  border-radius: 0;
+}
+.ol-touch
+  .ol-layerswitcher
+  .layerswitcher-opacity
+  .layerswitcher-opacity-cursor,
+.ol-layerswitcher .layerswitcher-opacity .layerswitcher-opacity-cursor:before {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 16px;
+  left: -1px;
+  border-radius: 0;
+  background: #038543;
 }
