@@ -75,17 +75,17 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
         expanded={activeCategory === "Details"}
         onChange={() => setActiveCategory("Details")}
         sx={{
-          backgroundColor: activeCategory === "Details" ? "#424242" : "#1c1c1c",
-          color: activeCategory === "Details" ? "#00E676" : "#9E9E9E",
+          backgroundColor: activeCategory === "Details" ? "#C4C4C4" : "#1c1c1c",
+          color: activeCategory === "Details" ? "#333" : "#9E9E9E",
         }}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6">Details</Typography>
+          <Typography sx={{ fontWeight: 'bold' }} variant="h6">Source Notes</Typography>
         </AccordionSummary>
         <AccordionDetails
           sx={{
-            backgroundColor: "#f5f7c5",
-            color: "#1B5E20",
+            backgroundColor: "#fff",
+            color: "#333",
           }}
         >
 
