@@ -31,7 +31,8 @@
     "react": "^18.2.0",
     "react-date-range": "^1.4.0",
     "react-dom": "^18.2.0",
-    "react-icons": "^5.0.1"
+    "react-icons": "^5.0.1",
+    "react-scroll": "^1.9.0"
   },
   "devDependencies": {
     "@types/colormap": "^2.3.4",
@@ -39,6 +40,7 @@
     "@types/ol-ext": "npm:@siedlerchr/types-ol-ext@^3.2.4",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
+    "@types/react-scroll": "^1.8.10",
     "babel-plugin-transform-commonjs": "^1.1.6",
     "eslint": "^8.55.0",
     "eslint-config-next": "^14.0.4",
