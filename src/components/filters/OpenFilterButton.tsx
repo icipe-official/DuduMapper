@@ -17,7 +17,7 @@ function OpenFilterButton({
           style={{ color: "#f4f4f4" }}
           onClick={onClick}
         >
-          <TuneIcon />
+          <TuneIcon style={{ fontSize: "1.7rem" }} />
         </IconButton>
       </Tooltip>
     </div>
