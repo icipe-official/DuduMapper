@@ -10,6 +10,8 @@ import {
   Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import axios from "axios";
+import {downloadOccurrence} from "@/api/occurrence";
 
 interface DownloadPopupProps {
   isOpen: boolean;
@@ -29,8 +31,10 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
   };
 
   const handleDownload = () => {
-    onDownload(selectedFormat);
+      downloadOccurrence(selectedFormat);
+
   };
+
 
   return (
     <Box
@@ -96,13 +100,13 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
               control={<Radio color="success" />}
               label="CSV"
             />
+            {/*<FormControlLabel*/}
+            {/*  value="Excel"*/}
+            {/*  control={<Radio color="success" />}*/}
+            {/*  label="Excel"*/}
+            {/*/>*/}
             <FormControlLabel
-              value="Excel"
-              control={<Radio color="success" />}
-              label="Excel"
-            />
-            <FormControlLabel
-              value="GeoJSON"
+              value="json"
               control={<Radio color="success" />}
               label="GeoJSON"
             />
@@ -112,7 +116,7 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
               label="KML"
             />
             <FormControlLabel
-              value="SHP"
+              value="shape-zip"
               control={<Radio color="success" />}
               label="SHP"
             />
