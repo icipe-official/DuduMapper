@@ -11,13 +11,17 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonIcon from "@mui/icons-material/Person";
 import HelpIcon from "@mui/icons-material/Help";
 import PrintIcon from "@mui/icons-material/Print";
+import DownloadIcon from "@mui/icons-material/Download";
 
 interface DrawerProps {
   sidebarOpen: boolean;
   toggleSidebar: () => void;
   filterOpen: boolean;
+
   setFilterOpen: (value: boolean) => void;
+
   printToScale: () => void;
+  handleDownloadClick: () => void;
 }
 
 const DrawerComponent: React.FC<DrawerProps> = ({
@@ -26,6 +30,7 @@ const DrawerComponent: React.FC<DrawerProps> = ({
   filterOpen,
   setFilterOpen,
   printToScale,
+  handleDownloadClick,
 }) => {
   return (
     <Box sx={{ zIndex: 1, overflow: "auto" }}>
@@ -87,6 +92,26 @@ const DrawerComponent: React.FC<DrawerProps> = ({
                 ></a>
               </div>
             </ListItem>
+
+            {/*Download */}
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <div className="dummy-dev-button">
+                <ListItem>
+                  <Tooltip title="Download" arrow>
+                    <IconButton onClick={handleDownloadClick}>
+                      <DownloadIcon
+                        style={{
+                          color: "#038543",
+                          fontWeight: "bold",
+                          fontSize: "1.9rem",
+                          marginTop: "10px",
+                        }}
+                      />
+                    </IconButton>
+                  </Tooltip>
+                </ListItem>
+              </div>
+            </div>
             {/* Profile */}
             <div style={{ display: "flex", alignItems: "center" }}>
               <div className="dummy-dev-button">
@@ -105,8 +130,7 @@ const DrawerComponent: React.FC<DrawerProps> = ({
                 </ListItem>
               </div>
             </div>
-
-            {/* Settings */}
+            {/* Help */}
             <div style={{ display: "flex", alignItems: "center" }}>
               <div className="dummy-dev-button">
                 <ListItem>
