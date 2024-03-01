@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { FaBook, FaCalendar, FaFileAlt, FaInfoCircle, FaLink, FaNewspaper, FaStickyNote, FaUser } from 'react-icons/fa'; // Import icons
-
+import StorageIcon from '@mui/icons-material/Storage';
 const convertToSensibleName = (key: string) => {
   return key
     .replace(/[_-]/g, " ") // Replace underscores and hyphens with spaces
@@ -79,7 +79,7 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
           color: activeCategory === "Details" ? "#333" : "#9E9E9E",
         }}
       >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <AccordionSummary expandIcon={<StorageIcon />}>
           <Typography sx={{ fontWeight: 'bold' }} variant="h6">Source Notes</Typography>
         </AccordionSummary>
         <AccordionDetails
