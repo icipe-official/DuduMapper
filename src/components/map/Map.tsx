@@ -714,7 +714,7 @@ function Newmap() {
         <DownloadPopup
           isOpen={downloadOpen}
           onClose={closeDownloadPopup}
-          onDownload={handleDownload}
+          cqlFilter={cqlFilter}
         />
       )}
 

@@ -4,7 +4,7 @@ const OCCURRENCE_API = `${geoServerBaseUrl}/geoserver/vector/ows?service=WFS&ver
 const SITE_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Asite&maxFeatures=50&outputFormat=application/json&cql_filter=site_id=SITE_ID";
 const BIONOMICS_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Abionomics&maxFeatures=50&outputFormat=application/json";
 const REFERENCE_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector%3Areference_v&maxFeatures=50&outputFormat=application/json";
-const DOWNLOAD_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:download_v&&outputFormat=FORMAT";
+const DOWNLOAD_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:download_v&outputFormat=FORMAT";
 export const fetchSiteInfo = async (siteId: any) => {
     const url = geoServerBaseUrl + SITE_URL.replace("SITE_ID", siteId);
     const response = await fetch(url);
@@ -35,8 +35,13 @@ export const fetchReference = async (referenceId: any) => {
     return await response.json();
 }
 
-export const downloadOccurrence = async (format: string) => {
-    const url = geoServerBaseUrl + DOWNLOAD_URL.replace("FORMAT", format);
+export const downloadOccurrence = async (format: string, cqL_filter: string) => {
+    let url = geoServerBaseUrl + DOWNLOAD_URL.replace("FORMAT", format);
+    console.log(`URL ${url}`)
+    if (cqL_filter) {
+        url +=  `&cql_filter=${cqL_filter}`
+        console.log(`URL ${url}`)
+    }
     try {
         const response = await axios({
             url,
