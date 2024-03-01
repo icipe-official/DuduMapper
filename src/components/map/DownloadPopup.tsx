@@ -10,19 +10,18 @@ import {
   Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import axios from "axios";
 import {downloadOccurrence} from "@/api/occurrence";
 
 interface DownloadPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  onDownload: (format: string) => void;
+  cqlFilter: string;
 }
 
 const DownloadPopup: React.FC<DownloadPopupProps> = ({
   isOpen,
   onClose,
-  onDownload,
+  cqlFilter,
 }) => {
   const [selectedFormat, setSelectedFormat] = useState("CSV");
 
@@ -30,9 +29,9 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
     setSelectedFormat(event.target.value);
   };
 
+  console.log('CQL filter', cqlFilter)
   const handleDownload = () => {
-      downloadOccurrence(selectedFormat);
-
+      downloadOccurrence(selectedFormat, cqlFilter);
   };
 
 
