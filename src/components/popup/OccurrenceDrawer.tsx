@@ -8,72 +8,83 @@ import BionomicsDetails from "@/components/popup/BionomicsDetails";
 import IrDetails from "@/components/popup/IrDetails";
 import EnvironmentCard from "@/components/popup/EnvironmentCard";
 import { fetchReference, fetchSiteInfo } from "@/api/occurrence";
-import '../map/accordion-style.css'
-import { CSSProperties } from 'react';
+import "../map/accordion-style.css";
+import { CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchBionomics } from '@/api/occurrence';
-import ReferenceDetails from './referenceBox';
+import { fetchBionomics } from "@/api/occurrence";
+import ReferenceDetails from "./referenceBox";
 import "./OccurrencePopup.css";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const borderStyle = {
-    // borderStyle: 'solid',
-    // borderColor: 'green',
-    // borderWidth: '2px 2px 2px 2px',
-    // borderRadius: '5px'
+  // borderStyle: 'solid',
+  // borderColor: 'green',
+  // borderWidth: '2px 2px 2px 2px',
+  // borderRadius: '5px'
 };
 
 const scrollableStyle: CSSProperties = {
-    overflowY: 'scroll'
+  overflowY: "scroll",
 };
 
-export default function OccurrencePopup({ id, handleClose, popoverContent }: { id: string, handleClose: any, popoverContent: any }) {
-    const [expanded, setExpanded] = React.useState<string | false>('panel1');
+export default function OccurrencePopup({
+  id,
+  handleClose,
+  popoverContent,
+}: {
+  id: string;
+  handleClose: any;
+  popoverContent: any;
+}) {
+  const [expanded, setExpanded] = React.useState<string | false>("panel1");
 
-    const open = Object.keys(popoverContent).length > 0;
+  const open = Object.keys(popoverContent).length > 0;
 
-    const bionomicsEnabled = (open && Boolean(popoverContent['bionomics_id']));
-    const environmentEnabled = (open && Boolean(popoverContent['site_id']));
-    const irEnabled = (open && Boolean(popoverContent['ir_bioassays_id']) && Boolean(popoverContent['genetic_mechanisms_id']));
+  const bionomicsEnabled = open && Boolean(popoverContent["bionomics_id"]);
+  const environmentEnabled = open && Boolean(popoverContent["site_id"]);
+  const irEnabled =
+    open &&
+    Boolean(popoverContent["ir_bioassays_id"]) &&
+    Boolean(popoverContent["genetic_mechanisms_id"]);
 
-    const handleChange =
-        (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-            setExpanded(isExpanded ? panel : false);
-            event.stopPropagation();
-        };
+  const handleChange =
+    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
+      event.stopPropagation();
+    };
 
-    const {
-        status,
-        data: siteData,
-        error,
-        isFetching,
-    } = useQuery({
-        queryKey: ["siteInfo", popoverContent['site_id']],
-        queryFn: ({ queryKey }) => fetchSiteInfo(queryKey[1])
-    });
+  const {
+    status,
+    data: siteData,
+    error,
+    isFetching,
+  } = useQuery({
+    queryKey: ["siteInfo", popoverContent["site_id"]],
+    queryFn: ({ queryKey }) => fetchSiteInfo(queryKey[1]),
+  });
 
-    const {
-        status: bionomics_fetch_status,
-        data: bionomicsData,
-        error: bionomics_fetch_error,
-        isFetching: bionomics_is_fetching,
-    } = useQuery({
-        queryKey: ["bionomicsInfo", popoverContent['bionomics_id']],
-        queryFn: ({ queryKey }) => fetchBionomics(queryKey[1])
-    });
+  const {
+    status: bionomics_fetch_status,
+    data: bionomicsData,
+    error: bionomics_fetch_error,
+    isFetching: bionomics_is_fetching,
+  } = useQuery({
+    queryKey: ["bionomicsInfo", popoverContent["bionomics_id"]],
+    queryFn: ({ queryKey }) => fetchBionomics(queryKey[1]),
+  });
 
-    const {
-        status: reference_fetch_status,
-        data: referenceData,
-        error: reference_fetch_error,
-        isFetching: reference_is_fetching,
-    } = useQuery({
-        queryKey: ["referenceInfo", popoverContent['reference_id']],
-        queryFn: ({ queryKey }) => fetchReference(queryKey[1])
-    });
+  const {
+    status: reference_fetch_status,
+    data: referenceData,
+    error: reference_fetch_error,
+    isFetching: reference_is_fetching,
+  } = useQuery({
+    queryKey: ["referenceInfo", popoverContent["reference_id"]],
+    queryFn: ({ queryKey }) => fetchReference(queryKey[1]),
+  });
 
-    console.log(referenceData);
-    console.log("Bionomics fetch error", bionomics_fetch_error)
+  console.log(referenceData);
+  console.log("Bionomics fetch error", bionomics_fetch_error);
 
     if (!open) {
         return null;
@@ -165,3 +176,4 @@ export default function OccurrencePopup({ id, handleClose, popoverContent }: { i
 
     );
 };
+

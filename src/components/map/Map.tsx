@@ -13,28 +13,33 @@ import { Vector as VectorLayer } from "ol/layer.js";
 import { getBasemapOverlaysLayersArray } from "@/api/requests";
 import { Stroke, Fill, Style, Circle } from "ol/style";
 import "../shared/CSS/LayerSwitcherStyles.css";
+import "../shared/CSS/olzoom.css";
 import OccurrencePopup from "../popup/OccurrenceDrawer";
 import "../filters/filterSectionStyles.css";
 import "../filters/filter_section_dev.css";
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
 import OpenFilterButton from "@/components/filters/OpenFilterButton";
 import { getOccurrence } from "@/api/occurrence";
-import {Alert, IconButton, Snackbar, Tooltip} from "@mui/material";
-import RenderFeature from "ol/render/Feature";
-import { Geometry, Polygon, SimpleGeometry } from "ol/geom";
+import { Alert, IconButton, Snackbar, Tooltip } from "@mui/material";
+import { Geometry, Polygon } from "ol/geom";
 import { transform } from "ol/proj";
-import { Coordinate } from "ol/coordinate";
 import { Draw, Modify, Snap } from "ol/interaction.js";
 import Map from "ol/Map";
 import { never } from "ol/events/condition";
 import colormap from "colormap";
-import PrintIcon from '@mui/icons-material/Print'
+import PrintIcon from "@mui/icons-material/Print";
+import CloseIcon from "@mui/icons-material/Close";
+import MenuIcon from "@mui/icons-material/Menu";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import PersonIcon from "@mui/icons-material/Person";
+import SettingsIcon from "@mui/icons-material/Settings";
+import DrawerComponent from "./DrawerComponent";
 
 let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
-
   const queryClient = useQueryClient();
   const mapRef = useRef<OlMap>();
   const [popoverContent, setPopoverContent] = React.useState<{
@@ -44,6 +49,7 @@ function Newmap() {
   const mapElement = useRef<HTMLDivElement>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
   const [areaSelected, setAreaSelected] = useState("");
   const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
   const [filterConditionsObj, setFilterConditionsObj] = useState<{
@@ -53,6 +59,31 @@ function Newmap() {
     period: "",
     country: "",
   });
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Function to toggle sidebar open/close
+  const toggleSidebar = () => {
+    setShowDrawer(!showDrawer);
+  };
+
+  const MenuIconButton = (
+    <Tooltip title="More Options" arrow>
+      <IconButton
+        style={{
+          backgroundColor: "#038543", // Adjust background color as needed
+          borderRadius: "5%", // Make the button circular
+          padding: "6px", // Optional: Add padding for spacing
+        }}
+        onClick={toggleSidebar}
+      >
+        {sidebarOpen ? (
+          <CloseIcon style={{ color: "#038543 !important" }} />
+        ) : (
+          <MenuIcon style={{ color: "white" }} />
+        )}
+      </IconButton>
+    </Tooltip>
+  );
+
   const [cqlFilter, setCqlFilter] = useState("");
   const [theOverlaysArray, setTheOverlaysArray] = useState<any>([]);
   const [theBaseMapsArray, setTheBaseMapsArray] = useState<any>([]);
@@ -64,7 +95,6 @@ function Newmap() {
       strategy: bboxStrategy,
     })
   );
-  const [zoomArea, setZoomArea] = useState<[number, number, number, number]>();
 
   const [speciesColors, setSpeciesColors] = useState<string[]>([
     "#DC267F",
@@ -78,13 +108,6 @@ function Newmap() {
   const getColormapColors = (numColors: number): string[] => {
     return colormap({ colormap: "jet", nshades: numColors, format: "hex" });
   };
-  const addColormapColorsIfNeeded = () => {
-    const remainingColors = selectedSpecies.length - speciesColors.length;
-    if (remainingColors > 0) {
-      const newColors = getColormapColors(remainingColors);
-      setSpeciesColors((prevColors) => [...prevColors, ...newColors]);
-    }
-  };
 
   const {
     status,
@@ -93,35 +116,14 @@ function Newmap() {
     error,
     isFetching,
   } = useQuery({
-    queryKey: ["occurrences", cqlFilter], //Example CQl filter species IN ('gambie', 'finiestus', 'fini') AND WITHIN (the_geom, MULTIPOLYGON((22,22,223,223))) AND adult =true AND season=dry
-    //queryFn: getOccurrences
+    queryKey: ["occurrences", cqlFilter],
     queryFn: ({ queryKey }) => getOccurrence(queryKey),
   });
-
-  function responseToGEOJSON(occurrenceData: any) {
-    const geoJSONPoints = (occurrenceData || []).map((d: any) => {
-      const coordinates = d.geometry.coordinates;
-      return {
-        type: "Feature",
-        geometry: {
-          type: d.geometry.type,
-          coordinates: coordinates,
-        },
-        properties: d.properties,
-      };
-    });
-    const geoJSONFeatureCollection = {
-      type: "FeatureCollection",
-      features: geoJSONPoints,
-    };
-    return geoJSONFeatureCollection;
-  }
 
   useEffect(() => {
     if (Object.keys(filterConditionsObj).length === 0) {
       return;
     }
-    //join the filter conditions into one string using the AND CQL clause conditions and add the date filter
     let filterConditions: string[] = Object.values(filterConditionsObj);
     filterConditions = filterConditions.filter((c) => c);
     const cql_filter = filterConditions.join(" AND ");
@@ -134,33 +136,39 @@ function Newmap() {
       species: conditions["species"],
       country: conditions["country"],
       bionomics: conditions["bionomics"],
+      larval: conditions["larvae"],
+      adult: conditions["adult"],
+      season: conditions["season"],
     });
   };
 
-  // const clearDropdown = () =>{
-  //   setSelectedSpecies([]);
-  // }
-
-  const removeOccurence = ()=> {
+  const removeOccurence = () => {
     setCqlFilter("");
-    setSelectedSpecies([])
+    setSelectedSpecies([]);
     setFilterConditionsObj({
-        species: "", // Reset species filter
-        period: "", // Reset period filter
-        country: "", // Reset country filter
-        bionomics: "",
+      species: "", // Reset species filter
+      period: "", // Reset period filter
+      country: "", // Reset country filter
+      bionomics: "",
+      larval: "",
+      adult: "",
+      season: "",
     });
-  }
+  };
 
   const resetOccurrence = () => {
     setCqlFilter("");
     setFilterConditionsObj({
-        species: selectedSpecies, // Reset species filter
-        period: "", // Reset period filter
-        country: "", // Reset country filter
+      species: selectedSpecies, // Reset species filter
+      period: "", // Reset period filter
+      country: "", // Reset country filter
+      bionomics: "",
+      larval: "",
+      adult: "",
+      season: "",
     });
     // Additional logic to clear any other filter-related state variables if needed
-};
+  };
 
   const handleTimeChange = (startYear: number, endYear: number) => {
     const condition = `start_year >= ${startYear} AND end_year <= ${endYear} `;
@@ -174,7 +182,6 @@ function Newmap() {
     const total = occurrenceData["totalFeatures"];
     const returned = occurrenceData["numberReturned"];
     console.log(`${returned} out of ${total} features`);
-    const featureArray = occurrenceData?.features || [];
 
     occurrenceSource?.clear();
     const geoJsonFormat = new GeoJSON({
@@ -183,12 +190,9 @@ function Newmap() {
       featureProjection: "EPSG:3857",
     });
     //Externalize this to a utils service file somewhere else
-    const geojsonData = geoJsonFormat.readFeatures(
-      responseToGEOJSON(featureArray),
-      {
-        featureProjection: "EPSG:3857",
-      }
-    ) as unknown;
+    const geojsonData = geoJsonFormat.readFeatures(occurrenceData, {
+      featureProjection: "EPSG:3857",
+    }) as unknown;
     const featureGeojson = geojsonData as Feature<Geometry>[];
 
     occurrenceSource?.addFeatures(featureGeojson);
@@ -208,7 +212,7 @@ function Newmap() {
   });
 
   const occurrenceLayer = new VectorLayer({
-    title: "Occurrence Layer",
+    title: "Occurrence",
     visible: true,
     preload: Infinity,
     source: occurrenceSource,
@@ -216,7 +220,7 @@ function Newmap() {
       image: new Circle({
         fill: fill,
         stroke: stroke,
-        radius: 8,
+        radius: 6,
       }),
       fill: fill,
       stroke: stroke,
@@ -304,7 +308,8 @@ function Newmap() {
 
   useEffect(() => {
     getBasemapOverlaysLayersArray("basemaps").then((baseMapsArray) => {
-      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {if (overlaysArray) {
+      getBasemapOverlaysLayersArray("overlays").then((overlaysArray) => {
+        if (overlaysArray) {
           setTheOverlaysArray(overlaysArray);
         }
         if (baseMapsArray) {
@@ -327,21 +332,20 @@ function Newmap() {
           layers: theOverlaysArray,
         } as GroupLayerOptions);
 
-
-            const initialMap = new OlMap({
-              target: "map-container",
-              layers: [BaseMaps, Overlays, occurrenceLayer],
-              view: new View({
-                center: [0, 0],
-                zoom: 2,
-              }),
-            });
-            const layerSwitcher = new LayerSwitcher();
-            initialMap.addControl(layerSwitcher);
-            initialMap.on("singleclick", handleMapClick);
-            mapRef.current = initialMap;
-            setMap(initialMap);
-          // Initialise map
+        const initialMap = new OlMap({
+          target: "map-container",
+          layers: [BaseMaps, Overlays, occurrenceLayer],
+          view: new View({
+            center: [0, 0],
+            zoom: 2,
+          }),
+        });
+        const layerSwitcher = new LayerSwitcher();
+        initialMap.addControl(layerSwitcher);
+        initialMap.on("singleclick", handleMapClick);
+        mapRef.current = initialMap;
+        setMap(initialMap);
+        // Initialise map
         return () => initialMap.setTarget(undefined);
       }
     };
@@ -358,7 +362,7 @@ function Newmap() {
       removeAreaInteractions(map);
       addAreaInteractions(map, areaSelected);
       console.log("Added Interaction");
-        }else {
+    } else {
       removeAreaInteractions(map);
     }
   }, [areaSelected, map]);
@@ -434,20 +438,20 @@ function Newmap() {
     };
 
     const existingOccurrenceLayer = map
-        ?.getLayers()
-        .getArray()
-        .find((layer) => {
-          return layer.get("occurrence-data") === true;
-        });
+      ?.getLayers()
+      .getArray()
+      .find((layer) => {
+        return layer.get("occurrence-data") === true;
+      });
     if (
-        existingOccurrenceLayer &&
-        existingOccurrenceLayer instanceof VectorLayer
+      existingOccurrenceLayer &&
+      existingOccurrenceLayer instanceof VectorLayer
     ) {
       const occurrenceSource = existingOccurrenceLayer.getSource();
       const existingLegendControl = map
-          ?.getControls()
-          .getArray()
-          .find((control) => control.get("name") === "legend");
+        ?.getControls()
+        .getArray()
+        .find((control) => control.get("name") === "legend");
       if (existingLegendControl) {
         map?.removeControl(existingLegendControl);
       }
@@ -475,7 +479,7 @@ function Newmap() {
       const legendContainer = document.createElement("div");
       legendContainer.className = "legend-container";
       legendContainer.style.position = "absolute";
-      legendContainer.style.bottom = "16px";
+      legendContainer.style.bottom = "20px";
       legendContainer.style.right = "16px";
       legendContainer.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
       legendContainer.style.padding = "8px";
@@ -616,20 +620,56 @@ function Newmap() {
     }
   };
 
+  function calculateWidth() {
+    if (showOccurrencePopup && showDrawer) {
+      // If both are open, adjust width accordingly
+      return "60%"; // For example, map container width is 100% - (30% + 10%)
+    } else if (showOccurrencePopup) {
+      // If only occurrence popup is open
+      return "70%"; // For example, map container width is 100% - 30%
+    } else if (showDrawer) {
+      // If only drawer is open
+      return "90%"; // For example, map container width is 100% - 10%
+    } else {
+      // If neither is open
+      return "100%"; // Default width
+    }
+  }
+
   return (
     <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
+      {/* Toggle sidebar button */}
       <div
-        style={{ flexGrow: 1, width: showOccurrencePopup ? "70%" : "100%" }}
+        style={{
+          position: "absolute",
+          top: "170px",
+          left: "13px",
+          zIndex: "1",
+        }}
+      >
+        {MenuIconButton}
+        <DrawerComponent
+          sidebarOpen={showDrawer}
+          toggleSidebar={() => setShowDrawer(!showDrawer)}
+          filterOpen={filterOpen}
+          setFilterOpen={setFilterOpen}
+          printToScale={printToScale}
+        />
+      </div>
+      {/* Sidebar */}
+
+      <div
+        style={{
+          flexGrow: 1,
+          width: calculateWidth(),
+          position: "relative",
+          zIndex: 0,
+        }}
         ref={mapElement}
         className="map-container"
         id="map-container"
       >
-        <div className="filter-dev-button">
-          <OpenFilterButton
-            filterOpen={filterOpen}
-            onClick={() => setFilterOpen(!filterOpen)}
-          />
-        </div>
+        {/* Occurrence filter */}
         <div>
           {filterOpen && (
             <OccurrenceFilter
@@ -644,36 +684,6 @@ function Newmap() {
             />
           )}
         </div>
-      </div>
-      <div
-        className="print-section"
-        style={{
-          position: "absolute",
-          top: "270px",
-          left: "12px",
-          alignItems: "center",
-          transform: "translateX(0%)",
-          zIndex: 900,
-          borderRadius: "15px",
-        }}
-      >
-        <Tooltip title="Print map image" arrow>
-          <IconButton onClick={printToScale}>
-            <PrintIcon
-              style={{
-                color: "#038543",
-                fontWeight: "bold",
-
-                // border: "2px solid white",
-              }}
-            />
-          </IconButton>
-        </Tooltip>
-        <a
-          id="image-download"
-          style={{ display: "none" }}
-          download="printed_map.png"
-        ></a>
       </div>
 
       {showOccurrencePopup && (
