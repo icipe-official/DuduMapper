@@ -58,6 +58,7 @@ const getCountries = async () => {
 
 export default function OccurrenceFilter({
   open,
+  onCloseFilter,
   handleFilterConditions,
   onClearFilter,
   handleDrawArea,
@@ -65,6 +66,7 @@ export default function OccurrenceFilter({
   onResetFilter,
 }: {
   open: boolean;
+  onCloseFilter: () => void;
   handleFilterConditions: any;
   onClearFilter: any;
   handleDrawArea: any;
@@ -307,6 +309,17 @@ export default function OccurrenceFilter({
           sx={{ width: 450, m: 3 }}
           // divider={<Divider orientation="horizontal" flexItem />}
         >
+          <IconButton
+            onClick={onCloseFilter}
+            sx={{
+              position: "absolute",
+              top: "5px",
+              right: "5px",
+              marginBottom: "15px",
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
           <Grid
             container
             spacing={2}
@@ -429,6 +442,7 @@ export default function OccurrenceFilter({
               container
               direction="row"
               alignItems="center"
+              justifyContent="space-between"
               sx={{ paddingLeft: "17px" }}
             >
               <Grid item xs={12} sm={4} md={6}>

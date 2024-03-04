@@ -21,7 +21,6 @@ import "../filters/filter_section_dev.css";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import OccurrenceFilter from "@/components/filters/OccurrenceFilter";
 import TimeSlider from "@/components/filters/TimeSlider";
-import OpenFilterButton from "@/components/filters/OpenFilterButton";
 import { getOccurrence } from "@/api/occurrence";
 import { Alert, IconButton, Snackbar, Tooltip } from "@mui/material";
 import { Geometry, Polygon } from "ol/geom";
@@ -30,13 +29,10 @@ import { Draw, Modify, Snap } from "ol/interaction.js";
 import Map from "ol/Map";
 import { never } from "ol/events/condition";
 import colormap from "colormap";
-import PrintIcon from "@mui/icons-material/Print";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import PersonIcon from "@mui/icons-material/Person";
-import SettingsIcon from "@mui/icons-material/Settings";
 import DrawerComponent from "./DrawerComponent";
+import DownloadPopup from "./DownloadPopup";
 
 let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
@@ -48,8 +44,10 @@ function Newmap() {
   const [map, setMap] = useState<OlMap | undefined>(); // Specify the type using a generic type argument
   const mapElement = useRef<HTMLDivElement>(null);
   const [filterOpen, setFilterOpen] = useState(false);
+
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
+  const [downloadOpen, setDownloadOpen] = useState(false);
   const [areaSelected, setAreaSelected] = useState("");
   const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
   const [filterConditionsObj, setFilterConditionsObj] = useState<{
@@ -635,6 +633,29 @@ function Newmap() {
       return "100%"; // Default width
     }
   }
+  const closeFilterPopup = () => {
+    setFilterOpen(false);
+  };
+
+  const handleDownloadClick = () => {
+    setDownloadOpen(true);
+  };
+
+  const handleCloseDownloadPopup = () => {
+    setDownloadOpen(false);
+  };
+
+  const closeDownloadPopup = () => {
+    setDownloadOpen(false); // Close the download popup
+  };
+
+  const handleDownload = (format: any) => {
+    // Implement download functionality based on the selected format
+    // For example, you can initiate a download request here
+    console.log("Downloading data in format:", format);
+    // Close the download popup after initiating the download
+    setDownloadOpen(false);
+  };
 
   return (
     <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
@@ -654,6 +675,7 @@ function Newmap() {
           filterOpen={filterOpen}
           setFilterOpen={setFilterOpen}
           printToScale={printToScale}
+          handleDownloadClick={handleDownloadClick}
         />
       </div>
       {/* Sidebar */}
@@ -674,6 +696,7 @@ function Newmap() {
           {filterOpen && (
             <OccurrenceFilter
               open={filterOpen}
+              onCloseFilter={closeFilterPopup}
               handleFilterConditions={updateFilterConditions}
               onClearFilter={() => {
                 removeOccurence();
@@ -686,6 +709,15 @@ function Newmap() {
         </div>
       </div>
 
+      {/* Download Popup */}
+      {downloadOpen && (
+        <DownloadPopup
+          isOpen={downloadOpen}
+          onClose={closeDownloadPopup}
+          cqlFilter={cqlFilter}
+        />
+      )}
+
       {showOccurrencePopup && (
         <OccurrencePopup
           id={"feature_popover"}
@@ -693,6 +725,7 @@ function Newmap() {
           popoverContent={popoverContent}
         />
       )}
+
       <div>
         <TimeSlider onChange={handleTimeChange} />
       </div>
