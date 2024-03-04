@@ -1,0 +1,38 @@
+.download-popup {
+  position: absolute;
+  top: 40%;
+  left: 13%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  height: 250px;
+  padding: 20px;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.download-header {
+  margin-bottom: 10px;
+}
+
+.download-body {
+  display: flex;
+  align-items: center;
+}
+
+.download-body select {
+  margin-right: 10px;
+}
+
+.download-body button {
+  background-color: #2e7d32;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.download-body button:hover {
+  background-color: #ebbd40;
+}
