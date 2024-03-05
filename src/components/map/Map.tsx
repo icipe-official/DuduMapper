@@ -33,6 +33,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import DrawerComponent from "./DrawerComponent";
 import DownloadPopup from "./DownloadPopup";
+import OverlaysLegend from "@/components/legend/OverlaysLegend";
 
 let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
@@ -58,6 +59,9 @@ function Newmap() {
     country: "",
   });
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [resolution, setResolution] = useState<number>()
+  const [legendOpen, setLegendOpen] = useState(false)
+  const [overlays, setOverlays] = useState<string[]>([])
   // Function to toggle sidebar open/close
   const toggleSidebar = () => {
     setShowDrawer(!showDrawer);
@@ -127,6 +131,10 @@ function Newmap() {
     const cql_filter = filterConditions.join(" AND ");
     setCqlFilter(cql_filter);
   }, [filterConditionsObj]);
+
+  const updateOverlays = (layerNames: string[]) => {
+    setOverlays(layerNames)
+  }
 
   const updateFilterConditions = (conditions: any) => {
     setFilterConditionsObj({
@@ -198,6 +206,8 @@ function Newmap() {
     const extent = occurrenceSource.getExtent();
     if (returned != 0) {
       mapRef.current?.getView().fit(extent);
+      const resolution = mapRef.current?.getView().getResolution();
+      console.log('Map resolution', resolution)
     }
   }
 
@@ -717,6 +727,7 @@ function Newmap() {
           cqlFilter={cqlFilter}
         />
       )}
+      <OverlaysLegend isOpen={true} onClose={() => setLegendOpen(false)} overlays={overlays} resolution={12345}/>
 
       {showOccurrencePopup && (
         <OccurrencePopup
