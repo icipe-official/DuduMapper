@@ -10,6 +10,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { FaBook, FaCalendar, FaFileAlt, FaInfoCircle, FaLink, FaNewspaper, FaStickyNote, FaUser } from 'react-icons/fa'; // Import icons
 import StorageIcon from '@mui/icons-material/Storage';
+import Link from 'next/link';
 const convertToSensibleName = (key: string) => {
   return key
     .replace(/[_-]/g, " ") // Replace underscores and hyphens with spaces
@@ -65,6 +66,54 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
   // Generic icon for keys not explicitly listed in the configuration
   const genericIcon = <span>&#x1F4AC;</span>; // You can replace this with your desired generic icon
 
+  interface MyError {
+    message: string;
+  }
+
+  const renderReference = (key: any): any => {
+
+    if (key === "doi") {
+      const doiValue = referenceProperties[key];
+      setDoi(doiValue); // Store DOI value
+
+      if (!doiValue) {
+        // Handle missing DOI (optional)
+        return <span style={{ fontWeight: "350" }}>Missing DOI</span>;
+      }
+
+      const doiUrl = `https://doi.org/${doiValue}`;
+
+      // Initiate check asynchronously (without blocking render)
+      (async () => {
+        setIsChecking(true);
+        try {
+          const response = await fetch(doiUrl, { method: 'HEAD' });
+          if (response.ok) {
+            setIsChecking(false); // No need to catch or return error
+          }
+        } finally {
+          setIsChecking(false); // Ensure state is updated after check
+        }
+      })(); // Self-invoking async function
+
+      return (
+        <>
+          {isChecking ? ( // Display "Checking..." while checking
+            <span style={{ fontWeight: "350" }}>Checking... {doiValue}</span>
+          ) : (
+            <Link href={doiUrl}>
+              <Box sx={{ fontWeight: "350" }}>{doiValue}</Box>
+            </Link>
+          )}
+        </>
+      );
+    } else {
+      // Handle other keys
+      return <span style={{ fontWeight: "350" }}>{referenceProperties[key]}</span>;
+    }
+  };
+
+
   // List of keys to ignore in rendering
   const ignoreCategoryList = ["id"];
 
@@ -98,7 +147,7 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
                   <span style={{ fontWeight: '600' }}>
                     {icon} {key == 'doi' ? displayName.toUpperCase() : convertToSensibleName(key)}:
                   </span>
-                  <span style={{ fontWeight: '350' }}> {referenceProperties[key]}</span>
+                  <span style={{ fontWeight: '350' }}> {renderReference(key)}</span>
                   <br></br>
                 </>
               )
