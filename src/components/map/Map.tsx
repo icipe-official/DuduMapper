@@ -33,6 +33,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import DrawerComponent from "./DrawerComponent";
 import DownloadPopup from "./DownloadPopup";
+import { Coordinate } from "ol/coordinate";
 
 let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
@@ -49,7 +50,9 @@ function Newmap() {
   const [showDrawer, setShowDrawer] = useState(false);
   const [downloadOpen, setDownloadOpen] = useState(false);
   const [areaSelected, setAreaSelected] = useState("");
+  const [removeSelection, setRemoveSelection] = useState(0);
   const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
+  const [cordinateArray, setCordinateArray] = useState([]);
   const [filterConditionsObj, setFilterConditionsObj] = useState<{
     [keys: string]: any;
   }>({
@@ -226,6 +229,13 @@ function Newmap() {
   } as BaseLayerOptions);
   occurrenceLayer.set("occurrence-data", true);
 
+  const VSource = new VectorSource({ wrapX: false });
+  const areaSelectLayer = new VectorLayer({
+    title: "Area Select",
+    source: VSource,
+  } as BaseLayerOptions);
+  areaSelectLayer.set("area-select", true);
+
   const handleClosePopup = () => {
     setShowOccurrencePopup(false);
   };
@@ -252,6 +262,35 @@ function Newmap() {
     map.removeInteraction(snap);
     console.log("Removed Interactions...");
   };
+
+  const updateSelectedPolygons = (map: Map, areaCoordinates: any) => {
+    console.log("Called Update Array of Coordinates....");
+    // clear out old polygons
+    const areaSelectLayer = map
+      .getAllLayers()
+      .find((l) => l.get("area-select"));
+    const source = areaSelectLayer?.getSource();
+    (source as VectorSource)
+      .getFeatures()
+      .forEach((f) => (source as VectorSource).removeFeature(f));
+
+    // draw the new one if it exists
+    if (areaCoordinates.length > 0) {
+      const coordinates = areaCoordinates.map((c: any) =>
+        transform(c, "EPSG:4326", "EPSG:3857")
+      );
+      const polygon = new Polygon([coordinates]);
+      (source as VectorSource).addFeature(new Feature({ geometry: polygon }));
+    }
+  };
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    updateSelectedPolygons(map, cordinateArray);
+  }, [map, cordinateArray]);
 
   const addAreaInteractions = (map: Map, shapeType: any) => {
     draw = new Draw({
@@ -283,6 +322,7 @@ function Newmap() {
       }
 
       console.log("Coordinates:", coordinates);
+      setCordinateArray(coordinates);
 
       if (coordinates) {
         const wktString = `MULTIPOLYGON(((${coordinates
@@ -332,7 +372,7 @@ function Newmap() {
 
         const initialMap = new OlMap({
           target: "map-container",
-          layers: [BaseMaps, Overlays, occurrenceLayer],
+          layers: [BaseMaps, Overlays, occurrenceLayer, areaSelectLayer],
           view: new View({
             center: [0, 0],
             zoom: 2,
@@ -386,6 +426,18 @@ function Newmap() {
   const handleSelectedSpecies = (selectedSpecies: any) => {
     setSelectedSpecies(selectedSpecies);
   };
+
+  const removeSelectionFilter = () => {
+    setRemoveSelection(removeSelection + 1);
+  };
+
+  useEffect(() => {
+    if (map) {
+      removeAreaInteractions(map);
+      updateSelectedPolygons(map, "");
+      resetOccurrence();
+    }
+  }, [removeSelection]);
 
   useEffect(() => {
     const defaultStyle = new Style({
@@ -704,6 +756,7 @@ function Newmap() {
               handleDrawArea={handleAreaDrawn}
               handleSelectedSpecies={handleSelectedSpecies}
               onResetFilter={resetOccurrence}
+              onRemoveSelection={removeSelectionFilter}
             />
           )}
         </div>
