@@ -70,11 +70,12 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
     message: string;
   }
 
-  const renderReference = (key: any): any => {
 
+
+
+  const renderReference = (key: any): any => {
     if (key === "doi") {
       const doiValue = referenceProperties[key];
-      setDoi(doiValue); // Store DOI value
 
       if (!doiValue) {
         // Handle missing DOI (optional)
@@ -83,35 +84,31 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
 
       const doiUrl = `https://doi.org/${doiValue}`;
 
-      // Initiate check asynchronously (without blocking render)
-      (async () => {
-        setIsChecking(true);
-        try {
-          const response = await fetch(doiUrl, { method: 'HEAD' });
+      return fetch(doiUrl, { method: 'HEAD' })
+        .then(response => {
           if (response.ok) {
-            setIsChecking(false); // No need to catch or return error
+            return (
+              <Link href={doiUrl}>
+                <Box sx={{ fontWeight: "350" }}>Checking... {doiValue}</Box>
+              </Link>
+            );
+          } else {
+            return <span style={{ fontWeight: "350" }}>{doiValue}</span>;
           }
-        } finally {
-          setIsChecking(false); // Ensure state is updated after check
-        }
-      })(); // Self-invoking async function
-
-      return (
-        <>
-          {isChecking ? ( // Display "Checking..." while checking
-            <span style={{ fontWeight: "350" }}>Checking... {doiValue}</span>
-          ) : (
-            <Link href={doiUrl}>
-              <Box sx={{ fontWeight: "350" }}>{doiValue}</Box>
-            </Link>
-          )}
-        </>
-      );
+        })
+        .catch(error => {
+          // Handle fetch error
+          console.error("Error fetching DOI:", error);
+          return <span style={{ fontWeight: "350" }}>{doiValue}</span>;
+        });
     } else {
       // Handle other keys
       return <span style={{ fontWeight: "350" }}>{referenceProperties[key]}</span>;
     }
   };
+
+
+
 
 
   // List of keys to ignore in rendering
