@@ -11,6 +11,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { FaBook, FaCalendar, FaFileAlt, FaInfoCircle, FaLink, FaNewspaper, FaStickyNote, FaUser } from 'react-icons/fa'; // Import icons
 import StorageIcon from '@mui/icons-material/Storage';
 import Link from 'next/link';
+import { fetchProxy } from "@/lib/proxy";
 const convertToSensibleName = (key: string) => {
   return key
     .replace(/[_-]/g, " ") // Replace underscores and hyphens with spaces
@@ -84,9 +85,9 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
 
       const doiUrl = `https://doi.org/${doiValue}`;
 
-      return fetch(doiUrl, { method: 'HEAD' })
+      return fetchProxy(doiUrl) // Use fetchProxy instead of fetch
         .then(response => {
-          if (response.ok) {
+          if (response.startsWith('2')) { // Check if the response status is in the 200 range
             return (
               <Link href={doiUrl}>
                 <Box sx={{ fontWeight: "350" }}>Checking... {doiValue}</Box>
@@ -106,8 +107,6 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
       return <span style={{ fontWeight: "350" }}>{referenceProperties[key]}</span>;
     }
   };
-
-
 
 
 
