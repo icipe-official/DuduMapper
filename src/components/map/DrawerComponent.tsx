@@ -12,6 +12,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import HelpIcon from "@mui/icons-material/Help";
 import PrintIcon from "@mui/icons-material/Print";
 import DownloadIcon from "@mui/icons-material/Download";
+import LegendToggleIcon from "@mui/icons-material/LegendToggle";
 
 interface DrawerProps {
   sidebarOpen: boolean;
@@ -22,6 +23,8 @@ interface DrawerProps {
 
   printToScale: () => void;
   handleDownloadClick: () => void;
+  legendOpen: boolean;
+  setLegendOpen: (value: boolean) => void;
 }
 
 const DrawerComponent: React.FC<DrawerProps> = ({
@@ -31,6 +34,8 @@ const DrawerComponent: React.FC<DrawerProps> = ({
   setFilterOpen,
   printToScale,
   handleDownloadClick,
+  legendOpen,
+  setLegendOpen,
 }) => {
   return (
     <Box sx={{ zIndex: 1, overflow: "auto" }}>
@@ -139,6 +144,25 @@ const DrawerComponent: React.FC<DrawerProps> = ({
                       <HelpIcon
                         style={{
                           color: "#038543",
+                          fontWeight: "bold",
+                          fontSize: "1.9rem",
+                        }}
+                      />
+                    </IconButton>
+                  </Tooltip>
+                </ListItem>
+              </div>
+            </div>
+            {/* Legends */}
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <div className="dummy-dev-button">
+                <ListItem>
+                  <Tooltip title="ledend" arrow>
+                    <IconButton onClick={() => setLegendOpen(!legendOpen)}>
+                      <LegendToggleIcon
+                        style={{
+                          color: "white",
+                          backgroundColor: "#038543",
                           fontWeight: "bold",
                           fontSize: "1.9rem",
                         }}

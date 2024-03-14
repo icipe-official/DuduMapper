@@ -6,6 +6,7 @@ import "ol-ext/control/LayerSwitcher.css";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
 import LayerGroup from "ol/layer/Group";
 import { BaseLayerOptions, GroupLayerOptions } from "ol-layerswitcher";
+import getLayers from "ol-layerswitcher";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON.js";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
@@ -59,9 +60,12 @@ function Newmap() {
     country: "",
   });
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [resolution, setResolution] = useState<number>()
-  const [legendOpen, setLegendOpen] = useState(false)
-  const [overlays, setOverlays] = useState<string[]>([])
+  const [resolution, setResolution] = useState<number>();
+  const [legendOpen, setLegendOpen] = useState(false);
+  const [overlays, setOverlays] = useState<string[]>([]);
+  const [speciesLegendDiv, setSpeciesLegendDiv] = useState<JSX.Element | null>(
+    null
+  );
   // Function to toggle sidebar open/close
   const toggleSidebar = () => {
     setShowDrawer(!showDrawer);
@@ -133,8 +137,8 @@ function Newmap() {
   }, [filterConditionsObj]);
 
   const updateOverlays = (layerNames: string[]) => {
-    setOverlays(layerNames)
-  }
+    setOverlays(layerNames);
+  };
 
   const updateFilterConditions = (conditions: any) => {
     setFilterConditionsObj({
@@ -207,7 +211,7 @@ function Newmap() {
     if (returned != 0) {
       mapRef.current?.getView().fit(extent);
       const resolution = mapRef.current?.getView().getResolution();
-      console.log('Map resolution', resolution)
+      console.log("Map resolution", resolution);
     }
   }
 
@@ -484,37 +488,42 @@ function Newmap() {
       map?.render();
     }
     const createLegendDiv = () => {
-      const legendContainer = document.createElement("div");
-      legendContainer.className = "legend-container";
-      legendContainer.style.position = "absolute";
-      legendContainer.style.bottom = "20px";
-      legendContainer.style.right = "16px";
-      legendContainer.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-      legendContainer.style.padding = "8px";
-      legendContainer.style.border = "1px solid #ccc";
-      legendContainer.style.borderRadius = "5px";
-      const legendTitle = document.createElement("div");
-      legendTitle.style.textDecoration = "underline";
-      legendTitle.style.fontWeight = "bold";
-      legendTitle.textContent = "Legend";
-      legendContainer.appendChild(legendTitle);
-      selectedSpecies.forEach((species, index) => {
-        const legendItem = document.createElement("div");
-        legendItem.style.fontStyle = "italic";
-        legendItem.style.fontWeight = "bold";
-        legendItem.style.color = speciesColors[index];
-        legendItem.textContent = `an. ${species}`;
-        legendContainer.appendChild(legendItem);
-      });
-      return legendContainer;
+      return (
+        <div
+          className="legend-container"
+          style={{
+            position: "relative",
+            width: "90%",
+            bottom: "0px",
+            right: "16px",
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            padding: "8px",
+            border: "1px solid #ccc",
+            borderRadius: "5px",
+          }}
+        >
+          <div style={{ textDecoration: "underline", fontWeight: "bold" }}>
+            Legend
+          </div>
+          {selectedSpecies.map((species, index) => (
+            <div
+              key={index}
+              style={{
+                fontStyle: "italic",
+                fontWeight: "bold",
+                color: speciesColors[index],
+              }}
+            >
+              an. {species}
+            </div>
+          ))}
+        </div>
+      );
     };
+
     const legendDiv = createLegendDiv();
-    document.body.appendChild(legendDiv);
-    return () => {
-      if (document.body.contains(legendDiv)) {
-        document.body.removeChild(legendDiv);
-      }
-    };
+    // document.body.appendChild(legendDiv);
+    setSpeciesLegendDiv(legendDiv);
   }, [occurrenceData]);
 
   const printToScale = () => {
@@ -667,6 +676,28 @@ function Newmap() {
     setDownloadOpen(false);
   };
 
+  useEffect(() => {
+    const checkSelectedLayers = () => {
+      const selectedOverlaysLayers: any = [];
+      theOverlaysArray.forEach((layer: any) => {
+        if (layer.getVisible()) {
+          const layerName = layer.get("name");
+          const nameParts = layerName.split(":");
+          const finalName = nameParts[nameParts.length - 1];
+          selectedOverlaysLayers.push(finalName);
+        }
+      });
+      setOverlays(selectedOverlaysLayers);
+    };
+
+    // Run the checkSelectedLayers function initially
+    checkSelectedLayers();
+
+    const intervalId = setInterval(checkSelectedLayers, 200);
+
+    return () => clearInterval(intervalId);
+  }, [theOverlaysArray]);
+
   return (
     <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
       {/* Toggle sidebar button */}
@@ -686,6 +717,8 @@ function Newmap() {
           setFilterOpen={setFilterOpen}
           printToScale={printToScale}
           handleDownloadClick={handleDownloadClick}
+          legendOpen={legendOpen}
+          setLegendOpen={setLegendOpen}
         />
       </div>
       {/* Sidebar */}
@@ -727,7 +760,15 @@ function Newmap() {
           cqlFilter={cqlFilter}
         />
       )}
-      <OverlaysLegend isOpen={true} onClose={() => setLegendOpen(false)} overlays={overlays} resolution={12345}/>
+      {legendOpen && (
+        <OverlaysLegend
+          isOpen={legendOpen}
+          onClose={() => setLegendOpen(false)}
+          overlays={overlays}
+          resolution={12345}
+          speciesLegendDiv={speciesLegendDiv}
+        />
+      )}
 
       {showOccurrencePopup && (
         <OccurrencePopup

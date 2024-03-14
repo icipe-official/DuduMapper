@@ -3,7 +3,7 @@ import WMTSCapabilities from "ol/format/WMTSCapabilities";
 import VectorTileLayer from "ol/layer/VectorTile";
 import VectorTileSource from "ol/source/VectorTile";
 import MVT from "ol/format/MVT";
-import { BaseLayerOptions} from "ol-layerswitcher";
+import { BaseLayerOptions } from "ol-layerswitcher";
 import Stroke from "ol/style/Stroke";
 import Fill from "ol/style/Fill";
 import Style from "ol/style/Style";
@@ -273,6 +273,7 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
           theTile = new TileLayer({
             title: displayName,
             visible: false,
+            name: layerName,
             source: new WMTS({
               url: geoServerBaseUrl + "/geoserver/gwc/service/wmts",
               layer: layerName,
