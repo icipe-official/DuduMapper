@@ -83,25 +83,31 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
         return <span style={{ fontWeight: "350" }}>Missing DOI</span>;
       }
 
-      const doiUrl = `https://doi.org/${doiValue}`;
+      const doiUrl = `http://localhost:3000/doi_endpoint?doi=https://doi.org/${doiValue}`;
 
-      return fetchProxy(doiUrl) // Use fetchProxy instead of fetch
-        .then(response => {
-          if (response.startsWith('2')) { // Check if the response status is in the 200 range
+
+      fetch(doiUrl)
+        .then(response => response.json()) // Parse JSON response
+        .then(data => {
+          const { reachable, response: status } = data;
+          if (reachable === true) { // Check if the response status is reachable
             return (
-              <Link href={doiUrl}>
-                <Box sx={{ fontWeight: "350" }}>Checking... {doiValue}</Box>
+              <Link href={`https://doi.org/${doiValue}`}>
+                <Box sx={{ fontWeight: "350" }}>{doiValue}</Box>
               </Link>
             );
+          } else if (reachable === false) {
+            return <span style={{ fontWeight: "350" }}>{doiValue} (Unreachable)</span>;
           } else {
-            return <span style={{ fontWeight: "350" }}>{doiValue}</span>;
+            console.error("Invalid response for DOI:", status);
+            return <span style={{ fontWeight: "350" }}>{doiValue} (Unreachable)</span>;
           }
         })
         .catch(error => {
-          // Handle fetch error
           console.error("Error fetching DOI:", error);
-          return <span style={{ fontWeight: "350" }}>{doiValue}</span>;
+          return <span style={{ fontWeight: "350" }}>{doiValue} (Unreachable)</span>;
         });
+
     } else {
       // Handle other keys
       return <span style={{ fontWeight: "350" }}>{referenceProperties[key]}</span>;
