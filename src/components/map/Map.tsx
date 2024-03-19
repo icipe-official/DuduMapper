@@ -35,6 +35,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import DrawerComponent from "./DrawerComponent";
 import DownloadPopup from "./DownloadPopup";
 import OverlaysLegend from "@/components/legend/OverlaysLegend";
+import CircleIcon from "@mui/icons-material/Circle";
 
 let draw: Draw, snap: Snap, modify: Modify;
 function Newmap() {
@@ -488,36 +489,73 @@ function Newmap() {
       // Refresh the map
       map?.render();
     }
-    const createLegendDiv = () => {
-      return (
-        <div
-          className="legend-container"
-          style={{
-            position: "relative",
-            //width: "70%",
-            bottom: "0px",
-            right: "16px",
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
-            padding: "8px",
-            border: "1px solid #ccc",
-            borderRadius: "5px",
-          }}
-        >
-          {selectedSpecies.map((species, index) => (
+    let createLegendDiv;
+
+    if (selectedSpecies.length > 0) {
+      createLegendDiv = () => {
+        return (
+          <div
+            className="legend-container"
+            style={{
+              position: "relative",
+              //width: "70%",
+              bottom: "0px",
+              right: "16px",
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              padding: "8px",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+            }}
+          >
+            {selectedSpecies.map((species, index) => (
+              <div
+                key={index}
+                style={{
+                  fontStyle: "italic",
+                  fontWeight: "bold",
+                  color: speciesColors[index],
+                }}
+              >
+                an. {species}
+              </div>
+            ))}
+          </div>
+        );
+      };
+    } else {
+      createLegendDiv = () => {
+        return (
+          <div
+            className="legend-container"
+            style={{
+              position: "relative",
+              //width: "70%",
+              bottom: "0px",
+              right: "16px",
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              padding: "8px",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+            }}
+          >
             <div
-              key={index}
               style={{
                 fontStyle: "italic",
                 fontWeight: "bold",
-                color: speciesColors[index],
+                color: "green",
               }}
             >
-              an. {species}
+              <div>
+                <IconButton style={{ color: "#02FF02" }}>
+                  <CircleIcon />
+                </IconButton>
+                Species
+              </div>
             </div>
-          ))}
-        </div>
-      );
-    };
+          </div>
+        );
+      };
+    }
 
     const legendDiv = createLegendDiv();
     setSpeciesLegendDiv(legendDiv);
