@@ -30,7 +30,9 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
   reference_is_fetching,
 }) => {
   const [activeCategory, setActiveCategory] = useState("Details");
-
+  const [linkElement, setLinkElement] = useState<React.ReactNode>(
+    <div>Checking DOI validity...</div>
+  );
   useEffect(() => {
     // Update active category when the referenceData changes
     if (referenceData) {
@@ -91,23 +93,21 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
         .then(data => {
           const { reachable, response: status } = data;
           if (reachable === true) { // Check if the response status is reachable
-            return (
-              <Link href={`https://doi.org/${doiValue}`}>
-                <Box sx={{ fontWeight: "350" }}>{doiValue}</Box>
-              </Link>
-            );
+            setLinkElement(<Link href={`https://doi.org/${doiValue}`}>
+              <Box sx={{ fontWeight: "350" }}>{doiValue}</Box>
+            </Link>)
           } else if (reachable === false) {
-            return <span style={{ fontWeight: "350" }}>{doiValue} (Unreachable)</span>;
+            setLinkElement(<span style={{ fontWeight: "350" }}>{doiValue} (Unreachable)</span>)
           } else {
             console.error("Invalid response for DOI:", status);
-            return <span style={{ fontWeight: "350" }}>{doiValue} (Unreachable)</span>;
+            setLinkElement(<span style={{ fontWeight: "350" }}>{doiValue} (Unreachable)</span>)
           }
         })
         .catch(error => {
           console.error("Error fetching DOI:", error);
           return <span style={{ fontWeight: "350" }}>{doiValue} (Unreachable)</span>;
         });
-
+      return linkElement;
     } else {
       // Handle other keys
       return <span style={{ fontWeight: "350" }}>{referenceProperties[key]}</span>;
