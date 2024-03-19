@@ -471,6 +471,7 @@ function Newmap() {
         // If no species selected, show the original data with default style
         occurrenceSource.getFeatures().forEach((feature: any) => {
           feature.setStyle(defaultStyle);
+          console.log("Setted Default..");
         });
       } else {
         // Update the style of features in the occurrence source based on selected species
@@ -493,7 +494,7 @@ function Newmap() {
           className="legend-container"
           style={{
             position: "relative",
-            width: "90%",
+            //width: "70%",
             bottom: "0px",
             right: "16px",
             backgroundColor: "rgba(255, 255, 255, 0.8)",
@@ -502,9 +503,6 @@ function Newmap() {
             borderRadius: "5px",
           }}
         >
-          <div style={{ textDecoration: "underline", fontWeight: "bold" }}>
-            Legend
-          </div>
           {selectedSpecies.map((species, index) => (
             <div
               key={index}
@@ -522,7 +520,6 @@ function Newmap() {
     };
 
     const legendDiv = createLegendDiv();
-    // document.body.appendChild(legendDiv);
     setSpeciesLegendDiv(legendDiv);
   }, [occurrenceData]);
 

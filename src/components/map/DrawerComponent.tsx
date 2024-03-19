@@ -157,7 +157,7 @@ const DrawerComponent: React.FC<DrawerProps> = ({
             <div style={{ display: "flex", alignItems: "center" }}>
               <div className="dummy-dev-button">
                 <ListItem>
-                  <Tooltip title="ledend" arrow>
+                  <Tooltip title="Legend" arrow>
                     <IconButton onClick={() => setLegendOpen(!legendOpen)}>
                       <LegendToggleIcon
                         style={{
