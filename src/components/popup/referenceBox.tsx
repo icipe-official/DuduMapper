@@ -85,7 +85,7 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
         return <span style={{ fontWeight: "350" }}>Missing DOI</span>;
       }
 
-      const doiUrl = `http://localhost:3000/doi_endpoint?doi=https://doi.org/${doiValue}`;
+      const doiUrl = `/doi_endpoint?doi=https://doi.org/${doiValue}`;
 
 
       fetch(doiUrl)
@@ -97,10 +97,10 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
               <Box sx={{ fontWeight: "350" }}>{doiValue}</Box>
             </Link>)
           } else if (reachable === false) {
-            setLinkElement(<span style={{ fontWeight: "350" }}>{doiValue} (Unreachable)</span>)
+            setLinkElement(<span style={{ fontWeight: "350" }}>{doiValue}</span>)
           } else {
             console.error("Invalid response for DOI:", status);
-            setLinkElement(<span style={{ fontWeight: "350" }}>{doiValue} (Unreachable)</span>)
+            setLinkElement(<span style={{ fontWeight: "350" }}>{doiValue}</span>)
           }
         })
         .catch(error => {
