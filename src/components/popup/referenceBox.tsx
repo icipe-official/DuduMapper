@@ -10,6 +10,8 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { FaBook, FaCalendar, FaFileAlt, FaInfoCircle, FaLink, FaNewspaper, FaStickyNote, FaUser } from 'react-icons/fa'; // Import icons
 import StorageIcon from '@mui/icons-material/Storage';
+import Link from 'next/link';
+import { fetchProxy } from "@/lib/proxy";
 const convertToSensibleName = (key: string) => {
   return key
     .replace(/[_-]/g, " ") // Replace underscores and hyphens with spaces
@@ -28,7 +30,9 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
   reference_is_fetching,
 }) => {
   const [activeCategory, setActiveCategory] = useState("Details");
-
+  const [linkElement, setLinkElement] = useState<React.ReactNode>(
+    <div>Checking DOI validity...</div>
+  );
   useEffect(() => {
     // Update active category when the referenceData changes
     if (referenceData) {
@@ -65,6 +69,53 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
   // Generic icon for keys not explicitly listed in the configuration
   const genericIcon = <span>&#x1F4AC;</span>; // You can replace this with your desired generic icon
 
+  interface MyError {
+    message: string;
+  }
+
+
+
+
+  const renderReference = (key: any): any => {
+    if (key === "doi") {
+      const doiValue = referenceProperties[key];
+
+      if (!doiValue) {
+        // Handle missing DOI (optional)
+        return <span style={{ fontWeight: "350" }}>Missing DOI</span>;
+      }
+
+      const doiUrl = `/doi_endpoint?doi=https://doi.org/${doiValue}`;
+
+
+      fetch(doiUrl)
+        .then(response => response.json()) // Parse JSON response
+        .then(data => {
+          const { reachable, response: status } = data;
+          if (reachable === true) { // Check if the response status is reachable
+            setLinkElement(<Link href={`https://doi.org/${doiValue}`}>
+              <Box sx={{ fontWeight: "350" }}>{doiValue}</Box>
+            </Link>)
+          } else if (reachable === false) {
+            setLinkElement(<span style={{ fontWeight: "350" }}>{doiValue}</span>)
+          } else {
+            console.error("Invalid response for DOI:", status);
+            setLinkElement(<span style={{ fontWeight: "350" }}>{doiValue}</span>)
+          }
+        })
+        .catch(error => {
+          console.error("Error fetching DOI:", error);
+          return <span style={{ fontWeight: "350" }}>{doiValue} (Unreachable)</span>;
+        });
+      return linkElement;
+    } else {
+      // Handle other keys
+      return <span style={{ fontWeight: "350" }}>{referenceProperties[key]}</span>;
+    }
+  };
+
+
+
   // List of keys to ignore in rendering
   const ignoreCategoryList = ["id"];
 
@@ -98,7 +149,7 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
                   <span style={{ fontWeight: '600' }}>
                     {icon} {key == 'doi' ? displayName.toUpperCase() : convertToSensibleName(key)}:
                   </span>
-                  <span style={{ fontWeight: '350' }}> {referenceProperties[key]}</span>
+                  <span style={{ fontWeight: '350' }}> {renderReference(key)}</span>
                   <br></br>
                 </>
               )
