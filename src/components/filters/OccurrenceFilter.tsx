@@ -64,6 +64,7 @@ export default function OccurrenceFilter({
   handleDrawArea,
   handleSelectedSpecies,
   onResetFilter,
+  onRemoveSelection,
 }: {
   open: boolean;
   onCloseFilter: () => void;
@@ -72,6 +73,7 @@ export default function OccurrenceFilter({
   handleDrawArea: any;
   handleSelectedSpecies: any;
   onResetFilter: any;
+  onRemoveSelection: any;
 }) {
   const queryClient = useQueryClient();
   // const [open, setOpen] = useState(false);
@@ -298,6 +300,9 @@ export default function OccurrenceFilter({
       handleDrawArea("");
       setSelectedByArea("");
     }
+  };
+  const clearDrawnArea = () => {
+    onRemoveSelection();
   };
   return (
     <div className="filter-dev-section">
@@ -1069,6 +1074,16 @@ export default function OccurrenceFilter({
                       <FormatShapesIcon />
                     </IconButton>
                   </Typography>
+                  <button
+                    style={{
+                      backgroundColor: "green",
+                      color: "white",
+                      height: "30px",
+                    }}
+                    onClick={() => clearDrawnArea()}
+                  >
+                    Remove Area Selection
+                  </button>
                 </Grid>
               </Grid>
             </Grid>
