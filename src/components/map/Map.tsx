@@ -545,12 +545,17 @@ function Newmap() {
                 color: "green",
               }}
             >
-              <div>
-                <IconButton style={{ color: "#02FF02" }}>
-                  <CircleIcon />
-                </IconButton>
-                Species
-              </div>
+              <IconButton>
+                <CircleIcon
+                  style={{
+                    color: "#02FF02",
+                    fontSize: "12px",
+                    border: "2px solid black",
+                    borderRadius: "10px",
+                  }}
+                />
+              </IconButton>
+              Species
             </div>
           </div>
         );
