@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import {
   LinearProgress,
   Typography,
@@ -31,8 +32,9 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
 }) => {
   const [activeCategory, setActiveCategory] = useState("Details");
   const [linkElement, setLinkElement] = useState<React.ReactNode>(
-    <div>Checking DOI validity...</div>
+    <LinearProgress />
   );
+  const router = useRouter() as any; // Cast router to 'any' type
   useEffect(() => {
     // Update active category when the referenceData changes
     if (referenceData) {
@@ -84,10 +86,8 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
         // Handle missing DOI (optional)
         return <span style={{ fontWeight: "350" }}>Missing DOI</span>;
       }
-
-      const doiUrl = `/doi_endpoint?doi=https://doi.org/${doiValue}`;
-
-
+      let basePath = router.basePath || '';
+      const doiUrl = `${basePath}/doi_endpoint?doi=https://doi.org/${doiValue}`;
       fetch(doiUrl)
         .then(response => response.json()) // Parse JSON response
         .then(data => {
