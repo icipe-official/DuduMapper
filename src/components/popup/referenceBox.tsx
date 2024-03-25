@@ -31,7 +31,7 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
 }) => {
   const [activeCategory, setActiveCategory] = useState("Details");
   const [linkElement, setLinkElement] = useState<React.ReactNode>(
-    <div>Checking DOI validity...</div>
+    <LinearProgress />
   );
   useEffect(() => {
     // Update active category when the referenceData changes
