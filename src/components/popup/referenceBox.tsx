@@ -34,6 +34,7 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
   const [linkElement, setLinkElement] = useState<React.ReactNode>(
     <LinearProgress />
   );
+  const router = useRouter() as any; // Cast router to 'any' type
   useEffect(() => {
     // Update active category when the referenceData changes
     if (referenceData) {
@@ -85,7 +86,6 @@ const ReferenceDetails: React.FC<ReferenceDetailsProps> = ({
         // Handle missing DOI (optional)
         return <span style={{ fontWeight: "350" }}>Missing DOI</span>;
       }
-      const router = useRouter() as any; // Cast router to 'any' type
       let basePath = router.basePath || '';
       const doiUrl = `${basePath}/doi_endpoint?doi=https://doi.org/${doiValue}`;
       fetch(doiUrl)
