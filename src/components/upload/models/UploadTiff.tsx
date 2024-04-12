@@ -1,5 +1,7 @@
 import UploadFile from "@mui/icons-material/UploadFile";
 import Box from "@mui/material/Box";
+("use client");
+
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { FilePond, registerPlugin } from "react-filepond";

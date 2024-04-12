@@ -11,6 +11,19 @@ import { BASE_PATH } from "@/lib/constants";
 const Navbar: React.FC = () => {
   const theme = useTheme();
   const navMenuItems: any[] = [];
+  navMenuItems.push(
+    <NavLink key="Upload CSV" url="/account/uploader/data" text="Upload CSV" />
+  );
+  navMenuItems.push(
+    <NavLink
+      key="Covariance"
+      url="/account/uploader/covariance"
+      text="Covariance"
+    />
+  );
+  navMenuItems.push(
+    <NavLink key="Users" url="/account/admin/users" text="Users" />
+  );
   navMenuItems.push(<NavLink key="About" url="/about" text="About" />);
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -18,15 +31,18 @@ const Navbar: React.FC = () => {
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="fixed" sx={{ bgcolor: 'white', margin: '0', padding: '0' }}>
+        <AppBar
+          position="fixed"
+          sx={{ bgcolor: "white", margin: "0", padding: "0" }}
+        >
           <Toolbar>
             <>
-              <Box sx={{ flexGrow: 1, mt: '6px' }}>
+              <Box sx={{ flexGrow: 1, mt: "6px" }}>
                 <Link href="/">
                   <picture>
                     <img
                       src={`${BASE_PATH}/vector-atlas-logo.svg`}
-                      style={{ maxHeight: '50px', cursor: 'pointer' }}
+                      style={{ maxHeight: "50px", cursor: "pointer" }}
                       alt="Vector Atlas logo"
                     />
                   </picture>

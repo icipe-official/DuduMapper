@@ -55,7 +55,7 @@ const DataUploadForm = () => {
   };
 
   return (
-    <Container>
+    <Container sx={{ mt: 10 }}>
       <Grid container gap={1}>
         <Grid item sm={12} md={5}>
           <Typography variant="h4">Upload Template</Typography>
