@@ -44,6 +44,7 @@ function Newmap() {
   const [map, setMap] = useState<OlMap | undefined>(); // Specify the type using a generic type argument
   const mapElement = useRef<HTMLDivElement>(null);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [mini, setMini] = useState(false); // Initialize mini state
 
   const [showOccurrencePopup, setShowOccurrencePopup] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
@@ -61,6 +62,10 @@ function Newmap() {
   // Function to toggle sidebar open/close
   const toggleSidebar = () => {
     setShowDrawer(!showDrawer);
+  };
+
+  const toggleMini = () => {
+    setMini(!mini);
   };
 
   const MenuIconButton = (
@@ -137,6 +142,8 @@ function Newmap() {
       larval: conditions["larvae"],
       adult: conditions["adult"],
       season: conditions["season"],
+      phenotype: conditions["phenotype"],
+      genotype: conditions["genotype"],
     });
   };
 
@@ -151,6 +158,8 @@ function Newmap() {
       larval: "",
       adult: "",
       season: "",
+      genotype: "",
+      phenotype: "",
     });
   };
 
@@ -164,6 +173,8 @@ function Newmap() {
       larval: "",
       adult: "",
       season: "",
+      genotype: "",
+      phenotype: "",
     });
     // Additional logic to clear any other filter-related state variables if needed
   };
@@ -505,7 +516,7 @@ function Newmap() {
         document.body.removeChild(legendDiv);
       }
     };
-  }, [occurrenceData]);
+  }, [occurrenceData, mini]);
 
   const printToScale = () => {
     console.log("Button clicked!");
@@ -696,6 +707,7 @@ function Newmap() {
           {filterOpen && (
             <OccurrenceFilter
               open={filterOpen}
+              
               onCloseFilter={closeFilterPopup}
               handleFilterConditions={updateFilterConditions}
               onClearFilter={() => {
