@@ -32,6 +32,11 @@ import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import LinkIcon from "@mui/icons-material/Link";
 import LinkOffIcon from "@mui/icons-material/LinkOff";
 import FormatShapesIcon from "@mui/icons-material/FormatShapes";
+import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import ClearIcon from '@mui/icons-material/Clear';
+import ChecklistIcon from '@mui/icons-material/Checklist';
+
 
 interface FilterConditions {
   species?: string;
@@ -40,6 +45,8 @@ interface FilterConditions {
   larvae?: string;
   adult?: string;
   season?: string;
+  phenotype?: string;
+  genotype?: string;
 }
 
 const reqParams = {
@@ -98,6 +105,10 @@ export default function OccurrenceFilter({
   const [bionomicsData, setBionomicsData] = useState("");
   const [insecticideControl, setInsecticideControl] = useState("");
   const [insecticideResistance, setInsecticideResistance] = useState("");
+  const [minimized, setMinimized] = useState(false);
+  const [mini, setMini] = useState(false);
+  const [phenotype, setPhenotype] = useState("");
+  const [genotype, setGenotype] = useState("");
 
   const {
     isFetching: isFetchingCountries,
@@ -155,6 +166,16 @@ export default function OccurrenceFilter({
       filterConditions["season"] = seasonFilter;
     }
 
+    if (phenotype && phenotype.length > 0){
+      const phenoFilter = `ir_bioassays_present = '${phenotype}'`;
+      filterConditions["phenotype"] = phenoFilter;
+    }
+
+    if (genotype && genotype.length > 0){
+      const phenoFilter = `ir_genetic_mechanisms_present = '${genotype}'`;
+      filterConditions["genotype"] = phenoFilter;
+    }
+
     //season, larvae, adult,
     return filterConditions;
   };
@@ -186,7 +207,8 @@ export default function OccurrenceFilter({
   const clearSelectedSpecies = () => {
     setSelectedSpecies([]);
   };
-  console.log("selected country", selectedCountry);
+  // console.log("selected country", selectedCountry);
+  console.log("selected species",selectedSpecies)
 
   const handleCountries = (feature: any) => {
     try {
@@ -224,6 +246,10 @@ export default function OccurrenceFilter({
   const handleResetFilter = () => {
     onResetFilter();
   };
+  const toggleMinimized = () => {
+    setMinimized(!minimized);
+  };
+
   const handleBioToggle = (value: any) => {
     if (bionomicsData === value) {
       // If the button is already selected, deselect it
@@ -234,6 +260,24 @@ export default function OccurrenceFilter({
       setBionomicsData(value);
     }
   };
+
+  const handlePhenotypeToggle = (value: any)=>{
+    if(phenotype === value){
+      setPhenotype("");
+      handleResetFilter();
+    }else {
+      setPhenotype(value)
+    }
+  };
+
+  const handleGenotypeToggle = (value: any) => {
+    if(genotype === value){
+      setGenotype("");
+      handleResetFilter();
+    }else {
+      setGenotype(value)
+    }
+  }
 
   const handleInsecticideToggle = (value: any) => {
     if (insecticideControl === value) {
@@ -287,6 +331,8 @@ export default function OccurrenceFilter({
     selectedLarval,
     selectedAdult,
     selectedSeason,
+    phenotype,
+    genotype,
   ]);
 
   const toggleSelectedByArea = (shape: string) => {
@@ -305,15 +351,26 @@ export default function OccurrenceFilter({
     onRemoveSelection();
   };
   return (
-    <div className="filter-dev-section">
+    <div className={`filter-dev-section ${mini ? 'minimized' : ''}`}>
       {open && (
         <Box
-          // className="container-style"
-          // direction="column"
-          // spacing={3}
           sx={{ width: 450, m: 3 }}
-          // divider={<Divider orientation="horizontal" flexItem />}
         >
+          {/* <Tooltip title= {mini?"Maximize":"Minimize"} arrow>
+           <IconButton
+            onClick={() => setMini(!mini)}
+            sx={{
+              position: "absolute",
+              top: "5px",
+              right: "40px",
+              marginBottom: "15px",
+            
+            }}
+          >
+            {mini ? <OpenInFullIcon /> : <CloseFullscreenIcon />}
+          </IconButton>
+          </Tooltip>
+          <Tooltip title="Close" arrow>
           <IconButton
             onClick={onCloseFilter}
             sx={{
@@ -321,10 +378,62 @@ export default function OccurrenceFilter({
               top: "5px",
               right: "5px",
               marginBottom: "15px",
+             
             }}
           >
             <CloseIcon />
           </IconButton>
+          </Tooltip> */}
+
+          {mini && (
+            <Tooltip title="Maximize" arrow>
+              <IconButton
+                onClick={() => setMini(false)}
+                sx={{
+                  position: "absolute",
+                  top: "5px",
+                  right: "40px",
+                  marginBottom: "15px",
+                  // width: "100%",
+                  zIndex: 1000,
+                  "&:hover": { backgroundColor: "rgba(0, 128, 0, 0.8)" },
+                }}
+              >
+                <OpenInFullIcon sx={{ width: "100%" }} />
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {/* Render your existing filter content when not minimized */}
+          {!mini && (
+            <>
+              <Tooltip title={mini ? "Maximize" : "Minimize"} arrow>
+                <IconButton
+                  onClick={() => setMini(!mini)}
+                  sx={{
+                    position: "absolute",
+                    top: "5px",
+                    right: "40px",
+                    marginBottom: "15px",
+                  }}
+                >
+                  {mini ? <OpenInFullIcon /> : <CloseFullscreenIcon />}
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Close" arrow>
+                <IconButton
+                  onClick={onCloseFilter}
+                  sx={{
+                    position: "absolute",
+                    top: "5px",
+                    right: "5px",
+                    marginBottom: "15px",
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Tooltip>
+
           <Grid
             container
             spacing={2}
@@ -443,284 +552,478 @@ export default function OccurrenceFilter({
                 />
               </FormControl>
             </Grid>
-            <Grid
-              container
-              direction="row"
-              alignItems="center"
-              justifyContent="space-between"
-              sx={{ paddingLeft: "17px" }}
-            >
-              <Grid item xs={12} sm={4} md={6}>
-                <Typography
-                  variant="caption"
+                <Grid
+                  container
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  sx={{ paddingLeft: "17px" }}
+                >
+                  <Grid item xs={12} sm={4} md={12}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontStyle: "italic",
+                        marginRight: "5px",
+                        color: "#555",
+                        fontSize: 15,
+                        fontWeight: "550",
+                      }}
+                    >
+                      Bionomics Data:
+                    </Typography>
+                    <Grid container direction="row" alignItems="center">
+                      <Grid item xs={4} textAlign="center">
+                        <Button
+                          variant="contained"
+                          onClick={() => handleBioToggle("true")}
+                          fullWidth
+                          sx={{
+                            display: "flex",
+                            fontSize: "0.7rem",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            padding: "6px 12px",
+                            marginBottom: "2px",
+                            color: bionomicsData === "true" ? "89C6A7" : "text.primary",
+                            backgroundColor: bionomicsData === "true" ? "success.light" : "background.default",
+                            "&:hover": {
+                              backgroundColor: bionomicsData === "true" ? "#ebbd40" : "background.default",
+                            },
+                          }}
+                        >
+                          <LinkIcon />
+                          True
+                        </Button>
+                      </Grid>
+                      <Grid item xs={4} textAlign="center">
+                        <Button
+                          variant="contained"
+                          onClick={() => handleBioToggle("false")}
+                          fullWidth
+                          sx={{
+                            display: "flex",
+                            fontSize: "0.7rem",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            padding: "6px 12px",
+                            marginBottom: "2px",
+                            color: bionomicsData === "false" ? "89C6A7" : "text.primary",
+                            backgroundColor: bionomicsData === "false" ? "success.light" : "background.default",
+                            "&:hover": {
+                              backgroundColor: bionomicsData === "false" ? "#ebbd40" : "background.default",
+                            },
+                          }}
+                        >
+                          <LinkOffIcon />
+                          False
+                        </Button>
+                      </Grid>
+                      <Grid item xs={4} textAlign="center">
+                        {/* Empty Icon Button */}
+                        <Button
+                          variant="contained"
+
+                          onClick={() => handleBioToggle("null")}
+                          fullWidth
+                          sx={{
+                            display: "flex",
+                            fontSize: "0.7rem",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            padding: "6px 12px",
+                            marginBottom: "2px",
+                            color: bionomicsData === "null" ? "89C6A7" : "text.primary",
+                            backgroundColor: bionomicsData === "null" ? "success.light" : "background.default",
+                            "&:hover": {
+                              backgroundColor: bionomicsData === "null" ? "#ebbd40" : "background.default",
+                            },
+                          }}
+                        >
+                          <DataArrayIcon />
+                          Empty
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+            </Grid>
+               
+                {/* <Typography
                   sx={{
-                    fontStyle: "italic",
-                    marginRight: "5px",
-                    color: "#555",
-                    fontSize: 15,
+                    color: "#2e7d32",
+                    fontSize: 17,
+                    mt: 4,
                     fontWeight: "550",
+                    marginLeft: '20px',
                   }}
                 >
-                  Bionomics Data:
+                  Insecicide Resistence
                 </Typography>
-                <Grid container direction="row" alignItems="center">
-                  <Grid item xs={4} textAlign="center">
-                    <Button
-                      variant="contained"
-                      onClick={() => handleBioToggle("true")}
-                      fullWidth
-                      sx={{
-                        display: "flex",
-                        fontSize: "0.7rem",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        padding: "6px 12px",
-                        marginBottom: "2px",
-                        color:
-                          bionomicsData === "true" ? "89C6A7" : "text.primary",
-                        backgroundColor:
-                          bionomicsData === "true"
-                            ? "success.light"
-                            : "background.default",
-                        "&:hover": {
-                          backgroundColor:
-                            bionomicsData === "true"
-                              ? "#ebbd40"
-                              : "background.default",
-                        },
-                      }}
-                    >
-                      <LinkIcon />
-                      True
-                    </Button>
-                  </Grid>
-                  <Grid item xs={4} textAlign="center">
-                    <Button
-                      variant="contained"
-                      onClick={() => handleBioToggle("false")}
-                      fullWidth
-                      sx={{
-                        display: "flex",
-                        fontSize: "0.7rem",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        padding: "6px 12px",
-                        marginBottom: "2px",
-                        color:
-                          bionomicsData === "false" ? "89C6A7" : "text.primary",
-                        backgroundColor:
-                          bionomicsData === "false"
-                            ? "success.light"
-                            : "background.default",
-                        "&:hover": {
-                          backgroundColor:
-                            bionomicsData === "false"
-                              ? "#ebbd40"
-                              : "background.default",
-                        },
-                      }}
-                    >
-                      <LinkOffIcon />
-                      False
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
 
-              <Grid item xs={12} sm={4} md={6}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontStyle: "italic",
-                    marginRight: "5px",
-                    color: "#555",
-                    fontSize: 15,
-                    fontWeight: "550",
-                  }}
+                <Grid
+                  container
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  sx={{ paddingLeft: "17px" }}
                 >
-                  Insecticide Control:
-                </Typography>
-                <Grid container direction="row" alignItems="center">
-                  <Grid item xs={4} textAlign="center">
-                    <Button
-                      variant="contained"
-                      onClick={() => handleInsecticideToggle("true")}
-                      fullWidth
+                 
+                  <Grid item xs={12} sm={3} md={6}>
+                    <Typography
+                      variant="caption"
                       sx={{
-                        display: "flex",
-                        fontSize: "0.7rem",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        padding: "8px 12px",
-                        marginBottom: "2px",
-                        color:
-                          insecticideControl === "true"
-                            ? "89C6A7"
-                            : "text.primary",
-                        backgroundColor:
-                          insecticideControl === "true"
-                            ? "success.light"
-                            : "background.default",
-                        "&:hover": {
-                          backgroundColor:
-                            insecticideControl === "true"
-                              ? "#ebbd40"
-                              : "background.default",
-                        },
+                        fontStyle: "italic",
+                        marginRight: "5px",
+                        color: "#555",
+                        fontSize: 15,
+                        fontWeight: "550",
                       }}
                     >
-                      <LinkIcon />
-                      True
-                    </Button>
-                  </Grid>
-                  <Grid item xs={4} textAlign="center">
-                    <Button
-                      variant="contained"
-                      onClick={() => handleInsecticideToggle("false")}
-                      fullWidth
-                      sx={{
-                        display: "flex",
-                        fontSize: "0.7rem",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        padding: "8px 12px",
-                        marginBottom: "2px",
-                        color:
-                          insecticideControl === "false"
-                            ? "89C6A7"
-                            : "text.primary",
-                        backgroundColor:
-                          insecticideControl === "false"
-                            ? "success.light"
-                            : "background.default",
-                        "&:hover": {
-                          backgroundColor:
-                            insecticideControl === "false"
-                              ? "#ebbd40"
-                              : "background.default",
-                        },
-                      }}
-                    >
-                      <LinkOffIcon />
-                      False
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
+                      Phenotype:
+                    </Typography>
+                    <Grid container direction="row" alignItems="center">
+                      <Grid item xs={3} textAlign="center">
+                        <Button
+                          variant="contained"
+                          onClick={() => handlePhenotypeToggle("true")}
+                          fullWidth
+                          sx={{
+                            display: "flex",
+                            fontSize: "0.7rem",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            padding: "6px 12px",
+                            marginBottom: "2px",
+                            color: phenotype === "true" ? "89C6A7" : "text.primary",
+                            backgroundColor: phenotype === "true" ? "success.light" : "background.default",
+                            "&:hover": {
+                              backgroundColor: phenotype === "true" ? "#ebbd40" : "background.default",
+                            },
+                          }}
+                        >
+                          <LinkIcon />
+                          True
+                        </Button>
+                      </Grid>
+                      <Grid item xs={3} textAlign="center">
+                        <Button
+                          variant="contained"
+                          onClick={() => handlePhenotypeToggle("false")}
+                          fullWidth
+                          sx={{
+                            display: "flex",
+                            fontSize: "0.7rem",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            padding: "6px 12px",
+                            marginBottom: "2px",
+                            color: phenotype === "false" ? "89C6A7" : "text.primary",
+                            backgroundColor: phenotype === "false" ? "success.light" : "background.default",
+                            "&:hover": {
+                              backgroundColor: phenotype === "false" ? "#ebbd40" : "background.default",
+                            },
+                          }}
+                        >
+                          <LinkOffIcon />
+                          False
+                        </Button>
+                      </Grid>
+                      <Grid item xs={3} textAlign="center">
+                    
+                        <Button
+                          variant="contained"
 
-            <Grid item xs={12} sm={4} md={12}>
-              <Typography
-                variant="caption"
-                sx={{
-                  fontStyle: "italic",
-                  marginRight: "5px",
-                  color: "#555",
-                  fontSize: 15,
-                  fontWeight: "550",
-                }}
-              >
-                Insecticide Resistance:
-              </Typography>
-              <Grid container direction="row" alignItems="center">
-                <Grid item xs={4} textAlign="center">
-                  <Button
-                    variant="contained"
-                    onClick={() => setInsecticideResistance("phenotypic")}
-                    fullWidth
+                          onClick={() => handlePhenotypeToggle("null")}
+                          fullWidth
+                          sx={{
+                            display: "flex",
+                            fontSize: "0.7rem",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            padding: "6px 12px",
+                            marginBottom: "2px",
+                            color: bionomicsData === "null" ? "89C6A7" : "text.primary",
+                            backgroundColor: bionomicsData === "null" ? "success.light" : "background.default",
+                            "&:hover": {
+                              backgroundColor: bionomicsData === "null" ? "#ebbd40" : "background.default",
+                            },
+                          }}
+                        >
+                          <DataArrayIcon />
+                          Empty
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                   
+                  <Grid item xs={12} sm={4} md={6}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontStyle: "italic",
+                        marginRight: "5px",
+                        color: "#555",
+                        fontSize: 15,
+                        fontWeight: "550",
+                      }}
+                    >
+                      Genotype:
+                    </Typography>
+                    <Grid container direction="row" alignItems="center">
+                      <Grid item xs={3} textAlign="center">
+                        <Button
+                          variant="contained"
+                          onClick={() => handleGenotypeToggle("true")}
+                          fullWidth
+                          sx={{
+                            display: "flex",
+                            fontSize: "0.7rem",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            padding: "6px 12px",
+                            marginBottom: "2px",
+                            color: genotype === "true" ? "89C6A7" : "text.primary",
+                            backgroundColor: genotype === "true" ? "success.light" : "background.default",
+                            "&:hover": {
+                              backgroundColor: genotype === "true" ? "#ebbd40" : "background.default",
+                            },
+                          }}
+                        >
+                          <LinkIcon />
+                          True
+                        </Button>
+                      </Grid>
+                      <Grid item xs={3} textAlign="center">
+                        <Button
+                          variant="contained"
+                          onClick={() => handleGenotypeToggle("false")}
+                          fullWidth
+                          sx={{
+                            display: "flex",
+                            fontSize: "0.7rem",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            padding: "6px 12px",
+                            marginBottom: "2px",
+                            color: genotype === "false" ? "89C6A7" : "text.primary",
+                            backgroundColor: genotype === "false" ? "success.light" : "background.default",
+                            "&:hover": {
+                              backgroundColor: genotype === "false" ? "#ebbd40" : "background.default",
+                            },
+                          }}
+                        >
+                          <LinkOffIcon />
+                          False
+                        </Button>
+                      </Grid>
+                      <Grid item xs={3} textAlign="center">
+                        
+                        <Button
+                          variant="contained"
+
+                          onClick={() => handleGenotypeToggle("null")}
+                          fullWidth
+                          sx={{
+                            display: "flex",
+                            fontSize: "0.7rem",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            padding: "6px 12px",
+                            marginBottom: "2px",
+                            color: bionomicsData === "null" ? "89C6A7" : "text.primary",
+                            backgroundColor: bionomicsData === "null" ? "success.light" : "background.default",
+                            "&:hover": {
+                              backgroundColor: bionomicsData === "null" ? "#ebbd40" : "background.default",
+                            },
+                          }}
+                        >
+                          <DataArrayIcon />
+                          Empty
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                    </Grid>
+                  */}
+               
+
+                <Grid item xs={12} sm={4} md={12}>
+                  <Typography
+                    variant="caption"
                     sx={{
-                      display: "flex",
-                      fontSize: "0.7rem",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      padding: "8px 12px",
-                      marginBottom: "2px",
-                      color:
-                        insecticideResistance === "phenotypic"
-                          ? "89C6A7"
-                          : "text.primary",
-                      backgroundColor:
-                        insecticideResistance === "phenotypic"
-                          ? "success.light"
-                          : "background.default",
-                      "&:hover": {
-                        backgroundColor:
-                          insecticideResistance === "phenotypic"
-                            ? "#ebbd40"
-                            : "background.default",
-                      },
+                      fontStyle: "italic",
+                      marginRight: "5px",
+                      color: "#555",
+                      fontSize: 15,
+                      fontWeight: "550",
                     }}
                   >
-                    <FingerprintIcon />
-                    Phenotypic
-                  </Button>
+                    Insecticide Resistance:
+                  </Typography>
+                  <Grid container direction="row" alignItems="center">
+                    <Grid item xs={3} textAlign="center">
+                      <Button
+                        variant="contained"
+                        onClick={() => setInsecticideResistance("phenotypic")}
+                        fullWidth
+                        sx={{
+                          display: "flex",
+                          fontSize: "0.7rem",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          padding: "8px 12px",
+                          marginBottom: "2px",
+                          color:
+                            insecticideResistance === "phenotypic"
+                              ? "89C6A7"
+                              : "text.primary",
+                          backgroundColor:
+                            insecticideResistance === "phenotypic"
+                              ? "success.light"
+                              : "background.default",
+                          "&:hover": {
+                            backgroundColor:
+                              insecticideResistance === "phenotypic"
+                                ? "#ebbd40"
+                                : "background.default",
+                          },
+                        }}
+                      >
+                        <FingerprintIcon />
+                        Phenotypic
+                      </Button>
+                    </Grid>
+                    <Grid item xs={3} textAlign="center">
+                      <Button
+                        variant="contained"
+                        onClick={() => setInsecticideResistance("genotypic")}
+                        fullWidth
+                        sx={{
+                          display: "flex",
+                          fontSize: "0.7rem",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          padding: "8px 12px",
+                          marginBottom: "2px",
+                          color:
+                            insecticideResistance === "genotypic"
+                              ? "89C6A7"
+                              : "text.primary",
+                          backgroundColor:
+                            insecticideResistance === "genotypic"
+                              ? "success.light"
+                              : "background.default",
+                          "&:hover": {
+                            backgroundColor:
+                              insecticideResistance === "genotypic"
+                                ? "#ebbd40"
+                                : "background.default",
+                          },
+                        }}
+                      >
+                        <HourglassEmptyIcon />
+                        Genotypic
+                      </Button>
+                    </Grid>
+                    <Grid item xs={3} textAlign="center">
+                      <Button
+                        variant="contained"
+                        onClick={() => setInsecticideResistance("empty")}
+                        fullWidth
+                        sx={{
+                          display: "flex",
+                          fontSize: "0.7rem",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          padding: "8px 12px",
+                          marginBottom: "2px",
+                          color:
+                            insecticideResistance === "empty"
+                              ? "89C6A7"
+                              : "text.primary",
+                          backgroundColor:
+                            insecticideResistance === "empty"
+                              ? "success.light"
+                              : "background.default",
+                          "&:hover": {
+                            backgroundColor:
+                              insecticideResistance === "empty"
+                                ? "#ebbd40"
+                                : "background.default",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                        Empty
+                      </Button>
+                    </Grid>
+                    {/* New Buttons */}
+                    <Grid item xs={3} textAlign="center">
+                      <Button
+                        variant="contained"
+                        onClick={() => setInsecticideResistance("none")}
+                        fullWidth
+                        sx={{
+                          display: "flex",
+                          fontSize: "0.7rem",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          padding: "8px 12px",
+                          marginBottom: "2px",
+                          color:
+                            insecticideResistance === "none"
+                              ? "89C6A7"
+                              : "text.primary",
+                          backgroundColor:
+                            insecticideResistance === "none"
+                              ? "success.light"
+                              : "background.default",
+                          "&:hover": {
+                            backgroundColor:
+                              insecticideResistance === "none"
+                                ? "#ebbd40"
+                                : "background.default",
+                          },
+                        }}
+                      >
+                        <ClearIcon />
+                        None
+                      </Button>
+                    </Grid>
+                    <Grid item xs={3} textAlign="center">
+                      <Button
+                        variant="contained"
+                        onClick={() => setInsecticideResistance("both")}
+                        fullWidth
+                        sx={{
+                          display: "flex",
+                          fontSize: "0.7rem",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          padding: "8px 12px",
+                          marginBottom: "2px",
+                          color:
+                            insecticideResistance === "both"
+                              ? "89C6A7"
+                              : "text.primary",
+                          backgroundColor:
+                            insecticideResistance === "both"
+                              ? "success.light"
+                              : "background.default",
+                          "&:hover": {
+                            backgroundColor:
+                              insecticideResistance === "both"
+                                ? "#ebbd40"
+                                : "background.default",
+                          },
+                        }}
+                      >
+                        <ChecklistIcon />
+                        Both
+                      </Button>
+                    </Grid>
+                  </Grid>
                 </Grid>
-                <Grid item xs={4} textAlign="center">
-                  <Button
-                    variant="contained"
-                    onClick={() => setInsecticideResistance("genotypic")}
-                    fullWidth
-                    sx={{
-                      display: "flex",
-                      fontSize: "0.7rem",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      padding: "8px 12px",
-                      marginBottom: "2px",
-                      color:
-                        insecticideResistance === "genotypic"
-                          ? "89C6A7"
-                          : "text.primary",
-                      backgroundColor:
-                        insecticideResistance === "genotypic"
-                          ? "success.light"
-                          : "background.default",
-                      "&:hover": {
-                        backgroundColor:
-                          insecticideResistance === "genotypic"
-                            ? "#ebbd40"
-                            : "background.default",
-                      },
-                    }}
-                  >
-                    <HourglassEmptyIcon />
-                    Genotypic
-                  </Button>
-                </Grid>
-                <Grid item xs={4} textAlign="center">
-                  <Button
-                    variant="contained"
-                    onClick={() => setInsecticideResistance("empty")}
-                    fullWidth
-                    sx={{
-                      display: "flex",
-                      fontSize: "0.7rem",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      padding: "8px 12px",
-                      marginBottom: "2px",
-                      color:
-                        insecticideResistance === "empty"
-                          ? "89C6A7"
-                          : "text.primary",
-                      backgroundColor:
-                        insecticideResistance === "empty"
-                          ? "success.light"
-                          : "background.default",
-                      "&:hover": {
-                        backgroundColor:
-                          insecticideResistance === "empty"
-                            ? "#ebbd40"
-                            : "background.default",
-                      },
-                    }}
-                  >
-                    <DataArrayIcon />
-                    Empty
-                  </Button>
-                </Grid>
-              </Grid>
-            </Grid>
 
             <Grid
               container
@@ -1126,6 +1429,8 @@ export default function OccurrenceFilter({
               </Button>
             </div>
           </Grid>
+          </>
+      )}
         </Box>
       )}
     </div>
