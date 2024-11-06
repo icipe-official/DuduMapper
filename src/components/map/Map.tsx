@@ -50,7 +50,7 @@ function Newmap() {
       const initializeMap = async () => {
         if (true) {
           const crpsystems = new LayerGroup({
-            title: "Crop Systems",
+            title: "Occurrence",
             layers: [
               new TileLayer({
                 title: "Overlays",
@@ -73,13 +73,113 @@ function Newmap() {
             ],
           } as GroupLayerOptions);
 
+          const population = new LayerGroup({
+            title: "Population",
+            layers: [
+              new TileLayer({
+                title: "Turkana_population_children",
+                visible: false,
+                source: new WMTS({
+                  url: geoServerBaseUrl + "/geoserver/gwc/service/wmts",
+                  layer: "Dudu:Turkana_population_children",
+                  matrixSet: "EPSG:900913",
+                  format: "image/png",
+                  projection: projection,
+                  tileGrid: new WMTSTileGrid({
+                    origin: getTopLeft(projectionExtent),
+                    resolutions: resolutions,
+                    matrixIds: matrixIds,
+                  }),
+                  style: "",
+                  wrapX: true,
+                }),
+              } as BaseLayerOptions),
+
+              new TileLayer({
+                title: "Turkana_population_senior65",
+                visible: false,
+                source: new WMTS({
+                  url: geoServerBaseUrl + "/geoserver/gwc/service/wmts",
+                  layer: "Dudu:Turkana_population_senior65",
+                  matrixSet: "EPSG:900913",
+                  format: "image/png",
+                  projection: projection,
+                  tileGrid: new WMTSTileGrid({
+                    origin: getTopLeft(projectionExtent),
+                    resolutions: resolutions,
+                    matrixIds: matrixIds,
+                  }),
+                  style: "",
+                  wrapX: true,
+                }),
+              } as BaseLayerOptions),
+              new TileLayer({
+                title: "Turkana_pre_retirement",
+                visible: false,
+                source: new WMTS({
+                  url: geoServerBaseUrl + "/geoserver/gwc/service/wmts",
+                  layer: "Dudu:Turkana_pre_retirement",
+                  matrixSet: "EPSG:900913",
+                  format: "image/png",
+                  projection: projection,
+                  tileGrid: new WMTSTileGrid({
+                    origin: getTopLeft(projectionExtent),
+                    resolutions: resolutions,
+                    matrixIds: matrixIds,
+                  }),
+                  style: "",
+                  wrapX: true,
+                }),
+              } as BaseLayerOptions),
+
+              new TileLayer({
+                title: "Turkana_youth15_24",
+                visible: false,
+                source: new WMTS({
+                  url: geoServerBaseUrl + "/geoserver/gwc/service/wmts",
+                  layer: "Dudu:Turkana_youth15_24",
+                  matrixSet: "EPSG:900913",
+                  format: "image/png",
+                  projection: projection,
+                  tileGrid: new WMTSTileGrid({
+                    origin: getTopLeft(projectionExtent),
+                    resolutions: resolutions,
+                    matrixIds: matrixIds,
+                  }),
+                  style: "",
+                  wrapX: true,
+                }),
+              } as BaseLayerOptions),
+
+              new TileLayer({
+                title: "turkana_population_working",
+                visible: false,
+                source: new WMTS({
+                  url: geoServerBaseUrl + "/geoserver/gwc/service/wmts",
+                  layer: "Dudu:turkana_population_working",
+                  matrixSet: "EPSG:900913",
+                  format: "image/png",
+                  projection: projection,
+                  tileGrid: new WMTSTileGrid({
+                    origin: getTopLeft(projectionExtent),
+                    resolutions: resolutions,
+                    matrixIds: matrixIds,
+                  }),
+                  style: "",
+                  wrapX: true,
+                }),
+              } as BaseLayerOptions),
+            ],
+          } as GroupLayerOptions);
+
           const initialMap = new OlMap({
             target: "map-container",
             layers: [
               new TileLayer({
                 source: new OSM(), // Use OpenStreetMap as the tile source
               }),
-              crpsystems /**BaseMaps, crpsystems, drought_risk, Overlays, vulnerablity, hazard, evapotranspiration*/,
+              crpsystems,
+              population /**BaseMaps, crpsystems, drought_risk, Overlays, vulnerablity, hazard, evapotranspiration*/,
             ],
             view: new View({
               center: fromLonLat([37.9062, -1.2921]),
