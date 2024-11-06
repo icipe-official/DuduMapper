@@ -3,7 +3,7 @@ import WMTSCapabilities from "ol/format/WMTSCapabilities";
 import VectorTileLayer from "ol/layer/VectorTile";
 import VectorTileSource from "ol/source/VectorTile";
 import MVT from "ol/format/MVT";
-import { BaseLayerOptions} from "ol-layerswitcher";
+import { BaseLayerOptions } from "ol-layerswitcher";
 import Stroke from "ol/style/Stroke";
 import Fill from "ol/style/Fill";
 import Style from "ol/style/Style";
@@ -47,6 +47,57 @@ function appendPath(baseURL: string, path: string): string {
   }
   return `${baseURL}${path}`;
 }
+
+
+
+export function showLegend(layerName: string) {
+  const legendUrl = `${geoServerBaseUrl}/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=${layerName}`;
+
+  // Create a modal container div for the legend
+  const modal = document.createElement('div');
+  modal.id = 'legend-modal';
+  modal.style.position = 'fixed';
+  modal.style.top = '50%'; // Middle of the screen
+  modal.style.left = '10px'; // Left of the screen
+  modal.style.transform = 'translateY(-50%)'; // Vertically center the modal
+  modal.style.backgroundColor = '#fff';
+  modal.style.padding = '10px';
+  modal.style.borderRadius = '4px'; // Rounded corners (optional)
+  modal.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+  modal.style.zIndex = '1000'; // Ensure it's on top of other elements
+
+  // Create a close button
+  const closeButton = document.createElement('button');
+  closeButton.textContent = 'Close';
+  closeButton.style.position = 'absolute';
+  closeButton.style.top = '5px';
+  closeButton.style.right = '5px';
+  closeButton.style.background = '#ff5f5f';
+  closeButton.style.color = '#fff';
+  closeButton.style.border = 'none';
+  closeButton.style.padding = '5px';
+  closeButton.style.cursor = 'pointer';
+
+  closeButton.addEventListener('click', () => {
+    // Remove the modal when the close button is clicked
+    document.body.removeChild(modal);
+  });
+
+  // Create an image element for the legend
+  const legendImg = document.createElement('img');
+  legendImg.src = legendUrl;
+  legendImg.alt = `Legend for ${layerName}`;
+  legendImg.style.maxWidth = '200px'; // Adjust the size as needed
+
+  // Append the image and close button to the modal
+  modal.appendChild(legendImg);
+  modal.appendChild(closeButton);
+
+  // Append the modal to the body
+  document.body.appendChild(modal);
+}
+
+
 
 async function fetchXML(url: RequestInfo | URL) {
   try {
@@ -165,6 +216,45 @@ export const overlays = (async () => {
   );
 })();
 
+export const drought_risk = (async () => {
+
+  return await extractLayersFromLayerGroup(
+    await geoServerData,
+    "drought_risk"
+  );
+})();
+
+export const vulenerability = (async () => {
+
+  return await extractLayersFromLayerGroup(
+    await geoServerData,
+    "vulnerability"
+  );
+})();
+export const hazard = (async () => {
+
+  return await extractLayersFromLayerGroup(
+    await geoServerData,
+    "hazard"
+  );
+})();
+
+export const evapotranspiration = (async () => {
+
+  return await extractLayersFromLayerGroup(
+    await geoServerData,
+    "evapotranspiration"
+  );
+})();
+
+export const crop_systems = (async () => {
+
+  return await extractLayersFromLayerGroup(
+    await geoServerData,
+    "crop_systems"
+  );
+})();
+
 export const basemapLayers = (async () => {
   if (typeof basemapLayergroup_in_geoserver !== "string") {
     console.error("overlaysLayergroup_in_geoserver must be a string");
@@ -240,6 +330,21 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
     } else if (layerType === "overlays") {
       layers = await overlays;
     }
+    else if (layerType === "drought_risk") {
+      layers = await drought_risk;
+    }
+    else if (layerType === "vulnerability") {
+      layers = await vulenerability;
+    }
+    else if (layerType === "hazard") {
+      layers = await hazard;
+    }
+    else if (layerType === "crop_systems") {
+      layers = await crop_systems;
+    }
+    else if (layerType === "evapotranspiration") {
+      layers = await evapotranspiration;
+    }
 
     if (layers) {
       const layerLen = layers.length;
@@ -269,7 +374,7 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
             }),
             style: tileStyle,
           } as BaseLayerOptions);
-        } else if (layerType === "overlays") {
+        } else if (layerType === "overlays" || layerType === "drought_risk" || layerType === "vulnerability" || layerType === "hazard" || layerType === "crop_systems" || layerType === "evapotranspiration") {
           theTile = new TileLayer({
             title: displayName,
             visible: false,
@@ -289,7 +394,28 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
             }),
           } as BaseLayerOptions);
         }
+        if (theTile != undefined) {
 
+          theTile.on('change:visible', function(event) {
+            const layer = event.target;
+            const isVisible = layer.getVisible();
+            const layerName = layer.get('title');
+
+            if (isVisible) {
+              console.log(`Layer name: ${layerName} is now visible`);
+              // Show legend in a modal popup when the layer becomes visible
+              showLegend(layerName);
+            } else {
+              console.log(`Layer name: ${layerName} is now hidden`);
+              // Optionally remove the legend if it was showing
+              const modal = document.getElementById('legend-modal');
+              if (modal) {
+                document.body.removeChild(modal);
+              }
+            }
+          });
+
+        }
         basemapArrays.push(theTile);
       }
       return basemapArrays;
