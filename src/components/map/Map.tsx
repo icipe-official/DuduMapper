@@ -173,10 +173,10 @@ function Newmap() {
           } as GroupLayerOptions);
 
           const suitability = new LayerGroup({
-            title: "Suitability",
+            title: "Sutability of Leishmaniasis",
             layers: [
               new TileLayer({
-                title: 'Sutability of Leishmaniasis',
+                title: 'Dudu:turkana_dec',
                 visible: false,
                 source: new WMTS({
                   url: geoServerBaseUrl + "/geoserver/gwc/service/wmts",
