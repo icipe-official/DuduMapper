@@ -172,6 +172,30 @@ function Newmap() {
             ],
           } as GroupLayerOptions);
 
+          const suitability = new LayerGroup({
+            title: "Suitability",
+            layers: [
+              new TileLayer({
+                title: 'Sutability of Leishmaniasis',
+                visible: false,
+                source: new WMTS({
+                  url: geoServerBaseUrl + "/geoserver/gwc/service/wmts",
+                  layer: 'Dudu:turkana_dec',
+                  matrixSet: "EPSG:900913",
+                  format: "image/png",
+                  projection: projection,
+                  tileGrid: new WMTSTileGrid({
+                    origin: getTopLeft(projectionExtent),
+                    resolutions: resolutions,
+                    matrixIds: matrixIds,
+                  }),
+                  style: "",
+                  wrapX: true,
+                }),
+              } as BaseLayerOptions),
+            ],
+          } as GroupLayerOptions);
+
           const initialMap = new OlMap({
             target: "map-container",
             layers: [
@@ -179,7 +203,7 @@ function Newmap() {
                 source: new OSM(), // Use OpenStreetMap as the tile source
               }),
               crpsystems,
-              population /**BaseMaps, crpsystems, drought_risk, Overlays, vulnerablity, hazard, evapotranspiration*/,
+              population, suitability /**BaseMaps, crpsystems, drought_risk, Overlays, vulnerablity, hazard, evapotranspiration*/,
             ],
             view: new View({
               center: fromLonLat([37.9062, -1.2921]),
@@ -193,12 +217,12 @@ function Newmap() {
           // Initialise map
           //
           //
-          initialMap.getLayers().forEach((layerGroup) => {
+          initialMap.getLayers().forEach((layerGroup: LayerGroup) => {
             // Check if the layer is a LayerGroup (contains multiple layers)
             if (layerGroup instanceof LayerGroup) {
               layerGroup.getLayers().forEach((layer) => {
                 if (layer instanceof TileLayer) {
-                  layer.on("change:visible", function (event) {
+                  layer.on("change:visible", function(event) {
                     const layer = event.target;
                     const isVisible = layer.getVisible();
                     const layerName = layer.get("title");
