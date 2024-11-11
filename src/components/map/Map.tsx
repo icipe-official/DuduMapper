@@ -217,7 +217,7 @@ function Newmap() {
           // Initialise map
           //
           //
-          initialMap.getLayers().forEach((layerGroup: LayerGroup) => {
+          initialMap.getLayers().forEach((layerGroup) => {
             // Check if the layer is a LayerGroup (contains multiple layers)
             if (layerGroup instanceof LayerGroup) {
               layerGroup.getLayers().forEach((layer) => {
