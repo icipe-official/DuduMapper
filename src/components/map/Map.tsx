@@ -117,6 +117,15 @@ function Newmap() {
             }),
             style: "",
             wrapX: true,
+            /**
+             * Custom tile load function for managing WMTS tile loading.
+             * Logs the source URL of the tile being loaded.
+             * Handles image loading errors and success by assigning
+             * appropriate callbacks to the image element of the tile.
+             *
+             * @param {any} tile - The tile object whose image is being loaded.
+             * @param {string} src - The source URL from which the tile image is fetched.
+             */
             tileLoadFunction: (tile: any, src: string) => {
               console.log("Loading tile from:", src);
               const img = tile.getImage();

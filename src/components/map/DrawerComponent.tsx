@@ -37,12 +37,18 @@ const DrawerComponent: React.FC<DrawerProps> = ({
       {sidebarOpen && (
         <div className="drawer-overlay" onClick={toggleSidebar}></div>
       )}
+
       <Drawer
         variant="persistent"
         anchor="left"
         open={sidebarOpen}
         className={`drawer ${sidebarOpen ? "" : "closed"}`}
-        sx={{ width: sidebarOpen ? "250px" : "55px" }}
+        sx={{
+          width: sidebarOpen ? "250px" : "55px",
+          zIndex: 1300,
+          position: "relative",
+          transition: "width 0.2s ease",
+        }}
       >
         <div>
           <List
@@ -151,6 +157,12 @@ const DrawerComponent: React.FC<DrawerProps> = ({
           </List>
         </div>
       </Drawer>
+
+      {/* Overlay */}
+      <div
+        className={`drawer-overlay ${sidebarOpen ? "open" : ""}`}
+        onClick={toggleSidebar} // Close the drawer when overlay is clicked
+      ></div>
     </Box>
   );
 };

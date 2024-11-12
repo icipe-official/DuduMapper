@@ -12,6 +12,8 @@ import WMTS from "ol/source/WMTS.js";
 import WMTSTileGrid from "ol/tilegrid/WMTS.js";
 import { get as getProjection } from "ol/proj.js";
 import { getTopLeft, getWidth } from "ol/extent.js";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 
 // let projection: any = null;
 
@@ -32,9 +34,13 @@ for (let z = 0; z < 19; ++z) {
   matrixIds[z] = `EPSG:4326:${z}`;
 }
 
-console.log('Raw GeoServer URL from env:', process.env.NEXT_PUBLIC_GEOSERVER_URL);
-export const geoServerBaseUrl = process.env.NEXT_PUBLIC_GEOSERVER_URL?.trim().replace(/['"]/g, '');
-console.log('Processed GeoServer URL:', geoServerBaseUrl);
+console.log(
+  "Raw GeoServer URL from env:",
+  process.env.NEXT_PUBLIC_GEOSERVER_URL
+);
+export const geoServerBaseUrl =
+  process.env.NEXT_PUBLIC_GEOSERVER_URL?.trim().replace(/['"]/g, "");
+console.log("Processed GeoServer URL:", geoServerBaseUrl);
 
 export const overlaysLayergroup_in_geoserver =
   process.env.NEXT_PUBLIC_OVERLAYS_LAYER_GROUP;
@@ -317,7 +323,7 @@ export async function fetchLayerCapabilities() {
     // Fetch both capabilities in parallel
     const [wmsResponse, wmtsResponse] = await Promise.all([
       fetchXML(wmsUrl),
-      fetchXML(wmtsUrl)
+      fetchXML(wmtsUrl),
     ]);
 
     if (!wmsResponse || !wmtsResponse) {
@@ -327,15 +333,14 @@ export async function fetchLayerCapabilities() {
     // Parse capabilities
     const wmsParser = new WMSCapabilities();
     const wmtsParser = new WMTSCapabilities();
-    
+
     const wmsResult = wmsParser.read(wmsResponse);
     const wmtsResult = wmtsParser.read(wmtsResponse);
 
     // Extract layer information
     const layers = extractLayerInfo(wmsResult, wmtsResult);
-    
-    return layers;
 
+    return layers;
   } catch (error) {
     console.error("Error fetching capabilities:", error);
     throw error;
@@ -348,14 +353,14 @@ function extractLayerInfo(wmsData: any, wmtsData: any) {
   // Process WMS layers to get projection and extent info
   if (wmsData?.Capability?.Layer?.Layer) {
     wmsData.Capability.Layer.Layer.forEach((layer: any) => {
-      if (layer.Name?.startsWith('Dudu:')) {
+      if (layer.Name?.startsWith("Dudu:")) {
         layerInfo.set(layer.Name, {
           name: layer.Name,
           title: layer.Title,
           abstract: layer.Abstract,
           crs: layer.CRS || [],
           bbox: layer.BoundingBox || [],
-          defaultStyle: layer.Style?.[0]?.Name || ''
+          defaultStyle: layer.Style?.[0]?.Name || "",
         });
       }
     });
@@ -364,13 +369,18 @@ function extractLayerInfo(wmsData: any, wmtsData: any) {
   // Add WMTS specific information
   if (wmtsData?.Contents?.Layer) {
     wmtsData.Contents.Layer.forEach((layer: any) => {
-      if (layer.Identifier?.startsWith('Dudu:') && layerInfo.has(layer.Identifier)) {
+      if (
+        layer.Identifier?.startsWith("Dudu:") &&
+        layerInfo.has(layer.Identifier)
+      ) {
         const info = layerInfo.get(layer.Identifier);
         layerInfo.set(layer.Identifier, {
           ...info,
-          tileMatrixSets: layer.TileMatrixSetLink?.map((link: any) => link.TileMatrixSet) || [],
+          tileMatrixSets:
+            layer.TileMatrixSetLink?.map((link: any) => link.TileMatrixSet) ||
+            [],
           formats: layer.Format || [],
-          wmtsStyles: layer.Style?.map((style: any) => style.Identifier) || []
+          wmtsStyles: layer.Style?.map((style: any) => style.Identifier) || [],
         });
       }
     });
@@ -386,7 +396,7 @@ export async function fetchWMTSCapabilities() {
   }
 
   const capabilitiesUrl = `${geoServerBaseUrl}/geoserver/gwc/service/wmts?request=GetCapabilities`;
-  
+
   try {
     const response = await fetchXML(capabilitiesUrl);
     if (!response) {
@@ -397,14 +407,14 @@ export async function fetchWMTSCapabilities() {
     const result = parser.read(response);
 
     // Extract Dudu layers with their projections
-    const layers = result.Contents.Layer
-      .filter((layer: any) => layer.Identifier.startsWith('Dudu:'))
-      .map((layer: any) => ({
-        name: layer.Identifier,
-        title: layer.Title,
-        matrixSet: layer.TileMatrixSetLink[0].TileMatrixSet,
-        supportedCRS: layer.TileMatrixSetLink[0].TileMatrixSet
-      }));
+    const layers = result.Contents.Layer.filter((layer: any) =>
+      layer.Identifier.startsWith("Dudu:")
+    ).map((layer: any) => ({
+      name: layer.Identifier,
+      title: layer.Title,
+      matrixSet: layer.TileMatrixSetLink[0].TileMatrixSet,
+      supportedCRS: layer.TileMatrixSetLink[0].TileMatrixSet,
+    }));
 
     return layers;
   } catch (error) {
@@ -414,20 +424,24 @@ export async function fetchWMTSCapabilities() {
 }
 
 export function getLegendUrl(layerName: string) {
-  if (!geoServerBaseUrl) return '';
-  
+  if (!geoServerBaseUrl) return "";
+
   // Clean up the layer name
-  const cleanLayerName = layerName.includes(':') ? layerName : `Dudu:${layerName}`;
-  
-  return `${geoServerBaseUrl}/geoserver/wms?` +
-    'REQUEST=GetLegendGraphic&' +
-    'VERSION=1.0.0&' +
-    'FORMAT=image/png&' +
-    'WIDTH=20&' +
-    'HEIGHT=20&' +
-    'LEGEND_OPTIONS=forceLabels:on;fontAntiAliasing:true&' + // Added anti-aliasing
+  const cleanLayerName = layerName.includes(":")
+    ? layerName
+    : `Dudu:${layerName}`;
+
+  return (
+    `${geoServerBaseUrl}/geoserver/wms?` +
+    "REQUEST=GetLegendGraphic&" +
+    "VERSION=1.0.0&" +
+    "FORMAT=image/png&" +
+    "WIDTH=20&" +
+    "HEIGHT=20&" +
+    "LEGEND_OPTIONS=forceLabels:on;fontAntiAliasing:true&" + // Added anti-aliasing
     `LAYER=${encodeURIComponent(cleanLayerName)}&` +
-    'TRANSPARENT=true&' +  // Make background transparent
-    'SCALE=0.5&' +        // Adjust scale if needed
-    'STYLE=';             // Empty style parameter
+    "TRANSPARENT=true&" + // Make background transparent
+    "SCALE=0.5&" + // Adjust scale if needed
+    "STYLE="
+  ); // Empty style parameter
 }
