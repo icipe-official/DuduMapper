@@ -13,15 +13,15 @@ import WMTSTileGrid from "ol/tilegrid/WMTS.js";
 import { get as getProjection } from "ol/proj.js";
 import { getTopLeft, getWidth } from "ol/extent.js";
 
-let projection: any = null;
+// let projection: any = null;
 
-const maybeProjection = getProjection("EPSG:900913");
+const Projection = getProjection("EPSG:4326");
 
-if (maybeProjection) {
-  projection = maybeProjection;
+if (!Projection) {
+  throw new Error("Projection not found");
 }
 
-const projectionExtent = projection.getExtent();
+const projectionExtent = Projection.getExtent();
 const size = getWidth(projectionExtent) / 256;
 const resolutions = new Array(19);
 
@@ -29,11 +29,13 @@ const matrixIds = new Array(19);
 for (let z = 0; z < 19; ++z) {
   // generate resolutions and matrixIds arrays for this WMTS
   resolutions[z] = size / Math.pow(2, z);
-  matrixIds[z] = `EPSG:900913:${z}`;
+  matrixIds[z] = `EPSG:4326:${z}`;
 }
 
-export const geoServerBaseUrl =
-  process.env.NEXT_PUBLIC_GEOSERVER_URL?.trim().replace(/['"]/g, "");
+console.log('Raw GeoServer URL from env:', process.env.NEXT_PUBLIC_GEOSERVER_URL);
+export const geoServerBaseUrl = process.env.NEXT_PUBLIC_GEOSERVER_URL?.trim().replace(/['"]/g, '');
+console.log('Processed GeoServer URL:', geoServerBaseUrl);
+
 export const overlaysLayergroup_in_geoserver =
   process.env.NEXT_PUBLIC_OVERLAYS_LAYER_GROUP;
 export const basemapLayergroup_in_geoserver =
@@ -47,57 +49,6 @@ function appendPath(baseURL: string, path: string): string {
   }
   return `${baseURL}${path}`;
 }
-
-
-
-export function showLegend(layerName: string) {
-  const legendUrl = `${geoServerBaseUrl}/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=${layerName}`;
-
-  // Create a modal container div for the legend
-  const modal = document.createElement('div');
-  modal.id = 'legend-modal';
-  modal.style.position = 'fixed';
-  modal.style.top = '50%'; // Middle of the screen
-  modal.style.left = '10px'; // Left of the screen
-  modal.style.transform = 'translateY(-50%)'; // Vertically center the modal
-  modal.style.backgroundColor = '#fff';
-  modal.style.padding = '10px';
-  modal.style.borderRadius = '4px'; // Rounded corners (optional)
-  modal.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-  modal.style.zIndex = '1000'; // Ensure it's on top of other elements
-
-  // Create a close button
-  const closeButton = document.createElement('button');
-  closeButton.textContent = 'Close';
-  closeButton.style.position = 'absolute';
-  closeButton.style.top = '5px';
-  closeButton.style.right = '5px';
-  closeButton.style.background = '#ff5f5f';
-  closeButton.style.color = '#fff';
-  closeButton.style.border = 'none';
-  closeButton.style.padding = '5px';
-  closeButton.style.cursor = 'pointer';
-
-  closeButton.addEventListener('click', () => {
-    // Remove the modal when the close button is clicked
-    document.body.removeChild(modal);
-  });
-
-  // Create an image element for the legend
-  const legendImg = document.createElement('img');
-  legendImg.src = legendUrl;
-  legendImg.alt = `Legend for ${layerName}`;
-  legendImg.style.maxWidth = '200px'; // Adjust the size as needed
-
-  // Append the image and close button to the modal
-  modal.appendChild(legendImg);
-  modal.appendChild(closeButton);
-
-  // Append the modal to the body
-  document.body.appendChild(modal);
-}
-
-
 
 async function fetchXML(url: RequestInfo | URL) {
   try {
@@ -216,45 +167,6 @@ export const overlays = (async () => {
   );
 })();
 
-export const drought_risk = (async () => {
-
-  return await extractLayersFromLayerGroup(
-    await geoServerData,
-    "drought_risk"
-  );
-})();
-
-export const vulenerability = (async () => {
-
-  return await extractLayersFromLayerGroup(
-    await geoServerData,
-    "vulnerability"
-  );
-})();
-export const hazard = (async () => {
-
-  return await extractLayersFromLayerGroup(
-    await geoServerData,
-    "hazard"
-  );
-})();
-
-export const evapotranspiration = (async () => {
-
-  return await extractLayersFromLayerGroup(
-    await geoServerData,
-    "evapotranspiration"
-  );
-})();
-
-export const crop_systems = (async () => {
-
-  return await extractLayersFromLayerGroup(
-    await geoServerData,
-    "crop_systems"
-  );
-})();
-
 export const basemapLayers = (async () => {
   if (typeof basemapLayergroup_in_geoserver !== "string") {
     console.error("overlaysLayergroup_in_geoserver must be a string");
@@ -330,21 +242,6 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
     } else if (layerType === "overlays") {
       layers = await overlays;
     }
-    else if (layerType === "drought_risk") {
-      layers = await drought_risk;
-    }
-    else if (layerType === "vulnerability") {
-      layers = await vulenerability;
-    }
-    else if (layerType === "hazard") {
-      layers = await hazard;
-    }
-    else if (layerType === "crop_systems") {
-      layers = await crop_systems;
-    }
-    else if (layerType === "evapotranspiration") {
-      layers = await evapotranspiration;
-    }
 
     if (layers) {
       const layerLen = layers.length;
@@ -373,49 +270,29 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
                 "@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf",
             }),
             style: tileStyle,
+            zIndex: 0,
           } as BaseLayerOptions);
-        } else if (layerType === "overlays" || layerType === "drought_risk" || layerType === "vulnerability" || layerType === "hazard" || layerType === "crop_systems" || layerType === "evapotranspiration") {
+        } else if (layerType === "overlays") {
           theTile = new TileLayer({
             title: displayName,
             visible: false,
             source: new WMTS({
-              url: geoServerBaseUrl + "/geoserver/gwc/service/wmts",
+              url: `${geoServerBaseUrl}/geoserver/gwc/service/wmts`,
               layer: layerName,
-              matrixSet: "EPSG:900913",
+              matrixSet: "EPSG:4326",
               format: "image/png",
-              projection: projection,
+              projection: Projection,
               tileGrid: new WMTSTileGrid({
                 origin: getTopLeft(projectionExtent),
                 resolutions: resolutions,
                 matrixIds: matrixIds,
               }),
-              style: "",
+              style: " ",
               wrapX: true,
             }),
           } as BaseLayerOptions);
         }
-        if (theTile != undefined) {
 
-          theTile.on('change:visible', function(event) {
-            const layer = event.target;
-            const isVisible = layer.getVisible();
-            const layerName = layer.get('title');
-
-            if (isVisible) {
-              console.log(`Layer name: ${layerName} is now visible`);
-              // Show legend in a modal popup when the layer becomes visible
-              showLegend(layerName);
-            } else {
-              console.log(`Layer name: ${layerName} is now hidden`);
-              // Optionally remove the legend if it was showing
-              const modal = document.getElementById('legend-modal');
-              if (modal) {
-                document.body.removeChild(modal);
-              }
-            }
-          });
-
-        }
         basemapArrays.push(theTile);
       }
       return basemapArrays;
@@ -425,3 +302,132 @@ export const getBasemapOverlaysLayersArray = async (layerType: string) => {
     return null;
   }
 };
+
+// Add this new function to fetch layer capabilities
+export async function fetchLayerCapabilities() {
+  if (!geoServerBaseUrl) {
+    throw new Error("GeoServer base URL is not defined");
+  }
+
+  // Fetch both WMS and WMTS capabilities
+  const wmsUrl = `${geoServerBaseUrl}/geoserver/wms?request=GetCapabilities&service=WMS`;
+  const wmtsUrl = `${geoServerBaseUrl}/geoserver/gwc/service/wmts?request=GetCapabilities`;
+
+  try {
+    // Fetch both capabilities in parallel
+    const [wmsResponse, wmtsResponse] = await Promise.all([
+      fetchXML(wmsUrl),
+      fetchXML(wmtsUrl)
+    ]);
+
+    if (!wmsResponse || !wmtsResponse) {
+      throw new Error("Failed to fetch capabilities");
+    }
+
+    // Parse capabilities
+    const wmsParser = new WMSCapabilities();
+    const wmtsParser = new WMTSCapabilities();
+    
+    const wmsResult = wmsParser.read(wmsResponse);
+    const wmtsResult = wmtsParser.read(wmtsResponse);
+
+    // Extract layer information
+    const layers = extractLayerInfo(wmsResult, wmtsResult);
+    
+    return layers;
+
+  } catch (error) {
+    console.error("Error fetching capabilities:", error);
+    throw error;
+  }
+}
+
+function extractLayerInfo(wmsData: any, wmtsData: any) {
+  const layerInfo = new Map();
+
+  // Process WMS layers to get projection and extent info
+  if (wmsData?.Capability?.Layer?.Layer) {
+    wmsData.Capability.Layer.Layer.forEach((layer: any) => {
+      if (layer.Name?.startsWith('Dudu:')) {
+        layerInfo.set(layer.Name, {
+          name: layer.Name,
+          title: layer.Title,
+          abstract: layer.Abstract,
+          crs: layer.CRS || [],
+          bbox: layer.BoundingBox || [],
+          defaultStyle: layer.Style?.[0]?.Name || ''
+        });
+      }
+    });
+  }
+
+  // Add WMTS specific information
+  if (wmtsData?.Contents?.Layer) {
+    wmtsData.Contents.Layer.forEach((layer: any) => {
+      if (layer.Identifier?.startsWith('Dudu:') && layerInfo.has(layer.Identifier)) {
+        const info = layerInfo.get(layer.Identifier);
+        layerInfo.set(layer.Identifier, {
+          ...info,
+          tileMatrixSets: layer.TileMatrixSetLink?.map((link: any) => link.TileMatrixSet) || [],
+          formats: layer.Format || [],
+          wmtsStyles: layer.Style?.map((style: any) => style.Identifier) || []
+        });
+      }
+    });
+  }
+
+  return Array.from(layerInfo.values());
+}
+
+// Add this new function while keeping all existing code
+export async function fetchWMTSCapabilities() {
+  if (!geoServerBaseUrl) {
+    throw new Error("GeoServer base URL is not defined");
+  }
+
+  const capabilitiesUrl = `${geoServerBaseUrl}/geoserver/gwc/service/wmts?request=GetCapabilities`;
+  
+  try {
+    const response = await fetchXML(capabilitiesUrl);
+    if (!response) {
+      throw new Error("Failed to fetch WMTS capabilities");
+    }
+
+    const parser = new WMTSCapabilities();
+    const result = parser.read(response);
+
+    // Extract Dudu layers with their projections
+    const layers = result.Contents.Layer
+      .filter((layer: any) => layer.Identifier.startsWith('Dudu:'))
+      .map((layer: any) => ({
+        name: layer.Identifier,
+        title: layer.Title,
+        matrixSet: layer.TileMatrixSetLink[0].TileMatrixSet,
+        supportedCRS: layer.TileMatrixSetLink[0].TileMatrixSet
+      }));
+
+    return layers;
+  } catch (error) {
+    console.error("Error fetching WMTS Capabilities:", error);
+    throw error;
+  }
+}
+
+export function getLegendUrl(layerName: string) {
+  if (!geoServerBaseUrl) return '';
+  
+  // Clean up the layer name
+  const cleanLayerName = layerName.includes(':') ? layerName : `Dudu:${layerName}`;
+  
+  return `${geoServerBaseUrl}/geoserver/wms?` +
+    'REQUEST=GetLegendGraphic&' +
+    'VERSION=1.0.0&' +
+    'FORMAT=image/png&' +
+    'WIDTH=20&' +
+    'HEIGHT=20&' +
+    'LEGEND_OPTIONS=forceLabels:on;fontAntiAliasing:true&' + // Added anti-aliasing
+    `LAYER=${encodeURIComponent(cleanLayerName)}&` +
+    'TRANSPARENT=true&' +  // Make background transparent
+    'SCALE=0.5&' +        // Adjust scale if needed
+    'STYLE=';             // Empty style parameter
+}
