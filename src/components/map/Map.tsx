@@ -46,7 +46,7 @@ const matrixIds3857 = Array.from({ length: 19 }, (_, z) => `EPSG:3857:${z}`);
 function Newmap() {
   const mapRef = useRef<OlMap>();
   const mapElement = useRef<HTMLDivElement>(null);
-  const [wmtsLayers, setWmtsLayers] = useState([]);
+  const [wmtsLayers, setWmtsLayers] = useState<any[]>([]);
   const [activeLayerName, setActiveLayerName] = useState<string | null>(null);
 
   // Single useEffect for layer fetching
@@ -73,59 +73,79 @@ function Newmap() {
   useEffect(() => {
     if (!mapElement.current || !wmtsLayers.length) return;
 
-    console.log("Initializing map with layers:", wmtsLayers);
+    console.log('Creating map with layers:', wmtsLayers);
 
-    // Create dynamic WMTS layers
-    const dynamicLayers = wmtsLayers
-      .map((layer: any) => {
-        const projectionToUse = getProjection(layer.supportedCRS);
-        if (!projectionToUse) {
-          console.warn(`Projection ${layer.supportedCRS} not found for layer ${layer.name}`);
-          return null;
-        }
+    // Group layers by their group membership
+    const layersByGroup = wmtsLayers.reduce((groups: Record<string, any[]>, layer: any) => {
+      const groupTitle = layer.group?.groupTitle || 'Ungrouped';
+      if (!groups[groupTitle]) {
+        groups[groupTitle] = [];
+      }
+      groups[groupTitle].push(layer);
+      return groups;
+    }, {});
 
-        return new TileLayer({
-          properties: {
-            title: layer.title,
-            type: 'overlay'
-          },
-          visible: false,
-          source: new WMTS({
-            url: `${geoServerBaseUrl}/geoserver/gwc/service/wmts`,
-            layer: layer.name,
-            matrixSet: layer.matrixSet,
-            format: "image/png",
-            projection: projectionToUse,
-            tileGrid: new WMTSTileGrid({
-              origin: [-180.0, 90.0],
-              resolutions: [
-                0.703125, 0.3515625, 0.17578125, 0.087890625,
-                0.0439453125, 0.02197265625, 0.010986328125,
-                0.0054931640625, 0.00274658203125, 0.001373291015625,
-                0.0006866455078125, 0.00034332275390625,
-                0.000171661376953125, 0.0000858306884765625
-              ],
-              matrixIds: Array.from({ length: 14 }, (_, i) => `EPSG:4326:${i}`),
-              tileSize: [256, 256],
-              extent: [-180.0, -90.0, 180.0, 90.0]
+    // Create layer groups
+    const dynamicGroups = Object.entries(layersByGroup).map(([groupTitle, groupLayers]) => {
+      const layers = groupLayers
+        .map(layer => {
+          const projectionToUse = getProjection(layer.supportedCRS);
+          if (!projectionToUse) {
+            console.warn(`Projection ${layer.supportedCRS} not found for layer ${layer.name}`);
+            return null;
+          }
+
+          return new TileLayer({
+            properties: {
+              title: layer.title,
+              type: 'overlay'
+            },
+            visible: false,
+            source: new WMTS({
+              url: `${geoServerBaseUrl}/geoserver/gwc/service/wmts`,
+              layer: layer.name,
+              matrixSet: layer.matrixSet,
+              format: "image/png",
+              projection: projectionToUse,
+              tileGrid: new WMTSTileGrid({
+                origin: [-180.0, 90.0],
+                resolutions: [
+                  0.703125, 0.3515625, 0.17578125, 0.087890625,
+                  0.0439453125, 0.02197265625, 0.010986328125,
+                  0.0054931640625, 0.00274658203125, 0.001373291015625,
+                  0.0006866455078125, 0.00034332275390625,
+                  0.000171661376953125, 0.0000858306884765625
+                ],
+                matrixIds: Array.from({ length: 14 }, (_, i) => `EPSG:4326:${i}`),
+                tileSize: [256, 256],
+                extent: [-180.0, -90.0, 180.0, 90.0]
+              }),
+              style: "",
+              wrapX: true,
+              tileLoadFunction: (tile: any, src: string) => {
+                console.log('Loading tile from:', src);
+                const img = tile.getImage();
+                img.onerror = () => {
+                  console.error('Tile load error:', src);
+                };
+                img.onload = () => {
+                  console.log('Tile loaded successfully:', src);
+                };
+                img.src = src;
+              }
             }),
-            style: "",
-            wrapX: true,
-            tileLoadFunction: (tile: any, src: string) => {
-              console.log('Loading tile from:', src);
-              const img = tile.getImage();
-              img.onerror = () => {
-                console.error('Tile load error:', src);
-              };
-              img.onload = () => {
-                console.log('Tile loaded successfully:', src);
-              };
-              img.src = src;
-            }
-          }),
-        });
-      })
-      .filter(layer => layer !== null);
+          });
+        })
+        .filter(layer => layer !== null);
+
+      return new LayerGroup({
+        properties: {
+          title: groupTitle,
+          type: 'group'  // Explicitly mark as a group
+        },
+        layers: new Collection(layers),
+      } as LayerGroupOptions);
+    });
 
     // Create base OSM layer
     const osmLayer = new TileLayer({
@@ -136,25 +156,18 @@ function Newmap() {
       }
     });
 
-    // Create layer groups
-    const baseGroup = new LayerGroup({
-      properties: {
-        title: 'Base Maps'
-      },
-      layers: [osmLayer],
-    } as LayerGroupOptions);
-
-    const duduGroup = new LayerGroup({
-      properties: {
-        title: 'Dudu Layers'
-      },
-      layers: new Collection(dynamicLayers),
-    } as LayerGroupOptions);
-
-    // Initialize map
+    // Initialize map with grouped layers
     const initialMap = new OlMap({
       target: mapElement.current,
-      layers: [baseGroup, duduGroup],
+      layers: [
+        new LayerGroup({
+          properties: {
+            title: 'Base Maps'
+          },
+          layers: [osmLayer],
+        } as LayerGroupOptions),
+        ...dynamicGroups
+      ],
       view: new View({
         projection: 'EPSG:4326',
         center: [37.9062, -1.2921],
@@ -172,18 +185,23 @@ function Newmap() {
     } as any);
     initialMap.addControl(layerSwitcher);
 
-    // Add visibility listeners
-    dynamicLayers.forEach(layer => {
-      if (layer) {
-        layer.on('change:visible', (event: any) => {
-          const isVisible = event.target.getVisible();
-          const layerName = event.target.get('title');
-          
-          if (isVisible) {
-            setActiveLayerName(layerName);
-            console.log(`Layer ${layerName} is now visible`);
-          } else if (activeLayerName === layerName) {
-            setActiveLayerName(null);
+    // Add visibility listeners with proper type checking
+    dynamicGroups.forEach(group => {
+      const groupLayers = group.getLayers(); // Get layers collection
+      if (groupLayers) {
+        groupLayers.forEach((layer: any) => {
+          if (layer) {
+            layer.on('change:visible', (event: any) => {
+              const isVisible = event.target.getVisible();
+              const layerName = event.target.get('title');
+              
+              if (isVisible) {
+                setActiveLayerName(layerName);
+                console.log(`Layer ${layerName} is now visible`);
+              } else if (activeLayerName === layerName) {
+                setActiveLayerName(null);
+              }
+            });
           }
         });
       }
