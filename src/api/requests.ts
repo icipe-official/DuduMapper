@@ -610,56 +610,43 @@ export async function fetchWMTSCapabilities(): Promise<WMTSLayer[]> {
       );
 
       console.log(
-        `Processing layer: ${layer.name} -> Normalized layer name: ${normalizedLayerName}`
+        `Processing layer: ${layer.name} -> Normalized name: ${normalizedLayerName}`,
+        `Found in group map: ${layerToGroupMap.has(normalizedLayerName)}`
       );
-      // const layerName = layer.name.includes(":")
-      //   ? layer.name.split(":")[1]
-      //   : layer.name
-      //check if the layer belongs to any group
+
       const group = layerToGroupMap.get(normalizedLayerName);
-      console.log(`Group for ${layer.name}:`, group);
-      //if no group found , set it to "Ungrouped"
-      if (!group) {
+
+      // Only mark as ungrouped if:
+      // 1. The layer is not found in any group AND
+      // 2. The layer name doesn't match any group names (to avoid including group containers)
+      const isGroupContainer = layerGroups.some(g => 
+        normalizeName(g.name) === normalizedLayerName
+      );
+
+      if (isGroupContainer) {
+        console.log(`Skipping group container: ${layer.name}`);
+        return null;
+      }
+
+      if (group) {
         return {
           ...layer,
           group: {
-            groupName: "Ungrouped",
-            groupTitle: "Ungrouped Layers",
+            groupName: group.groupName,
+            groupTitle: group.groupTitle,
           },
         };
       }
-      //check if the group itself is a layer group
-      //skip addiing it to ungroupped if its part of a group
-      if (group.groupName && group.groupTitle) {
-        return {
-          ...layer,
-          group,
-        };
-      } else {
-        //if no group found, set it to "Ungrouped"
-        //also if it is not a group itself
-        return {
-          ...layer,
-          group: {
-            groupName: "Ungrouped",
-            groupTitle: "Ungrouped Layers",
-          },
-        };
-      }
-    });
-       // Filter out:
-    // 1. Layers that mistakenly ended up in "Ungrouped" when they belong to a group
-    // 2. Layer groups themselves that are showing in "Ungrouped"
-    const finalEnrichedLayers = enrichedLayers.filter((layer: WMTSLayer) => {
-      // 1. Remove layers that should belong to a group, not "Ungrouped"
-      const isLayerInGroup = layerToGroupMap.has(normalizeName(layer.name));
 
-      // 2. Remove layer groups from the ungrouped list (i.e., layers that are not "Ungrouped")
-      const isLayerGroup = !isLayerInGroup && layer.group?.groupName === "Ungrouped";
-
-      // Only include layers if they have a valid group or they are genuinely ungrouped layers
-      return !(isLayerGroup);
-    });
+      return {
+        ...layer,
+        group: {
+          groupName: "Ungrouped",
+          groupTitle: "Ungrouped Layers",
+        },
+      };
+    })
+    .filter((layer): layer is WMTSLayer => layer !== null);
 
     console.log("Final enriched layers:", enrichedLayers);
     return enrichedLayers;
