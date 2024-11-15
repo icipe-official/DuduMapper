@@ -28,7 +28,7 @@ const Navbar: React.FC = () => {
                 <Link href="/">
                   <picture>
                     <img
-                      src={`${BASE_PATH}/Animals-Mosquito-icon.png`}
+                      src={"/Animals-Mosquito-icon.png"}
                       style={{ maxHeight: "70px", cursor: "pointer" }}
                       alt="Dudu Mapper logo"
                     />
