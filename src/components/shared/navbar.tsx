@@ -1,10 +1,10 @@
 "use client";
 import * as React from "react";
-import AppBar from "@mui/material/AppBar";
+// import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Link from "next/link";
-import DrawerComp from "./DrawerComp";
+// import Toolbar from "@mui/material/Toolbar";
+// import Link from "next/link";
+// import DrawerComp from "./DrawerComp";
 import NavLink from "./navlink";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { BASE_PATH } from "@/lib/constants";
@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
   return (
     <div>
       <Box sx={{ position: "relative", zIndex: 2 }}>
-        <AppBar
+        {/* <AppBar
           position="fixed"
           sx={{ bgcolor: "white", margin: "0", padding: "0" }}
         >
@@ -43,7 +43,7 @@ const Navbar: React.FC = () => {
               )}
             </>
           </Toolbar>
-        </AppBar>
+        </AppBar> */}
       </Box>
     </div>
   );
