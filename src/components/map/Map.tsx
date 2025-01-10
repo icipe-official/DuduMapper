@@ -38,6 +38,15 @@ import { geoServerBaseUrl, fetchWMTSCapabilities } from "@/api/requests";
 import { fromLonLat } from "ol/proj";
 import { getTopLeft, getWidth } from "ol/extent";
 import { Options as LayerGroupOptions } from "ol/layer/Group";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import { Collapse } from "@mui/material";
+import Checkbox from "@mui/material/Checkbox";
+import LayersIcon from "@mui/icons-material/Layers";
+import MapIcon from "@mui/icons-material/Map";
+import FolderIcon from "@mui/icons-material/Folder";
+import Tooltip from "@mui/material/Tooltip";
+import { alpha } from "@mui/material/styles";
 import Legend from "./Legend";
 
 const drawerWidth = 240;
@@ -106,21 +115,18 @@ const matrixIds4326 = Array.from({ length: 19 }, (_, z) => `EPSG:4326:${z}`);
 
 const Newmap = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const mapRef = useRef<OlMap>();
   const mapElement = useRef<HTMLDivElement>(null);
   const [wmtsLayers, setWmtsLayers] = useState<any[]>([]);
   const [activeLayerName, setActiveLayerName] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [overlaysOpen, setOverlaysOpen] = useState(false);
+  const [layerGroups, setLayerGroups] = useState<Record<string, any[]>>({});
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+    {}
+  );
 
-  const navMenuItems = [
-    <Link href="/about" key="about" style={{ margin: "0 10px" }}>
-      About
-    </Link>,
-    <Link href="/contact" key="contact" style={{ margin: "0 10px" }}>
-      Contact
-    </Link>,
-  ];
+  // Handle drawer states
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -128,6 +134,29 @@ const Newmap = () => {
 
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+
+  const handleOverlaysClick = () => setOverlaysOpen(!overlaysOpen);
+
+  // Handle group expansion
+  const handleGroupClick = (groupTitle: string) => {
+    setExpandedGroups((prev) => ({
+      ...prev,
+      [groupTitle]: !prev[groupTitle],
+    }));
+  };
+
+  // Handle layer visibility
+  const handleLayerToggle = (layer: any) => {
+    if (layer) {
+      const newVisibility = !layer.getVisible();
+      layer.setVisible(newVisibility);
+      if (newVisibility) {
+        setActiveLayerName(layer.get("title"));
+      } else if (activeLayerName === layer.get("title")) {
+        setActiveLayerName(null);
+      }
+    }
   };
 
   useEffect(() => {
@@ -139,8 +168,22 @@ const Newmap = () => {
 
       try {
         const layers = await fetchWMTSCapabilities();
-        console.log("Fetched WMTS layers:", layers);
         setWmtsLayers(layers);
+
+        // Organize layers by group
+        const groupedLayers = layers.reduce(
+          (groups: Record<string, any[]>, layer: any) => {
+            const groupTitle = layer.group?.groupTitle || "Ungrouped";
+            if (!groups[groupTitle]) {
+              groups[groupTitle] = [];
+            }
+            groups[groupTitle].push(layer);
+            return groups;
+          },
+          {}
+        );
+
+        setLayerGroups(groupedLayers);
       } catch (error) {
         console.error("Error fetching capabilities:", error);
       }
@@ -148,8 +191,6 @@ const Newmap = () => {
 
     fetchLayers();
   }, []);
-
-  // Update map size when drawer opens/closes
   useEffect(() => {
     if (mapRef.current) {
       mapRef.current.updateSize();
@@ -159,21 +200,7 @@ const Newmap = () => {
   useEffect(() => {
     if (!mapElement.current || !wmtsLayers.length) return;
 
-    console.log("Creating map with layers:", wmtsLayers);
-
-    const layersByGroup = wmtsLayers.reduce(
-      (groups: Record<string, any[]>, layer: any) => {
-        const groupTitle = layer.group?.groupTitle || "Ungrouped";
-        if (!groups[groupTitle]) {
-          groups[groupTitle] = [];
-        }
-        groups[groupTitle].push(layer);
-        return groups;
-      },
-      {}
-    );
-
-    const dynamicGroups = Object.entries(layersByGroup).map(
+    const dynamicGroups = Object.entries(layerGroups).map(
       ([groupTitle, groupLayers]) => {
         const layers = groupLayers
           .map((layer) => {
@@ -215,21 +242,10 @@ const Newmap = () => {
                 }),
                 style: "",
                 wrapX: true,
-                tileLoadFunction: (tile: any, src: string) => {
-                  console.log("Loading tile from:", src);
-                  const img = tile.getImage();
-                  img.onerror = () => {
-                    console.error("Tile load error:", src);
-                  };
-                  img.onload = () => {
-                    console.log("Tile loaded successfully:", src);
-                  };
-                  img.src = src;
-                },
               }),
             });
           })
-          .filter((layer) => layer !== null);
+          .filter((layer): layer is TileLayer<any> => layer !== null);
 
         return new LayerGroup({
           properties: {
@@ -270,39 +286,89 @@ const Newmap = () => {
       }),
     });
 
-    const layerSwitcher = new LayerSwitcher({
-      startActive: true,
-      groupSelectStyle: "children",
-    } as any);
-    initialMap.addControl(layerSwitcher);
-
-    dynamicGroups.forEach((group) => {
-      const groupLayers = group.getLayers();
-      if (groupLayers) {
-        groupLayers.forEach((layer: any) => {
-          if (layer) {
-            layer.on("change:visible", (event: any) => {
-              const isVisible = event.target.getVisible();
-              const layerName = event.target.get("title");
-
-              if (isVisible) {
-                setActiveLayerName(layerName);
-                console.log(`Layer ${layerName} is now visible`);
-              } else if (activeLayerName === layerName) {
-                setActiveLayerName(null);
-              }
-            });
-          }
-        });
-      }
-    });
-
     mapRef.current = initialMap;
 
     return () => {
       initialMap.setTarget(undefined);
     };
-  }, [wmtsLayers]);
+  }, [wmtsLayers, layerGroups]);
+
+  const renderLayerControls = () => (
+    <Collapse in={overlaysOpen} timeout="auto" unmountOnExit>
+      {Object.entries(layerGroups).map(([groupTitle, groupLayers]) => (
+        <div key={groupTitle}>
+          <ListItemButton
+            onClick={() => handleGroupClick(groupTitle)}
+            sx={{
+              pl: 4,
+              py: 1,
+              "&:hover": {
+                backgroundColor: alpha(theme.palette.primary.main, 0.1),
+              },
+              backgroundColor: expandedGroups[groupTitle]
+                ? alpha(theme.palette.primary.main, 0.08)
+                : "transparent",
+            }}
+          >
+            <ListItemIcon>
+              <FolderIcon
+                color={expandedGroups[groupTitle] ? "primary" : "inherit"}
+              />
+            </ListItemIcon>
+            <ListItemText
+              primary={groupTitle}
+              primaryTypographyProps={{
+                fontWeight: expandedGroups[groupTitle] ? 600 : 400,
+                color: expandedGroups[groupTitle]
+                  ? theme.palette.primary.main
+                  : "inherit",
+              }}
+            />
+            {expandedGroups[groupTitle] ? (
+              <ExpandLess color="primary" />
+            ) : (
+              <ExpandMore />
+            )}
+          </ListItemButton>
+          <Collapse
+            in={expandedGroups[groupTitle]}
+            timeout="auto"
+            unmountOnExit
+          >
+            <List component="div" disablePadding>
+              {groupLayers.map((layer) => {
+                const olLayer = mapRef.current
+                  ?.getLayers()
+                  .getArray()
+                  .find((l: any) => l.get("title") === groupTitle)
+                  ?.getLayers()
+                  .getArray()
+                  .find((l: any) => l.get("title") === layer.title);
+
+                const isVisible = olLayer?.getVisible() || false;
+
+                return (
+                  <ListItemButton
+                    key={layer.title}
+                    sx={{ pl: 8 }}
+                    onClick={() => handleLayerToggle(olLayer)}
+                  >
+                    <Checkbox
+                      edge="start"
+                      checked={olLayer?.getVisible() || false}
+                      tabIndex={-1}
+                      disableRipple
+                    />
+                    <ListItemText primary={layer.title} />
+                  </ListItemButton>
+                );
+              })}
+            </List>
+          </Collapse>
+        </div>
+      ))}
+    </Collapse>
+  );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
@@ -381,30 +447,46 @@ const Newmap = () => {
         </Box>
         <Divider />
         <List>
-          {["Layer Controls", "Base Maps", "Overlays"].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary="Layer Controls" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary="Base Maps" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton onClick={handleOverlaysClick}>
+              <ListItemIcon>
+                <MailIcon />
+              </ListItemIcon>
+              <ListItemText primary="Overlays" />
+              {overlaysOpen ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+          </ListItem>
+          {renderLayerControls()}
         </List>
       </Drawer>
       <Main open={open}>
-        <DrawerHeader /> {/* This pushes the content below the app bar */}
+        <DrawerHeader />
         <div
           ref={mapElement}
           className="map-container"
           id="map-container"
           style={{
             width: "100%",
-            height: "calc(100vh - 64px)", // Adjust height to account for app bar
+            height: "calc(100vh - 64px)",
             position: "relative",
           }}
-        ></div>
+        />
         <Legend layerName={activeLayerName} />
       </Main>
     </Box>

@@ -266,10 +266,10 @@ export function DrawerComponent({
         <MapWrapper />
       </Box>
 
-      {/* <Box component="main" sx={{ flexGrow: 1, p: 3 }}> */}
-      {/* <DrawerHeader /> */}
-      {/* <MapWrapper /> */}
-      {/* </Box> */}
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <DrawerHeader />
+        <MapWrapper />
+      </Box>
     </Box>
   );
 }
