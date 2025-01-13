@@ -24,7 +24,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/dudmapper:latest .
+          docker build -t ghcr.io/${{ github.repository_owner }}/dudumapper:latest .
 
       - name: Push Docker Image
         run: |
