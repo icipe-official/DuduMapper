@@ -47,6 +47,9 @@ import MapIcon from "@mui/icons-material/Map";
 import FolderIcon from "@mui/icons-material/Folder";
 import Tooltip from "@mui/material/Tooltip";
 import { alpha } from "@mui/material/styles";
+import DownloadPopup from "./DownloadPopup";
+import Button from "@mui/material/Button";
+import { Download } from "lucide-react";
 import Legend from "./Legend";
 
 const drawerWidth = 240;
@@ -125,9 +128,18 @@ const Newmap = () => {
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {}
   );
+  const [downloadPopupOpen, setDownloadPopupOpen] = useState(false);
+  const [cqlFilter, setCqlFilter] = useState<string | null>(null);
+
+  const handleLayerSelection = (layer: any) => {
+    const filter = `layer_name='${layer.get("title")}'`; // Example filter
+    setCqlFilter(filter);
+  };
 
   // Handle drawer states
 
+  // const [downloadPopupOpen, setDownloadPopupOpen] = useState(false);
+  // const [cqlFilter, setCqlFilter] = useState<string | null>(null);
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -375,6 +387,7 @@ const Newmap = () => {
       <CssBaseline />
       <AppBar
         position="fixed"
+        open={open}
         sx={{ bgcolor: "white", margin: "0", padding: "0" }}
       >
         <Toolbar>
@@ -401,6 +414,14 @@ const Newmap = () => {
           <Typography variant="h6" noWrap component="div">
             Dudumapper
           </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setDownloadPopupOpen(true)}
+            sx={{ ml: 2 }}
+          >
+            Open Download
+          </Button>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -410,6 +431,7 @@ const Newmap = () => {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
+            // position: "relative",
           },
         }}
         variant="persistent"
@@ -425,6 +447,7 @@ const Newmap = () => {
             )}
           </IconButton>
         </DrawerHeader>
+        <Divider />
         <Box
           sx={{
             display: "flex",
@@ -472,9 +495,18 @@ const Newmap = () => {
               {overlaysOpen ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton onClick={() => setDownloadPopupOpen(true)}>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary="Download" />
+            </ListItemButton>
+          </ListItem>
           {renderLayerControls()}
         </List>
       </Drawer>
+
       <Main open={open}>
         <DrawerHeader />
         <div
@@ -487,6 +519,13 @@ const Newmap = () => {
             position: "relative",
           }}
         />
+
+        <DownloadPopup
+          isOpen={downloadPopupOpen}
+          onClose={() => setDownloadPopupOpen(false)}
+          cqlFilter={cqlFilter || ""}
+        />
+
         <Legend layerName={activeLayerName} />
       </Main>
     </Box>
