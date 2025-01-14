@@ -1,8 +1,8 @@
-name: Build and Push Docker Image
+name: Build, Push, and Deploy Docker Image
 
 on:
   push:
-    branches: [test]  # Trigger on pushes to the 'main' branch
+    branches: [test]  # Trigger on pushes to the 'test' branch
 
 jobs:
   build-and-push:
@@ -19,7 +19,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }} 
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker Image
@@ -29,3 +29,34 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push ghcr.io/${{ github.repository_owner }}/dudumapper:latest
+
+  deploy:
+      needs: build-and-push
+      runs-on: ubuntu-latest
+      steps:
+        - name: SSH to Deployment Server and Pull & Run Docker Image
+          uses: appleboy/ssh-action@v0.1.8
+          with:
+            host: ${{ secrets.DEPLOYMENT_SERVER_HOST }}
+            username: ${{ secrets.DEPLOYMENT_SERVER_USER }}
+            key: ${{ secrets.DEPLOYMENT_SERVER_SSH_KEY }}
+            script: |
+              echo "Logging into GitHub Container Registry on deployment server..."
+              echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+              
+              echo "Pulling latest Docker image..."
+              docker pull ghcr.io/${{ github.repository_owner }}/dudumapper:latest
+              
+              echo "Stopping and removing any running container named 'dudumapper'..."
+              docker rm -f dudumapper || true
+              
+              echo "Starting a new container with the latest image..."
+              docker run -d --name dudumapper \
+              -p 3030:3000 \
+                -e NEXT_PUBLIC_GEOSERVER_URL=${{ secrets.NEXT_PUBLIC_GEOSERVER_URL }} \
+                -e NEXT_PUBLIC_OVERLAYS_LAYER_GROUP=${{ secrets.NEXT_PUBLIC_OVERLAYS_LAYER_GROUP }} \
+                -e NEXT_PUBLIC_BASEMAP_LAYER_GROUP=${{ secrets.NEXT_PUBLIC_BASEMAP_LAYER_GROUP }} \
+                -e NEXT_PUBLIC_SELECTED_WORKSPACE=${{ secrets.NEXT_PUBLIC_SELECTED_WORKSPACE }} \
+                ghcr.io/${{ github.repository_owner }}/dudumapper:latest
+
+
