@@ -30,33 +30,38 @@ jobs:
         run: |
           docker push ghcr.io/${{ github.repository_owner }}/dudumapper:latest
 
+  
   deploy:
-      needs: build-and-push
-      runs-on: ubuntu-latest
-      steps:
-        - name: SSH to Deployment Server and Pull & Run Docker Image
-          uses: appleboy/ssh-action@v0.1.8
-          with:
-            host: ${{ secrets.DEPLOYMENT_SERVER_HOST }}
-            username: ${{ secrets.DEPLOYMENT_SERVER_USER }}
-            key: ${{ secrets.DEPLOYMENT_SERVER_SSH_KEY }}
-            script: |
-              echo "Logging into GitHub Container Registry on deployment server..."
-              echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
-              
-              echo "Pulling latest Docker image..."
-              docker pull ghcr.io/${{ github.repository_owner }}/dudumapper:latest
-              
-              echo "Stopping and removing any running container named 'dudumapper'..."
-              docker rm -f dudumapper || true
-              
-              echo "Starting a new container with the latest image..."
-              docker run -d --name dudumapper \
-              -p 3030:3000 \
-                -e NEXT_PUBLIC_GEOSERVER_URL=${{ secrets.NEXT_PUBLIC_GEOSERVER_URL }} \
-                -e NEXT_PUBLIC_OVERLAYS_LAYER_GROUP=${{ secrets.NEXT_PUBLIC_OVERLAYS_LAYER_GROUP }} \
-                -e NEXT_PUBLIC_BASEMAP_LAYER_GROUP=${{ secrets.NEXT_PUBLIC_BASEMAP_LAYER_GROUP }} \
-                -e NEXT_PUBLIC_SELECTED_WORKSPACE=${{ secrets.NEXT_PUBLIC_SELECTED_WORKSPACE }} \
-                ghcr.io/${{ github.repository_owner }}/dudumapper:latest
+     needs: build-and-push
+     runs-on: ubuntu-latest
+     steps:
+       - name: SSH to Deployment Server and Pull & Run Docker Image
+         uses: appleboy/ssh-action@v0.1.8
+         with:
+           host: ${{ secrets.DEPLOYMENT_SERVER_HOST }}
+           username: ${{ secrets.DEPLOYMENT_SERVER_USER }}
+           key: ${{ secrets.DEPLOYMENT_SERVER_SSH_KEY }}
+           script: |
+             echo "Logging into GitHub Container Registry on deployment server..."
+             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin || echo "Login failed"
+             
+             echo "Pulling latest Docker image..."
+             docker pull ghcr.io/${{ github.repository_owner }}/dudumapper:latest || echo "Docker pull failed"
+             
+             echo "Stopping and removing any running container named 'dudumapper'..."
+             docker rm -f dudumapper || true
+             
+             echo "Starting a new container with the latest image..."
+             docker run -d --name dudumapper \
+               -p 3030:3000 \
+               -e NEXT_PUBLIC_GEOSERVER_URL=${{ secrets.NEXT_PUBLIC_GEOSERVER_URL }} \
+               -e NEXT_PUBLIC_OVERLAYS_LAYER_GROUP=${{ secrets.NEXT_PUBLIC_OVERLAYS_LAYER_GROUP }} \
+               -e NEXT_PUBLIC_BASEMAP_LAYER_GROUP=${{ secrets.NEXT_PUBLIC_BASEMAP_LAYER_GROUP }} \
+               -e NEXT_PUBLIC_SELECTED_WORKSPACE=${{ secrets.NEXT_PUBLIC_SELECTED_WORKSPACE }} \
+               ghcr.io/${{ github.repository_owner }}/dudumapper:latest || echo "Docker container failed to start"
+             
+             echo "Checking logs for the container..."
+             docker logs dudumapper || echo "No logs available for dudumapper"
+
 
 
