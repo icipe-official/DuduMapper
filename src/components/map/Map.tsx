@@ -325,9 +325,9 @@ const Newmap = () => {
           >
             <ListItemIcon>
               <FolderIcon
-              style={{
-                color: expandedGroups[groupTitle] ? green[500] : "inherit", // Green when expanded, default otherwise
-              }}
+                style={{
+                  color: expandedGroups[groupTitle] ? green[500] : "inherit", // Green when expanded, default otherwise
+                }}
               />
             </ListItemIcon>
             <ListItemText
@@ -417,14 +417,14 @@ const Newmap = () => {
           <Typography variant="h6" noWrap component="div">
             Dudumapper
           </Typography>
-          <Button
+          {/* <Button
             variant="contained"
             color="primary"
             onClick={() => setDownloadPopupOpen(true)}
             sx={{ ml: 2 }}
           >
             Open Download
-          </Button>
+          </Button> */}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -490,6 +490,72 @@ const Newmap = () => {
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                transition: "all 0.3s ease",
+                mb: downloadPopupOpen ? 2 : 0,
+              }}
+            >
+              <ListItemButton
+                onClick={() => setDownloadPopupOpen(!downloadPopupOpen)}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                  },
+                  backgroundColor: downloadPopupOpen
+                    ? alpha(green[500], 0.1)
+                    : "transparent",
+                }}
+              >
+                <ListItemIcon>
+                  <InboxIcon
+                    sx={{
+                      color: downloadPopupOpen ? green[500] : "inherit",
+                    }}
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Download"
+                  primaryTypographyProps={{
+                    fontWeight: downloadPopupOpen ? 600 : 400,
+                    color: downloadPopupOpen ? green[500] : "inherit",
+                  }}
+                />
+                {downloadPopupOpen ? (
+                  <ExpandLess sx={{ color: green[500] }} />
+                ) : (
+                  <ExpandMore />
+                )}
+              </ListItemButton>
+              <Collapse
+                in={downloadPopupOpen}
+                timeout="auto"
+                unmountOnExit
+                sx={{
+                  position: "relative",
+                  zIndex: 1,
+                  backgroundColor: "background.paper",
+                  borderRadius: 1,
+                  boxShadow: downloadPopupOpen ? 1 : 0,
+                  mt: 0.5,
+                  mb: downloadPopupOpen ? 2 : 0,
+                }}
+              >
+                <Box sx={{ padding: " 200px", transition: "all 0.3s ease" }}>
+                  <DownloadPopup
+                    isOpen={downloadPopupOpen}
+                    onClose={() => setDownloadPopupOpen(false)}
+                    cqlFilter={cqlFilter || ""}
+                  />
+                </Box>
+              </Collapse>
+            </Box>
+          </ListItem>
+
+          <ListItem disablePadding>
             <ListItemButton onClick={handleOverlaysClick}>
               <ListItemIcon>
                 <MailIcon />
@@ -498,14 +564,7 @@ const Newmap = () => {
               {overlaysOpen ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton onClick={() => setDownloadPopupOpen(true)}>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Download" />
-            </ListItemButton>
-          </ListItem>
+
           {renderLayerControls()}
         </List>
       </Drawer>
@@ -521,12 +580,6 @@ const Newmap = () => {
             height: "calc(100vh - 64px)",
             position: "relative",
           }}
-        />
-
-        <DownloadPopup
-          isOpen={downloadPopupOpen}
-          onClose={() => setDownloadPopupOpen(false)}
-          cqlFilter={cqlFilter || ""}
         />
 
         <Legend layerName={activeLayerName} />
