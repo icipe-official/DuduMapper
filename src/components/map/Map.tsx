@@ -414,14 +414,7 @@ const Newmap = () => {
           <Typography variant="h6" noWrap component="div">
             Dudumapper
           </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setDownloadPopupOpen(true)}
-            sx={{ ml: 2 }}
-          >
-            Open Download
-          </Button>
+          ?
         </Toolbar>
       </AppBar>
       <Drawer
