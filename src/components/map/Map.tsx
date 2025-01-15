@@ -51,6 +51,7 @@ import DownloadPopup from "./DownloadPopup";
 import Button from "@mui/material/Button";
 import { Download } from "lucide-react";
 import Legend from "./Legend";
+import { green } from "@mui/material/colors";
 
 const drawerWidth = 240;
 
@@ -318,13 +319,15 @@ const Newmap = () => {
                 backgroundColor: alpha(theme.palette.primary.main, 0.1),
               },
               backgroundColor: expandedGroups[groupTitle]
-                ? alpha(theme.palette.primary.main, 0.08)
+                ? alpha(green[500], 0.1)
                 : "transparent",
             }}
           >
             <ListItemIcon>
               <FolderIcon
-                color={expandedGroups[groupTitle] ? "primary" : "inherit"}
+              style={{
+                color: expandedGroups[groupTitle] ? green[500] : "inherit", // Green when expanded, default otherwise
+              }}
               />
             </ListItemIcon>
             <ListItemText
@@ -332,12 +335,12 @@ const Newmap = () => {
               primaryTypographyProps={{
                 fontWeight: expandedGroups[groupTitle] ? 600 : 400,
                 color: expandedGroups[groupTitle]
-                  ? theme.palette.primary.main
-                  : "inherit",
+                  ? green[500] // Green text when expanded
+                  : "inherit", // default color otherwise
               }}
             />
             {expandedGroups[groupTitle] ? (
-              <ExpandLess color="primary" />
+              <ExpandLess style={{ color: green[500] }} />
             ) : (
               <ExpandMore />
             )}
@@ -414,7 +417,14 @@ const Newmap = () => {
           <Typography variant="h6" noWrap component="div">
             Dudumapper
           </Typography>
-          ?
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setDownloadPopupOpen(true)}
+            sx={{ ml: 2 }}
+          >
+            Open Download
+          </Button>
         </Toolbar>
       </AppBar>
       <Drawer
