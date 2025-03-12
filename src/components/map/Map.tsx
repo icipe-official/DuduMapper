@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Children, useEffect, useRef, useState } from "react";
 import { Map as OlMap, Tile, View } from "ol";
 import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
@@ -21,6 +21,7 @@ import {
 } from "@/api/requests"; // Adjust import path as needed
 import Legend from "./Legend"; // Import the Legend component
 import { Options as LayerGroupOptions } from "ol/layer/Group";
+import { Collapse } from "@mui/material";
 
 // Add these constants at the top of the file after imports
 const projection4326 = getProjection("EPSG:4326");
@@ -83,6 +84,7 @@ function Newmap() {
     const dynamicLayers = wmtsLayers
       .map((layer: any) => {
         const projectionToUse = getProjection(layer.supportedCRS);
+
         if (!projectionToUse) {
           console.warn(
             `Projection ${layer.supportedCRS} not found for layer ${layer.name}`
@@ -162,6 +164,8 @@ function Newmap() {
     const duduGroup = new LayerGroup({
       properties: {
         title: "Dudu Layers",
+        LayerGroup,
+        Collapse: false,
       },
       layers: new Collection(dynamicLayers),
     } as LayerGroupOptions);
@@ -170,6 +174,7 @@ function Newmap() {
     const initialMap = new OlMap({
       target: mapElement.current,
       layers: [baseGroup, duduGroup],
+    
       view: new View({
         projection: "EPSG:4326",
         center: [37.9062, -1.2921],
@@ -184,8 +189,13 @@ function Newmap() {
     const layerSwitcher = new LayerSwitcher({
       startActive: true,
       groupSelectStyle: "children",
+      collapsed: false,
     } as any);
+    duduGroup.set("openInLayerSwitcher", true)// keep the group open
+
+
     initialMap.addControl(layerSwitcher);
+    
 
     // Add visibility listeners
     dynamicLayers.forEach((layer) => {
