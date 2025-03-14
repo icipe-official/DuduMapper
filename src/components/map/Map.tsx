@@ -20,9 +20,7 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import { useMediaQuery } from "@mui/material";
-// import DrawerComp from "./DrawerComp";
 import Link from "next/link"; // Ensure this is imported correctly
-
 import { Map as OlMap, Tile, View } from "ol";
 import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
@@ -52,7 +50,56 @@ import Button from "@mui/material/Button";
 import { Download } from "lucide-react";
 import Legend from "./Legend";
 import { green } from "@mui/material/colors";
+import ProgressBar from "./ProgressBar";
+import CircularProgress from "@mui/material";
+//import page from "./page";
+//map component progressbar
 
+const NewMap = () => {
+  const [countdown, setCountdown] = useState(5); // Start from 3 seconds
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev === 1) {
+          clearInterval(timer);
+          setLoading(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000); // Decrease every 1 second
+
+    return () => clearInterval(timer);
+  }, []);
+  // Define NewMap inside MapComponent
+
+  return (
+    <Box sx={{ width: "100vw", height: "100vh", position: "relative" }}>
+      {/* Show countdown before map loads */}
+      {loading ? (
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h4">Loading map in {countdown}...</Typography>
+        </Box>
+      ) : (
+        <Box id="map-container" sx={{ width: "100%", height: "100%" }}>
+          {/* Your map component should render here */}
+        </Box>
+      )}
+    </Box>
+  );
+};
+
+// we take over the map component
 const drawerWidth = 240;
 
 // Styled Main component for map container
@@ -96,6 +143,7 @@ const AppBar = styled(MuiAppBar, {
     }),
   }),
 }));
+//reverse
 
 // Drawer Header
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -395,7 +443,7 @@ const Newmap = () => {
       >
         <Toolbar>
           <IconButton
-            color="inherit"
+            //color="inherit"
             aria-label="open drawer"
             onClick={handleDrawerOpen}
             edge="start"
@@ -588,4 +636,4 @@ const Newmap = () => {
   );
 };
 
-export default Newmap;
+export default NewMap;
