@@ -53,6 +53,9 @@ function Newmap() {
   const mapElement = useRef<HTMLDivElement>(null);
   const [wmtsLayers, setWmtsLayers] = useState([]);
   const [activeLayerName, setActiveLayerName] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [tilesLoading, setTilesLoading] = useState(0);
+  const mapInitializedRef = useRef(false);
 
   // Single useEffect for layer fetching
   useEffect(() => {
@@ -130,12 +133,26 @@ function Newmap() {
              */
             tileLoadFunction: (tile: any, src: string) => {
               console.log("Loading tile from:", src);
+
+              // Only track tile loading after initial map load
+              if (mapInitializedRef.current) {
+                setTilesLoading(prev => prev + 1);
+              }
+
               const img = tile.getImage();
               img.onerror = () => {
                 console.error("Tile load error:", src);
+
+                if (mapInitializedRef.current) {
+                  setTilesLoading(prev => prev - 1);
+                }
               };
               img.onload = () => {
                 console.log("Tile loaded successfully:", src);
+
+                if (mapInitializedRef.current) {
+                  setTilesLoading(prev => prev - 1);
+                }
               };
               img.src = src;
             },
@@ -145,13 +162,31 @@ function Newmap() {
       .filter((layer) => layer !== null);
 
     // Create base OSM layer
+    const osmSource = new OSM();
     const osmLayer = new TileLayer({
-      source: new OSM(),
+      source: osmSource,
       properties: {
         title: "OpenStreetMap",
         type: "base",
       },
     });
+
+    // Add loading events for OSM tiles
+    const incrementLoading = () => {
+      if (mapInitializedRef.current) {
+        setTilesLoading(prev => prev + 1);
+      }
+    };
+
+    const decrementLoading = () => {
+      if (mapInitializedRef.current) {
+        setTilesLoading(prev => prev - 1);
+      }
+    };
+
+    osmSource.on('tileloadstart', incrementLoading);
+    osmSource.on('tileloadend', decrementLoading);
+    osmSource.on('tileloaderror', decrementLoading);
 
     // Create layer groups
     const baseGroup = new LayerGroup({
@@ -212,9 +247,27 @@ function Newmap() {
       }
     });
 
+    // Create a one-time event listener for the initial load
+    const handleInitialLoad = () => {
+      // Give a small delay to ensure base tiles are loaded
+      setTimeout(() => {
+        console.log("Map initial render complete - hiding loader");
+        setIsLoading(false);
+
+        // Now we can start tracking individual tile loads
+        mapInitializedRef.current = true;
+      }, 1000);
+    };
+
+    // Listen for the map's first render
+    initialMap.once('rendercomplete', handleInitialLoad);
+
     mapRef.current = initialMap;
 
     return () => {
+      osmSource.un('tileloadstart', incrementLoading);
+      osmSource.un('tileloadend', decrementLoading);
+      osmSource.un('tileloaderror', decrementLoading);
       initialMap.setTarget(undefined);
     };
   }, [wmtsLayers]);
@@ -226,10 +279,16 @@ function Newmap() {
         ref={mapElement}
         className="map-container"
         id="map-container"
-      ></div>
+      >
+        {(isLoading || tilesLoading > 0) && (
+          <div className="map-loader">
+            <div className="spinner"></div>
+            <p>Loading map resources...</p>
+          </div>
+        )}
+      </div>
       <Legend layerName={activeLayerName} />
     </div>
   );
 }
-
 export default Newmap;
