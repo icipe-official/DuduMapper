@@ -22,7 +22,8 @@ import {
 import Legend from "./Legend"; // Import the Legend component
 import { Options as LayerGroupOptions } from "ol/layer/Group";
 import { Collapse } from "@mui/material";
-
+import CircularProgress from "@mui/material";
+import { FaMapMarkedAlt, FaMapMarkerAlt } from "react-icons/fa";
 // Add these constants at the top of the file after imports
 const projection4326 = getProjection("EPSG:4326");
 const projection3857 = getProjection("EPSG:3857");
@@ -136,7 +137,7 @@ function Newmap() {
 
               // Only track tile loading after initial map load
               if (mapInitializedRef.current) {
-                setTilesLoading(prev => prev + 1);
+                setTilesLoading((prev) => prev + 1);
               }
 
               const img = tile.getImage();
@@ -144,14 +145,14 @@ function Newmap() {
                 console.error("Tile load error:", src);
 
                 if (mapInitializedRef.current) {
-                  setTilesLoading(prev => prev - 1);
+                  setTilesLoading((prev) => prev - 1);
                 }
               };
               img.onload = () => {
                 console.log("Tile loaded successfully:", src);
 
                 if (mapInitializedRef.current) {
-                  setTilesLoading(prev => prev - 1);
+                  setTilesLoading((prev) => prev - 1);
                 }
               };
               img.src = src;
@@ -174,19 +175,19 @@ function Newmap() {
     // Add loading events for OSM tiles
     const incrementLoading = () => {
       if (mapInitializedRef.current) {
-        setTilesLoading(prev => prev + 1);
+        setTilesLoading((prev) => prev + 1);
       }
     };
 
     const decrementLoading = () => {
       if (mapInitializedRef.current) {
-        setTilesLoading(prev => prev - 1);
+        setTilesLoading((prev) => prev - 1);
       }
     };
 
-    osmSource.on('tileloadstart', incrementLoading);
-    osmSource.on('tileloadend', decrementLoading);
-    osmSource.on('tileloaderror', decrementLoading);
+    osmSource.on("tileloadstart", incrementLoading);
+    osmSource.on("tileloadend", decrementLoading);
+    osmSource.on("tileloaderror", decrementLoading);
 
     // Create layer groups
     const baseGroup = new LayerGroup({
@@ -260,14 +261,14 @@ function Newmap() {
     };
 
     // Listen for the map's first render
-    initialMap.once('rendercomplete', handleInitialLoad);
+    initialMap.once("rendercomplete", handleInitialLoad);
 
     mapRef.current = initialMap;
 
     return () => {
-      osmSource.un('tileloadstart', incrementLoading);
-      osmSource.un('tileloadend', decrementLoading);
-      osmSource.un('tileloaderror', decrementLoading);
+      osmSource.un("tileloadstart", incrementLoading);
+      osmSource.un("tileloadend", decrementLoading);
+      osmSource.un("tileloaderror", decrementLoading);
       initialMap.setTarget(undefined);
     };
   }, [wmtsLayers]);
@@ -282,12 +283,33 @@ function Newmap() {
       >
         {(isLoading || tilesLoading > 0) && (
           <div className="map-loader">
-            <div className="spinner"></div>
-            <p>Loading map resources...</p>
+            <FaMapMarkerAlt size={25} color="#3498db" className="icon-spin" />
           </div>
         )}
       </div>
       <Legend layerName={activeLayerName} />
+
+      {/* Inline CSS inside JSX */}
+      <style>
+        {`
+
+        .map-loader {
+              position: absolute;
+                top: 50%; /* Centers vertically */
+              left: 50%;
+              transform: translate(-50%, -30%); /* Moves it slightly lower */
+            }
+
+        .icon-spin {
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}
+      </style>
     </div>
   );
 }
