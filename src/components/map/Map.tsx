@@ -52,9 +52,10 @@ import Legend from "./Legend";
 import { green } from "@mui/material/colors";
 import ProgressBar from "./ProgressBar";
 import CircularProgress from "@mui/material";
+//import MapWithLoader from "./MapWithLoader";
 //import page from "./page";
 //map component progressbar
-
+/*
 const NewMap = () => {
   const [countdown, setCountdown] = useState(5); // Start from 3 seconds
   const [loading, setLoading] = useState(true);
@@ -77,7 +78,7 @@ const NewMap = () => {
 
   return (
     <Box sx={{ width: "100vw", height: "100vh", position: "relative" }}>
-      {/* Show countdown before map loads */}
+      {/* Show countdown before map loads /}
       {loading ? (
         <Box
           sx={{
@@ -92,13 +93,13 @@ const NewMap = () => {
         </Box>
       ) : (
         <Box id="map-container" sx={{ width: "100%", height: "100%" }}>
-          {/* Your map component should render here */}
+          {/* Your map component should render here /}
         </Box>
       )}
     </Box>
   );
 };
-
+*/
 // we take over the map component
 const drawerWidth = 240;
 
@@ -636,4 +637,4 @@ const Newmap = () => {
   );
 };
 
-export default NewMap;
+export default Newmap;
