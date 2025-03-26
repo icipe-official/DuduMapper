@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { styled, useTheme, alpha } from "@mui/material/styles";
@@ -24,6 +23,11 @@ import Collapse from "@mui/material/Collapse";
 import Checkbox from "@mui/material/Checkbox";
 import FolderIcon from "@mui/icons-material/Folder";
 import Link from "next/link";
+import DownloadIcon from "@mui/icons-material/Download";
+import CloseIcon from "@mui/icons-material/Close";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
 
 import { Map as OlMap, Tile, View } from "ol";
 import "ol/ol.css";
@@ -394,7 +398,13 @@ function Newmap() {
       <AppBar
         position="fixed"
         open={open}
-        sx={{ bgcolor: "white", margin: 0, padding: 0 }}
+        sx={{ 
+          bgcolor: "white", 
+          margin: 0, 
+          padding: 0,
+          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          borderBottom: "1px solid rgba(0,0,0,0.1)",
+        }}
       >
         <Toolbar>
           <IconButton
@@ -402,9 +412,29 @@ function Newmap() {
             aria-label="open drawer"
             onClick={handleDrawerOpen}
             edge="start"
-            sx={{ mr: 2, ...(open && { display: "none" }) }}
+            sx={{ 
+              mr: 2, 
+              ...(open && { display: "none" }),
+              bgcolor: 'rgba(0,0,0,0.04)',
+              '&:hover': {
+                bgcolor: 'rgba(0,0,0,0.08)',
+              },
+              width: '40px',
+              height: '40px',
+              border: '1px solid rgba(0,0,0,0.1)',
+              borderRadius: '8px',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'scale(1.05)',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              }
+            }}
           >
-            <MenuIcon />
+            <MenuIcon sx={{ 
+              fontSize: '24px',
+              color: 'primary.main',
+              fontWeight: 'bold'
+            }} />
           </IconButton>
           <Box sx={{ flexGrow: 1, mt: "6px" }}>
             <Link href="/">
@@ -427,7 +457,12 @@ function Newmap() {
           zIndex: (theme) => theme.zIndex.drawer + 3,
           width: drawerWidth,
           flexShrink: 0,
-          "& .MuiDrawer-paper": { width: drawerWidth, boxSizing: "border-box" },
+          "& .MuiDrawer-paper": { 
+            width: drawerWidth, 
+            boxSizing: "border-box",
+            borderRight: "1px solid rgba(0,0,0,0.1)",
+            boxShadow: "2px 0 4px rgba(0,0,0,0.1)",
+          },
         }}
         variant="persistent"
         anchor="left"
@@ -442,28 +477,6 @@ function Newmap() {
             )}
           </IconButton>
         </DrawerHeader>
-        <Divider />
-        <Box
-          sx={{
-            display: "flex",
-
-            justifyContent: "flex-start",
-            alignItems: "center",
-            pl: 2,
-            mb: 1,
-            mt: -4.7,
-          }}
-        >
-          <Link href="/">
-            <picture>
-              <img
-                src={"/Animals-Mosquito-icon.png"}
-                style={{ maxHeight: "70px", cursor: "pointer" }}
-                alt="Dudu Mapper logo"
-              />
-            </picture>
-          </Link>
-        </Box>
         <Divider />
         <List>
           <ListItem disablePadding>
@@ -489,7 +502,6 @@ function Newmap() {
                 display: "flex",
                 flexDirection: "column",
                 transition: "all 0.3s ease",
-                mb: downloadPopupOpen ? 2 : 0,
               }}
             >
               <ListItemButton
@@ -504,12 +516,13 @@ function Newmap() {
                 }}
               >
                 <ListItemIcon>
-                  <InboxIcon
+                  <DownloadIcon
                     sx={{ color: downloadPopupOpen ? green[500] : "inherit" }}
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Download"
+                  primary="Download Data"
+                  secondary="Export map data"
                   primaryTypographyProps={{
                     fontWeight: downloadPopupOpen ? 600 : 400,
                     color: downloadPopupOpen ? green[500] : "inherit",
@@ -521,28 +534,6 @@ function Newmap() {
                   <ChevronRightIcon />
                 )}
               </ListItemButton>
-              <Collapse
-                in={downloadPopupOpen}
-                timeout="auto"
-                unmountOnExit
-                sx={{
-                  position: "relative",
-                  zIndex: 1,
-                  backgroundColor: "background.paper",
-                  borderRadius: 1,
-                  boxShadow: downloadPopupOpen ? 1 : 0,
-                  mt: 0.5,
-                  mb: downloadPopupOpen ? 2 : 0,
-                }}
-              >
-                <Box sx={{ padding: "200px", transition: "all 0.3s ease" }}>
-                  <DownloadPopup
-                    isOpen={downloadPopupOpen}
-                    onClose={() => setDownloadPopupOpen(false)}
-                    cqlFilter={cqlFilter || ""}
-                  />
-                </Box>
-              </Collapse>
             </Box>
           </ListItem>
           <ListItem disablePadding>
@@ -559,6 +550,33 @@ function Newmap() {
       </Drawer>
       <Main open={open}>
         <DrawerHeader />
+        <Box
+          sx={{
+            position: 'fixed',
+            left: 0,
+            top: '80px',
+            zIndex: (theme) => theme.zIndex.drawer + 4,
+            display: open ? 'none' : 'block',
+            bgcolor: 'white',
+            borderRadius: '0 4px 4px 0',
+            boxShadow: '2px 0 4px rgba(0,0,0,0.1)',
+            p: 1.5,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+              bgcolor: 'rgba(0,0,0,0.04)',
+              transform: 'translateX(4px)',
+              boxShadow: '4px 0 8px rgba(0,0,0,0.15)',
+            }
+          }}
+          onClick={handleDrawerOpen}
+        >
+          <MenuIcon sx={{ 
+            color: 'primary.main',
+            fontSize: '28px',
+            display: 'block'
+          }} />
+        </Box>
         <div
           ref={mapElement}
           className="map-container"
@@ -570,6 +588,40 @@ function Newmap() {
           }}
         ></div>
         <Legend layerName={activeLayerName} />
+        
+        {/* Download Popup moved outside drawer */}
+        <Dialog
+          open={downloadPopupOpen}
+          onClose={() => setDownloadPopupOpen(false)}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: {
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              maxHeight: '80vh',
+              overflow: 'auto'
+            }
+          }}
+        >
+          <DialogTitle>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="h6">Download Map Data</Typography>
+              <IconButton onClick={() => setDownloadPopupOpen(false)}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+          </DialogTitle>
+          <DialogContent>
+            <DownloadPopup
+              isOpen={downloadPopupOpen}
+              onClose={() => setDownloadPopupOpen(false)}
+              cqlFilter={cqlFilter || ""}
+            />
+          </DialogContent>
+        </Dialog>
       </Main>
     </Box>
   );
