@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-"use client";
->>>>>>> feature/loader-left
 import React, { useState } from "react";
 import { Drawer, IconButton, List } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
