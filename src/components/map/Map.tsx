@@ -1,28 +1,5 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { styled, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import { useMediaQuery } from "@mui/material";
-// import DrawerComp from "./DrawerComp";
-import Link from "next/link"; // Ensure this is imported correctly
-
 import { Map as OlMap, Tile, View } from "ol";
 import "ol/ol.css";
 import "ol-ext/control/LayerSwitcher.css";
@@ -38,74 +15,8 @@ import { geoServerBaseUrl, fetchWMTSCapabilities } from "@/api/requests";
 import { fromLonLat } from "ol/proj";
 import { getTopLeft, getWidth } from "ol/extent";
 import { Options as LayerGroupOptions } from "ol/layer/Group";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-import { Collapse } from "@mui/material";
-import Checkbox from "@mui/material/Checkbox";
-import LayersIcon from "@mui/icons-material/Layers";
-import MapIcon from "@mui/icons-material/Map";
-import FolderIcon from "@mui/icons-material/Folder";
-import Tooltip from "@mui/material/Tooltip";
-import { alpha } from "@mui/material/styles";
-import DownloadPopup from "./DownloadPopup";
-import Button from "@mui/material/Button";
-import { Download } from "lucide-react";
-import Legend from "./Legend";
 
-const drawerWidth = 240;
-
-// Styled Main component for map container
-
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
-  open?: boolean;
-}>(({ theme, open }) => ({
-  flexGrow: 1,
-  transition: theme.transitions.create("margin", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  marginLeft: `-${drawerWidth}px`,
-  ...(open && {
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  }),
-}));
-
-// AppBar styling
-interface AppBarProps extends MuiAppBarProps {
-  open?: boolean;
-}
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})<AppBarProps>(({ theme, open }) => ({
-  backgroundColor: "white",
-  transition: theme.transitions.create(["margin", "width"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: `${drawerWidth}px`,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
-
-// Drawer Header
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
-}));
-
-// Projection and matrix calculations
+// Add these constants at the top of the file after imports
 const projection4326 = getProjection("EPSG:4326");
 const projectionExtent4326 = projection4326?.getExtent();
 const size4326 = projectionExtent4326
@@ -116,61 +27,24 @@ const resolutions4326 = projectionExtent4326
   : [];
 const matrixIds4326 = Array.from({ length: 19 }, (_, z) => `EPSG:4326:${z}`);
 
-const Newmap = () => {
-  const theme = useTheme();
+// Calculate resolutions and matrix IDs for EPSG:3857
+const projectionExtent3857 = projection3857?.getExtent();
+const size3857 = projectionExtent3857
+  ? getWidth(projectionExtent3857) / 256
+  : 0;
+const resolutions3857 = Array.from(
+  { length: 19 },
+  (_, z) => size3857 / Math.pow(2, z)
+);
+const matrixIds3857 = Array.from({ length: 19 }, (_, z) => `EPSG:3857:${z}`);
+
+function Newmap() {
   const mapRef = useRef<OlMap>();
   const mapElement = useRef<HTMLDivElement>(null);
   const [wmtsLayers, setWmtsLayers] = useState<any[]>([]);
   const [activeLayerName, setActiveLayerName] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
-  const [overlaysOpen, setOverlaysOpen] = useState(false);
-  const [layerGroups, setLayerGroups] = useState<Record<string, any[]>>({});
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
-    {}
-  );
-  const [downloadPopupOpen, setDownloadPopupOpen] = useState(false);
-  const [cqlFilter, setCqlFilter] = useState<string | null>(null);
 
-  const handleLayerSelection = (layer: any) => {
-    const filter = `layer_name='${layer.get("title")}'`; // Example filter
-    setCqlFilter(filter);
-  };
-
-  // Handle drawer states
-
-  // const [downloadPopupOpen, setDownloadPopupOpen] = useState(false);
-  // const [cqlFilter, setCqlFilter] = useState<string | null>(null);
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  const handleOverlaysClick = () => setOverlaysOpen(!overlaysOpen);
-
-  // Handle group expansion
-  const handleGroupClick = (groupTitle: string) => {
-    setExpandedGroups((prev) => ({
-      ...prev,
-      [groupTitle]: !prev[groupTitle],
-    }));
-  };
-
-  // Handle layer visibility
-  const handleLayerToggle = (layer: any) => {
-    if (layer) {
-      const newVisibility = !layer.getVisible();
-      layer.setVisible(newVisibility);
-      if (newVisibility) {
-        setActiveLayerName(layer.get("title"));
-      } else if (activeLayerName === layer.get("title")) {
-        setActiveLayerName(null);
-      }
-    }
-  };
-
+  // Single useEffect for layer fetching
   useEffect(() => {
     const fetchLayers = async () => {
       if (!geoServerBaseUrl) {
@@ -180,6 +54,7 @@ const Newmap = () => {
 
       try {
         const layers = await fetchWMTSCapabilities();
+        console.log("Fetched WMTS layers:", layers);
         setWmtsLayers(layers);
 
         // Organize layers by group
@@ -212,82 +87,90 @@ const Newmap = () => {
   useEffect(() => {
     if (!mapElement.current || !wmtsLayers.length) return;
 
-    const dynamicGroups = Object.entries(layerGroups).map(
-      ([groupTitle, groupLayers]) => {
-        const layers = groupLayers
-          .map((layer) => {
-            const projectionToUse = getProjection(layer.supportedCRS);
-            if (!projectionToUse) {
-              console.warn(
-                `Projection ${layer.supportedCRS} not found for layer ${layer.name}`
-              );
-              return null;
-            }
+    console.log("Initializing map with layers:", wmtsLayers);
 
-            return new TileLayer({
-              properties: {
-                title: layer.title,
-                type: "overlay",
-              },
-              visible: false,
-              source: new WMTS({
-                url: `${geoServerBaseUrl}/geoserver/gwc/service/wmts`,
-                layer: layer.name,
-                matrixSet: layer.matrixSet,
-                format: "image/png",
-                projection: projectionToUse,
-                tileGrid: new WMTSTileGrid({
-                  origin: [-180.0, 90.0],
-                  resolutions: [
-                    0.703125, 0.3515625, 0.17578125, 0.087890625, 0.0439453125,
-                    0.02197265625, 0.010986328125, 0.0054931640625,
-                    0.00274658203125, 0.001373291015625, 0.0006866455078125,
-                    0.00034332275390625, 0.000171661376953125,
-                    0.0000858306884765625,
-                  ],
-                  matrixIds: Array.from(
-                    { length: 14 },
-                    (_, i) => `EPSG:4326:${i}`
-                  ),
-                  tileSize: [256, 256],
-                  extent: [-180.0, -90.0, 180.0, 90.0],
-                }),
-                style: "",
-                wrapX: true,
-              }),
-            });
-          })
-          .filter((layer): layer is TileLayer<any> => layer !== null);
+    // Create dynamic WMTS layers
+    const dynamicLayers = wmtsLayers
+      .map((layer: any) => {
+        const projectionToUse = getProjection(layer.supportedCRS);
+        if (!projectionToUse) {
+          console.warn(
+            `Projection ${layer.supportedCRS} not found for layer ${layer.name}`
+          );
+          return null;
+        }
 
-        return new LayerGroup({
+        return new TileLayer({
           properties: {
-            title: groupTitle,
-            type: "group",
+            title: layer.title,
+            type: "overlay",
           },
-          layers: new Collection(layers),
+          visible: false,
+          source: new WMTS({
+            url: `${geoServerBaseUrl}/geoserver/gwc/service/wmts`,
+            layer: layer.name,
+            matrixSet: layer.matrixSet,
+            format: "image/png",
+            projection: projectionToUse,
+            tileGrid: new WMTSTileGrid({
+              origin: [-180.0, 90.0],
+              resolutions: [
+                0.703125, 0.3515625, 0.17578125, 0.087890625, 0.0439453125,
+                0.02197265625, 0.010986328125, 0.0054931640625,
+                0.00274658203125, 0.001373291015625, 0.0006866455078125,
+                0.00034332275390625, 0.000171661376953125,
+                0.0000858306884765625,
+              ],
+              matrixIds: Array.from({ length: 14 }, (_, i) => `EPSG:4326:${i}`),
+              tileSize: [256, 256],
+              extent: [-180.0, -90.0, 180.0, 90.0],
+            }),
+            style: "",
+            wrapX: true,
+            tileLoadFunction: (tile: any, src: string) => {
+              console.log("Loading tile from:", src);
+              const img = tile.getImage();
+              img.onerror = () => {
+                console.error("Tile load error:", src);
+              };
+              img.onload = () => {
+                console.log("Tile loaded successfully:", src);
+              };
+              img.src = src;
+            },
+          }),
         });
-      }
-    );
+      })
+      .filter((layer) => layer !== null);
 
+    // Create base OSM layer
     const osmLayer = new TileLayer({
-      source: new OSM(),
+      source: osmSource,
       properties: {
         title: "OpenStreetMap",
         type: "base",
       },
     });
 
+    // Create layer groups
+    const baseGroup = new LayerGroup({
+      properties: {
+        title: "Base Maps",
+      },
+      layers: [osmLayer],
+    } as LayerGroupOptions);
+
+    const duduGroup = new LayerGroup({
+      properties: {
+        title: "Dudu Layers",
+      },
+      layers: new Collection(dynamicLayers),
+    } as LayerGroupOptions);
+
+    // Initialize map
     const initialMap = new OlMap({
       target: mapElement.current,
-      layers: [
-        new LayerGroup({
-          properties: {
-            title: "Base Maps",
-          },
-          layers: [osmLayer],
-        }),
-        ...dynamicGroups,
-      ],
+      layers: [baseGroup, duduGroup],
       view: new View({
         projection: "EPSG:4326",
         center: [37.9062, -1.2921],
@@ -298,9 +181,36 @@ const Newmap = () => {
       }),
     });
 
+    // Add layer switcher
+    const layerSwitcher = new LayerSwitcher({
+      startActive: true,
+      groupSelectStyle: "children",
+    } as any);
+    initialMap.addControl(layerSwitcher);
+
+    // Add visibility listeners
+    dynamicLayers.forEach((layer) => {
+      if (layer) {
+        layer.on("change:visible", (event: any) => {
+          const isVisible = event.target.getVisible();
+          const layerName = event.target.get("title");
+
+          if (isVisible) {
+            setActiveLayerName(layerName);
+            console.log(`Layer ${layerName} is now visible`);
+          } else if (activeLayerName === layerName) {
+            setActiveLayerName(null);
+          }
+        });
+      }
+    });
+
     mapRef.current = initialMap;
 
     return () => {
+      osmSource.un("tileloadstart", incrementLoading);
+      osmSource.un("tileloadend", decrementLoading);
+      osmSource.un("tileloaderror", decrementLoading);
       initialMap.setTarget(undefined);
     };
   }, [wmtsLayers, layerGroups]);
@@ -383,153 +293,16 @@ const Newmap = () => {
   );
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        open={open}
-        sx={{ bgcolor: "white", margin: "0", padding: "0" }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: "none" }) }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Box sx={{ flexGrow: 1, mt: "6px" }}>
-            <Link href="/">
-              <picture>
-                <img
-                  src={"/Animals-Mosquito-icon.png"}
-                  style={{ maxHeight: "70px", cursor: "pointer" }}
-                  alt="Dudu Mapper logo"
-                />
-              </picture>
-            </Link>
-          </Box>
-          <Typography variant="h6" noWrap component="div">
-            Dudumapper
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setDownloadPopupOpen(true)}
-            sx={{ ml: 2 }}
-          >
-            Open Download
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            // position: "relative",
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            pl: 2,
-            mb: 1,
-            mt: -4.7,
-          }}
-        >
-          <Link href="/">
-            <picture>
-              <img
-                src={"/Animals-Mosquito-icon.png"}
-                style={{ maxHeight: "70px", cursor: "pointer" }}
-                alt="Dudu Mapper logo"
-              />
-            </picture>
-          </Link>
-        </Box>
-        <Divider />
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Layer Controls" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Base Maps" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton onClick={handleOverlaysClick}>
-              <ListItemIcon>
-                <MailIcon />
-              </ListItemIcon>
-              <ListItemText primary="Overlays" />
-              {overlaysOpen ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton onClick={() => setDownloadPopupOpen(true)}>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Download" />
-            </ListItemButton>
-          </ListItem>
-          {renderLayerControls()}
-        </List>
-      </Drawer>
-
-      <Main open={open}>
-        <DrawerHeader />
-        <div
-          ref={mapElement}
-          className="map-container"
-          id="map-container"
-          style={{
-            width: "100%",
-            height: "calc(100vh - 64px)",
-            position: "relative",
-          }}
-        />
-
-        <DownloadPopup
-          isOpen={downloadPopupOpen}
-          onClose={() => setDownloadPopupOpen(false)}
-          cqlFilter={cqlFilter || ""}
-        />
-
-        <Legend layerName={activeLayerName} />
-      </Main>
-    </Box>
+    <div style={{ display: "flex", height: "calc(100vh - 70px)" }}>
+      <div
+        style={{ flexGrow: 1, position: "relative" }}
+        ref={mapElement}
+        className="map-container"
+        id="map-container"
+      ></div>
+      <Legend layerName={activeLayerName} />
+    </div>
   );
-};
+}
 
 export default Newmap;
