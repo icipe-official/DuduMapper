@@ -8,33 +8,10 @@ import Box from "@mui/material/Box";
 import NavLink from "./navlink";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { BASE_PATH } from "@/lib/constants";
-//import { useNavigate } from "react-router-dom";
-//import { Link } from "react-router-dom";
 const Navbar: React.FC = () => {
   const theme = useTheme();
-  //const navigate = useNavigate();
-  const navigateTo = (path: string) => {
-    window.location.href = path;
-  };
   const navMenuItems: any[] = [];
-
-  //nav items calling//
-  navMenuItems.push(
-    <NavLink
-      key="About"
-      url="./about"
-      text="About" //trying onclick for handle window shift request
-      //onClick={() => navigateTo("/About")}
-    />
-  );
-  navMenuItems.push(
-    <NavLink
-      key="Register"
-      url="./auth/register"
-      text="Register" //trying onclick for handle window shift request
-      //onClick={() => navigateTo("/Register")}
-    />
-  );
+  navMenuItems.push(<NavLink key="About" url="/about" text="About" />);
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -45,8 +22,6 @@ const Navbar: React.FC = () => {
           position="fixed"
           sx={{ bgcolor: "white", margin: "0", padding: "0" }}
         >
-          {/* about link click function*/}
-
           <Toolbar>
             <>
               <Box sx={{ flexGrow: 1, mt: "6px" }}>
