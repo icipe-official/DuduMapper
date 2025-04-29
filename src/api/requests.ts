@@ -587,7 +587,10 @@ export async function fetchWMTSCapabilities(): Promise<WMTSLayer[]> {
     }
 
     // Create a map of normalized layer to group
-    const layerToGroupMap = new Map<string, { groupName: string; groupTitle: string }>();
+    const layerToGroupMap = new Map<
+      string,
+      { groupName: string; groupTitle: string }
+    >();
 
     if (layerGroups && layerGroups.length > 0) {
       layerGroups.forEach((group: LayerGroup) => {
@@ -604,49 +607,50 @@ export async function fetchWMTSCapabilities(): Promise<WMTSLayer[]> {
     }
 
     // Enrich WMTS layers with group information
-    const enrichedLayers = wmtsLayers.map((layer: WMTSLayer) => {
-      const normalizedLayerName = normalizeName(
-        layer.name.includes(":") ? layer.name.split(":")[1] : layer.name
-      );
+    const enrichedLayers = wmtsLayers
+      .map((layer: WMTSLayer) => {
+        const normalizedLayerName = normalizeName(
+          layer.name.includes(":") ? layer.name.split(":")[1] : layer.name
+        );
 
-      console.log(
-        `Processing layer: ${layer.name} -> Normalized name: ${normalizedLayerName}`,
-        `Found in group map: ${layerToGroupMap.has(normalizedLayerName)}`
-      );
+        console.log(
+          `Processing layer: ${layer.name} -> Normalized name: ${normalizedLayerName}`,
+          `Found in group map: ${layerToGroupMap.has(normalizedLayerName)}`
+        );
 
-      const group = layerToGroupMap.get(normalizedLayerName);
+        const group = layerToGroupMap.get(normalizedLayerName);
 
-      // Only mark as ungrouped if:
-      // 1. The layer is not found in any group AND
-      // 2. The layer name doesn't match any group names (to avoid including group containers)
-      const isGroupContainer = layerGroups.some(g => 
-        normalizeName(g.name) === normalizedLayerName
-      );
+        // Only mark as ungrouped if:
+        // 1. The layer is not found in any group AND
+        // 2. The layer name doesn't match any group names (to avoid including group containers)
+        const isGroupContainer = layerGroups.some(
+          (g) => normalizeName(g.name) === normalizedLayerName
+        );
 
-      if (isGroupContainer) {
-        console.log(`Skipping group container: ${layer.name}`);
-        return null;
-      }
+        if (isGroupContainer) {
+          console.log(`Skipping group container: ${layer.name}`);
+          return null;
+        }
 
-      if (group) {
+        if (group) {
+          return {
+            ...layer,
+            group: {
+              groupName: group.groupName,
+              groupTitle: group.groupTitle,
+            },
+          };
+        }
+
         return {
           ...layer,
           group: {
-            groupName: group.groupName,
-            groupTitle: group.groupTitle,
+            groupName: "Ungrouped",
+            groupTitle: "Ungrouped Layers",
           },
         };
-      }
-
-      return {
-        ...layer,
-        group: {
-          groupName: "Ungrouped",
-          groupTitle: "Ungrouped Layers",
-        },
-      };
-    })
-    .filter((layer): layer is WMTSLayer => layer !== null);
+      })
+      .filter((layer): layer is WMTSLayer => layer !== null);
 
     console.log("Final enriched layers:", enrichedLayers);
     return enrichedLayers;

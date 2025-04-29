@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -17,13 +17,13 @@ import {
   IconButton,
   Tooltip,
   Checkbox,
-} from '@mui/material';
+} from "@mui/material";
 import {
   FormatListBulleted as FormatListIcon,
   HelpOutline as HelpIcon,
   Download as DownloadIcon,
   Clear as ClearIcon,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
 interface DownloadPopupProps {
   isOpen: boolean;
@@ -36,18 +36,18 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
   onClose,
   cqlFilter,
 }) => {
-  const [format, setFormat] = useState('shp');
+  const [format, setFormat] = useState("shp");
   const [selectedLayers, setSelectedLayers] = useState<string[]>([]);
-  const [areaOfInterest, setAreaOfInterest] = useState('');
+  const [areaOfInterest, setAreaOfInterest] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   const formats = [
-    { value: 'shp', label: 'Shapefile (SHP)' },
-    { value: 'geojson', label: 'GeoJSON' },
-    { value: 'kml', label: 'KML' },
-    { value: 'csv', label: 'CSV' },
+    { value: "shp", label: "Shapefile (SHP)" },
+    { value: "geojson", label: "GeoJSON" },
+    { value: "kml", label: "KML" },
+    { value: "csv", label: "CSV" },
   ];
 
   const handleFormatChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -55,16 +55,14 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
   };
 
   const handleLayerToggle = (layer: string) => {
-    setSelectedLayers(prev =>
-      prev.includes(layer)
-        ? prev.filter(l => l !== layer)
-        : [...prev, layer]
+    setSelectedLayers((prev) =>
+      prev.includes(layer) ? prev.filter((l) => l !== layer) : [...prev, layer]
     );
   };
 
   const handleDownload = async () => {
     if (selectedLayers.length === 0) {
-      setError('Please select at least one layer to download');
+      setError("Please select at least one layer to download");
       return;
     }
 
@@ -74,20 +72,20 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
     try {
       // Here you would implement your actual download logic
       // For example:
-      // await downloadLayers({
+      //await downloadLayers({
       //   layers: selectedLayers,
       //   format,
       //   areaOfInterest,
       //   cqlFilter
       // });
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       setSuccess(true);
       onClose();
     } catch (err) {
-      setError('Failed to download data. Please try again.');
+      setError("Failed to download data. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -95,8 +93,8 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
 
   const handleClear = () => {
     setSelectedLayers([]);
-    setFormat('shp');
-    setAreaOfInterest('');
+    setFormat("shp");
+    setAreaOfInterest("");
     setError(null);
     setSuccess(false);
   };
@@ -107,7 +105,7 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
         {/* Format Selection */}
         <Grid item xs={12}>
           <Paper sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <FormatListIcon sx={{ mr: 1 }} />
               <Typography variant="subtitle1">Download Format</Typography>
               <Tooltip title="Choose the file format for your download">
@@ -117,11 +115,7 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
               </Tooltip>
             </Box>
             <FormControl fullWidth>
-              <Select
-                value={format}
-                onChange={handleFormatChange}
-                displayEmpty
-              >
+              <Select value={format} onChange={handleFormatChange} displayEmpty>
                 {formats.map((f) => (
                   <MenuItem key={f.value} value={f.value}>
                     {f.label}
@@ -139,7 +133,7 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
               Select Layers
             </Typography>
             <FormGroup>
-              {['Layer 1', 'Layer 2', 'Layer 3'].map((layer) => (
+              {["Layer 1", "Layer 2", "Layer 3"].map((layer) => (
                 <FormControlLabel
                   key={layer}
                   control={
@@ -174,7 +168,7 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
 
         {/* Action Buttons */}
         <Grid item xs={12}>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
             <Button
               startIcon={<ClearIcon />}
               onClick={handleClear}
@@ -184,7 +178,9 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
             </Button>
             <Button
               variant="contained"
-              startIcon={loading ? <CircularProgress size={20} /> : <DownloadIcon />}
+              startIcon={
+                loading ? <CircularProgress size={20} /> : <DownloadIcon />
+              }
               onClick={handleDownload}
               disabled={loading || selectedLayers.length === 0}
             >

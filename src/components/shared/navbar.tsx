@@ -11,7 +11,11 @@ import { BASE_PATH } from "@/lib/constants";
 const Navbar: React.FC = () => {
   const theme = useTheme();
   const navMenuItems: any[] = [];
-  navMenuItems.push(<NavLink key="About" url="/about" text="About" />);
+
+  navMenuItems.push(<NavLink key="About" url="./about" text="About" />);
+  navMenuItems.push(
+    <NavLink key="Register" url="./auth/register" text="Register" />
+  );
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -28,7 +32,7 @@ const Navbar: React.FC = () => {
                 <Link href="/">
                   <picture>
                     <img
-                      src={"/Animals-Mosquito-icon.png"}
+                      src={`${BASE_PATH}/Animals-Mosquito-icon.png`}
                       style={{ maxHeight: "70px", cursor: "pointer" }}
                       alt="Dudu Mapper logo"
                     />
