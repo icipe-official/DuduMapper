@@ -88,7 +88,28 @@ const SignIn: React.FC<SignProps> = ({ onLoginSuccess }) => {
       setError(err.message || "Invalid credentials. Try again.");
     }
   };
+  /*
+//session logout
+// const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
 
+    const response = await fetch("/api/session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Redirect after successful login (you can change this URL as needed)
+      router.push("/dashboard");
+    } else {
+      setError(data.message);
+    }
+  };*/
   return (
     <div
       style={{
