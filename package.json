@@ -23,6 +23,7 @@
     "bcrypt": "^5.1.1",
     "betterknown": "^1.0.3",
     "colormap": "^2.3.2",
+    "cookie": "^1.0.2",
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "fast-xml-parser": "^5.2.1",
     "framer-motion": "^12.9.1",
