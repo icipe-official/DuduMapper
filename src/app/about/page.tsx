@@ -181,6 +181,7 @@ const About = () => {
                 ].map((item, index) => (
                   <Box
                     key={index}
+                    ro
                     sx={{ display: "flex", alignItems: "center", mb: 2 }}
                   >
                     <Box sx={{ mr: 2, color: "#2E7D32" }}>{item.icon}</Box>

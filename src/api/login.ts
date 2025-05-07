@@ -1,6 +1,6 @@
 // pages/api/login.ts
 import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/generated/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 //import { NextResponse } from "next/server";
@@ -20,9 +20,12 @@ export default async function handler(
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
   }
-
+  // Optional: Validate email format
+  if (!/\S+@\S+\.\S+/.test(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email },
     });
 

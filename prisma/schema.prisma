@@ -8,10 +8,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model users {
   id                Int      @id @default(autoincrement())
-  email             String   @unique
-  password          String
-  createdAt         DateTime @default(now())
-  wantsNotification Boolean  @default(false)
+  email             String   @unique @db.VarChar(100)
+  password          String   @db.VarChar(255)
+  wantsnotification Boolean? @default(true)
 }
