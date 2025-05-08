@@ -1,17 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    // Parse the request body
-    const body = await request.json();
-    const { email, password } = body;
+    const { email, password } = await req.json();
 
-    // Validate inputs
     if (!email || !password) {
       return NextResponse.json(
         { message: "Email and password are required" },
@@ -19,15 +16,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Optional: Validate email format
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      return NextResponse.json(
-        { message: "Invalid email format" },
-        { status: 400 }
-      );
-    }
-
-    // Find the user
+    // Check if user exists
     const user = await prisma.users.findUnique({
       where: { email },
     });
@@ -39,7 +28,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify password
+    // Check if password matches
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -48,25 +37,25 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate JWT
+    // Generate JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || "secret",
+      process.env.JWT_SECRET || "secret", // Use a stronger secret in production
       { expiresIn: "1h" }
     );
 
-    // Return successful response
+    // Set JWT token in an HTTP-only cookie
     const response = NextResponse.json(
       { message: "Login successful" },
       { status: 200 }
     );
-    //cookies setting
+
     response.cookies.set("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-      maxAge: 60 * 60, // 1 hour in seconds
+      httpOnly: true, // Ensure the cookie cannot be accessed via JavaScript
+      secure: process.env.NODE_ENV === "production", // Secure cookies in production
+      sameSite: "strict", // CSRF protection
+      path: "/", // Cookie is available across the entire site
+      maxAge: 60 * 60, // Cookie expires in 1 hour
     });
 
     return response;

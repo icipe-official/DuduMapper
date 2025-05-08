@@ -10,11 +10,11 @@ import { motion } from "framer-motion";
 //import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-interface SignProps {
+/*interface SignProps {
   onLoginSuccess: () => void;
 }
-
-const SignIn: React.FC<SignProps> = ({ onLoginSuccess }) => {
+*/
+const SignIn: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -82,7 +82,7 @@ const SignIn: React.FC<SignProps> = ({ onLoginSuccess }) => {
 
       alert("Signed in successfully!");
       router.push("/"); //redirect to dashboard
-      onLoginSuccess();
+      //onLoginSuccess();
     } catch (err: any) {
       console.error("Sign in failed", err);
       setError(err.message || "Invalid credentials. Try again.");

@@ -12,9 +12,9 @@ const Navbar: React.FC = () => {
   const theme = useTheme();
   const navMenuItems: any[] = [];
 
-  navMenuItems.push(<NavLink key="About" url="./about" text="About" />);
+  navMenuItems.push(<NavLink key="About" url="/about" text="About" />);
   navMenuItems.push(
-    <NavLink key="Register" url="./auth/register" text="Register" />
+    <NavLink key="Register" url="/auth/register" text="Register" />
   );
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
