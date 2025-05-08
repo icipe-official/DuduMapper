@@ -15,6 +15,7 @@ import {
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+
 //import { useNavigate } from "react-router-dom";
 interface RegisterProps {
   onRegisterSuccess: () => void;
@@ -70,15 +71,18 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
       const data = await res.json();
 
       if (!res.ok) {
+        //console.error("Registration failed:", data.error || "unknow error");
+        //alert("registration failed" + data.error);
         setError(data.error || "Registration failed.");
         return;
       }
 
       alert("User registered successfully!");
-      onRegisterSuccess(); // You can navigate to SignIn or Homepage here
+      onRegisterSuccess();
+      router.push("/"); // You can navigate to SignIn or Homepage here
     } catch (err) {
       console.error("Registration failed:", err);
-      setError("Something went wrong. Please try again.");
+      //setError("Something went wrong. Please try again.");
     }
   };
 
