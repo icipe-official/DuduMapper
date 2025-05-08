@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./Legend.css";
-import { getLegendUrl } from "@/api/requests";
+import { getLegendUrl } from "@/app/api/requests";
 
 // Legend component to show and hide legends based on layer visibility
 interface LegendProps {
@@ -30,22 +30,24 @@ const Legend: React.FC<LegendProps> = ({ layerName }) => {
       // Create legend URL and add to legends array
       const legendUrl = getLegendUrl(layerName);
       if (!legendUrl) {
-        setError('Unable to create legend URL');
+        setError("Unable to create legend URL");
         return;
       }
 
-      console.log('Attempting to load legend from:', legendUrl);
+      console.log("Attempting to load legend from:", legendUrl);
 
-      setLegends([{
-        url: legendUrl,
-        title: layerName.split(':').pop() || layerName
-      }]);
+      setLegends([
+        {
+          url: legendUrl,
+          title: layerName.split(":").pop() || layerName,
+        },
+      ]);
 
       // Verify the legend image loads
       const img = new Image();
       img.onerror = () => {
         console.error(`Failed to load legend image for ${layerName}`);
-        console.error('Failed URL:', legendUrl);
+        console.error("Failed URL:", legendUrl);
         setError(`Unable to load legend for ${layerName}`);
       };
       img.onload = () => {
@@ -53,8 +55,8 @@ const Legend: React.FC<LegendProps> = ({ layerName }) => {
       };
       img.src = legendUrl;
     } catch (err) {
-      console.error('Error setting up legend:', err);
-      setError('Error setting up legend');
+      console.error("Error setting up legend:", err);
+      setError("Error setting up legend");
     }
   }, [layerName]);
 
@@ -69,11 +71,11 @@ const Legend: React.FC<LegendProps> = ({ layerName }) => {
             {error ? (
               <div className="legend-error">{error}</div>
             ) : (
-              <img 
-                src={legend.url} 
+              <img
+                src={legend.url}
                 alt={`Legend for ${legend.title}`}
                 onError={(e) => {
-                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.style.display = "none";
                   setError(`Failed to load legend image for ${legend.title}`);
                 }}
               />

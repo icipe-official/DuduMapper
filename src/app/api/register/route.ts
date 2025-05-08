@@ -29,7 +29,10 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ message: "User created", user });
+    return NextResponse.json(
+      { message: "User created", user },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error creating user:", error);
     return NextResponse.json({ error: "Error creating user" }, { status: 500 });
