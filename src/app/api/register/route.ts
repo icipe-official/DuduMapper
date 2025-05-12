@@ -7,9 +7,16 @@ const prisma = new PrismaClient();
 export async function POST(req: Request) {
   try {
     const { email, password, wantsNotification = false } = await req.json();
-
+    // Validate inputs
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: "Email and password are required" },
+        { status: 400 }
+      );
+    }
     // Check if the user already exists
     const existingUser = await prisma.users.findUnique({ where: { email } });
+
     if (existingUser) {
       return NextResponse.json(
         { error: "Email already exists" },
