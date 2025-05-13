@@ -22,7 +22,7 @@ const SignIn: React.FC = () => {
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   //added line
-  const { login } = useAuth();
+  //const { login } = useAuth();
 
   //EMAIL VALIDATION
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {

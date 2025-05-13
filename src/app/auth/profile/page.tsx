@@ -2,14 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/context";
+import { useRouter } from "next/navigation";
 
 export default function ProfileMenu() {
   const { user, logout, updateUserName } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [setting, setSetting] = useState();
   const [name, setName] = useState(user?.name || "");
   const [loading, setLoading] = useState(true); // For showing loading state while fetching user data
 
+  const router = useRouter();
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -32,10 +35,18 @@ export default function ProfileMenu() {
   }, [updateUserName]);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
+  const toggleDropdownMenu = () => setIsOpen(!isOpen);
 
   const handleNameSave = () => {
     updateUserName(name); // Update the user's name in context
     setEditing(false);
+  };
+  //logout function
+  const handleLogout = async () => {
+    await fetch("/api/logout", { method: "POST" });
+    setUser(null); // Clear context or local state
+    router.push("/"); // Redirect to home or login
+    localStorage.removeItem("user");
   };
 
   if (loading) {
@@ -86,7 +97,7 @@ export default function ProfileMenu() {
                 </button>
                 <button
                   onClick={() => setEditing(false)}
-                  className="text-sm text-gray-600 hover:underline"
+                  className="text-sm tex<MenuItem Menut-gray-600 hover:underline"
                 >
                   Cancel
                 </button>
@@ -95,11 +106,15 @@ export default function ProfileMenu() {
           )}
 
           {/* Always show Settings and Logout */}
-          <button className="mt-4 w-full text-left text-gray-700 hover:underline">
+          <button
+            onClick={toggleDropdownMenu}
+            className="mt-4 w-full text-left text-gray-700 hover:underline"
+          >
             Settings
           </button>
+
           <button
-            onClick={logout}
+            onClick={handleLogout}
             className="mt-2 w-full text-left text-red-600 hover:underline"
           >
             Logout
@@ -108,4 +123,7 @@ export default function ProfileMenu() {
       )}
     </div>
   );
+}
+function setUser(arg0: null) {
+  throw new Error("Function not implemented.");
 }

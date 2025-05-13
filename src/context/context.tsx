@@ -7,11 +7,12 @@ import {
   useState,
   ReactNode,
 } from "react";
-
+import { useRouter } from "next/navigation";
 type User = {
   name: string;
   email: string;
 };
+//
 
 type AuthContextType = {
   user: User | null;
@@ -47,9 +48,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
   };
+  //added line
 
-  const logout = () => {
+  const router = useRouter();
+  const logout = async () => {
     setUser(null);
+    router.push("/");
+    localStorage.removeItem("token");
     localStorage.removeItem("user");
   };
 
