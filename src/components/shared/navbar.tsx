@@ -16,6 +16,7 @@ import MenuItem from "@mui/material/MenuItem";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { useRouter } from "next/navigation";
 
 const Navbar: React.FC = () => {
   const theme = useTheme();
@@ -25,6 +26,7 @@ const Navbar: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [editingName, setEditingName] = React.useState(false);
   const [newName, setNewName] = React.useState(user?.name || "");
+  const [setting, setSetting] = React.useState();
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -39,7 +41,16 @@ const Navbar: React.FC = () => {
     updateUserName(newName);
     setEditingName(false);
   };
+  //lets choose  handle logo click
+  const router = useRouter();
 
+  const handleLogoClick = () => {
+    if (!user) {
+      alert("Please sign in first");
+      return;
+    }
+    router.push("/");
+  };
   const navMenuItems: any[] = [];
   navMenuItems.push(<NavLink key="About" url="/about" text="About" />);
   if (!user) {
@@ -57,7 +68,8 @@ const Navbar: React.FC = () => {
         >
           <Toolbar>
             <Box sx={{ flexGrow: 1, mt: "6px" }}>
-              <Link href="/">
+              <div onClick={handleLogoClick}>
+                <Link href="/"></Link>
                 <picture>
                   <img
                     src={`${BASE_PATH}/Animals-Mosquito-icon.png`}
@@ -65,7 +77,7 @@ const Navbar: React.FC = () => {
                     alt="Dudu Mapper logo"
                   />
                 </picture>
-              </Link>
+              </div>
             </Box>
 
             {isMobile ? (
@@ -78,7 +90,7 @@ const Navbar: React.FC = () => {
                     <IconButton
                       size="large"
                       edge="end"
-                      color="inherit"
+                      color="success"
                       onClick={handleMenuOpen}
                     >
                       <AccountCircle />
@@ -106,7 +118,7 @@ const Navbar: React.FC = () => {
                           Edit Name ({user.email || "Unnamed"})
                         </MenuItem>
                       )}
-                      <MenuItem /*onClick={//setting}*/>Setting</MenuItem>
+                      <MenuItem>Setting</MenuItem>
                       <MenuItem onClick={logout}>Logout</MenuItem>
                     </Menu>
                   </>

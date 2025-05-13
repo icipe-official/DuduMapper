@@ -25,5 +25,5 @@ export function authentication(req: NextRequest) {
 
 // Define paths where the middleware should be applied
 export const config = {
-  matcher: ["/map/"], // This will protect the homepage ("/") and redirect to login if not authenticated
+  matcher: ["/", "/profile"], // This will protect the homepage ("/") and redirect to login if not authenticated
 };

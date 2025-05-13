@@ -18,11 +18,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/context";
 
 //import { useNavigate } from "react-router-dom";
-interface RegisterProps {
+/*interface RegisterProps {
   onRegisterSuccess: () => void;
 }
-
-const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
+*/
+const Register: React.FC = ({}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -81,9 +81,10 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
         return;
       }
       //added line of code code
-      login({ email: email, name: data.user });
+      //login({ email: data.user.email, name: data.user.name });
       alert("User registered successfully!");
-      //onRegisterSuccess();
+      login({ email: data.user.email, name: data });
+
       router.push("/profile"); // You can navigate to SignIn or Homepage here
     } catch (err) {
       console.error("Registration failed:", err);
