@@ -15,12 +15,14 @@ import {
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/context";
+
 //import { useNavigate } from "react-router-dom";
-interface RegisterProps {
+/*interface RegisterProps {
   onRegisterSuccess: () => void;
 }
-
-const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
+*/
+const Register: React.FC = ({}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -28,6 +30,9 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [wantsNotification, setWantsNotification] = useState(false);
+  //added line
+  const { login } = useAuth();
+  // const [name, setName] = useState("");
 
   //email validation
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,15 +75,20 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess }) => {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Registration failed.");
+        //console.error("Registration failed:", data.error || "unknow error");
+        //alert("registration failed" + data.error);
+        setError(data.error || "Registration failed" + " details required");
         return;
       }
-
+      //added line of code code
+      //login({ email: data.user.email, name: data.user.name });
       alert("User registered successfully!");
-      onRegisterSuccess(); // You can navigate to SignIn or Homepage here
+      login({ email: data.user.email, name: data });
+
+      router.push("/profile"); // You can navigate to SignIn or Homepage here
     } catch (err) {
       console.error("Registration failed:", err);
-      setError("Something went wrong. Please try again.");
+      //setError("Something went wrong. Please try again.");
     }
   };
 

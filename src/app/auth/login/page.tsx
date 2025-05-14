@@ -9,17 +9,20 @@ import { TextField, Button, Typography, Container, Box } from "@mui/material";
 import { motion } from "framer-motion";
 //import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/context";
 
-interface SignProps {
+/*interface SignProps {
   onLoginSuccess: () => void;
 }
-
-const SignIn: React.FC<SignProps> = ({ onLoginSuccess }) => {
+*/
+const SignIn: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  //added line
+  //const { login } = useAuth();
 
   //EMAIL VALIDATION
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +70,7 @@ const SignIn: React.FC<SignProps> = ({ onLoginSuccess }) => {
   };*/
   const handleEmailSignIn = async () => {
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("/api/session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,14 +83,31 @@ const SignIn: React.FC<SignProps> = ({ onLoginSuccess }) => {
         throw new Error(data.message || "Login failed");
       }
 
-      alert("Signed in successfully!");
-      router.push("/"); //redirect to dashboard
-      onLoginSuccess();
+      // Fetch the session info (user data)
+      const sessionResponse = await fetch("/api/session", {
+        method: "GET",
+        credentials: "same-origin", // Important for cookies to be sent
+      });
+
+      if (!sessionResponse.ok) {
+        throw new Error("Failed to fetch session");
+      }
+
+      const sessionData = await sessionResponse.json();
+
+      if (sessionData.user) {
+        // Store user info in context or localStorage, if necessary
+        // Example: login({ email: sessionData.user.email, name: sessionData.user.name });
+
+        alert("Signed in successfully!");
+        router.push("/profile"); // Redirect to profile page
+      }
     } catch (err: any) {
       console.error("Sign in failed", err);
       setError(err.message || "Invalid credentials. Try again.");
     }
   };
+
   /*
 //session logout
 // const handleLogin = async (e: React.FormEvent) => {

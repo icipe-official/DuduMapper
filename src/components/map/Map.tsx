@@ -41,7 +41,7 @@ import Collection from "ol/Collection";
 import OSM from "ol/source/OSM";
 import { get as getProjection } from "ol/proj";
 import { getTopLeft, getWidth } from "ol/extent";
-import { geoServerBaseUrl, fetchWMTSCapabilities } from "@/api/requests";
+import { geoServerBaseUrl, fetchWMTSCapabilities } from "@/app/api/requests";
 import Legend from "./Legend";
 import { green } from "@mui/material/colors";
 import DownloadPopup from "./DownloadPopup";
