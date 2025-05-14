@@ -8,67 +8,77 @@ import {
   ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
+
 type User = {
-  name: string;
   email: string;
 };
-//
 
 type AuthContextType = {
   user: User | null;
-  login: (userData: User) => void;
-  logout: () => void;
-  updateUserName: (name: string) => void;
+  loading: boolean; // Added loading state
+  login: (userData: User) => Promise<void>; // Made async
+  logout: () => Promise<void>; // Made async
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true); // Start with loading true
+  const router = useRouter();
 
-  //check if session is active, user
   useEffect(() => {
     const fetchUser = async () => {
+      setLoading(true); // Set loading when starting
       try {
         const res = await fetch("/api/me");
         if (!res.ok) throw new Error("Not authenticated");
 
         const data = await res.json();
-        setUser(data.user); // assuming API returns { user: { name, email } }
+        setUser(data.user);
       } catch (error) {
         console.log("No active session");
         setUser(null);
+      } finally {
+        setLoading(false); // Always set loading to false when done
       }
     };
 
     fetchUser();
   }, []);
 
-  const login = (userData: User) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
-  };
-  //added line
-
-  const router = useRouter();
-  const logout = async () => {
-    setUser(null);
-    router.push("/");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  const login = async (userData: User): Promise<void> => {
+    try {
+      // Set user in state
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Login failed:", error);
+      return Promise.reject(error);
+    }
   };
 
-  const updateUserName = (name: string) => {
-    setUser((prev) => {
-      if (!prev) return null;
-      const updatedUser = { ...prev, name };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      return updatedUser;
-    });
+  const logout = async (): Promise<void> => {
+    try {
+      // Call your logout API
+      await fetch("/api/logout", { method: "POST" });
+
+      // Clear user state
+      setUser(null);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      router.push("/");
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Logout failed:", error);
+      return Promise.reject(error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUserName }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

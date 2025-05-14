@@ -75,20 +75,19 @@ const Register: React.FC = ({}) => {
       const data = await res.json();
 
       if (!res.ok) {
-        //console.error("Registration failed:", data.error || "unknow error");
-        //alert("registration failed" + data.error);
         setError(data.error || "Registration failed" + " details required");
         return;
       }
-      //added line of code code
-      //login({ email: data.user.email, name: data.user.name });
-      alert("User registered successfully!");
-      login({ email: data.user.email, name: data });
 
-      router.push("/profile"); // You can navigate to SignIn or Homepage here
+      // Login the user - auth context will handle redirection to stored URL
+      await login({ email: data.user.email });
+      alert("User registered successfully!");
+
+      // No need for explicit redirect here - the login function now handles it
+      //router.push("components/map/map"); // REMOVED this line
     } catch (err) {
       console.error("Registration failed:", err);
-      //setError("Something went wrong. Please try again.");
+      setError("Something went wrong. Please try again.");
     }
   };
 
