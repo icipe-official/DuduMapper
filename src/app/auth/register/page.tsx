@@ -84,7 +84,7 @@ const Register: React.FC = ({}) => {
       alert("User registered successfully!");
 
       // No need for explicit redirect here - the login function now handles it
-      //router.push("components/map/map"); // REMOVED this line
+      router.push("/"); // REMOVED this line
     } catch (err) {
       console.error("Registration failed:", err);
       setError("Something went wrong. Please try again.");

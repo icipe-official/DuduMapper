@@ -1,2 +1,2 @@
-declare module "betterknown"
-declare module '@turf/turf'
+declare module "betterknown";
+declare module "@turf/turf";
