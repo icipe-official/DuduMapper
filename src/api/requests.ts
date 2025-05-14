@@ -13,8 +13,15 @@ import WMTSTileGrid from "ol/tilegrid/WMTS.js";
 import { get as getProjection } from "ol/proj.js";
 import { getTopLeft, getWidth } from "ol/extent.js";
 import { el } from "date-fns/locale";
+import { DOMParser as XmldomParser } from "xmldom";
 
 // let projection: any = null;
+
+// Provide DOMParser for server-side environment
+if (typeof global !== 'undefined' && !global.DOMParser) {
+  global.DOMParser = XmldomParser;
+}
+
 
 const Projection = getProjection("EPSG:4326");
 
@@ -650,8 +657,8 @@ export async function fetchWMTSCapabilities(): Promise<WMTSLayer[]> {
           },
         };
       })
-      .filter((layer): layer is WMTSLayer => layer !== null);
-
+      .filter((layer: WMTSLayer | null): layer is WMTSLayer => layer !== null);
+      
     console.log("Final enriched layers:", enrichedLayers);
     return enrichedLayers;
   } catch (error) {
