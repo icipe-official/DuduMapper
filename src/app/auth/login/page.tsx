@@ -100,7 +100,10 @@ const SignIn: React.FC = () => {
         // Example: login({ email: sessionData.user.email, name: sessionData.user.name });
 
         alert("Signed in successfully!");
-        router.push("/profile"); // Redirect to profile page
+        setTimeout(() => {
+          router.push("/");
+        }, 600);
+        // Redirect to profile page
       }
     } catch (err: any) {
       console.error("Sign in failed", err);
