@@ -1,4 +1,4 @@
-"use client";
+/*"use client";
 import React, { useEffect, useRef, useState } from "react";
 import { styled, useTheme, alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -72,12 +72,12 @@ const drawerWidth = 240;
     marginLeft: 0,
     marginTop: 0,
   }),
-}));*/
-/*
+}));
+*/ /*
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
-
+/*
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme, open }) => ({
@@ -94,8 +94,8 @@ const AppBar = styled(MuiAppBar, {
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
-}));*/
-
+}));
+*/ /*
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -458,7 +458,7 @@ function Newmap() {
         )}
       </div>
       <Legend layerName={activeLayerName} />
-      {/*inline*/}
+      {/*inline*/ /*
       <style>
         {`
               .map-loader{
@@ -483,17 +483,7 @@ function Newmap() {
 
       <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
         <CssBaseline />
-        {/*<AppBar
-          position="fixed"
-          open={open}
-          sx={{
-            bgcolor: "white",
-            margin: 0,
-            padding: 0,
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            borderBottom: "1px solid rgba(0,0,0,0.1)",
-          }}
-        >*/}
+
         <Toolbar>
           <IconButton
             aria-label="open drawer"
@@ -536,10 +526,8 @@ function Newmap() {
               </picture>
             </Link>
           </Box>
-          {/*<NavLink key="About" url="./about" text="About" />
-          <NavLink key="Register" url="./auth/register" text="Register" />*/}
         </Toolbar>
-        {/*</AppBar>*/}
+
         <Drawer
           sx={{
             zIndex: (theme) => theme.zIndex.drawer + 3,
@@ -636,7 +624,7 @@ function Newmap() {
             {renderLayerControls()}
           </List>
         </Drawer>
-        {/*<Main open={open}>*/}
+
         {/*
           //its another form of drawer in the body enclosed
           <DrawerHeader />
@@ -668,7 +656,7 @@ function Newmap() {
                 display: "block",
               }}
             />
-          </Box>*/}
+          </Box>*/ /*
         <div
           ref={mapElement}
           className="map-container"
@@ -683,7 +671,7 @@ function Newmap() {
         ></div>
         <Legend layerName={activeLayerName} />
 
-        {/* Download Popup moved outside drawer */}
+        {/* Download Popup moved outside drawer */ /*
         <Dialog
           open={downloadPopupOpen}
           onClose={() => setDownloadPopupOpen(false)}
@@ -722,10 +710,10 @@ function Newmap() {
             />
           </DialogContent>
         </Dialog>
-        {/*</Main>*/}
       </Box>
     </div>
   );
 }
 
 export default Newmap;
+*/

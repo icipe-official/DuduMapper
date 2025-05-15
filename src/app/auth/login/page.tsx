@@ -22,7 +22,7 @@ const SignIn: React.FC = () => {
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   //added line
-  //const { login } = useAuth();
+  const { login } = useAuth();
 
   //EMAIL VALIDATION
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,8 +67,37 @@ const SignIn: React.FC = () => {
       console.error("signed failed", err);
       setError("Google sign-in failed.");
     }
+      
   };*/
   const handleEmailSignIn = async () => {
+    try {
+      const response = await fetch("/api/session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Login failed");
+      }
+
+      // Instead of manual fetch to /api/session, call login() from context
+      await login({ email });
+
+      alert("Signed in successfully!");
+      setTimeout(() => {
+        router.push("/");
+      }, 600);
+    } catch (err: any) {
+      console.error("Sign in failed", err);
+      setError(err.message || "Invalid credentials. Try again.");
+    }
+  };
+
+  /*const handleEmailSignIn = async () => {
     try {
       const response = await fetch("/api/session", {
         method: "POST",
@@ -109,7 +138,7 @@ const SignIn: React.FC = () => {
       console.error("Sign in failed", err);
       setError(err.message || "Invalid credentials. Try again.");
     }
-  };
+  };*/
 
   /*
 //session logout

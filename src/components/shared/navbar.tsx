@@ -7,6 +7,63 @@ import Toolbar from "@mui/material/Toolbar";
 import Link from "next/link";
 import DrawerComp from "./DrawerComp";
 import NavLink from "./navlink";
+import { Button, useMediaQuery, useTheme } from "@mui/material";
+import { BASE_PATH } from "@/lib/constants";
+import { useRouter } from "next/navigation";
+
+const Navbar: React.FC = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const router = useRouter();
+  console.log("Rendering default ✅");
+  const handleLogoClick = () => {
+    router.push("/");
+  };
+
+  const navMenuItems = [
+    <NavLink key="About" url="/about" text="About" />,
+    <NavLink key="Register" url="/auth/register" text="Register" />,
+  ];
+
+  return (
+    <Box sx={{ position: "relative", zIndex: 2 }}>
+      <AppBar position="fixed" sx={{ bgcolor: "white", margin: 0, padding: 0 }}>
+        <Toolbar>
+          <Box sx={{ flexGrow: 1, mt: "6px" }}>
+            <div onClick={handleLogoClick} style={{ cursor: "pointer" }}>
+              <Link href="/"></Link>
+              <picture>
+                <img
+                  src={`${BASE_PATH}/Animals-Mosquito-icon.png`}
+                  style={{ maxHeight: "70px" }}
+                  alt="Dudu Mapper logo"
+                />
+              </picture>
+            </div>
+          </Box>
+
+          {isMobile ? (
+            <DrawerComp navItems={navMenuItems} />
+          ) : (
+            <>{navMenuItems}</>
+          )}
+        </Toolbar>
+      </AppBar>
+    </Box>
+  );
+};
+
+export default Navbar;
+
+/*"use client";
+
+import * as React from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import Link from "next/link";
+import DrawerComp from "./DrawerComp";
+import NavLink from "./navlink";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { BASE_PATH } from "@/lib/constants";
 import { useAuth } from "@/context/context";
@@ -44,7 +101,7 @@ const Navbar: React.FC = () => {
   // Create navigation items based on auth state
   const navMenuItems: any[] = [];
   navMenuItems.push(<NavLink key="About" url="/about" text="About" />);
-  if (!user) {
+  if (!user && !loading) {
     navMenuItems.push(
       <NavLink key="Register" url="/auth/register" text="Register" />
     );
@@ -71,7 +128,7 @@ const Navbar: React.FC = () => {
               </div>
             </Box>
 
-            {/* Only render auth-dependent UI after loading completes */}
+            {/* Only render auth-dependent UI after loading completes }
             {loading ? (
               // Optional loading indicator (can be styled better)
               <div style={{ color: "black" }}>Loading...</div>

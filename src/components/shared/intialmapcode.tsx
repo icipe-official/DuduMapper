@@ -1,4 +1,4 @@
-"use client";
+/*"use client";
 import React, { useEffect, useRef, useState } from "react";
 import { styled, useTheme, alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -55,7 +55,7 @@ import { useRouter } from "next/router";
 
 const drawerWidth = 240;
 
-/*const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
+const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme, open }) => ({
   flexGrow: 1,
@@ -72,8 +72,8 @@ const drawerWidth = 240;
     marginLeft: 0,
     marginTop: 0,
   }),
-}));*/
-/*
+}));
+
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
@@ -94,7 +94,7 @@ const AppBar = styled(MuiAppBar, {
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
-}));*/
+}));
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -458,7 +458,7 @@ function Newmap() {
         )}
       </div>
       <Legend layerName={activeLayerName} />
-      {/*inline*/}
+      {/*inline*/ /*
       <style>
         {`
               .map-loader{
@@ -483,7 +483,7 @@ function Newmap() {
 
       <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
         <CssBaseline />
-        {/*<AppBar
+        <AppBar
           position="fixed"
           open={open}
           sx={{
@@ -493,53 +493,53 @@ function Newmap() {
             boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
             borderBottom: "1px solid rgba(0,0,0,0.1)",
           }}
-        >*/}
-        <Toolbar>
-          <IconButton
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              mr: 2,
-              ...(open && { display: "none" }),
-              bgcolor: "rgba(0,0,0,0.04)",
-              //color: "rgb(34,148,90)",
-              width: "40px",
-              height: "40px",
-              border: "1px solid rgba(0,0,0,0.1)",
-              borderRadius: "8px",
-              transition: "all 0.2s ease-in-out",
-              "&:hover": {
-                transform: "scale(1.05)",
-                boxShadow: "0 10px 12px  rgb(34,148,90)",
-                background: "rgb(41, 77, 58)",
-              },
-            }}
-          >
-            <MenuIcon
+        >
+          <Toolbar>
+            <IconButton
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
               sx={{
-                fontSize: "24px",
-                color: "rgb(34,148,90)",
-                fontWeight: "bold",
+                mr: 2,
+                ...(open && { display: "none" }),
+                bgcolor: "rgba(0,0,0,0.04)",
+                //color: "rgb(34,148,90)",
+                width: "40px",
+                height: "40px",
+                border: "1px solid rgba(0,0,0,0.1)",
+                borderRadius: "8px",
+                transition: "all 0.2s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: "0 10px 12px  rgb(34,148,90)",
+                  background: "rgb(41, 77, 58)",
+                },
               }}
-            />
-          </IconButton>
-          <Box sx={{ flexGrow: 1, mt: "6px" }}>
-            <Link href={"/"}>
-              <picture>
-                <img
-                  src={"/Animals-Mosquito-icon.png"}
-                  style={{ maxHeight: "70px", cursor: "pointer" }}
-                  alt="Dudu Mapper logo"
-                  //onClick={() => router.push("/")}
-                />
-              </picture>
-            </Link>
-          </Box>
-          {/*<NavLink key="About" url="./about" text="About" />
-          <NavLink key="Register" url="./auth/register" text="Register" />*/}
-        </Toolbar>
-        {/*</AppBar>*/}
+            >
+              <MenuIcon
+                sx={{
+                  fontSize: "24px",
+                  color: "rgb(34,148,90)",
+                  fontWeight: "bold",
+                }}
+              />
+            </IconButton>
+            <Box sx={{ flexGrow: 1, mt: "6px" }}>
+              <Link href={"/"}>
+                <picture>
+                  <img
+                    src={"/Animals-Mosquito-icon.png"}
+                    style={{ maxHeight: "70px", cursor: "pointer" }}
+                    alt="Dudu Mapper logo"
+                    //onClick={() => router.push("/")}
+                  />
+                </picture>
+              </Link>
+            </Box>
+            <NavLink key="About" url="./about" text="About" />
+            <NavLink key="Register" url="./auth/register" text="Register" />
+          </Toolbar>
+        </AppBar>
         <Drawer
           sx={{
             zIndex: (theme) => theme.zIndex.drawer + 3,
@@ -636,8 +636,8 @@ function Newmap() {
             {renderLayerControls()}
           </List>
         </Drawer>
-        {/*<Main open={open}>*/}
-        {/*
+        <Main open={open}>
+          {/*
           //its another form of drawer in the body enclosed
           <DrawerHeader />
           <Box
@@ -668,64 +668,65 @@ function Newmap() {
                 display: "block",
               }}
             />
-          </Box>*/}
-        <div
-          ref={mapElement}
-          className="map-container"
-          id="map-container"
-          style={{
-            //flexGrow: 1,
-            display: "flex",
-            width: "100%",
-            height: "calc(100vh - 64px",
-            position: "relative",
-          }}
-        ></div>
-        <Legend layerName={activeLayerName} />
+          </Box>*/ /*
+          <div
+            ref={mapElement}
+            className="map-container"
+            id="map-container"
+            style={{
+              //flexGrow: 1,
+              display: "flex",
+              width: "100%",
+              height: "calc(100vh - 64px",
+              position: "relative",
+            }}
+          ></div>
+          <Legend layerName={activeLayerName} />
 
-        {/* Download Popup moved outside drawer */}
-        <Dialog
-          open={downloadPopupOpen}
-          onClose={() => setDownloadPopupOpen(false)}
-          maxWidth="sm"
-          fullWidth
-          PaperProps={{
-            sx: {
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              maxHeight: "80vh",
-              overflow: "auto",
-            },
-          }}
-        >
-          <DialogTitle>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Typography variant="h6">Download Map Data</Typography>
-              <IconButton onClick={() => setDownloadPopupOpen(false)}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
-          </DialogTitle>
-          <DialogContent>
-            <DownloadPopup
-              isOpen={downloadPopupOpen}
-              onClose={() => setDownloadPopupOpen(false)}
-              cqlFilter={cqlFilter || ""}
-            />
-          </DialogContent>
-        </Dialog>
-        {/*</Main>*/}
+          {/* Download Popup moved outside drawer */ /*
+          <Dialog
+            open={downloadPopupOpen}
+            onClose={() => setDownloadPopupOpen(false)}
+            maxWidth="sm"
+            fullWidth
+            PaperProps={{
+              sx: {
+                position: "fixed",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                maxHeight: "80vh",
+                overflow: "auto",
+              },
+            }}
+          >
+            <DialogTitle>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="h6">Download Map Data</Typography>
+                <IconButton onClick={() => setDownloadPopupOpen(false)}>
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+            </DialogTitle>
+            <DialogContent>
+              <DownloadPopup
+                isOpen={downloadPopupOpen}
+                onClose={() => setDownloadPopupOpen(false)}
+                cqlFilter={cqlFilter || ""}
+              />
+            </DialogContent>
+          </Dialog>
+        </Main>
       </Box>
     </div>
   );
 }
 
 export default Newmap;
+*/
