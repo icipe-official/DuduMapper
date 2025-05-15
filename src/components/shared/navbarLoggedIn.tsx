@@ -24,6 +24,7 @@ import { BASE_PATH } from "@/lib/constants";
 import { useAuth } from "@/context/context";
 import { useRouter } from "next/navigation";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+import { toast } from "react-toastify";
 
 const NavbarLoggedIn: React.FC = () => {
   const theme = useTheme();
@@ -43,6 +44,13 @@ const NavbarLoggedIn: React.FC = () => {
 
   const handleLogout = async () => {
     await logout();
+    toast.success("Logout Successfully"),
+      {
+        position: "top-right",
+        hideProgressBar: false,
+        pauseOnHover: false,
+        autoClose: 5000,
+      };
     router.push("/");
     handleMenuClose();
   };

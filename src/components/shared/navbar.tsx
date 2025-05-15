@@ -31,14 +31,15 @@ const Navbar: React.FC = () => {
         <Toolbar>
           <Box sx={{ flexGrow: 1, mt: "6px" }}>
             <div onClick={handleLogoClick} style={{ cursor: "pointer" }}>
-              <Link href="/"></Link>
-              <picture>
-                <img
-                  src={`${BASE_PATH}/Animals-Mosquito-icon.png`}
-                  style={{ maxHeight: "70px" }}
-                  alt="Dudu Mapper logo"
-                />
-              </picture>
+              <Link href="/">
+                <picture>
+                  <img
+                    src={"/Animals-Mosquito-icon.png"}
+                    style={{ maxHeight: "70px" }}
+                    alt="Dudu Mapper logo"
+                  />
+                </picture>
+              </Link>
             </div>
           </Box>
 

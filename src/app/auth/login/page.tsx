@@ -10,6 +10,8 @@ import { motion } from "framer-motion";
 //import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/context";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 /*interface SignProps {
   onLoginSuccess: () => void;
@@ -87,7 +89,13 @@ const SignIn: React.FC = () => {
       // Instead of manual fetch to /api/session, call login() from context
       await login({ email });
 
-      alert("Signed in successfully!");
+      toast.success("Signed in successfully!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        pauseOnHover: false,
+      });
+
       setTimeout(() => {
         router.push("/");
       }, 600);
