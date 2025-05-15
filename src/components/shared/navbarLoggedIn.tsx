@@ -13,7 +13,13 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
+import PersonIcon from "@mui/icons-material/Person";
+import TuneIcon from "@mui/icons-material/Tune";
+import MenuIcon from "@mui/icons-material/Menu";
 import { BASE_PATH } from "@/lib/constants";
 import { useAuth } from "@/context/context";
 import { useRouter } from "next/navigation";
@@ -44,6 +50,7 @@ const NavbarLoggedIn: React.FC = () => {
   const handleLogoClick = () => {
     router.push("/");
   };
+  const [open, setOpen] = React.useState(false);
 
   const navMenuItems = [<NavLink key="About" url="/about" text="About" />];
 
@@ -86,6 +93,7 @@ const NavbarLoggedIn: React.FC = () => {
                 <MenuItem disabled>
                   <span>Welcome&nbsp;</span>
                   {user?.email}
+                  <PersonIcon />
                 </MenuItem>
                 <MenuItem
                   onClick={() => {
@@ -94,6 +102,9 @@ const NavbarLoggedIn: React.FC = () => {
                   }}
                 >
                   Settings
+                  <IconButton>
+                    <SettingsIcon />
+                  </IconButton>
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
