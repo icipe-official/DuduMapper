@@ -16,6 +16,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/context";
+import { toast } from "react-toastify";
 
 //import { useNavigate } from "react-router-dom";
 /*interface RegisterProps {
@@ -81,7 +82,13 @@ const Register: React.FC = ({}) => {
 
       // Login the user - auth context will handle redirection to stored URL
       await login({ email: data.user.email });
-      alert("User registered successfully!");
+      toast.success("User Registered Successfully"),
+        {
+          position: "top-right",
+          autoclose: 5000,
+          hideProgressBar: false,
+          pauseOnHover: true,
+        };
 
       // No need for explicit redirect here - the login function now handles it
       router.push("/"); // REMOVED this line

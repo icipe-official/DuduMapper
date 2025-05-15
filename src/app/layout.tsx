@@ -5,6 +5,7 @@ import NavbarContainer from "@/components/shared/navbarContainer";
 import { AuthProvider } from "@/context/context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ToastContainer } from "react-toastify";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <NavbarContainer />
+          <ToastContainer />
+
           <QueryClientProvider client={queryClient}>
             {children}
             {/* <ReactQueryDevtools initialIsOpen={false} /> */}
