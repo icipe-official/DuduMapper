@@ -650,7 +650,9 @@ export async function fetchWMTSCapabilities(): Promise<WMTSLayer[]> {
           },
         };
       })
-      .filter((layer): layer is WMTSLayer => layer !== null);
+      //line of code adjusted(.filter(.filter((layer): layer is WMTSLayer => layer !== null);
+
+      .filter((layer: WMTSLayer | null): layer is WMTSLayer => layer !== null);
 
     console.log("Final enriched layers:", enrichedLayers);
     return enrichedLayers;

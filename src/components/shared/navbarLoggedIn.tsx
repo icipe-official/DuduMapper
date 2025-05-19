@@ -15,7 +15,12 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Typography,
+  TextField,
+  Button,
 } from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
+
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
 import TuneIcon from "@mui/icons-material/Tune";
@@ -25,6 +30,9 @@ import { useAuth } from "@/context/context";
 import { useRouter } from "next/navigation";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { toast } from "react-toastify";
+import { List } from "@mui/icons-material";
+import Logout from "@mui/icons-material/Logout";
+import Text from "ol/style/Text";
 
 const NavbarLoggedIn: React.FC = () => {
   const theme = useTheme();
@@ -33,6 +41,8 @@ const NavbarLoggedIn: React.FC = () => {
   console.log("Rendering NavbarLoggedIn ✅");
   const { user, logout } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [settingAnchorEl, setSettingAnchorEl] =
+    React.useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -40,8 +50,11 @@ const NavbarLoggedIn: React.FC = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+    setSettingAnchorEl(null);
   };
-
+  const handleSettingClick = (event: React.MouseEvent<HTMLElement>) => {
+    setSettingAnchorEl(event.currentTarget);
+  };
   const handleLogout = async () => {
     await logout();
     toast.success("Logout Successfully"),
@@ -61,6 +74,11 @@ const NavbarLoggedIn: React.FC = () => {
   const [open, setOpen] = React.useState(false);
 
   const navMenuItems = [<NavLink key="About" url="/about" text="About" />];
+  //using this as name in my field
+  function getNameFromEmail(email?: string): string {
+    if (!email) return "user"; // handle for undefined email
+    return email.split("@")[0];
+  }
 
   return (
     <Box sx={{ position: "relative", zIndex: 2 }}>
@@ -99,22 +117,119 @@ const NavbarLoggedIn: React.FC = () => {
                 onClose={handleMenuClose}
               >
                 <MenuItem disabled>
-                  <span>Welcome&nbsp;</span>
-                  {user?.email}
+                  <Typography
+                    sx={{
+                      color: "black",
+                      fontFamily: "sans-serif",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Welcome &nbsp;
+                  </Typography>
+                  {getNameFromEmail(user?.email)}
                   <PersonIcon />
                 </MenuItem>
                 <MenuItem
-                  onClick={() => {
-                    router.push("/settings");
-                    handleMenuClose();
-                  }}
+                  // onClick={() => {
+                  //router.push("/settings");
+                  //handleMenuClose();
+                  //}}
+                  onClick={handleSettingClick}
                 >
                   Settings
-                  <IconButton>
-                    <SettingsIcon />
-                  </IconButton>
+                  <SettingsIcon sx={{ ml: "auto", mr: 1 }} />
                 </MenuItem>
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                <MenuItem onClick={handleLogout}>
+                  Logout
+                  <Logout sx={{ ml: "auto", mr: 1 }} />
+                </MenuItem>
+              </Menu>
+              {/**setting dropdown */}
+              <Menu
+                anchorEl={settingAnchorEl}
+                open={Boolean(settingAnchorEl)}
+                onClose={handleMenuClose}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                transformOrigin={{ vertical: "top", horizontal: "left" }}
+              >
+                <MenuItem>
+                  <Box sx={{ px: 2, py: 2, mt: 1 }}>
+                    <Typography
+                      variant="h6"
+                      display=" block"
+                      fontWeight="bold"
+                      fontFamily="sans-serif"
+                    >
+                      User Profile
+                    </Typography>
+                    <Typography
+                      sx={{
+                        color: "green",
+                        display: "center",
+                        mb: 2,
+                        alignItems: "center",
+                      }}
+                    >
+                      Hello {getNameFromEmail(user?.email)}!
+                    </Typography>
+
+                    {/* <ListItemText
+                    //sx={{ color: "black", padding: "5px" }}
+                    //primary={`Name : ${user?.email}`}
+                    //secondary={`Email Address:  ${user?.email}`}
+                    />*/}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        mb: 2,
+                        alignItems: "center",
+                        fontFamily: "sans-serif",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {" "}
+                      <Typography variant="h6">
+                        {" "}
+                        Personal Details!
+                      </Typography>{" "}
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                      <Typography sx={{ padding: "5px", gap: 1 }}>
+                        {" "}
+                        <PersonIcon
+                          sx={{ mr: 1, color: "text.secondary" }}
+                        />{" "}
+                        Name:&nbsp;
+                        {getNameFromEmail(user?.email)}
+                      </Typography>
+                    </Box>
+                    {/* Name input field */}
+                    {/*<Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                      <TextField
+                        sx={{ padding: "5px", gap: 1 }}
+                        label="Enter your Name!"
+                      />{" "}
+                      <Button>Save</Button>
+                    </Box>*/}
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Typography sx={{ padding: "5px", gap: 1, color: "" }}>
+                        {" "}
+                        <EmailIcon
+                          sx={{ mr: 1, color: "text.secondary" }}
+                        />{" "}
+                        Email Address:&nbsp;
+                        {user?.email}
+                      </Typography>
+                    </Box>
+
+                    {/*<ListItemText sx={{ padding: "5px" }}>
+                      <PersonIcon />
+                      <h5>You are who?</h5>
+                      <PersonIcon />
+                      <p> Your email Address is {user?.email}</p>
+                    </ListItemText>*/}
+                  </Box>
+                </MenuItem>
               </Menu>
             </>
           )}

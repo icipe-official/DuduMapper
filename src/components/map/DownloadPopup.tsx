@@ -24,7 +24,7 @@ import {
   Download as DownloadIcon,
   Clear as ClearIcon,
 } from "@mui/icons-material";
-
+import { SelectChangeEvent } from "@mui/material/Select";
 interface DownloadPopupProps {
   isOpen: boolean;
   onClose: () => void;
@@ -50,8 +50,9 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
     { value: "csv", label: "CSV" },
   ];
 
-  const handleFormatChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setFormat(event.target.value as string);
+  const handleFormatChange = (event: SelectChangeEvent<string>) => {
+    const selectedFormat = event.target.value;
+    setFormat(selectedFormat);
   };
 
   const handleLayerToggle = (layer: string) => {

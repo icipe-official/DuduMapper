@@ -574,7 +574,7 @@ function Newmap() {
                 </ListItemIcon>
                 <ListItemText primary="Layer Controls" />
               </ListItemButton>
-            </ListItem>
+            </ListItem>••••••••
             <ListItem disablePadding>
               <ListItemButton>
                 <ListItemIcon>
