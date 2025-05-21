@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === "production", // Secure cookies in production
       sameSite: "strict", // CSRF protection
       path: "/", // Cookie is available across the entire site
-      maxAge: 60, // Cookie expires in 1 hour
+      maxAge: 60 * 60, // Cookie expires in 1 hour
     });
 
     return response;
