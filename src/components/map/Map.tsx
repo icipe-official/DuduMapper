@@ -402,13 +402,29 @@ function Newmap() {
             <List component="div" disablePadding>
               {groupLayers.map((layer) => {
                 // Find the corresponding OL layer from the map
-                const olLayer = mapRef.current
+                {
+                  /*const olLayer = mapRef.current
                   ?.getLayers()
                   .getArray()
                   .find((l: any) => l.get("title") === groupTitle)
                   ?.getLayers()
                   .getArray()
-                  .find((l: any) => l.get("title") === layer.title);
+                  .find((l: any) => l.get("title") === layer.title);*/
+                }
+                //change the above code to this
+                const group = mapRef.current
+                  ?.getLayers()
+                  .getArray()
+                  .find((l: any) => l.get("title") === groupTitle);
+
+                const olLayer =
+                  group instanceof LayerGroup
+                    ? group
+                        .getLayers()
+                        .getArray()
+                        .find((l: any) => l.get("title") === layer.title)
+                    : null;
+
                 return (
                   <ListItemButton
                     key={layer.title}
@@ -479,6 +495,7 @@ function Newmap() {
               100% { transform: rotate(360deg); }
               }
               `}
+        <div id="map" style={{ width: "100%", height: "100vh" }} />
       </style>
 
       <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>

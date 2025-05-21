@@ -106,6 +106,7 @@ const Register: React.FC = ({}) => {
         height: "100vh",
         justifyContent: "center",
         alignItems: "center",
+        //backgroundImage: 'url("/Animals-Mosquito-icon.png")',
       }}
     >
       <Container maxWidth="sm">

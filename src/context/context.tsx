@@ -135,7 +135,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   console.log("Auth Provider state:", {
     user: user ? `${user.email} (set)` : "null",
     loading,
-    fromLocalStorage: !!localStorage.getItem("user"),
+    fromLocalStorage:
+      //corrected local storage not defined
+      typeof window != "undefined" && !!localStorage.getItem("user"),
   });
 
   return (

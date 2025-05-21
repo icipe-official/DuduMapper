@@ -146,8 +146,7 @@ const About = () => {
                   sx={{ fontWeight: "bold", color: "#2E7D32" }}
                 >
                   <PestControl
-                    font-Size="16px"
-                    sx={{ verticalAlign: "middle", mr: 1 }}
+                    sx={{ verticalAlign: "middle", mr: 1, fontSize: "16px" }}
                   />
                   Insect Monitoring
                 </Typography>
@@ -215,8 +214,7 @@ const About = () => {
                   sx={{ fontWeight: "bold", color: "#C62828" }}
                 >
                   <HealthAndSafety
-                    font-size="16px"
-                    sx={{ verticalAlign: "middle", mr: 1 }}
+                    sx={{ verticalAlign: "middle", mr: 1, fontSize: "16px" }}
                   />
                   Disease Surveillance
                 </Typography>

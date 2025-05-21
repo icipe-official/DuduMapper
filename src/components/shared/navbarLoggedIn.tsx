@@ -11,7 +11,6 @@ import {
   useMediaQuery,
   useTheme,
   IconButton,
-  Menu,
   MenuItem,
   ListItemIcon,
   ListItemText,
@@ -19,6 +18,8 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import Menu from "@mui/material/Menu";
+
 import EmailIcon from "@mui/icons-material/Email";
 
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -44,6 +45,12 @@ const NavbarLoggedIn: React.FC = () => {
   const [settingAnchorEl, setSettingAnchorEl] =
     React.useState<null | HTMLElement>(null);
 
+  /*************  ✨ Windsurf Command ⭐  *************/
+  /**
+   * Opens the user menu.
+   * @param {React.MouseEvent<HTMLElement>} event The event that triggered the function.
+   */
+  /*******  f3559e20-e1b3-4bf5-a28a-82a02d448521  *******/
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -89,7 +96,7 @@ const NavbarLoggedIn: React.FC = () => {
               <Link href="/">
                 <picture>
                   <img
-                    src={`${BASE_PATH}/Animals-Mosquito-icon.png`}
+                    src={`/Animals-Mosquito-icon.png`}
                     style={{ maxHeight: "70px" }}
                     alt="Dudu Mapper logo"
                   />
@@ -156,7 +163,7 @@ const NavbarLoggedIn: React.FC = () => {
                   <Box sx={{ px: 2, py: 2, mt: 1 }}>
                     <Typography
                       variant="h6"
-                      display=" block"
+                      display="block"
                       fontWeight="bold"
                       fontFamily="sans-serif"
                     >

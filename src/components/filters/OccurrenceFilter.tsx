@@ -6,13 +6,13 @@ import {
   CircularProgress,
   Collapse,
   FormControl,
-  Grid,
   IconButton,
   TextField,
   Tooltip,
   Typography,
   colors,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import { GEOSERVER_BASE_PATH } from "@/lib/constants";
 import axios from "axios";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -32,11 +32,10 @@ import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import LinkIcon from "@mui/icons-material/Link";
 import LinkOffIcon from "@mui/icons-material/LinkOff";
 import FormatShapesIcon from "@mui/icons-material/FormatShapes";
-import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
-import OpenInFullIcon from '@mui/icons-material/OpenInFull';
-import ClearIcon from '@mui/icons-material/Clear';
-import ChecklistIcon from '@mui/icons-material/Checklist';
-
+import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
+import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+import ClearIcon from "@mui/icons-material/Clear";
+import ChecklistIcon from "@mui/icons-material/Checklist";
 
 interface FilterConditions {
   species?: string;
@@ -120,6 +119,7 @@ export default function OccurrenceFilter({
     queryFn: getCountries,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const composeFilterConditions = (): {} => {
     const filterConditions: FilterConditions = {};
 
@@ -166,12 +166,12 @@ export default function OccurrenceFilter({
       filterConditions["season"] = seasonFilter;
     }
 
-    if (phenotype && phenotype.length > 0){
+    if (phenotype && phenotype.length > 0) {
       const phenoFilter = `ir_bioassays_present = '${phenotype}'`;
       filterConditions["phenotype"] = phenoFilter;
     }
 
-    if (genotype && genotype.length > 0){
+    if (genotype && genotype.length > 0) {
       const phenoFilter = `ir_genetic_mechanisms_present = '${genotype}'`;
       filterConditions["genotype"] = phenoFilter;
     }
@@ -189,7 +189,7 @@ export default function OccurrenceFilter({
     return () => {
       active = false;
     };
-  }, [isFetchingCountries]);
+  }, [countriesData.features, countriesStatus, isFetchingCountries]);
   const handleDiseaseChange = (
     _: React.SyntheticEvent<Element, Event>,
     value: string[]
@@ -208,7 +208,7 @@ export default function OccurrenceFilter({
     setSelectedSpecies([]);
   };
   // console.log("selected country", selectedCountry);
-  console.log("selected species",selectedSpecies)
+  console.log("selected species", selectedSpecies);
 
   const handleCountries = (feature: any) => {
     try {
@@ -261,23 +261,23 @@ export default function OccurrenceFilter({
     }
   };
 
-  const handlePhenotypeToggle = (value: any)=>{
-    if(phenotype === value){
+  const handlePhenotypeToggle = (value: any) => {
+    if (phenotype === value) {
       setPhenotype("");
       handleResetFilter();
-    }else {
-      setPhenotype(value)
+    } else {
+      setPhenotype(value);
     }
   };
 
   const handleGenotypeToggle = (value: any) => {
-    if(genotype === value){
+    if (genotype === value) {
       setGenotype("");
       handleResetFilter();
-    }else {
-      setGenotype(value)
+    } else {
+      setGenotype(value);
     }
-  }
+  };
 
   const handleInsecticideToggle = (value: any) => {
     if (insecticideControl === value) {
@@ -330,9 +330,10 @@ export default function OccurrenceFilter({
     bionomicsData,
     selectedLarval,
     selectedAdult,
-    selectedSeason,
     phenotype,
     genotype,
+    composeFilterConditions,
+    handleFilterConditions,
   ]);
 
   const toggleSelectedByArea = (shape: string) => {
@@ -351,11 +352,9 @@ export default function OccurrenceFilter({
     onRemoveSelection();
   };
   return (
-    <div className={`filter-dev-section ${mini ? 'minimized' : ''}`}>
+    <div className={`filter-dev-section ${mini ? "minimized" : ""}`}>
       {open && (
-        <Box
-          sx={{ width: 450, m: 3 }}
-        >
+        <Box sx={{ width: 450, m: 3 }}>
           {/* <Tooltip title= {mini?"Maximize":"Minimize"} arrow>
            <IconButton
             onClick={() => setMini(!mini)}
@@ -434,124 +433,128 @@ export default function OccurrenceFilter({
                 </IconButton>
               </Tooltip>
 
-          <Grid
-            container
-            spacing={2}
-            style={{
-              marginTop: "10px",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <Grid item xs={12} sm={4} md={12}>
-              <FormControl fullWidth>
-                {/* <Box width="100%"> */}
-                <Autocomplete
-                  fullWidth
-                  multiple
-                  id="disease-select"
-                  options={["Malaria", "Chikungunya"]} //needs to change
-                  freeSolo
-                  filterSelectedOptions
-                  value={selectedDisease}
-                  onChange={(event, value) => handleDiseaseChange(event, value)}
-                  getOptionLabel={(option) => option}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="filled"
-                      label={`Disease (${selectedDisease.length} selected)`}
-                      InputLabelProps={{ sx: { fontSize: "0.9rem" } }}
-                      style={{ width: "100%" }}
+              <Grid
+                container
+                spacing={2}
+                style={{
+                  marginTop: "10px",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Grid item xs={12} sm={4} md={12}>
+                  <FormControl fullWidth>
+                    {/* <Box width="100%"> */}
+                    <Autocomplete
+                      fullWidth
+                      multiple
+                      id="disease-select"
+                      options={["Malaria", "Chikungunya"]} //needs to change
+                      freeSolo
+                      filterSelectedOptions
+                      value={selectedDisease}
+                      onChange={(event, value) =>
+                        handleDiseaseChange(event, value)
+                      }
+                      getOptionLabel={(option) => option}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          variant="filled"
+                          label={`Disease (${selectedDisease.length} selected)`}
+                          InputLabelProps={{ sx: { fontSize: "0.9rem" } }}
+                          style={{ width: "100%" }}
+                        />
+                      )}
                     />
-                  )}
-                />
-                {/* </Box> */}
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={4} md={12}>
-              <FormControl fullWidth style={{ width: "100%" }}>
-                <Autocomplete
-                  multiple
-                  id="species-filter"
-                  options={speciesList.map(
-                    (species) => species.properties.species
-                  )}
-                  freeSolo
-                  value={selectedSpecies}
-                  limitTags={4}
-                  filterSelectedOptions
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="filled"
-                      label={`Species (${selectedSpecies.length} selected)`}
-                      InputLabelProps={{ sx: { fontSize: "0.9rem" } }}
-                      // placeholder="Select Species"
-                    />
-                  )}
-                  onChange={(event, values) => {
-                    // Check if values are null or an empty array
-                    if (!values || values.length === 0) {
-                      handleSpecies([]);
-                      handleResetFilter();
-                    } else {
-                      handleSpecies(values);
-                    }
-                  }}
-                />
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={4} md={12}>
-              <FormControl fullWidth style={{ width: "100%" }}>
-                <Autocomplete
-                  //multiple
-                  id="filter-by-country"
-                  open={openCountries}
-                  value={selectedCountry}
-                  onOpen={() => {
-                    setOpenCountries(true);
-                  }}
-                  onClose={() => {
-                    setOpenCountries(false);
-                  }}
-                  //isOptionEqualToValue={(option, value) => option === value}
-                  getOptionLabel={(option) => (option as any).properties.name}
-                  getOptionKey={(option) => (option as any).id}
-                  options={countriesOptions}
-                  loading={isFetchingCountries}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={`Countries`}
-                      variant="filled"
-                      InputLabelProps={{ sx: { fontSize: "0.9rem" } }}
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <React.Fragment>
-                            {isFetchingCountries ? (
-                              <CircularProgress color="inherit" size={10} />
-                            ) : null}
-                            {params.InputProps.endAdornment}
-                          </React.Fragment>
-                        ),
+                    {/* </Box> */}
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={4} md={12}>
+                  <FormControl fullWidth style={{ width: "100%" }}>
+                    <Autocomplete
+                      multiple
+                      id="species-filter"
+                      options={speciesList.map(
+                        (species) => species.properties.species
+                      )}
+                      freeSolo
+                      value={selectedSpecies}
+                      limitTags={4}
+                      filterSelectedOptions
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          variant="filled"
+                          label={`Species (${selectedSpecies.length} selected)`}
+                          InputLabelProps={{ sx: { fontSize: "0.9rem" } }}
+                          // placeholder="Select Species"
+                        />
+                      )}
+                      onChange={(event, values) => {
+                        // Check if values are null or an empty array
+                        if (!values || values.length === 0) {
+                          handleSpecies([]);
+                          handleResetFilter();
+                        } else {
+                          handleSpecies(values);
+                        }
                       }}
                     />
-                  )}
-                  onChange={(event, values) => {
-                    // Check if values are null or an empty array
-                    if (!values || values.length === 0) {
-                      // clearSelectedCountries();// Clear selected countries
-                      setSelectedCountry("");
-                      handleResetFilter(); // Clear filter associated with countries
-                    } else {
-                      handleCountries(values); // Update selected countries
-                    }
-                  }}
-                />
-              </FormControl>
-            </Grid>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={4} md={12}>
+                  <FormControl fullWidth style={{ width: "100%" }}>
+                    <Autocomplete
+                      //multiple
+                      id="filter-by-country"
+                      open={openCountries}
+                      value={selectedCountry}
+                      onOpen={() => {
+                        setOpenCountries(true);
+                      }}
+                      onClose={() => {
+                        setOpenCountries(false);
+                      }}
+                      //isOptionEqualToValue={(option, value) => option === value}
+                      getOptionLabel={(option) =>
+                        (option as any).properties.name
+                      }
+                      getOptionKey={(option) => (option as any).id}
+                      options={countriesOptions}
+                      loading={isFetchingCountries}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={`Countries`}
+                          variant="filled"
+                          InputLabelProps={{ sx: { fontSize: "0.9rem" } }}
+                          InputProps={{
+                            ...params.InputProps,
+                            endAdornment: (
+                              <React.Fragment>
+                                {isFetchingCountries ? (
+                                  <CircularProgress color="inherit" size={10} />
+                                ) : null}
+                                {params.InputProps.endAdornment}
+                              </React.Fragment>
+                            ),
+                          }}
+                        />
+                      )}
+                      onChange={(event, values) => {
+                        // Check if values are null or an empty array
+                        if (!values || values.length === 0) {
+                          // clearSelectedCountries();// Clear selected countries
+                          setSelectedCountry("");
+                          handleResetFilter(); // Clear filter associated with countries
+                        } else {
+                          handleCountries(values); // Update selected countries
+                        }
+                      }}
+                    />
+                  </FormControl>
+                </Grid>
                 <Grid
                   container
                   direction="row"
@@ -585,10 +588,19 @@ export default function OccurrenceFilter({
                             justifyContent: "center",
                             padding: "6px 12px",
                             marginBottom: "2px",
-                            color: bionomicsData === "true" ? "89C6A7" : "text.primary",
-                            backgroundColor: bionomicsData === "true" ? "success.light" : "background.default",
+                            color:
+                              bionomicsData === "true"
+                                ? "89C6A7"
+                                : "text.primary",
+                            backgroundColor:
+                              bionomicsData === "true"
+                                ? "success.light"
+                                : "background.default",
                             "&:hover": {
-                              backgroundColor: bionomicsData === "true" ? "#ebbd40" : "background.default",
+                              backgroundColor:
+                                bionomicsData === "true"
+                                  ? "#ebbd40"
+                                  : "background.default",
                             },
                           }}
                         >
@@ -608,10 +620,19 @@ export default function OccurrenceFilter({
                             justifyContent: "center",
                             padding: "6px 12px",
                             marginBottom: "2px",
-                            color: bionomicsData === "false" ? "89C6A7" : "text.primary",
-                            backgroundColor: bionomicsData === "false" ? "success.light" : "background.default",
+                            color:
+                              bionomicsData === "false"
+                                ? "89C6A7"
+                                : "text.primary",
+                            backgroundColor:
+                              bionomicsData === "false"
+                                ? "success.light"
+                                : "background.default",
                             "&:hover": {
-                              backgroundColor: bionomicsData === "false" ? "#ebbd40" : "background.default",
+                              backgroundColor:
+                                bionomicsData === "false"
+                                  ? "#ebbd40"
+                                  : "background.default",
                             },
                           }}
                         >
@@ -623,7 +644,6 @@ export default function OccurrenceFilter({
                         {/* Empty Icon Button */}
                         <Button
                           variant="contained"
-
                           onClick={() => handleBioToggle("null")}
                           fullWidth
                           sx={{
@@ -633,10 +653,19 @@ export default function OccurrenceFilter({
                             justifyContent: "center",
                             padding: "6px 12px",
                             marginBottom: "2px",
-                            color: bionomicsData === "null" ? "89C6A7" : "text.primary",
-                            backgroundColor: bionomicsData === "null" ? "success.light" : "background.default",
+                            color:
+                              bionomicsData === "null"
+                                ? "89C6A7"
+                                : "text.primary",
+                            backgroundColor:
+                              bionomicsData === "null"
+                                ? "success.light"
+                                : "background.default",
                             "&:hover": {
-                              backgroundColor: bionomicsData === "null" ? "#ebbd40" : "background.default",
+                              backgroundColor:
+                                bionomicsData === "null"
+                                  ? "#ebbd40"
+                                  : "background.default",
                             },
                           }}
                         >
@@ -646,8 +675,8 @@ export default function OccurrenceFilter({
                       </Grid>
                     </Grid>
                   </Grid>
-            </Grid>
-               
+                </Grid>
+
                 {/* <Typography
                   sx={{
                     color: "#2e7d32",
@@ -845,7 +874,6 @@ export default function OccurrenceFilter({
                   </Grid>
                     </Grid>
                   */}
-               
 
                 <Grid item xs={12} sm={4} md={12}>
                   <Typography
@@ -1025,412 +1053,444 @@ export default function OccurrenceFilter({
                   </Grid>
                 </Grid>
 
-            <Grid
-              container
-              alignItems="center"
-              direction="row"
-              justifyContent="space-between"
-              p="45px"
-            >
-              <Grid
-                item
-                xs={12}
-                sm={4}
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontStyle: "italic",
-                    marginRight: ".5px",
-                    fontSize: "0.98rem",
-                    fontWeight: "550",
-                  }}
+                <Grid
+                  container
+                  alignItems="center"
+                  direction="row"
+                  justifyContent="space-between"
+                  p="45px"
                 >
-                  Season:
-                </Typography>
-                <Tooltip title="Rainy" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Season", "wet")}
-                    color={selectedSeason === "wet" ? "success" : "default"}
+                  <Grid
+                    item
+                    xs={12}
+                    sm={4}
                     sx={{
-                      fontSize: "1.5rem",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontStyle: "italic",
+                        marginRight: ".5px",
+                        fontSize: "0.98rem",
+                        fontWeight: "550",
+                      }}
+                    >
+                      Season:
+                    </Typography>
+                    <Tooltip title="Rainy" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Season", "wet")}
+                        color={selectedSeason === "wet" ? "success" : "default"}
+                        sx={{
+                          fontSize: "1.5rem",
 
-                      "&:hover": {
-                        color: "#2e7d32", // Green color on hover
-                      },
-                    }}
-                  >
-                    <ThunderstormIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Dry" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Season", "dry")}
-                    color={selectedSeason === "dry" ? "success" : "default"}
+                          "&:hover": {
+                            color: "#2e7d32", // Green color on hover
+                          },
+                        }}
+                      >
+                        <ThunderstormIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Dry" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Season", "dry")}
+                        color={selectedSeason === "dry" ? "success" : "default"}
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedSeason === "dry" ? "default" : "#2e7d32",
+                          },
+                        }}
+                      >
+                        <WbSunnyIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Cross" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Season", "cross")}
+                        color={
+                          selectedSeason === "cross" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedSeason === "cross"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
                     sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color: selectedSeason === "dry" ? "default" : "#2e7d32",
-                      },
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
                     }}
                   >
-                    <WbSunnyIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Cross" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Season", "cross")}
-                    color={selectedSeason === "cross" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedSeason === "cross" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <DataArrayIcon />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontStyle: "italic",
-                    marginRight: "0.5px",
-                    fontSize: "1rem",
-                    fontWeight: "550",
-                  }}
-                >
-                  Control:
-                </Typography>
-                <Tooltip title="True" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Control", "true")}
-                    color={selectedControl === "true" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedControl === "true" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <DoneIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="False" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Control", "false")}
-                    color={selectedControl === "false" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedControl === "false" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Empty" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Control", "empty")}
-                    color={selectedControl === "empty" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedControl === "empty" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <DataArrayIcon />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontStyle: "italic",
-                    marginRight: "10px",
-                    fontSize: "1rem",
-                    fontWeight: "550",
-                  }}
-                >
-                  Adult:
-                </Typography>
-                <Tooltip title="True" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Adult", "true")}
-                    color={selectedAdult === "true" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color: selectedAdult === "true" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <EmojiNatureIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="False" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Adult", "false")}
-                    color={selectedAdult === "false" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedAdult === "false" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <BugReportIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Empty" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Adult", "empty")}
-                    color={selectedAdult === "empty" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedAdult === "empty" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <DataArrayIcon />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontStyle: "italic",
-                    marginRight: "5px",
-                    fontSize: "1rem",
-                    fontWeight: "550",
-                  }}
-                >
-                  Larval:
-                </Typography>
-                <Tooltip title="True" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Larval", "true")}
-                    color={selectedLarval === "true" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedLarval === "true" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <PestControlIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="False" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Larval", "false")}
-                    color={selectedLarval === "false" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedLarval === "false" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <EggIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Empty" arrow>
-                  <IconButton
-                    onClick={() => handleSelection("Larval", "null")}
-                    color={selectedLarval === "null" ? "success" : "default"}
-                    sx={{
-                      fontSize: "1.5rem",
-                      "&:hover": {
-                        color:
-                          selectedLarval === "null" ? "#2e7d32" : "primary",
-                      },
-                    }}
-                  >
-                    <DataArrayIcon />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-              <Typography
-                sx={{
-                  color: "#2e7d32",
-                  fontSize: 17,
-                  mt: 4,
-                  fontWeight: "550",
-                }}
-              >
-                Select by area
-              </Typography>
-              <Grid
-                container
-                rowSpacing={8}
-                direction="row"
-                sx={{ flexDirection: "row" }}
-              >
-                <Grid
-                  item
-                  // xs={12}
-                  // sm={12}
-                >
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontStyle: "italic",
-                      marginRight: "5px",
-                      color: "black",
-                      fontSize: ".9rem",
-                    }}
-                  >
-                    Circle:{" "}
-                    <IconButton
-                      onClick={() => toggleSelectedByArea("Circle")}
-                      color={
-                        selectedByArea === "Circle" ? "success" : "default"
-                      }
+                    <Typography
+                      variant="caption"
                       sx={{
-                        "&:hover": {
-                          color:
-                            selectedByArea === "Circle" ? "#2e7d32" : "primary",
-                        },
+                        fontStyle: "italic",
+                        marginRight: "0.5px",
+                        fontSize: "1rem",
+                        fontWeight: "550",
                       }}
                     >
-                      <CircleOutlinedIcon />
-                    </IconButton>
-                  </Typography>
-                </Grid>
-                <Grid
-                  item
-                  // xs={12}
-                  // sm={12}
-                >
-                  <Typography
-                    variant="caption"
+                      Control:
+                    </Typography>
+                    <Tooltip title="True" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Control", "true")}
+                        color={
+                          selectedControl === "true" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedControl === "true"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <DoneIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="False" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Control", "false")}
+                        color={
+                          selectedControl === "false" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedControl === "false"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Empty" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Control", "empty")}
+                        color={
+                          selectedControl === "empty" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedControl === "empty"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
                     sx={{
-                      fontStyle: "italic",
-                      marginRight: "5px",
-                      color: "black",
-                      fontSize: ".9rem",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
                     }}
                   >
-                    Polygon:{" "}
-                    <IconButton
-                      onClick={() => toggleSelectedByArea("Polygon")}
-                      color={
-                        selectedByArea === "Polygon" ? "success" : "default"
-                      }
+                    <Typography
+                      variant="caption"
                       sx={{
-                        "&:hover": {
-                          color:
-                            selectedByArea === "Polygon"
-                              ? "#2e7d32"
-                              : "primary",
-                        },
+                        fontStyle: "italic",
+                        marginRight: "10px",
+                        fontSize: "1rem",
+                        fontWeight: "550",
                       }}
                     >
-                      <FormatShapesIcon />
-                    </IconButton>
-                  </Typography>
-                  <button
-                    style={{
-                      backgroundColor: "green",
-                      color: "white",
-                      height: "30px",
+                      Adult:
+                    </Typography>
+                    <Tooltip title="True" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Adult", "true")}
+                        color={selectedAdult === "true" ? "success" : "default"}
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedAdult === "true" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <EmojiNatureIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="False" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Adult", "false")}
+                        color={
+                          selectedAdult === "false" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedAdult === "false" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <BugReportIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Empty" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Adult", "empty")}
+                        color={
+                          selectedAdult === "empty" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedAdult === "empty" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
                     }}
-                    onClick={() => clearDrawnArea()}
                   >
-                    Remove Area Selection
-                  </button>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontStyle: "italic",
+                        marginRight: "5px",
+                        fontSize: "1rem",
+                        fontWeight: "550",
+                      }}
+                    >
+                      Larval:
+                    </Typography>
+                    <Tooltip title="True" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Larval", "true")}
+                        color={
+                          selectedLarval === "true" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedLarval === "true" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <PestControlIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="False" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Larval", "false")}
+                        color={
+                          selectedLarval === "false" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedLarval === "false"
+                                ? "#2e7d32"
+                                : "primary",
+                          },
+                        }}
+                      >
+                        <EggIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Empty" arrow>
+                      <IconButton
+                        onClick={() => handleSelection("Larval", "null")}
+                        color={
+                          selectedLarval === "null" ? "success" : "default"
+                        }
+                        sx={{
+                          fontSize: "1.5rem",
+                          "&:hover": {
+                            color:
+                              selectedLarval === "null" ? "#2e7d32" : "primary",
+                          },
+                        }}
+                      >
+                        <DataArrayIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Typography
+                    sx={{
+                      color: "#2e7d32",
+                      fontSize: 17,
+                      mt: 4,
+                      fontWeight: "550",
+                    }}
+                  >
+                    Select by area
+                  </Typography>
+                  <Grid
+                    container
+                    rowSpacing={8}
+                    direction="row"
+                    sx={{ flexDirection: "row" }}
+                  >
+                    <Grid
+                      item
+                      // xs={12}
+                      // sm={12}
+                    >
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontStyle: "italic",
+                          marginRight: "5px",
+                          color: "black",
+                          fontSize: ".9rem",
+                        }}
+                      >
+                        Circle:{" "}
+                        <IconButton
+                          onClick={() => toggleSelectedByArea("Circle")}
+                          color={
+                            selectedByArea === "Circle" ? "success" : "default"
+                          }
+                          sx={{
+                            "&:hover": {
+                              color:
+                                selectedByArea === "Circle"
+                                  ? "#2e7d32"
+                                  : "primary",
+                            },
+                          }}
+                        >
+                          <CircleOutlinedIcon />
+                        </IconButton>
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      // xs={12}
+                      // sm={12}
+                    >
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontStyle: "italic",
+                          marginRight: "5px",
+                          color: "black",
+                          fontSize: ".9rem",
+                        }}
+                      >
+                        Polygon:{" "}
+                        <IconButton
+                          onClick={() => toggleSelectedByArea("Polygon")}
+                          color={
+                            selectedByArea === "Polygon" ? "success" : "default"
+                          }
+                          sx={{
+                            "&:hover": {
+                              color:
+                                selectedByArea === "Polygon"
+                                  ? "#2e7d32"
+                                  : "primary",
+                            },
+                          }}
+                        >
+                          <FormatShapesIcon />
+                        </IconButton>
+                      </Typography>
+                      <button
+                        style={{
+                          backgroundColor: "green",
+                          color: "white",
+                          height: "30px",
+                        }}
+                        onClick={() => clearDrawnArea()}
+                      >
+                        Remove Area Selection
+                      </button>
+                    </Grid>
+                  </Grid>
                 </Grid>
+                <div className="button-container-style">
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#2e7d32",
+                      "&:hover": {
+                        backgroundColor: "#ebbd40",
+                        // Background color on hover
+                      },
+                    }}
+                    size="small"
+                    style={{ fontSize: "0.7rem" }}
+                    onClick={() => {
+                      setSelectedDisease([] as string[]);
+                      setIsDiseaseSelected(false);
+                      setSelectedCountry("");
+                      setIsCountrySelected(false);
+                      setSelectedSpecies([] as string[]);
+                      setIsSpeciesSelected(false);
+                      setSelectedSeason("");
+                      setIsSeasonSelected(false);
+                      setSelectedAdult("");
+                      setIsAdultSelected(false);
+                      setSelectedControl("");
+                      setIsControlSelected(false);
+                      setSelectedLarval("");
+                      setIsLarvalSelected(false);
+                      setSelectedByArea("");
+                      handleClearFilter();
+                      clearSelectedCountries();
+                      setBionomicsData("");
+                      setInsecticideResistance("");
+                      // Reset other state variables as needed
+                    }}
+                  >
+                    Clear Selection
+                  </Button>
+                </div>
               </Grid>
-            </Grid>
-            <div className="button-container-style">
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: "#2e7d32",
-                  "&:hover": {
-                    backgroundColor: "#ebbd40",
-                    // Background color on hover
-                  },
-                }}
-                size="small"
-                style={{ fontSize: "0.7rem" }}
-                onClick={() => {
-                  setSelectedDisease([] as string[]);
-                  setIsDiseaseSelected(false);
-                  setSelectedCountry("");
-                  setIsCountrySelected(false);
-                  setSelectedSpecies([] as string[]);
-                  setIsSpeciesSelected(false);
-                  setSelectedSeason("");
-                  setIsSeasonSelected(false);
-                  setSelectedAdult("");
-                  setIsAdultSelected(false);
-                  setSelectedControl("");
-                  setIsControlSelected(false);
-                  setSelectedLarval("");
-                  setIsLarvalSelected(false);
-                  setSelectedByArea("");
-                  handleClearFilter();
-                  clearSelectedCountries();
-                  setBionomicsData("");
-                  setInsecticideResistance("");
-                  // Reset other state variables as needed
-                }}
-              >
-                Clear Selection
-              </Button>
-            </div>
-          </Grid>
-          </>
-      )}
+            </>
+          )}
         </Box>
       )}
     </div>
