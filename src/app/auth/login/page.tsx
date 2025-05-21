@@ -222,7 +222,7 @@ const SignIn: React.FC = () => {
               fontStyle: "italic",
             }}
           >
-            Sign in to dev@dudumapper874 to continue to Dudumapper platform
+            Sign in
           </h3>
 
           <TextField

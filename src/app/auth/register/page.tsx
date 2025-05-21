@@ -151,7 +151,7 @@ const Register: React.FC = ({}) => {
               fontStyle: "italic",
             }}
           >
-            Sign Up to dev@dudumapper874 to continue to Dudumapper platform
+            Sign Up
           </h2>
 
           <TextField
