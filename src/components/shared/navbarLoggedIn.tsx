@@ -34,6 +34,9 @@ import { toast } from "react-toastify";
 import { List } from "@mui/icons-material";
 import Logout from "@mui/icons-material/Logout";
 import Text from "ol/style/Text";
+import MaleIcon from "@mui/icons-material/Male";
+import FemaleIcon from "@mui/icons-material/Female";
+import TransgenderIcon from "@mui/icons-material/Transgender";
 
 const NavbarLoggedIn: React.FC = () => {
   const theme = useTheme();
@@ -74,6 +77,31 @@ const NavbarLoggedIn: React.FC = () => {
     router.push("/");
     handleMenuClose();
   };
+  //icon for gender
+  const getGenderIcon = (gender: string | undefined) => {
+    switch (gender?.toLowerCase()) {
+      case "male":
+        return (
+          <MaleIcon fontSize="small" sx={{ verticalAlign: "middle", ml: 1 }} />
+        );
+      case "female":
+        return (
+          <FemaleIcon
+            fontSize="small"
+            sx={{ verticalAlign: "middle", ml: 1 }}
+          />
+        );
+      case "other":
+        return (
+          <TransgenderIcon
+            fontSize="small"
+            sx={{ verticalAlign: "middle", ml: 1 }}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   const handleLogoClick = () => {
     router.push("/");
@@ -82,9 +110,11 @@ const NavbarLoggedIn: React.FC = () => {
 
   const navMenuItems = [<NavLink key="About" url="/about" text="About" />];
   //using this as name in my field
-  function getNameFromEmail(email?: string): string {
+  {
+    /*function getNameFromEmail(email?: string): string {
     if (!email) return "user"; // handle for undefined email
     return email.split("@")[0];
+  }*/
   }
 
   return (
@@ -133,14 +163,14 @@ const NavbarLoggedIn: React.FC = () => {
                   >
                     Welcome &nbsp;
                   </Typography>
-                  {getNameFromEmail(user?.email)}
+                  {user?.firstName}
                   <PersonIcon />
                 </MenuItem>
                 <MenuItem
-                  // onClick={() => {
-                  //router.push("/settings");
+                  //onClick={() => {
+                  //router.push("");
                   //handleMenuClose();
-                  //}}
+                  // }}
                   onClick={handleSettingClick}
                 >
                   Settings
@@ -177,7 +207,7 @@ const NavbarLoggedIn: React.FC = () => {
                         alignItems: "center",
                       }}
                     >
-                      Hello {getNameFromEmail(user?.email)}!
+                      Hello {user?.firstName}!
                     </Typography>
 
                     {/* <ListItemText
@@ -200,14 +230,32 @@ const NavbarLoggedIn: React.FC = () => {
                         Personal Details!
                       </Typography>{" "}
                     </Box>
+
                     <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                       <Typography sx={{ padding: "5px", gap: 1 }}>
                         {" "}
                         <PersonIcon
                           sx={{ mr: 1, color: "text.secondary" }}
                         />{" "}
-                        Name:&nbsp;
-                        {getNameFromEmail(user?.email)}
+                        First Name:&nbsp;
+                        {user?.firstName}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                      <Typography sx={{ padding: "5px", gap: 1 }}>
+                        {" "}
+                        <PersonIcon
+                          sx={{ mr: 1, color: "text.secondary" }}
+                        />{" "}
+                        Last Name:&nbsp;
+                        {user?.lastName}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                      <Typography sx={{ padding: "5px", gap: 1 }}>
+                        {""}
+                        {getGenderIcon(user?.gender)} Gender:&nbsp;
+                        {user?.gender}
                       </Typography>
                     </Box>
                     {/* Name input field */}

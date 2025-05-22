@@ -6,7 +6,15 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
-    const { email, password, wantsNotification = false } = await req.json();
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      gender,
+      //wantsNotification = false,
+    } = await req.json();
+
     // Validate inputs
     if (!email || !password) {
       return NextResponse.json(
@@ -14,6 +22,14 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    if (!firstName || !lastName || !gender) {
+      return NextResponse.json(
+        { message: "First name, last name, and gender are required" },
+        { status: 400 }
+      );
+    }
+
     // Check if the user already exists
     const existingUser = await prisma.users.findUnique({ where: { email } });
 
@@ -31,7 +47,11 @@ export async function POST(req: Request) {
     const user = await prisma.users.create({
       data: {
         email,
+        firstName,
+        lastName,
+        gender,
         password: hashedPassword,
+
         //wantsNotification,
       },
     });

@@ -12,5 +12,9 @@ model users {
   id                Int      @id @default(autoincrement())
   email             String   @unique @db.VarChar(100)
   password          String   @db.VarChar(255)
+  firstName         String?  @db.VarChar(100)
+  lastName          String?  @db.VarChar(100)
+  gender            String?  @db.VarChar(50)
   wantsnotification Boolean? @default(true)
 }
+

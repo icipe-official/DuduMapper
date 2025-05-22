@@ -87,7 +87,8 @@ const SignIn: React.FC = () => {
       }
 
       // Instead of manual fetch to /api/session, call login() from context
-      await login({ email });
+      const data = await response.json();
+      await login(data.user);
 
       toast.success("Signed in successfully!", {
         position: "top-right",

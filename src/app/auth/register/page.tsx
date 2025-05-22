@@ -9,6 +9,10 @@ import {
   Box,
   FormControlLabel,
   Checkbox,
+  RadioGroup,
+  FormControl,
+  FormLabel,
+  Radio,
 } from "@mui/material";
 //import { auth } from "./firebaseConfig";
 //import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -17,6 +21,10 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/context";
 import { toast } from "react-toastify";
+import { set } from "date-fns";
+import MaleIcon from "@mui/icons-material/Male";
+import FemaleIcon from "@mui/icons-material/Female";
+import TransgenderIcon from "@mui/icons-material/Transgender";
 
 //import { useNavigate } from "react-router-dom";
 /*interface RegisterProps {
@@ -24,9 +32,14 @@ import { toast } from "react-toastify";
 }
 */
 const Register: React.FC = ({}) => {
+  //email, name, gender, password, confirmPassword
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
+  const [gender, setGender] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  //errors
   const [error, setError] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
@@ -41,6 +54,23 @@ const Register: React.FC = ({}) => {
     setEmail(input);
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
     setEmailError(!isValidEmail && input.length > 0);
+  };
+
+  //fistname validation
+  const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    setFirstName(input);
+  };
+
+  //lastname validation
+  const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    setLastName(input);
+  };
+
+  //gender
+  const handleGenderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setGender(event.target.value);
   };
 
   //PASSWORD VALIDATION
@@ -70,7 +100,14 @@ const Register: React.FC = ({}) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email,
+          password,
+          firstName,
+          lastName,
+          gender,
+          wantsNotification,
+        }),
       });
 
       const data = await res.json();
@@ -81,7 +118,12 @@ const Register: React.FC = ({}) => {
       }
 
       // Login the user - auth context will handle redirection to stored URL
-      await login({ email: data.user.email });
+      await login({
+        email: data.user.email,
+        firstName: data.user.firstName,
+        lastName: data.user.lastName,
+        gender: data.user.gender,
+      });
       toast.success("User Registered Successfully"),
         {
           position: "top-right",
@@ -117,7 +159,7 @@ const Register: React.FC = ({}) => {
             boxShadow: 3,
             borderRadius: 2,
             textAlign: "center",
-            backgroundColor: "white",
+            //backgroundColor: "white",
           }}
         >
           <motion.div
@@ -153,6 +195,62 @@ const Register: React.FC = ({}) => {
           >
             Sign Up
           </h2>
+          <TextField
+            label="First Name"
+            type="text"
+            value={firstName}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            onChange={handleFirstNameChange}
+          />
+          <TextField
+            label="Last Name"
+            type="text"
+            value={lastName}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            onChange={handleLastNameChange}
+          />
+
+          <FormControl component="fieldset" margin="normal">
+            <FormLabel component="legend">Gender</FormLabel>
+            <RadioGroup row value={gender} onChange={handleGenderChange}>
+              <FormControlLabel
+                value="male"
+                control={<Radio />}
+                label={
+                  <>
+                    <MaleIcon sx={{ verticalAlign: "middle", mr: 0.5 }} />
+                    Male
+                  </>
+                }
+              />
+              <FormControlLabel
+                value="female"
+                control={<Radio />}
+                label={
+                  <>
+                    <FemaleIcon sx={{ verticalAlign: "middle", mr: 0.5 }} />
+                    Female
+                  </>
+                }
+              />
+              <FormControlLabel
+                value="other"
+                control={<Radio />}
+                label={
+                  <>
+                    <TransgenderIcon
+                      sx={{ verticalAlign: "middle", mr: 0.5 }}
+                    />
+                    Other
+                  </>
+                }
+              />
+            </RadioGroup>
+          </FormControl>
 
           <TextField
             label="Email"
