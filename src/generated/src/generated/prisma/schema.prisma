@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id                Int      @id @default(autoincrement())
+  email             String   @unique @db.VarChar(100)
+  password          String   @db.VarChar(255)
+  wantsnotification Boolean? @default(true)
+}

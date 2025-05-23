@@ -133,7 +133,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/kelvin/Desktop/jack/DuduMapper/src/generated/prisma",
+      "value": "/home/main/Projects/DuduMapper/src/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -144,10 +144,18 @@ const config = {
         "fromEnvVar": null,
         "value": "debian-openssl-3.0.x",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "debian-openssl-3.0.x"
+      },
+      {
+        "fromEnvVar": null,
+        "value": "linux-musl-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/kelvin/Desktop/jack/DuduMapper/prisma/schema.prisma",
+    "sourceFilePath": "/home/main/Projects/DuduMapper/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -169,8 +177,13 @@ const config = {
       }
     }
   },
+<<<<<<< HEAD
   "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel users {\n  id                Int      @id @default(autoincrement())\n  email             String   @unique @db.VarChar(100)\n  password          String   @db.VarChar(255)\n  firstName         String?  @db.VarChar(100)\n  lastName          String?  @db.VarChar(100)\n  gender            String?  @db.VarChar(50)\n  wantsnotification Boolean? @default(true)\n}\n",
   "inlineSchemaHash": "dc8a6458acd9bd8b77b610ac49459dcf4816bb9c4168829587477dd1dc110726",
+=======
+  "inlineSchema": "generator client {\n  provider      = \"prisma-client-js\"\n  binaryTargets = [\"native\", \"debian-openssl-3.0.x\", \"linux-musl-openssl-3.0.x\"]\n  output        = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel users {\n  id                Int      @id @default(autoincrement())\n  email             String   @unique @db.VarChar(100)\n  password          String   @db.VarChar(255)\n  wantsnotification Boolean? @default(true)\n}\n",
+  "inlineSchemaHash": "47415ffcf07b893eebdfb01e2ece7daafe99fc1c8065c082e47ecc6d858c6a6c",
+>>>>>>> 70f88a97f0476455d20c312bd41dd0890f59fc91
   "copyEngine": true
 }
 
@@ -211,6 +224,10 @@ Object.assign(exports, Prisma)
 // file annotations for bundling tools to include these files
 path.join(__dirname, "libquery_engine-debian-openssl-3.0.x.so.node");
 path.join(process.cwd(), "src/generated/prisma/libquery_engine-debian-openssl-3.0.x.so.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-linux-musl-openssl-3.0.x.so.node");
+path.join(process.cwd(), "src/generated/prisma/libquery_engine-linux-musl-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "src/generated/prisma/schema.prisma")
