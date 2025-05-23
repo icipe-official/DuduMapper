@@ -133,7 +133,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/main/Projects/DuduMapper/src/generated/prisma",
+      "value": "/home/kelvin/Desktop/jack/DuduMapper/src/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -155,7 +155,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/main/Projects/DuduMapper/prisma/schema.prisma",
+    "sourceFilePath": "/home/kelvin/Desktop/jack/DuduMapper/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -169,6 +169,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -177,13 +178,8 @@ const config = {
       }
     }
   },
-<<<<<<< HEAD
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel users {\n  id                Int      @id @default(autoincrement())\n  email             String   @unique @db.VarChar(100)\n  password          String   @db.VarChar(255)\n  firstName         String?  @db.VarChar(100)\n  lastName          String?  @db.VarChar(100)\n  gender            String?  @db.VarChar(50)\n  wantsnotification Boolean? @default(true)\n}\n",
-  "inlineSchemaHash": "dc8a6458acd9bd8b77b610ac49459dcf4816bb9c4168829587477dd1dc110726",
-=======
-  "inlineSchema": "generator client {\n  provider      = \"prisma-client-js\"\n  binaryTargets = [\"native\", \"debian-openssl-3.0.x\", \"linux-musl-openssl-3.0.x\"]\n  output        = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel users {\n  id                Int      @id @default(autoincrement())\n  email             String   @unique @db.VarChar(100)\n  password          String   @db.VarChar(255)\n  wantsnotification Boolean? @default(true)\n}\n",
-  "inlineSchemaHash": "47415ffcf07b893eebdfb01e2ece7daafe99fc1c8065c082e47ecc6d858c6a6c",
->>>>>>> 70f88a97f0476455d20c312bd41dd0890f59fc91
+  "inlineSchema": "generator client {\n  provider      = \"prisma-client-js\"\n  binaryTargets = [\"native\", \"debian-openssl-3.0.x\", \"linux-musl-openssl-3.0.x\"]\n  output        = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel users {\n  id                Int      @id @default(autoincrement())\n  email             String   @unique @db.VarChar(100)\n  password          String   @db.VarChar(255)\n  firstName         String?  @db.VarChar(100)\n  lastName          String?  @db.VarChar(100)\n  gender            String?  @db.VarChar(50)\n  wantsnotification Boolean? @default(true)\n}\n",
+  "inlineSchemaHash": "ef9b241acd081d94dba9df9735f124864dcc0b09213426150811a0d5097d0dc7",
   "copyEngine": true
 }
 

@@ -1,15 +1,6 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Menu,
-  MenuItem,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Divider, Paper, Typography } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 
-import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";

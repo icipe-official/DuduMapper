@@ -167,11 +167,11 @@ const NavbarLoggedIn: React.FC = () => {
                   <PersonIcon />
                 </MenuItem>
                 <MenuItem
-                  //onClick={() => {
-                  //router.push("");
-                  //handleMenuClose();
-                  // }}
-                  onClick={handleSettingClick}
+                //onClick={() => {
+                //router.push("");
+                //handleMenuClose();
+                // }}
+                //onClick={handleSettingClick}
                 >
                   Settings
                   <SettingsIcon sx={{ ml: "auto", mr: 1 }} />
