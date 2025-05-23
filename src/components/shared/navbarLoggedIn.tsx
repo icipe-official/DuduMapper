@@ -17,6 +17,7 @@ import {
   Typography,
   TextField,
   Button,
+  Divider,
 } from "@mui/material";
 import Menu from "@mui/material/Menu";
 
@@ -76,6 +77,10 @@ const NavbarLoggedIn: React.FC = () => {
       };
     router.push("/");
     handleMenuClose();
+  };
+  //route
+  const accountpage = () => {
+    router.push("/auth/AccountPage");
   };
   //icon for gender
   const getGenderIcon = (gender: string | undefined) => {
@@ -166,21 +171,31 @@ const NavbarLoggedIn: React.FC = () => {
                   {user?.firstName}
                   <PersonIcon />
                 </MenuItem>
+
+                <Divider sx={{ my: 0.5 }} />
+
+                <MenuItem onClick={accountpage}>
+                  Account Page &nbsp;
+                  <AccountCircle sx={{ ml: "auto", mr: 1 }} />
+                </MenuItem>
+
                 <MenuItem
-                //onClick={() => {
-                //router.push("");
-                //handleMenuClose();
-                // }}
-                //onClick={handleSettingClick}
+                  //onClick={() => {
+                  // router.push("/auth/settings");
+                  //handleMenuClose();
+                  // }}
+                  onClick={handleSettingClick}
                 >
                   Settings
                   <SettingsIcon sx={{ ml: "auto", mr: 1 }} />
                 </MenuItem>
+
                 <MenuItem onClick={handleLogout}>
                   Logout
                   <Logout sx={{ ml: "auto", mr: 1 }} />
                 </MenuItem>
               </Menu>
+
               {/**setting dropdown */}
               <Menu
                 anchorEl={settingAnchorEl}
@@ -230,7 +245,7 @@ const NavbarLoggedIn: React.FC = () => {
                         Personal Details!
                       </Typography>{" "}
                     </Box>
-
+                    <Divider sx={{ mb: 2 }} />
                     <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                       <Typography sx={{ padding: "5px", gap: 1 }}>
                         {" "}

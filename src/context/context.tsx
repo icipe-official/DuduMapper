@@ -23,6 +23,7 @@ type AuthContextType = {
   login: (userData: User) => Promise<void>;
   logout: () => Promise<void>;
   forceRefresh: () => void; // Added force refresh function
+  updateUser: (newUserData: Partial<User>) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -134,7 +135,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return Promise.reject(error);
     }
   };
-
+  // *** Implement updateUser to merge partial updates ***
+  const updateUser = (newUserData: Partial<User>) => {
+    setUser((prevUser) => {
+      if (!prevUser) return null; // no user to update
+      const updatedUser = { ...prevUser, ...newUserData };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      return updatedUser;
+    });
+  };
   // Debug output with more details
   console.log("Auth Provider state:", {
     user: user ? `${user.email} (set)` : "null",
@@ -143,10 +152,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       //corrected local storage not defined
       typeof window != "undefined" && !!localStorage.getItem("user"),
   });
+  //updating user
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, logout, forceRefresh }}
+      value={{ user, loading, login, logout, forceRefresh, updateUser }}
     >
       {children}
     </AuthContext.Provider>

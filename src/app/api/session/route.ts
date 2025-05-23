@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET || "secret", // Use a stronger secret in production
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
 
     // Set JWT token in an HTTP-only cookie
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === "production", // Secure cookies in production
       sameSite: "strict", // CSRF protection
       path: "/", // Cookie is available across the entire site
-      maxAge: 60 * 60, // Cookie expires in 1 hour
+      maxAge: 60 * 60 * 24, // Cookie expires in 24 hour
     });
 
     return response;
