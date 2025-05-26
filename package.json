@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix --dir ."
-    
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -51,6 +50,7 @@
     "@types/ol-ext": "npm:@siedlerchr/types-ol-ext@^3.2.4",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
+    "@types/uuid": "^10.0.0",
     "babel-plugin-transform-commonjs": "^1.1.6",
     "eslint": "^8.55.0",
     "eslint-config-next": "^14.0.4",

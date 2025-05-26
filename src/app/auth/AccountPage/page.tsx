@@ -20,6 +20,7 @@ import { set } from "date-fns";
 import { is } from "date-fns/locale";
 import { toast } from "react-toastify";
 import { AccountCircle } from "@mui/icons-material";
+import { useRef } from "react";
 const AccountProfile = () => {
   const { user, logout, updateUser } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -29,6 +30,7 @@ const AccountProfile = () => {
   const [isEditLastName, setIsEditLastName] = React.useState(false);
   const [firstNameEditted, setFirstNameEditted] = React.useState("");
   const [lastNameEditted, setLastNameEditted] = React.useState("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -113,6 +115,49 @@ const AccountProfile = () => {
         );
     }
   };
+
+  //user profile picture
+  const handleProfilePicture = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.style.display = "none";
+
+    input.onchange = async (event: Event) => {
+      const target = event.target as HTMLInputElement;
+      const file = target.files?.[0];
+
+      if (file) {
+        console.log("Selected file:", file);
+        const formData = new FormData();
+        formData.append("profilePicture", file);
+
+        try {
+          const res = await fetch("/api/accountPage", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!res.ok) {
+            throw new Error("Failed to update profile");
+          }
+
+          const data = await res.json();
+          //updateUser(data.user);
+          toast.success("Profile updated successfully");
+        } catch (error) {
+          console.error("Error updating profile:", error);
+          toast.error("Failed to update profile picture");
+        }
+      }
+
+      document.body.removeChild(input);
+    };
+
+    document.body.appendChild(input);
+    input.click();
+  };
+
   return (
     <Box
       sx={{
@@ -133,16 +178,35 @@ const AccountProfile = () => {
             height: "50px" /* or your container height */,
           }}
         >
-          <AccountCircle
-            fontSize="large"
-            sx={{
-              position: "absolute",
-              top: 2,
-              right: 8,
-              //color: "darkgreen",
-              //backgroundImage: 'url("/Animals-Mosquito-icon.png")',
-            }}
-          />
+          {user?.profilePicture ? (
+            <Image
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                objectFit: "cover",
+                cursor: "pointer",
+                position: "absolute",
+                top: 2,
+                right: 8,
+              }}
+              src={user?.profilePicture}
+              onClick={handleProfilePicture}
+              alt="profile"
+            />
+          ) : (
+            <AccountCircle
+              fontSize="large"
+              onClick={handleProfilePicture}
+              sx={{
+                position: "absolute",
+                top: 2,
+                right: 8,
+                cursor: "pointer",
+              }}
+            />
+          )}
+
           <Image
             style={{ position: "absolute", top: 2, left: 8 }}
             src="/Animals-Mosquito-icon.png"

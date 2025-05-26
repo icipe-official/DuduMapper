@@ -896,6 +896,7 @@ export namespace Prisma {
     firstName: string | null
     lastName: string | null
     gender: string | null
+    profilePicture: string | null
     wantsnotification: boolean | null
   }
 
@@ -906,6 +907,7 @@ export namespace Prisma {
     firstName: string | null
     lastName: string | null
     gender: string | null
+    profilePicture: string | null
     wantsnotification: boolean | null
   }
 
@@ -916,6 +918,7 @@ export namespace Prisma {
     firstName: number
     lastName: number
     gender: number
+    profilePicture: number
     wantsnotification: number
     _all: number
   }
@@ -936,6 +939,7 @@ export namespace Prisma {
     firstName?: true
     lastName?: true
     gender?: true
+    profilePicture?: true
     wantsnotification?: true
   }
 
@@ -946,6 +950,7 @@ export namespace Prisma {
     firstName?: true
     lastName?: true
     gender?: true
+    profilePicture?: true
     wantsnotification?: true
   }
 
@@ -956,6 +961,7 @@ export namespace Prisma {
     firstName?: true
     lastName?: true
     gender?: true
+    profilePicture?: true
     wantsnotification?: true
     _all?: true
   }
@@ -1053,6 +1059,7 @@ export namespace Prisma {
     firstName: string | null
     lastName: string | null
     gender: string | null
+    profilePicture: string | null
     wantsnotification: boolean | null
     _count: UsersCountAggregateOutputType | null
     _avg: UsersAvgAggregateOutputType | null
@@ -1082,6 +1089,7 @@ export namespace Prisma {
     firstName?: boolean
     lastName?: boolean
     gender?: boolean
+    profilePicture?: boolean
     wantsnotification?: boolean
   }, ExtArgs["result"]["users"]>
 
@@ -1092,6 +1100,7 @@ export namespace Prisma {
     firstName?: boolean
     lastName?: boolean
     gender?: boolean
+    profilePicture?: boolean
     wantsnotification?: boolean
   }, ExtArgs["result"]["users"]>
 
@@ -1102,6 +1111,7 @@ export namespace Prisma {
     firstName?: boolean
     lastName?: boolean
     gender?: boolean
+    profilePicture?: boolean
     wantsnotification?: boolean
   }, ExtArgs["result"]["users"]>
 
@@ -1112,10 +1122,11 @@ export namespace Prisma {
     firstName?: boolean
     lastName?: boolean
     gender?: boolean
+    profilePicture?: boolean
     wantsnotification?: boolean
   }
 
-  export type usersOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "gender" | "wantsnotification", ExtArgs["result"]["users"]>
+  export type usersOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "gender" | "profilePicture" | "wantsnotification", ExtArgs["result"]["users"]>
 
   export type $usersPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "users"
@@ -1127,6 +1138,7 @@ export namespace Prisma {
       firstName: string | null
       lastName: string | null
       gender: string | null
+      profilePicture: string | null
       wantsnotification: boolean | null
     }, ExtArgs["result"]["users"]>
     composites: {}
@@ -1557,6 +1569,7 @@ export namespace Prisma {
     readonly firstName: FieldRef<"users", 'String'>
     readonly lastName: FieldRef<"users", 'String'>
     readonly gender: FieldRef<"users", 'String'>
+    readonly profilePicture: FieldRef<"users", 'String'>
     readonly wantsnotification: FieldRef<"users", 'Boolean'>
   }
     
@@ -1945,6 +1958,7 @@ export namespace Prisma {
     firstName: 'firstName',
     lastName: 'lastName',
     gender: 'gender',
+    profilePicture: 'profilePicture',
     wantsnotification: 'wantsnotification'
   };
 
@@ -2042,6 +2056,7 @@ export namespace Prisma {
     firstName?: StringNullableFilter<"users"> | string | null
     lastName?: StringNullableFilter<"users"> | string | null
     gender?: StringNullableFilter<"users"> | string | null
+    profilePicture?: StringNullableFilter<"users"> | string | null
     wantsnotification?: BoolNullableFilter<"users"> | boolean | null
   }
 
@@ -2052,6 +2067,7 @@ export namespace Prisma {
     firstName?: SortOrderInput | SortOrder
     lastName?: SortOrderInput | SortOrder
     gender?: SortOrderInput | SortOrder
+    profilePicture?: SortOrderInput | SortOrder
     wantsnotification?: SortOrderInput | SortOrder
   }
 
@@ -2065,6 +2081,7 @@ export namespace Prisma {
     firstName?: StringNullableFilter<"users"> | string | null
     lastName?: StringNullableFilter<"users"> | string | null
     gender?: StringNullableFilter<"users"> | string | null
+    profilePicture?: StringNullableFilter<"users"> | string | null
     wantsnotification?: BoolNullableFilter<"users"> | boolean | null
   }, "id" | "email">
 
@@ -2075,6 +2092,7 @@ export namespace Prisma {
     firstName?: SortOrderInput | SortOrder
     lastName?: SortOrderInput | SortOrder
     gender?: SortOrderInput | SortOrder
+    profilePicture?: SortOrderInput | SortOrder
     wantsnotification?: SortOrderInput | SortOrder
     _count?: usersCountOrderByAggregateInput
     _avg?: usersAvgOrderByAggregateInput
@@ -2093,6 +2111,7 @@ export namespace Prisma {
     firstName?: StringNullableWithAggregatesFilter<"users"> | string | null
     lastName?: StringNullableWithAggregatesFilter<"users"> | string | null
     gender?: StringNullableWithAggregatesFilter<"users"> | string | null
+    profilePicture?: StringNullableWithAggregatesFilter<"users"> | string | null
     wantsnotification?: BoolNullableWithAggregatesFilter<"users"> | boolean | null
   }
 
@@ -2102,6 +2121,7 @@ export namespace Prisma {
     firstName?: string | null
     lastName?: string | null
     gender?: string | null
+    profilePicture?: string | null
     wantsnotification?: boolean | null
   }
 
@@ -2112,6 +2132,7 @@ export namespace Prisma {
     firstName?: string | null
     lastName?: string | null
     gender?: string | null
+    profilePicture?: string | null
     wantsnotification?: boolean | null
   }
 
@@ -2121,6 +2142,7 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
+    profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
   }
 
@@ -2131,6 +2153,7 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
+    profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
   }
 
@@ -2141,6 +2164,7 @@ export namespace Prisma {
     firstName?: string | null
     lastName?: string | null
     gender?: string | null
+    profilePicture?: string | null
     wantsnotification?: boolean | null
   }
 
@@ -2150,6 +2174,7 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
+    profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
   }
 
@@ -2160,6 +2185,7 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
+    profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
   }
 
@@ -2221,6 +2247,7 @@ export namespace Prisma {
     firstName?: SortOrder
     lastName?: SortOrder
     gender?: SortOrder
+    profilePicture?: SortOrder
     wantsnotification?: SortOrder
   }
 
@@ -2235,6 +2262,7 @@ export namespace Prisma {
     firstName?: SortOrder
     lastName?: SortOrder
     gender?: SortOrder
+    profilePicture?: SortOrder
     wantsnotification?: SortOrder
   }
 
@@ -2245,6 +2273,7 @@ export namespace Prisma {
     firstName?: SortOrder
     lastName?: SortOrder
     gender?: SortOrder
+    profilePicture?: SortOrder
     wantsnotification?: SortOrder
   }
 
