@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import EditIcon from "@mui/icons-material/Edit";
+import Image from "next/image";
 import PersonIcon from "@mui/icons-material/Person";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
@@ -138,8 +139,16 @@ const AccountProfile = () => {
               position: "absolute",
               top: 2,
               right: 8,
-              color: "darkgreen",
+              //color: "darkgreen",
+              //backgroundImage: 'url("/Animals-Mosquito-icon.png")',
             }}
+          />
+          <Image
+            style={{ position: "absolute", top: 2, left: 8 }}
+            src="/Animals-Mosquito-icon.png"
+            alt={""}
+            width={25}
+            height={25}
           />
         </Box>
         <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>

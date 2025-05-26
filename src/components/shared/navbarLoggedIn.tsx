@@ -175,11 +175,11 @@ const NavbarLoggedIn: React.FC = () => {
                 <Divider sx={{ my: 0.5 }} />
 
                 <MenuItem onClick={accountpage}>
-                  Account Page &nbsp;
+                  Profile &nbsp;
                   <AccountCircle sx={{ ml: "auto", mr: 1 }} />
                 </MenuItem>
 
-                <MenuItem
+                {/*<MenuItem
                   //onClick={() => {
                   // router.push("/auth/settings");
                   //handleMenuClose();
@@ -188,7 +188,7 @@ const NavbarLoggedIn: React.FC = () => {
                 >
                   Settings
                   <SettingsIcon sx={{ ml: "auto", mr: 1 }} />
-                </MenuItem>
+                </MenuItem>*/}
 
                 <MenuItem onClick={handleLogout}>
                   Logout
@@ -196,7 +196,7 @@ const NavbarLoggedIn: React.FC = () => {
                 </MenuItem>
               </Menu>
 
-              {/**setting dropdown */}
+              {/**setting dropdown *
               <Menu
                 anchorEl={settingAnchorEl}
                 open={Boolean(settingAnchorEl)}
@@ -229,7 +229,7 @@ const NavbarLoggedIn: React.FC = () => {
                     //sx={{ color: "black", padding: "5px" }}
                     //primary={`Name : ${user?.email}`}
                     //secondary={`Email Address:  ${user?.email}`}
-                    />*/}
+                    />*
                     <Box
                       sx={{
                         display: "flex",
@@ -273,14 +273,14 @@ const NavbarLoggedIn: React.FC = () => {
                         {user?.gender}
                       </Typography>
                     </Box>
-                    {/* Name input field */}
+                    {/* Name input field *
                     {/*<Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                       <TextField
                         sx={{ padding: "5px", gap: 1 }}
                         label="Enter your Name!"
                       />{" "}
                       <Button>Save</Button>
-                    </Box>*/}
+                    </Box>*
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Typography sx={{ padding: "5px", gap: 1, color: "" }}>
                         {" "}
@@ -297,10 +297,10 @@ const NavbarLoggedIn: React.FC = () => {
                       <h5>You are who?</h5>
                       <PersonIcon />
                       <p> Your email Address is {user?.email}</p>
-                    </ListItemText>*/}
+                    </ListItemText>
                   </Box>
                 </MenuItem>
-              </Menu>
+              </Menu>*/}
             </>
           )}
         </Toolbar>

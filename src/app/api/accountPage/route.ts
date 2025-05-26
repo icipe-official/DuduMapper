@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
 import jwt from "jsonwebtoken";
+//import { cookies } from "next/headers";
 
 const prisma = new PrismaClient();
 
 export async function PUT(req: NextRequest) {
   try {
     // Access cookies using the request object (correct way in API routes)
+    //const cookieStore = cookies();
+    // const token = cookieStore.get("token")?.value;
     const token = req.cookies.get("token")?.value;
 
     if (!token) {
