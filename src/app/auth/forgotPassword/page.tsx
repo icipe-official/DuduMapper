@@ -46,11 +46,21 @@ const ForgotPassword = () => {
         <Box
           sx={{
             mt: 8,
-            boxShadow: 3,
             borderRadius: 2,
             textAlign: "center",
             p: 4,
+
             flexDirection: "column",
+            boxShadow:
+              " inset 2px 2px  5px 5px #babecc, inset -10px -10px 20px #ffffff",
+
+            input: {
+              padding: "12px",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              border: "none",
+            },
+            mx: "auto",
           }}
         >
           <motion.div
@@ -90,6 +100,17 @@ const ForgotPassword = () => {
             onChange={handleEmailChange}
             error={emailError}
             helperText={emailError ? "type the correct mail" : ""}
+            sx={{
+              borderRadius: "20px",
+              boxShadow:
+                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              input: {
+                padding: "12px",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+            }}
           />
           <Button
             style={{
@@ -98,6 +119,10 @@ const ForgotPassword = () => {
               marginLeft: "10px",
               backgroundColor: "green",
               color: "white",
+              borderRadius: "20px",
+              boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
+              textTransform: "none",
+              fontWeight: "bold",
             }}
             onClick={() => {
               handleSendLink();

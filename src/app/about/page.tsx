@@ -73,8 +73,13 @@ const About = () => {
         color="textSecondary"
         paragraph
       >
-        An innovative GIS project dedicated to mapping insect populations and
-        disease-prone areas in Kenya using advanced raster data techniques.
+        An innovative GIS project which serves as a critical tool in the fight
+        against leishmaniasis, a neglected tropical disease affecting millions
+        worldwide. By visualizing disease prevalence alongside population
+        density data, we empower researchers, healthcare professionals, and
+        policymakers to identify high-risk areas, allocate resources
+        effectively, and develop targeted intervention strategies. raster data
+        techniques.
       </Typography>
 
       {/* Section: Why DuduMapper? */}
@@ -93,15 +98,17 @@ const About = () => {
             color="textSecondary"
             paragraph
           >
-            Kenya`s diverse landscapes create unique habitats for
-            disease-carrying insects like mosquitoes, tsetse flies, and locusts.
-            These insects pose threats to both human populations and food
-            security.
+            Leishmaniasis is the second-largest parasitic killer after malaria,
+            yet it remains one of the most neglected tropical diseases. With
+            over 1 billion people at risk globally , there is an urgent need for
+            innovative tools that can identify where the disease strikes hardest
+            and who is most vulnerable.
           </Typography>
           <Typography fontSize="13px" variant="body1" color="textSecondary">
-            DuduMapper bridges the gap between science, technology, and
-            real-world impact by offering a data-driven approach to
-            understanding:
+            Traditional disease reporting relies on fragmented, often outdated
+            information scattered across different health systems. Dudumapper
+            exists because we recognized that raw epidemiological data is
+            meaningless without context :
           </Typography>
           <Divider sx={{ my: 2 }} />
 
@@ -146,7 +153,7 @@ const About = () => {
                   sx={{ fontWeight: "bold", color: "#2E7D32" }}
                 >
                   <PestControl
-                    sx={{ verticalAlign: "middle", mr: 1, fontSize: "16px" }}
+                    sx={{ verticalAlign: "middle", mr: 1, fontSize: "14px" }}
                   />
                   Insect Monitoring
                 </Typography>

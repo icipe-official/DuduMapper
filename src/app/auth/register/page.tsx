@@ -149,7 +149,8 @@ const Register: React.FC = ({}) => {
         height: "100vh",
         justifyContent: "center",
         alignItems: "center",
-        //backgroundImage: 'url("/Animals-Mosquito-icon.png")',
+        padding: 4,
+        boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff",
       }}
     >
       <Container maxWidth="sm">
@@ -157,10 +158,18 @@ const Register: React.FC = ({}) => {
           sx={{
             mt: 8,
             p: 4,
-            boxShadow: 3,
             borderRadius: 2,
             textAlign: "center",
-            //backgroundColor: "white",
+            padding: 4,
+
+            boxShadow:
+              "inset 0.5px 0.5px 5px 5px  #babecc, inset -6px -6px 8px #ffffff",
+            input: {
+              padding: "12px",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              border: "none",
+            },
           }}
         >
           <motion.div
@@ -183,7 +192,10 @@ const Register: React.FC = ({}) => {
             />
           </motion.div>
 
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
+          <Typography
+            variant="h5"
+            sx={{ mb: 2, fontWeight: "bold", fontFamily: "Nunito, sans-serif" }}
+          >
             Register
           </Typography>
           <h2
@@ -194,7 +206,7 @@ const Register: React.FC = ({}) => {
               fontStyle: "italic",
             }}
           >
-            Enter your personal details and start your journey with us
+            Enter your personal details and start your journey.
           </h2>
           <TextField
             label="First Name"
@@ -204,6 +216,18 @@ const Register: React.FC = ({}) => {
             fullWidth
             margin="normal"
             onChange={handleFirstNameChange}
+            sx={{
+              backgroundColor: "white",
+              borderRadius: "20px",
+              boxShadow:
+                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              input: {
+                padding: "12px",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+            }}
           />
           <TextField
             label="Last Name"
@@ -213,11 +237,44 @@ const Register: React.FC = ({}) => {
             fullWidth
             margin="normal"
             onChange={handleLastNameChange}
+            sx={{
+              //backgroundColor: "#e0e5ec",
+              borderRadius: "20px",
+              boxShadow:
+                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              input: {
+                padding: "12px",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+            }}
           />
 
           <FormControl component="fieldset" margin="normal">
-            <FormLabel component="legend">Gender</FormLabel>
-            <RadioGroup row value={gender} onChange={handleGenderChange}>
+            <FormLabel
+              component="legend"
+              sx={{
+                color: "#555",
+                textAlign: "center",
+                mb: 1,
+                textShadow: "1px 1px 2px #fff",
+              }}
+            >
+              Gender
+            </FormLabel>
+            <RadioGroup
+              row
+              value={gender}
+              onChange={handleGenderChange}
+              sx={{
+                mt: 2,
+                borderRadius: "20px",
+                boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
+                textTransform: "none",
+                fontWeight: "bold",
+              }}
+            >
               <FormControlLabel
                 value="male"
                 control={<Radio />}
@@ -263,6 +320,18 @@ const Register: React.FC = ({}) => {
             onChange={handleEmailChange}
             error={emailError}
             helperText={emailError ? "invalid email" : ""}
+            sx={{
+              // backgroundColor: "#e0e5ec",
+              borderRadius: "20px",
+              boxShadow:
+                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              input: {
+                padding: "12px",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+            }}
           />
 
           <TextField
@@ -279,6 +348,18 @@ const Register: React.FC = ({}) => {
                 ? "password should be a mix of 8 characters long (uppercase and special case)"
                 : ""
             }
+            sx={{
+              //backgroundColor: "#e0e5ec",
+              borderRadius: "20px",
+              boxShadow:
+                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              input: {
+                padding: "12px",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+            }}
           />
 
           <TextField
@@ -289,6 +370,18 @@ const Register: React.FC = ({}) => {
             variant="outlined"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            sx={{
+              // backgroundColor: "#e0e5ec",
+              borderRadius: "20px",
+              boxShadow:
+                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              input: {
+                padding: "12px",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+            }}
           />
 
           {error && (
@@ -302,6 +395,14 @@ const Register: React.FC = ({}) => {
               <Checkbox
                 checked={wantsNotification}
                 onChange={(e) => setWantsNotification(e.target.checked)}
+                sx={{
+                  mt: 2,
+                  borderRadius: "20px",
+                  // backgroundColor: "#00bcd4",
+                  boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
+                  textTransform: "none",
+                  fontWeight: "bold",
+                }}
               />
             }
             label="Notify me about disease-prone areas"
@@ -311,7 +412,14 @@ const Register: React.FC = ({}) => {
             variant="contained"
             color="success"
             fullWidth
-            sx={{ mt: 2 }}
+            sx={{
+              mt: 2,
+              borderRadius: "20px",
+              backgroundColor: "green",
+              boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
+              textTransform: "none",
+              fontWeight: "bold",
+            }}
             onClick={handleRegister}
           >
             Sign Up

@@ -208,7 +208,11 @@ const AccountProfile = () => {
           )}
 
           <Image
-            style={{ position: "absolute", top: 2, left: 8 }}
+            style={{
+              position: "absolute",
+              top: 2,
+              left: 8,
+            }}
             src="/Animals-Mosquito-icon.png"
             alt={""}
             width={25}
@@ -263,12 +267,37 @@ const AccountProfile = () => {
               <TextField
                 value={firstNameEditted}
                 onChange={(e) => setFirstNameEditted(e.target.value)}
-                sx={{ mr: 1 }}
+                //sx={{ mr: 1 }}
+                sx={{
+                  mr: 1,
+                  backgroundColor: "#e0e5ec",
+                  borderRadius: "20px",
+                  boxShadow:
+                    "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+                  input: {
+                    padding: "12px",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    border: "none",
+                  },
+                }}
               />
               <Button
                 //variant="contained"
                 size="small"
                 onClick={handleFirstNameSave}
+                sx={{
+                  mt: 2,
+                  borderRadius: "20px",
+                  backgroundColor: "green",
+                  color: "#ffffff",
+                  boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  "&:hover": {
+                    backgroundColor: "#00acc1",
+                  },
+                }}
               >
                 Save
               </Button>
@@ -295,12 +324,37 @@ const AccountProfile = () => {
               <TextField
                 value={lastNameEditted}
                 onChange={(e) => setLastNameEditted(e.target.value)}
-                sx={{ mr: 1 }}
+                //sx={{ mr: 1 }}
+                sx={{
+                  mr: 1,
+                  backgroundColor: "#e0e5ec",
+                  borderRadius: "20px",
+                  boxShadow:
+                    "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+                  input: {
+                    padding: "12px",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    border: "none",
+                  },
+                }}
               />
               <Button
                 //variant="contained"
                 size="small"
                 onClick={handleLastNameSave}
+                sx={{
+                  mt: 2,
+                  borderRadius: "20px",
+                  backgroundColor: "green",
+                  color: "#ffffff",
+                  boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  "&:hover": {
+                    backgroundColor: "#00acc1",
+                  },
+                }}
               >
                 Save
               </Button>

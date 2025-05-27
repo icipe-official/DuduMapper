@@ -171,6 +171,7 @@ const SignIn: React.FC = () => {
       setError(data.message);
     }
   };*/
+
   return (
     <div
       style={{
@@ -179,6 +180,7 @@ const SignIn: React.FC = () => {
         width: "100vw",
         justifyContent: "center",
         alignItems: "center",
+        //backgroundColor: "#e0e5ec",
       }}
     >
       <Container maxWidth="sm">
@@ -186,10 +188,19 @@ const SignIn: React.FC = () => {
           sx={{
             mt: 8,
             p: 4,
-            boxShadow: 3,
+
             borderRadius: 2,
             textAlign: "center",
-            backgroundColor: "whiyte",
+            mx: "auto",
+
+            boxShadow:
+              "inset 0.2px 0.2px 5px 5px #babecc, inset -6px -6px 10px #ffffff",
+            input: {
+              padding: "12px",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              border: "none",
+            },
           }}
         >
           <motion.div
@@ -212,7 +223,15 @@ const SignIn: React.FC = () => {
             />
           </motion.div>
 
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
+          <Typography
+            variant="h5"
+            sx={{
+              mb: 2,
+              fontWeight: "bold",
+              fontFamily: "Nunito, sans-serif",
+              //textShadow: "1px 1px 2px #fff, -1px -1px 2px #babecc",
+            }}
+          >
             Login
           </Typography>
           <h3
@@ -223,7 +242,7 @@ const SignIn: React.FC = () => {
               fontStyle: "italic",
             }}
           >
-            To keep connected with us please login with your personal info.
+            To keep connected please login with your personal info.
           </h3>
 
           <TextField
@@ -235,6 +254,18 @@ const SignIn: React.FC = () => {
             onChange={handleEmailChange}
             error={emailError}
             helperText={emailError ? "invalid email" : ""}
+            sx={{
+              //backgroundColor: "#e0e5ec",
+              borderRadius: "20px",
+              boxShadow:
+                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              input: {
+                padding: "12px",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+            }}
           />
           <TextField
             label="Password"
@@ -249,6 +280,18 @@ const SignIn: React.FC = () => {
                 ? "password must be 8 mixed characters long (uppercase and special characters)"
                 : ""
             }
+            sx={{
+              //backgroundColor: "#e0e5ec",
+              borderRadius: "20px",
+              boxShadow:
+                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              input: {
+                padding: "12px",
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+              },
+            }}
           />
 
           {error && (
@@ -269,8 +312,15 @@ const SignIn: React.FC = () => {
             variant="contained"
             color="success"
             fullWidth
-            sx={{ mt: 2 }}
             onClick={handleEmailSignIn}
+            sx={{
+              mt: 2,
+              borderRadius: "20px",
+              backgroundColor: "green",
+              boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
+              textTransform: "none",
+              fontWeight: "bold",
+            }}
           >
             Sign In
           </Button>
@@ -281,10 +331,12 @@ const SignIn: React.FC = () => {
             variant="contained"
             fullWidth
             sx={{
-              backgroundColor: "white", //"#db4437",
-              color: "black",
-
-              "&:hover": { backgroundColor: "lightgrey", transform: "none" },
+              mt: 2,
+              borderRadius: "20px",
+              backgroundColor: "#00bcd4",
+              boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
+              textTransform: "none",
+              fontWeight: "bold",
             }}
             /*onClick={handleGoogleSignIn}*/
             startIcon={

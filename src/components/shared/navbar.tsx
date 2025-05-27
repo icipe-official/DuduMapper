@@ -27,7 +27,10 @@ const Navbar: React.FC = () => {
 
   return (
     <Box sx={{ position: "relative", zIndex: 2 }}>
-      <AppBar position="fixed" sx={{ bgcolor: "white", margin: 0, padding: 0 }}>
+      <AppBar
+        position="fixed"
+        sx={{ backgroundColor: "white", margin: 0, padding: 0 }}
+      >
         <Toolbar>
           <Box sx={{ flexGrow: 1, mt: "6px" }}>
             <div onClick={handleLogoClick} style={{ cursor: "pointer" }}>
