@@ -14,6 +14,7 @@ export async function POST(req: Request) {
       firstName,
       lastName,
       gender,
+      profilePicture,
       //wantsNotification = false,
     } = await req.json();
 
@@ -52,6 +53,7 @@ export async function POST(req: Request) {
         firstName,
         lastName,
         gender,
+        profilePicture,
         password: hashedPassword,
 
         //wantsNotification,

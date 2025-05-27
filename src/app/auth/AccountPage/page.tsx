@@ -143,7 +143,7 @@ const AccountProfile = () => {
           }
 
           const data = await res.json();
-          //updateUser(data.user);
+          updateUser(data.user);
           toast.success("Profile updated successfully");
         } catch (error) {
           console.error("Error updating profile:", error);
@@ -172,7 +172,7 @@ const AccountProfile = () => {
         elevation={4}
         sx={{ p: 4, borderRadius: 4, width: "100%", maxWidth: 400 }}
       >
-        <Box
+        <div
           style={{
             position: "relative",
             height: "50px" /* or your container height */,
@@ -180,9 +180,9 @@ const AccountProfile = () => {
         >
           {user?.profilePicture ? (
             <Image
+              width={50}
+              height={50}
               style={{
-                width: 40,
-                height: 40,
                 borderRadius: "50%",
                 objectFit: "cover",
                 cursor: "pointer",
@@ -214,7 +214,7 @@ const AccountProfile = () => {
             width={25}
             height={25}
           />
-        </Box>
+        </div>
         <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
           <Typography
             variant="h6"

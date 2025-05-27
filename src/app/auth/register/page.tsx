@@ -123,6 +123,7 @@ const Register: React.FC = ({}) => {
         firstName: data.user.firstName,
         lastName: data.user.lastName,
         gender: data.user.gender,
+        profilePicture: data.user.profileProfile ?? null,
       });
       toast.success("User Registered Successfully"),
         {
@@ -183,7 +184,7 @@ const Register: React.FC = ({}) => {
           </motion.div>
 
           <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-            Welcome
+            Register
           </Typography>
           <h2
             style={{
@@ -193,7 +194,7 @@ const Register: React.FC = ({}) => {
               fontStyle: "italic",
             }}
           >
-            Sign Up
+            Enter your personal details and start your journey with us
           </h2>
           <TextField
             label="First Name"
@@ -308,17 +309,17 @@ const Register: React.FC = ({}) => {
 
           <Button
             variant="contained"
-            color="primary"
+            color="success"
             fullWidth
             sx={{ mt: 2 }}
             onClick={handleRegister}
           >
-            Register
+            Sign Up
           </Button>
 
           <Typography sx={{ mt: 2 }}>
             Already have an account?{" "}
-            <Button color="secondary" onClick={handleNavigate}>
+            <Button color="success" onClick={handleNavigate}>
               Sign In
             </Button>
           </Typography>

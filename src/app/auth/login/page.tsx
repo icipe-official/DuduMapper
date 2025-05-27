@@ -213,7 +213,7 @@ const SignIn: React.FC = () => {
           </motion.div>
 
           <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-            Welcome
+            Login
           </Typography>
           <h3
             style={{
@@ -223,7 +223,7 @@ const SignIn: React.FC = () => {
               fontStyle: "italic",
             }}
           >
-            Sign in
+            To keep connected with us please login with your personal info.
           </h3>
 
           <TextField
@@ -260,14 +260,14 @@ const SignIn: React.FC = () => {
           <a
             href="ForgotPassword"
             onClick={handleForgotPassword}
-            style={{ textDecoration: "none", color: "#1976d2" }}
+            style={{ textDecoration: "none", color: "green" }}
           >
             Forgot Password?
           </a>
 
           <Button
             variant="contained"
-            color="primary"
+            color="success"
             fullWidth
             sx={{ mt: 2 }}
             onClick={handleEmailSignIn}

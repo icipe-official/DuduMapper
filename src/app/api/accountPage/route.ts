@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
 import jwt from "jsonwebtoken";
-import { writeFile } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { existsSync } from "fs";
 
 //import { cookies } from "next/headers";
 
@@ -97,8 +98,12 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const filename = `${uuidv4()}_${file.name}`;
-    const filePath = path.join(process.cwd(), "public", "uploads", filename);
-
+    //create directory
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    if (!existsSync(uploadDir)) {
+      await mkdir(uploadDir, { recursive: true });
+    }
+    const filePath = path.join(uploadDir, filename);
     await writeFile(filePath, new Uint8Array(buffer));
 
     const imageUrl = `/uploads/${filename}`;
