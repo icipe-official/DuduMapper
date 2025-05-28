@@ -193,14 +193,7 @@ const SignIn: React.FC = () => {
             textAlign: "center",
             mx: "auto",
 
-            boxShadow:
-              "inset 0.2px 0.2px 5px 5px #babecc, inset -6px -6px 10px #ffffff",
-            input: {
-              padding: "12px",
-            },
-            "& .MuiOutlinedInput-notchedOutline": {
-              border: "none",
-            },
+            boxShadow: " 6px 6px 12px #babecc, -6px -6px 12px #ffffff",
           }}
         >
           <motion.div
@@ -333,7 +326,7 @@ const SignIn: React.FC = () => {
             sx={{
               mt: 2,
               borderRadius: "20px",
-              backgroundColor: "#00bcd4",
+              backgroundColor: "green",
               boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
               textTransform: "none",
               fontWeight: "bold",

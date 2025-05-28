@@ -51,16 +51,7 @@ const ForgotPassword = () => {
             p: 4,
 
             flexDirection: "column",
-            boxShadow:
-              " inset 2px 2px  5px 5px #babecc, inset -10px -10px 20px #ffffff",
-
-            input: {
-              padding: "12px",
-            },
-            "& .MuiOutlinedInput-notchedOutline": {
-              border: "none",
-            },
-            mx: "auto",
+            boxShadow: "6px 6px 12px #babecc, -6px -6px 12px #ffffff",
           }}
         >
           <motion.div

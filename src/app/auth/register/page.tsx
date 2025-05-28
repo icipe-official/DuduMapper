@@ -161,15 +161,7 @@ const Register: React.FC = ({}) => {
             borderRadius: 2,
             textAlign: "center",
             padding: 4,
-
-            boxShadow:
-              "inset 0.5px 0.5px 5px 5px  #babecc, inset -6px -6px 8px #ffffff",
-            input: {
-              padding: "12px",
-            },
-            "& .MuiOutlinedInput-notchedOutline": {
-              border: "none",
-            },
+            boxShadow: "6px 6px 12px #babecc, -6px -6px 12px #ffffff",
           }}
         >
           <motion.div

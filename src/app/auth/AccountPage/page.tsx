@@ -406,9 +406,22 @@ const AccountProfile = () => {
                       <PersonIcon />
                       <p> Your email Address is {user?.email}</p>
                     </ListItemText>*/}
-        <Divider sx={{ mb: 2 }} />
+        <Divider sx={{ mb: 2, mt: 2 }} />
         <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-          <Button onClick={logout}>Logout</Button>
+          <Button
+            onClick={logout}
+            sx={{
+              borderRadius: "30px",
+              //boxShadow: "6px 6px 12px #babecc, -6px -6px 12px #ffffff",
+              "&:hover": {
+                backgroundColor: "#00acc1",
+              },
+              color: "green",
+              //color: "#ffffff",
+            }}
+          >
+            Log out
+          </Button>
         </Box>
       </Paper>
     </Box>

@@ -53,7 +53,34 @@ import { useRouter } from "next/router";
 
 // ─── Constants & Styled Components ────────────────────────────────────────────
 
-const drawerWidth = 240;
+//const drawerWidth = 240;
+//dragging drawer logic implemetation
+const useDrawerDrag = () => {
+  const [width, setWidth] = React.useState(240);
+  const [dragging, setDragging] = React.useState(false);
+  React.useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!dragging) return;
+      const maxWidth = window.innerWidth * 0.5;
+      const newWidth = Math.min(Math.max(240, e.clientX), maxWidth);
+      setWidth(newWidth);
+    };
+    const stopDragging = () => setDragging(false);
+    if (dragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", stopDragging);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", stopDragging);
+    };
+  }, [dragging]);
+  const drawerWidth = () => width;
+  const startDragging = () => setDragging(true);
+
+  return { drawerWidth, startDragging };
+};
+
 /*const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme, open }) => ({
@@ -117,6 +144,8 @@ const matrixIds4326 = Array.from({ length: 19 }, (_, z) => `EPSG:4326:${z}`);
 // ─── Component ───────────────────────────────────────────────────────────────
 
 function Newmap() {
+  //drag effect
+  const { drawerWidth, startDragging } = useDrawerDrag();
   const theme = useTheme();
   const mapRef = useRef<OlMap>();
 
@@ -559,10 +588,10 @@ function Newmap() {
         <Drawer
           sx={{
             zIndex: (theme) => theme.zIndex.drawer + 3,
-            width: drawerWidth,
+            width: drawerWidth(),
             flexShrink: 0,
             "& .MuiDrawer-paper": {
-              width: drawerWidth,
+              width: drawerWidth(),
               boxSizing: "border-box",
               borderRight: "1px solid rgba(0,0,0,0.1)",
               boxShadow: "2px 0 4px rgba(0,0,0,0.1)",
@@ -572,6 +601,18 @@ function Newmap() {
           anchor="left"
           open={open}
         >
+          <div
+            onMouseDown={startDragging}
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              width: 6,
+              height: "100%",
+              cursor: "ew-resize",
+              zIndex: 999,
+            }}
+          />
           <DrawerHeader>
             <IconButton onClick={handleDrawerClose}>
               {theme.direction === "ltr" ? (

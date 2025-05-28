@@ -68,7 +68,7 @@ const NavbarLoggedIn: React.FC = () => {
   };
   const handleLogout = async () => {
     await logout();
-    toast.success("Logout Successfully"),
+    toast.success("Logging out Successfully"),
       {
         position: "top-right",
         hideProgressBar: false,
