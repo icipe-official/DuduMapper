@@ -54,6 +54,7 @@
     "babel-plugin-transform-commonjs": "^1.1.6",
     "eslint": "^8.55.0",
     "eslint-config-next": "^14.0.4",
+    "prisma": "^6.8.2",
     "typescript": "^5"
   }
 }
