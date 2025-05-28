@@ -624,23 +624,23 @@ function Newmap() {
           </DrawerHeader>
           <Divider />
           <List>
-            <ListItem disablePadding>
+            {/*<ListItem disablePadding>
               <ListItemButton>
                 <ListItemIcon>
                   <InboxIcon />
                 </ListItemIcon>
                 <ListItemText primary="Layer Controls" />
               </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
+            </ListItem>*/}
+            {/* <ListItem disablePadding>
               <ListItemButton>
                 <ListItemIcon>
                   <InboxIcon />
                 </ListItemIcon>
                 <ListItemText primary="Base Maps" />
               </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
+            </ListItem>*/}
+            {/*<ListItem disablePadding>
               <Box
                 sx={{
                   width: "100%",
@@ -680,7 +680,7 @@ function Newmap() {
                   )}
                 </ListItemButton>
               </Box>
-            </ListItem>
+            </ListItem>*/}
             <ListItem disablePadding>
               <ListItemButton onClick={handleOverlaysClick}>
                 <ListItemIcon>
