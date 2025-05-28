@@ -31,7 +31,7 @@ import TransgenderIcon from "@mui/icons-material/Transgender";
   onRegisterSuccess: () => void;
 }
 */
-const Register: React.FC = ({}) => {
+const Register: React.FC = ({ }) => {
   //email, name, gender, password, confirmPassword
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -52,7 +52,9 @@ const Register: React.FC = ({}) => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     setEmail(input);
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
+    const isValidEmail =
+      /^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/.test(input);
+
     setEmailError(!isValidEmail && input.length > 0);
   };
 
@@ -78,7 +80,8 @@ const Register: React.FC = ({}) => {
     const input = e.target.value;
     setPassword(input);
     const isValidPassword =
-      /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(input);
+      /^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/.test(input);
+
     setPasswordError(!isValidPassword && input.length > 0);
   };
 
@@ -126,12 +129,12 @@ const Register: React.FC = ({}) => {
         profilePicture: data.user.profileProfile ?? null,
       });
       toast.success("User Registered Successfully"),
-        {
-          position: "top-right",
-          autoclose: 5000,
-          hideProgressBar: false,
-          pauseOnHover: true,
-        };
+      {
+        position: "top-right",
+        autoclose: 5000,
+        hideProgressBar: false,
+        pauseOnHover: true,
+      };
 
       // No need for explicit redirect here - the login function now handles it
       router.push("/"); // REMOVED this line

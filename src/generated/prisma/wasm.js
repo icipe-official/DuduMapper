@@ -131,6 +131,27 @@ exports.Prisma.UsersScalarFieldEnum = {
   wantsnotification: 'wantsnotification'
 };
 
+exports.Prisma.VectorRiskDataScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  country: 'country',
+  region: 'region',
+  year: 'year',
+  month: 'month',
+  model: 'model',
+  description: 'description',
+  highRisk: 'highRisk',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  vectorRiskDataId: 'vectorRiskDataId',
+  sentAt: 'sentAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -148,7 +169,9 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  users: 'users'
+  users: 'users',
+  VectorRiskData: 'VectorRiskData',
+  Notification: 'Notification'
 };
 
 /**

@@ -1,7 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
-  output   = "../src/generated/prisma"
+  output        = "../src/generated/prisma"
 }
 
 datasource db {
@@ -10,13 +10,38 @@ datasource db {
 }
 
 model users {
-  id                Int      @id @default(autoincrement())
-  email             String   @unique @db.VarChar(100)
-  password          String   @db.VarChar(255)
-  firstName         String?  @db.VarChar(100)
-  lastName          String?  @db.VarChar(100)
-  gender            String?  @db.VarChar(50)
-  profilePicture    String?  @db.VarChar(255)
-  wantsnotification Boolean? @default(true)
+  id                Int            @id @default(autoincrement())
+  email             String         @unique @db.VarChar(100)
+  password          String         @db.VarChar(255)
+  firstName         String?        @db.VarChar(100)
+  lastName          String?        @db.VarChar(100)
+  gender            String?        @db.VarChar(50)
+  profilePicture    String?        @db.VarChar(255)
+  wantsnotification Boolean?       @default(true)
+  notifications     Notification[] // 👈 Back-relation from Notification
 }
 
+model VectorRiskData {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(100)
+  country     String   @db.VarChar(100)
+  region      String   @db.VarChar(100)
+  year        Int
+  month       Int
+  model       String   @db.VarChar(100)
+  description String?  @db.Text
+  highRisk    Boolean
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  notifications Notification[] // 👈 Back-relation from Notification
+}
+
+model Notification {
+  id               Int            @id @default(autoincrement())
+  user             users          @relation(fields: [userId], references: [id])
+  userId           Int
+  vectorRiskData   VectorRiskData @relation(fields: [vectorRiskDataId], references: [id])
+  vectorRiskDataId Int
+  sentAt           DateTime       @default(now())
+}
