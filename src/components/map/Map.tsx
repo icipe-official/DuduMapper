@@ -262,6 +262,7 @@ function Newmap() {
               }),
             });
           })
+
           .filter((layer): layer is TileLayer<any> => layer !== null);
 
         return new LayerGroup({
@@ -463,6 +464,7 @@ function Newmap() {
                       edge="start"
                       checked={olLayer?.getVisible() || false}
                       tabIndex={-1}
+                      color="success"
                       disableRipple
                     />
                     <ListItemText primary={layer.title} />
@@ -569,18 +571,7 @@ function Newmap() {
               }}
             />
           </IconButton>
-          <Box sx={{ flexGrow: 1, mt: "6px" }}>
-            <Link href={"/"}>
-              <picture>
-                <img
-                  src={"/Animals-Mosquito-icon.png"}
-                  style={{ maxHeight: "70px", cursor: "pointer" }}
-                  alt="Dudu Mapper logo"
-                  //onClick={() => router.push("/")}
-                />
-              </picture>
-            </Link>
-          </Box>
+
           {/*<NavLink key="About" url="./about" text="About" />
           <NavLink key="Register" url="./auth/register" text="Register" />*/}
         </Toolbar>

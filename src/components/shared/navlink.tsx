@@ -9,7 +9,7 @@ export default function NavLink({ url, text }: { url: string; text: string }) {
   const baseStyle = {
     padding: "8px",
     "&:hover": {
-      backgroundColor: theme.palette.primary.light,
+      backgroundColor: theme.palette.success.light,
       borderRadius: "40%",
     },
   };

@@ -14,7 +14,7 @@ const ForgotPassword = () => {
 
   //handle navigation
   const handleNavigateBack = () => {
-    router.push("/");
+    router.push("/auth/login");
   };
 
   //email validation
@@ -86,6 +86,7 @@ const ForgotPassword = () => {
           </p>
           <TextField
             label="Email address"
+            color="success"
             type="email"
             value={email}
             onChange={handleEmailChange}
@@ -93,8 +94,7 @@ const ForgotPassword = () => {
             helperText={emailError ? "type the correct mail" : ""}
             sx={{
               borderRadius: "20px",
-              boxShadow:
-                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              boxShadow: " 2px 2px 6px #babecc,  -6px -6px 12px #ffffff",
               input: {
                 padding: "12px",
               },
@@ -125,7 +125,7 @@ const ForgotPassword = () => {
 
           <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
             <a
-              href="./app"
+              href="./auth/login"
               onClick={handleNavigateBack}
               style={{
                 marginTop: "10px",
@@ -140,7 +140,7 @@ const ForgotPassword = () => {
               //<a href="./app/SignIn">DashBoard</a>
               //onClick={handleNavigate}
             >
-              DashBoard
+              Cancel
             </a>
           </Box>
         </Box>

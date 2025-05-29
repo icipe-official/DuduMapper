@@ -31,7 +31,7 @@ import TransgenderIcon from "@mui/icons-material/Transgender";
   onRegisterSuccess: () => void;
 }
 */
-const Register: React.FC = ({ }) => {
+const Register: React.FC = ({}) => {
   //email, name, gender, password, confirmPassword
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -52,8 +52,7 @@ const Register: React.FC = ({ }) => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     setEmail(input);
-    const isValidEmail =
-      /^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/.test(input);
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
 
     setEmailError(!isValidEmail && input.length > 0);
   };
@@ -79,8 +78,7 @@ const Register: React.FC = ({ }) => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     setPassword(input);
-    const isValidPassword =
-      /^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/.test(input);
+    const isValidPassword = /^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/.test(input);
 
     setPasswordError(!isValidPassword && input.length > 0);
   };
@@ -129,12 +127,12 @@ const Register: React.FC = ({ }) => {
         profilePicture: data.user.profileProfile ?? null,
       });
       toast.success("User Registered Successfully"),
-      {
-        position: "top-right",
-        autoclose: 5000,
-        hideProgressBar: false,
-        pauseOnHover: true,
-      };
+        {
+          position: "top-right",
+          autoclose: 5000,
+          hideProgressBar: false,
+          pauseOnHover: true,
+        };
 
       // No need for explicit redirect here - the login function now handles it
       router.push("/"); // REMOVED this line
@@ -153,7 +151,7 @@ const Register: React.FC = ({ }) => {
         justifyContent: "center",
         alignItems: "center",
         padding: 4,
-        boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff",
+        //boxShadow: "8px 8px 16px #babecc, -8px -8px 16px #ffffff",
       }}
     >
       <Container maxWidth="sm">
@@ -206,6 +204,7 @@ const Register: React.FC = ({ }) => {
           <TextField
             label="First Name"
             type="text"
+            color="success"
             value={firstName}
             variant="outlined"
             fullWidth
@@ -214,8 +213,8 @@ const Register: React.FC = ({ }) => {
             sx={{
               backgroundColor: "white",
               borderRadius: "20px",
-              boxShadow:
-                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+
+              boxShadow: "2px 2px 6px #babecc, -6px -6px 12px #ffffff",
               input: {
                 padding: "12px",
               },
@@ -227,6 +226,7 @@ const Register: React.FC = ({ }) => {
           <TextField
             label="Last Name"
             type="text"
+            color="success"
             value={lastName}
             variant="outlined"
             fullWidth
@@ -235,8 +235,7 @@ const Register: React.FC = ({ }) => {
             sx={{
               //backgroundColor: "#e0e5ec",
               borderRadius: "20px",
-              boxShadow:
-                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              boxShadow: "2px 2px 6px #babecc, -6px -6px 12px #ffffff",
               input: {
                 padding: "12px",
               },
@@ -264,6 +263,7 @@ const Register: React.FC = ({ }) => {
               onChange={handleGenderChange}
               sx={{
                 mt: 2,
+
                 borderRadius: "20px",
                 boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
                 textTransform: "none",
@@ -272,7 +272,16 @@ const Register: React.FC = ({ }) => {
             >
               <FormControlLabel
                 value="male"
-                control={<Radio />}
+                control={
+                  <Radio
+                    sx={{
+                      ml: 2,
+                      "&.Mui-checked": {
+                        color: "green",
+                      },
+                    }}
+                  />
+                }
                 label={
                   <>
                     <MaleIcon sx={{ verticalAlign: "middle", mr: 0.5 }} />
@@ -282,7 +291,7 @@ const Register: React.FC = ({ }) => {
               />
               <FormControlLabel
                 value="female"
-                control={<Radio />}
+                control={<Radio sx={{ "&.Mui-checked": { color: "green" } }} />}
                 label={
                   <>
                     <FemaleIcon sx={{ verticalAlign: "middle", mr: 0.5 }} />
@@ -292,7 +301,15 @@ const Register: React.FC = ({ }) => {
               />
               <FormControlLabel
                 value="other"
-                control={<Radio />}
+                control={
+                  <Radio
+                    sx={{
+                      "&.Mui-checked": {
+                        color: "green",
+                      },
+                    }}
+                  />
+                }
                 label={
                   <>
                     <TransgenderIcon
@@ -318,8 +335,7 @@ const Register: React.FC = ({ }) => {
             sx={{
               // backgroundColor: "#e0e5ec",
               borderRadius: "20px",
-              boxShadow:
-                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              boxShadow: "2px 2px 6px #babecc, -6px -6px 12px #ffffff",
               input: {
                 padding: "12px",
               },
@@ -327,10 +343,12 @@ const Register: React.FC = ({ }) => {
                 border: "none",
               },
             }}
+            color="success"
           />
 
           <TextField
             label="Password"
+            color="success"
             type="password"
             fullWidth
             margin="normal"
@@ -346,8 +364,7 @@ const Register: React.FC = ({ }) => {
             sx={{
               //backgroundColor: "#e0e5ec",
               borderRadius: "20px",
-              boxShadow:
-                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              boxShadow: "2px 2px 6px #babecc, -6px -6px 12px #ffffff",
               input: {
                 padding: "12px",
               },
@@ -359,6 +376,7 @@ const Register: React.FC = ({ }) => {
 
           <TextField
             label="Confirm Password"
+            color="success"
             type="password"
             fullWidth
             margin="normal"
@@ -368,8 +386,7 @@ const Register: React.FC = ({ }) => {
             sx={{
               // backgroundColor: "#e0e5ec",
               borderRadius: "20px",
-              boxShadow:
-                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              boxShadow: "2px 2px 6px #babecc, -6px -6px 12px #ffffff",
               input: {
                 padding: "12px",
               },
@@ -392,11 +409,15 @@ const Register: React.FC = ({ }) => {
                 onChange={(e) => setWantsNotification(e.target.checked)}
                 sx={{
                   mt: 2,
+                  mr: 2,
                   borderRadius: "20px",
                   // backgroundColor: "#00bcd4",
                   boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
                   textTransform: "none",
                   fontWeight: "bold",
+                  "&.Mui-checked": {
+                    color: "green",
+                  },
                 }}
               />
             }

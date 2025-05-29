@@ -38,9 +38,6 @@ const SignIn: React.FC = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     setPassword(input);
-    const isValidPassword =
-      /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(input);
-    setPasswordError(!isValidPassword && input.length > 0);
   };
 
   //navigation to forgotpassword
@@ -240,6 +237,7 @@ const SignIn: React.FC = () => {
 
           <TextField
             label="Email address*"
+            color="success"
             type="email"
             fullWidth
             margin="normal"
@@ -250,8 +248,8 @@ const SignIn: React.FC = () => {
             sx={{
               //backgroundColor: "#e0e5ec",
               borderRadius: "20px",
-              boxShadow:
-                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              boxShadow: "2px 2px 6px #babecc, -6px -6px 12px #ffffff",
+
               input: {
                 padding: "12px",
               },
@@ -263,6 +261,7 @@ const SignIn: React.FC = () => {
           <TextField
             label="Password"
             type="password"
+            color="success"
             fullWidth
             margin="normal"
             value={password}
@@ -276,8 +275,7 @@ const SignIn: React.FC = () => {
             sx={{
               //backgroundColor: "#e0e5ec",
               borderRadius: "20px",
-              boxShadow:
-                "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+              boxShadow: "2px 2px 6px #babecc,  -6px -6px 12px #ffffff",
               input: {
                 padding: "12px",
               },
