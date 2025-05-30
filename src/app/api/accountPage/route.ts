@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
 import jwt from "jsonwebtoken";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
-import { existsSync } from "fs";
-
-//import { cookies } from "next/headers";
 
 const prisma = new PrismaClient();
 
@@ -85,33 +79,20 @@ export async function POST(req: NextRequest) {
       email: string;
     };
 
-    const formData = await req.formData();
-    const file = formData.get("profilePicture") as File;
+    const body = await req.json();
+    const base64Image = body.profilePicture;
 
-    if (!file) {
+    if (!base64Image || typeof base64Image !== "string") {
       return NextResponse.json(
-        { message: "No file uploaded" },
+        { message: "No image data provided" },
         { status: 400 }
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const filename = `${uuidv4()}_${file.name}`;
-    //create directory
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-    const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, new Uint8Array(buffer));
-
-    const imageUrl = `/uploads/${filename}`;
-
     const updatedUser = await prisma.users.update({
       where: { email: decoded.email },
       data: {
-        profilePicture: imageUrl,
+        profilePicture: base64Image,
       },
       select: {
         id: true,
@@ -125,7 +106,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ user: updatedUser });
   } catch (err) {
-    console.error("Profile picture upload error:", err);
+    console.error("Profile picture update error:", err);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

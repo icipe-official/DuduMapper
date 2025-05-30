@@ -16,7 +16,7 @@ model users {
   firstName         String?        @db.VarChar(100)
   lastName          String?        @db.VarChar(100)
   gender            String?        @db.VarChar(50)
-  profilePicture    String?        @db.VarChar(255)
+  profilePicture    String?        @db.Text
   wantsnotification Boolean?       @default(true)
   notifications     Notification[] // 👈 Back-relation from Notification
 }

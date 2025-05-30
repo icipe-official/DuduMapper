@@ -1,8 +1,12 @@
 "use client";
 import {
+  Avatar,
   Box,
   Button,
+  Dialog,
+  DialogContent,
   Divider,
+  IconButton,
   Paper,
   TextField,
   Typography,
@@ -15,12 +19,14 @@ import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
 import { useAuth } from "@/context/context";
-import React from "react";
+import React, { useState } from "react";
 import { set } from "date-fns";
 import { is } from "date-fns/locale";
 import { toast } from "react-toastify";
 import { AccountCircle } from "@mui/icons-material";
 import { useRef } from "react";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+
 const AccountProfile = () => {
   const { user, logout, updateUser } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -129,13 +135,25 @@ const AccountProfile = () => {
 
       if (file) {
         console.log("Selected file:", file);
-        const formData = new FormData();
-        formData.append("profilePicture", file);
+
+        // Convert image to Base64
+        const toBase64 = (file: File): Promise<string> =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = (error) => reject(error);
+          });
 
         try {
+          const base64String = await toBase64(file);
+
           const res = await fetch("/api/accountPage", {
             method: "POST",
-            body: formData,
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ profilePicture: base64String }),
           });
 
           if (!res.ok) {
@@ -143,7 +161,7 @@ const AccountProfile = () => {
           }
 
           const data = await res.json();
-          updateUser(data.user);
+          updateUser(data.user); // Update AuthContext or local state
           toast.success("Profile updated successfully");
         } catch (error) {
           console.error("Error updating profile:", error);
@@ -158,6 +176,10 @@ const AccountProfile = () => {
     input.click();
   };
 
+  //enhancing the profile picture size
+  const [open, setOpen] = useState(false);
+  const handleEnhanceSize = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   return (
     <Box
       sx={{
@@ -206,7 +228,35 @@ const AccountProfile = () => {
               }}
             />
           )}
-
+          <IconButton
+            onClick={handleEnhanceSize}
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              width: 30,
+              height: 30,
+            }}
+          >
+            <CameraAltIcon fontSize="small" />
+          </IconButton>
+          <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+            <DialogContent sx={{ p: 2 }}>
+              <Box
+                component="img"
+                src={user?.profilePicture}
+                alt="Enlarged picture"
+                sx={{
+                  width: "100%",
+                  maxHeight: "90vh",
+                  objectFit: "contain",
+                  display: "block",
+                  m: "auto",
+                  borderRadius: 2,
+                }}
+              />
+            </DialogContent>
+          </Dialog>
           <Image
             style={{
               position: "absolute",
