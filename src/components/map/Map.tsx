@@ -36,6 +36,8 @@ import LayerSwitcher from "ol-ext/control/LayerSwitcher";
 import LayerGroup from "ol/layer/Group";
 import TileLayer from "ol/layer/Tile";
 import WMTS from "ol/source/WMTS";
+import WMTSCapabilities from 'ol/format/WMTSCapabilities';
+import {optionsFromCapabilities} from 'ol/source/WMTS';
 import WMTSTileGrid from "ol/tilegrid/WMTS";
 import Collection from "ol/Collection";
 import OSM from "ol/source/OSM";
@@ -104,6 +106,27 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-end",
 }));
 
+   {/* Add styles properly using styled component */}
+      <style jsx>{`
+        .map-loader {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -30%);
+        }
+        
+        .icon-spinner {
+          display: inline-block;
+          animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+
+
 // For WMTS, using EPSG:4326
 const projection4326 = getProjection("EPSG:4326");
 const projectionExtent4326 = projection4326?.getExtent();
@@ -114,6 +137,7 @@ const resolutions4326 = projectionExtent4326
   ? Array.from({ length: 19 }, (_, z) => size4326 / Math.pow(2, z))
   : [];
 const matrixIds4326 = Array.from({ length: 19 }, (_, z) => `EPSG:4326:${z}`);
+
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -158,6 +182,8 @@ function Newmap() {
     };
     fetchLayers();
   }, []);
+
+  
 
   // ── Initialize the Map (same as your second code) ──
   useEffect(() => {
@@ -432,7 +458,7 @@ function Newmap() {
     </Collapse>
   );
 
-  // ── Render ──
+    // ── Render ──
   return (
     <div
       style={{
@@ -459,27 +485,25 @@ function Newmap() {
       </div>
       <Legend layerName={activeLayerName} />
       {/*inline*/}
-      <style>
-        {`
-              .map-loader{
-              position :fixed;
-              top : 50%;
-              left :50%;
-              transform : translate ( -50%, -30%);
-              
-              }
+         {/* Add styles properly using styled component */}
+      <style jsx>{`
+        .map-loader {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -30%);
+        }
         
-              .icon-spinner{
-              display : inline-block;
-              animation: spin 1s linear infinite;
-              }
+        .icon-spinner {
+          display: inline-block;
+          animation: spin 1s linear infinite;
+        }
         
-              @keyframes spin{
-               0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-              }
-              `}
-      </style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
 
       <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
         <CssBaseline />

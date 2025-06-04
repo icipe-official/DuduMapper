@@ -44,6 +44,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/colormap": "^2.3.4",
+    "@types/http-proxy": "^1.17.16",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20.8.9",
     "@types/ol-ext": "npm:@siedlerchr/types-ol-ext@^3.2.4",
