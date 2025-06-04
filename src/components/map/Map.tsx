@@ -28,6 +28,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
+import BugReportIcon from '@mui/icons-material/BugReport';
 
 import { Map as OlMap, Tile, View } from "ol";
 import "ol/ol.css";
@@ -164,6 +165,11 @@ function Newmap() {
   const [isLoading, setIsLoading] = useState(true);
   const [tilesLoading, setTilesLoading] = useState(0);
   const mapInitializedRef = useRef(false);
+
+  const handleLeishmaniasisClick = () => {
+  // code to be executed when the button is clicked
+  console.log('Leishmaniasis button clicked');
+};
 
   // ── Fetch WMTS Layers (remains as in the second code) ──
   useEffect(() => {
@@ -591,22 +597,31 @@ function Newmap() {
           </DrawerHeader>
           <Divider />
           <List>
-            <ListItem disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <InboxIcon />
-                </ListItemIcon>
-                <ListItemText primary="Layer Controls" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <InboxIcon />
-                </ListItemIcon>
-                <ListItemText primary="Base Maps" />
-              </ListItemButton>
-            </ListItem>
+            <List>
+  <ListItem disablePadding>
+    <ListItemButton onClick={handleOverlaysClick}>
+      <ListItemIcon>
+        <MailIcon />
+      </ListItemIcon>
+      <ListItemText primary="Diseases" />
+      {overlaysOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+    </ListItemButton>
+  </ListItem>
+
+  <Collapse in={overlaysOpen} timeout="auto" unmountOnExit>
+    <List component="div" disablePadding>
+      <ListItem disablePadding sx={{ pl: 4 }}>
+        <ListItemButton onClick={handleLeishmaniasisClick}>
+          <ListItemIcon>
+            <BugReportIcon />
+          </ListItemIcon>
+          <ListItemText primary="Leishmaniasis" />
+        </ListItemButton>
+      </ListItem>
+    </List>
+  </Collapse>
+</List>
+            
             <ListItem disablePadding>
               <Box
                 sx={{
