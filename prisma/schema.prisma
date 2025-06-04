@@ -18,6 +18,8 @@ model users {
   gender            String?        @db.VarChar(50)
   profilePicture    String?        @db.Text
   wantsnotification Boolean?       @default(true)
+   role             String         @default("user") // or "admin"
+   createdAt        DateTime       @default(now())
   notifications     Notification[] // 👈 Back-relation from Notification
 }
 

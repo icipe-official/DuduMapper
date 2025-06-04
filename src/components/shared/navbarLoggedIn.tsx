@@ -32,7 +32,7 @@ import { useAuth } from "@/context/context";
 import { useRouter } from "next/navigation";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { toast } from "react-toastify";
-import { List } from "@mui/icons-material";
+import { AdminPanelSettings, List } from "@mui/icons-material";
 import Logout from "@mui/icons-material/Logout";
 import Text from "ol/style/Text";
 import MaleIcon from "@mui/icons-material/Male";
@@ -82,6 +82,10 @@ const NavbarLoggedIn: React.FC = () => {
   const accountpage = () => {
     router.push("/auth/AccountPage");
   };
+  //admin page
+  const handleAdminPage = () => {
+    router.push("/auth/admin");
+  };
   //icon for gender
   const getGenderIcon = (gender: string | undefined) => {
     switch (gender?.toLowerCase()) {
@@ -114,6 +118,7 @@ const NavbarLoggedIn: React.FC = () => {
   const [open, setOpen] = React.useState(false);
 
   const navMenuItems = [<NavLink key="About" url="/about" text="About" />];
+
   //using this as name in my field
   {
     /*function getNameFromEmail(email?: string): string {
@@ -170,6 +175,13 @@ const NavbarLoggedIn: React.FC = () => {
                   </Typography>
                   {user?.firstName}
                   <PersonIcon />
+                </MenuItem>
+
+                <Divider sx={{ my: 0.5 }} />
+
+                <MenuItem onClick={handleAdminPage}>
+                  Admin Panel &nbsp;
+                  <AdminPanelSettings sx={{ ml: "auto", mr: 1 }} />
                 </MenuItem>
 
                 <Divider sx={{ my: 0.5 }} />

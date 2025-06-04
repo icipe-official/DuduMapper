@@ -241,8 +241,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.8.2
-   * Query Engine version: 2060c79ba17c6bb9f5823312b6f6b7f4a845738e
+   * Prisma Client JS version: 6.9.0
+   * Query Engine version: 81e4af48011447c3cc503a190e86995b66d2a28e
    */
   export type PrismaVersion = {
     client: string
@@ -1141,6 +1141,8 @@ export namespace Prisma {
     gender: string | null
     profilePicture: string | null
     wantsnotification: boolean | null
+    role: string | null
+    createdAt: Date | null
   }
 
   export type UsersMaxAggregateOutputType = {
@@ -1152,6 +1154,8 @@ export namespace Prisma {
     gender: string | null
     profilePicture: string | null
     wantsnotification: boolean | null
+    role: string | null
+    createdAt: Date | null
   }
 
   export type UsersCountAggregateOutputType = {
@@ -1163,6 +1167,8 @@ export namespace Prisma {
     gender: number
     profilePicture: number
     wantsnotification: number
+    role: number
+    createdAt: number
     _all: number
   }
 
@@ -1184,6 +1190,8 @@ export namespace Prisma {
     gender?: true
     profilePicture?: true
     wantsnotification?: true
+    role?: true
+    createdAt?: true
   }
 
   export type UsersMaxAggregateInputType = {
@@ -1195,6 +1203,8 @@ export namespace Prisma {
     gender?: true
     profilePicture?: true
     wantsnotification?: true
+    role?: true
+    createdAt?: true
   }
 
   export type UsersCountAggregateInputType = {
@@ -1206,6 +1216,8 @@ export namespace Prisma {
     gender?: true
     profilePicture?: true
     wantsnotification?: true
+    role?: true
+    createdAt?: true
     _all?: true
   }
 
@@ -1304,6 +1316,8 @@ export namespace Prisma {
     gender: string | null
     profilePicture: string | null
     wantsnotification: boolean | null
+    role: string
+    createdAt: Date
     _count: UsersCountAggregateOutputType | null
     _avg: UsersAvgAggregateOutputType | null
     _sum: UsersSumAggregateOutputType | null
@@ -1334,6 +1348,8 @@ export namespace Prisma {
     gender?: boolean
     profilePicture?: boolean
     wantsnotification?: boolean
+    role?: boolean
+    createdAt?: boolean
     notifications?: boolean | users$notificationsArgs<ExtArgs>
     _count?: boolean | UsersCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["users"]>
@@ -1347,6 +1363,8 @@ export namespace Prisma {
     gender?: boolean
     profilePicture?: boolean
     wantsnotification?: boolean
+    role?: boolean
+    createdAt?: boolean
   }, ExtArgs["result"]["users"]>
 
   export type usersSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1358,6 +1376,8 @@ export namespace Prisma {
     gender?: boolean
     profilePicture?: boolean
     wantsnotification?: boolean
+    role?: boolean
+    createdAt?: boolean
   }, ExtArgs["result"]["users"]>
 
   export type usersSelectScalar = {
@@ -1369,9 +1389,11 @@ export namespace Prisma {
     gender?: boolean
     profilePicture?: boolean
     wantsnotification?: boolean
+    role?: boolean
+    createdAt?: boolean
   }
 
-  export type usersOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "gender" | "profilePicture" | "wantsnotification", ExtArgs["result"]["users"]>
+  export type usersOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "gender" | "profilePicture" | "wantsnotification" | "role" | "createdAt", ExtArgs["result"]["users"]>
   export type usersInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     notifications?: boolean | users$notificationsArgs<ExtArgs>
     _count?: boolean | UsersCountOutputTypeDefaultArgs<ExtArgs>
@@ -1393,6 +1415,8 @@ export namespace Prisma {
       gender: string | null
       profilePicture: string | null
       wantsnotification: boolean | null
+      role: string
+      createdAt: Date
     }, ExtArgs["result"]["users"]>
     composites: {}
   }
@@ -1825,6 +1849,8 @@ export namespace Prisma {
     readonly gender: FieldRef<"users", 'String'>
     readonly profilePicture: FieldRef<"users", 'String'>
     readonly wantsnotification: FieldRef<"users", 'Boolean'>
+    readonly role: FieldRef<"users", 'String'>
+    readonly createdAt: FieldRef<"users", 'DateTime'>
   }
     
 
@@ -4562,7 +4588,9 @@ export namespace Prisma {
     lastName: 'lastName',
     gender: 'gender',
     profilePicture: 'profilePicture',
-    wantsnotification: 'wantsnotification'
+    wantsnotification: 'wantsnotification',
+    role: 'role',
+    createdAt: 'createdAt'
   };
 
   export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
@@ -4702,6 +4730,8 @@ export namespace Prisma {
     gender?: StringNullableFilter<"users"> | string | null
     profilePicture?: StringNullableFilter<"users"> | string | null
     wantsnotification?: BoolNullableFilter<"users"> | boolean | null
+    role?: StringFilter<"users"> | string
+    createdAt?: DateTimeFilter<"users"> | Date | string
     notifications?: NotificationListRelationFilter
   }
 
@@ -4714,6 +4744,8 @@ export namespace Prisma {
     gender?: SortOrderInput | SortOrder
     profilePicture?: SortOrderInput | SortOrder
     wantsnotification?: SortOrderInput | SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
     notifications?: NotificationOrderByRelationAggregateInput
   }
 
@@ -4729,6 +4761,8 @@ export namespace Prisma {
     gender?: StringNullableFilter<"users"> | string | null
     profilePicture?: StringNullableFilter<"users"> | string | null
     wantsnotification?: BoolNullableFilter<"users"> | boolean | null
+    role?: StringFilter<"users"> | string
+    createdAt?: DateTimeFilter<"users"> | Date | string
     notifications?: NotificationListRelationFilter
   }, "id" | "email">
 
@@ -4741,6 +4775,8 @@ export namespace Prisma {
     gender?: SortOrderInput | SortOrder
     profilePicture?: SortOrderInput | SortOrder
     wantsnotification?: SortOrderInput | SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
     _count?: usersCountOrderByAggregateInput
     _avg?: usersAvgOrderByAggregateInput
     _max?: usersMaxOrderByAggregateInput
@@ -4760,6 +4796,8 @@ export namespace Prisma {
     gender?: StringNullableWithAggregatesFilter<"users"> | string | null
     profilePicture?: StringNullableWithAggregatesFilter<"users"> | string | null
     wantsnotification?: BoolNullableWithAggregatesFilter<"users"> | boolean | null
+    role?: StringWithAggregatesFilter<"users"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"users"> | Date | string
   }
 
   export type VectorRiskDataWhereInput = {
@@ -4912,6 +4950,8 @@ export namespace Prisma {
     gender?: string | null
     profilePicture?: string | null
     wantsnotification?: boolean | null
+    role?: string
+    createdAt?: Date | string
     notifications?: NotificationCreateNestedManyWithoutUserInput
   }
 
@@ -4924,6 +4964,8 @@ export namespace Prisma {
     gender?: string | null
     profilePicture?: string | null
     wantsnotification?: boolean | null
+    role?: string
+    createdAt?: Date | string
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -4935,6 +4977,8 @@ export namespace Prisma {
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    role?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notifications?: NotificationUpdateManyWithoutUserNestedInput
   }
 
@@ -4947,6 +4991,8 @@ export namespace Prisma {
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    role?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -4959,6 +5005,8 @@ export namespace Prisma {
     gender?: string | null
     profilePicture?: string | null
     wantsnotification?: boolean | null
+    role?: string
+    createdAt?: Date | string
   }
 
   export type usersUpdateManyMutationInput = {
@@ -4969,6 +5017,8 @@ export namespace Prisma {
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    role?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type usersUncheckedUpdateManyInput = {
@@ -4980,6 +5030,8 @@ export namespace Prisma {
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    role?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type VectorRiskDataCreateInput = {
@@ -5171,6 +5223,17 @@ export namespace Prisma {
     not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
   }
 
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
   export type NotificationListRelationFilter = {
     every?: NotificationWhereInput
     some?: NotificationWhereInput
@@ -5195,6 +5258,8 @@ export namespace Prisma {
     gender?: SortOrder
     profilePicture?: SortOrder
     wantsnotification?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type usersAvgOrderByAggregateInput = {
@@ -5210,6 +5275,8 @@ export namespace Prisma {
     gender?: SortOrder
     profilePicture?: SortOrder
     wantsnotification?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type usersMinOrderByAggregateInput = {
@@ -5221,6 +5288,8 @@ export namespace Prisma {
     gender?: SortOrder
     profilePicture?: SortOrder
     wantsnotification?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type usersSumOrderByAggregateInput = {
@@ -5287,12 +5356,7 @@ export namespace Prisma {
     _max?: NestedBoolNullableFilter<$PrismaModel>
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type DateTimeFilter<$PrismaModel = never> = {
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -5300,7 +5364,15 @@ export namespace Prisma {
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type VectorRiskDataCountOrderByAggregateInput = {
@@ -5363,20 +5435,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type UsersScalarRelationFilter = {
@@ -5448,6 +5506,10 @@ export namespace Prisma {
     set?: boolean | null
   }
 
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
   export type NotificationUpdateManyWithoutUserNestedInput = {
     create?: XOR<NotificationCreateWithoutUserInput, NotificationUncheckedCreateWithoutUserInput> | NotificationCreateWithoutUserInput[] | NotificationUncheckedCreateWithoutUserInput[]
     connectOrCreate?: NotificationCreateOrConnectWithoutUserInput | NotificationCreateOrConnectWithoutUserInput[]
@@ -5500,10 +5562,6 @@ export namespace Prisma {
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
   }
 
   export type NotificationUpdateManyWithoutVectorRiskDataNestedInput = {
@@ -5606,6 +5664,17 @@ export namespace Prisma {
     not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
   }
 
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -5686,30 +5755,6 @@ export namespace Prisma {
     _max?: NestedBoolNullableFilter<$PrismaModel>
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -5722,6 +5767,19 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NotificationCreateWithoutUserInput = {
@@ -5816,6 +5874,8 @@ export namespace Prisma {
     gender?: string | null
     profilePicture?: string | null
     wantsnotification?: boolean | null
+    role?: string
+    createdAt?: Date | string
   }
 
   export type usersUncheckedCreateWithoutNotificationsInput = {
@@ -5827,6 +5887,8 @@ export namespace Prisma {
     gender?: string | null
     profilePicture?: string | null
     wantsnotification?: boolean | null
+    role?: string
+    createdAt?: Date | string
   }
 
   export type usersCreateOrConnectWithoutNotificationsInput = {
@@ -5885,6 +5947,8 @@ export namespace Prisma {
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    role?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type usersUncheckedUpdateWithoutNotificationsInput = {
@@ -5896,6 +5960,8 @@ export namespace Prisma {
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    role?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type VectorRiskDataUpsertWithoutNotificationsInput = {
