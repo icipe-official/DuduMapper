@@ -179,10 +179,10 @@ const NavbarLoggedIn: React.FC = () => {
 
                 <Divider sx={{ my: 0.5 }} />
 
-                <MenuItem onClick={handleAdminPage}>
+                {/*<MenuItem onClick={handleAdminPage}>
                   Admin Panel &nbsp;
                   <AdminPanelSettings sx={{ ml: "auto", mr: 1 }} />
-                </MenuItem>
+                </MenuItem>*/}
 
                 <Divider sx={{ my: 0.5 }} />
 

@@ -17,13 +17,13 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import BugReportIcon from "@mui/icons-material/BugReport";
+import LayersIcon from "@mui/icons-material/Layers";
 import Collapse from "@mui/material/Collapse";
 import Checkbox from "@mui/material/Checkbox";
-import FolderIcon from "@mui/icons-material/Folder";
+import PeopleIcon from "@mui/icons-material/People";
 import Link from "next/link";
-import DownloadIcon from "@mui/icons-material/Download";
+//import HealthAndSafety  from "@mui/icons-material/HealthAndSafety";
 import CloseIcon from "@mui/icons-material/Close";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -50,6 +50,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 //import { Button } from "@mui/material";
 import NavLink from "../shared/navlink";
 import { useRouter } from "next/router";
+import { HealthAndSafety } from "@mui/icons-material";
 
 // ─── Constants & Styled Components ────────────────────────────────────────────
 
@@ -168,6 +169,15 @@ function Newmap() {
   const [isLoading, setIsLoading] = useState(true);
   const [tilesLoading, setTilesLoading] = useState(0);
   const mapInitializedRef = useRef(false);
+  // Component state
+  const [leishOpen, setLeishOpen] = useState(false);
+
+  const [diseasesOpen, setDiseasesOpen] = useState(false);
+  const handleDiseasesClick = () => setDiseasesOpen(!diseasesOpen);
+
+  const handleLeishClick = () => {
+    setLeishOpen(!leishOpen);
+  };
 
   // ── Fetch WMTS Layers (remains as in the second code) ──
   useEffect(() => {
@@ -404,7 +414,7 @@ function Newmap() {
             }}
           >
             <ListItemIcon>
-              <FolderIcon
+              <PeopleIcon
                 style={{
                   color: expandedGroups[groupTitle] ? green[500] : "inherit",
                 }}
@@ -672,16 +682,56 @@ function Newmap() {
                 </ListItemButton>
               </Box>
             </ListItem>*/}
+            {/* Diseases */}
             <ListItem disablePadding>
-              <ListItemButton onClick={handleOverlaysClick}>
+              <ListItemButton onClick={handleDiseasesClick}>
                 <ListItemIcon>
-                  <MailIcon />
+                  <HealthAndSafety />
                 </ListItemIcon>
-                <ListItemText primary="Overlays" />
-                {overlaysOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                <ListItemText primary="Diseases" />
+                {diseasesOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
               </ListItemButton>
             </ListItem>
-            {renderLayerControls()}
+
+            {/* Leishmaniasis inside Diseases */}
+            <Collapse in={diseasesOpen} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItem disablePadding sx={{ pl: 2 }}>
+                  <ListItemButton onClick={handleLeishClick}>
+                    <ListItemIcon>
+                      <BugReportIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Leishmaniasis" />
+                    {leishOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                  </ListItemButton>
+                </ListItem>
+
+                {/* Overlays inside Leishmaniasis */}
+                <Collapse in={leishOpen} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    <ListItem disablePadding sx={{ pl: 4 }}>
+                      <ListItemButton onClick={handleOverlaysClick}>
+                        <ListItemIcon>
+                          <LayersIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Overlays" />
+                        {overlaysOpen ? (
+                          <ChevronLeftIcon />
+                        ) : (
+                          <ChevronRightIcon />
+                        )}
+                      </ListItemButton>
+                    </ListItem>
+
+                    <Collapse in={overlaysOpen} timeout="auto" unmountOnExit>
+                      <List component="div" disablePadding sx={{ pl: 6 }}>
+                        {renderLayerControls()}
+                      </List>
+                    </Collapse>
+                  </List>
+                </Collapse>
+              </List>
+            </Collapse>
           </List>
         </Drawer>
         {/*<Main open={open}>*/}
