@@ -19,7 +19,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import BugReportIcon from "@mui/icons-material/BugReport";
 import LayersIcon from "@mui/icons-material/Layers";
-import { Place } from "@mui/icons-material";
+import { Place, Map } from "@mui/icons-material";
+
 import Collapse from "@mui/material/Collapse";
 import Checkbox from "@mui/material/Checkbox";
 import PeopleIcon from "@mui/icons-material/People";
@@ -47,7 +48,7 @@ import Legend from "./Legend";
 import { green } from "@mui/material/colors";
 import DownloadPopup from "./DownloadPopup";
 import { Options as LayerGroupOptions } from "ol/layer/Group";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { FaGlobe, FaMapMarkerAlt } from "react-icons/fa";
 //import { Button } from "@mui/material";
 import NavLink from "../shared/navlink";
 import { useRouter } from "next/router";
@@ -161,6 +162,8 @@ function Newmap() {
   const [open, setOpen] = useState(true); // default to open
   const [overlaysOpen, setOverlaysOpen] = useState(true);
   const [turkanaOpen, setTurkanaOpen] = useState(false);
+  const [kenyaOpen, setKenyaOpen] = useState(false);
+  const [countryOpen, setCountryOpen] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {}
   );
@@ -180,7 +183,12 @@ function Newmap() {
   const handleLeishClick = () => {
     setLeishOpen(!leishOpen);
   };
-
+  const handleCountryClick = () => {
+    setCountryOpen(!countryOpen);
+  };
+  const handleKenyaClick = () => {
+    setKenyaOpen(!kenyaOpen);
+  };
   // ── Fetch WMTS Layers (remains as in the second code) ──
   useEffect(() => {
     const fetchLayers = async () => {
@@ -508,10 +516,10 @@ function Newmap() {
       >
         {(isLoading || tilesLoading > 0) && ( //spinner
           <div className="map-loader">
-            <FaMapMarkerAlt
+            <FaGlobe
               size={25}
               color="rgb(65, 126, 113)"
-              className="icon-spinner"
+              className="globe icon-spinner"
             />
           </div>
         )}
@@ -722,12 +730,31 @@ function Newmap() {
                   </ListItemButton>
                 </ListItem>
 
-                {/* Overlays inside Leishmaniasis */}
-                {/*change overlays name only to Kenya*/}
+                {/*Country nesting */}
                 <Collapse in={leishOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     <ListItem disablePadding sx={{ pl: 4 }}>
-                      <ListItemButton onClick={handleOverlaysClick}>
+                      <ListItemButton onClick={handleCountryClick}>
+                        <ListItemIcon>
+                          <Map />
+                        </ListItemIcon>
+                        <ListItemText primary="Country" />
+                        {countryOpen ? (
+                          <ChevronLeftIcon />
+                        ) : (
+                          <ChevronRightIcon />
+                        )}
+                      </ListItemButton>
+                    </ListItem>
+                  </List>
+                </Collapse>
+
+                {/* Overlays inside Leishmaniasis */}
+                {/*change overlays name only to Kenya*/}
+                <Collapse in={countryOpen} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    <ListItem disablePadding sx={{ pl: 4 }}>
+                      <ListItemButton onClick={handleKenyaClick}>
                         <ListItemIcon>
                           <LayersIcon />
                         </ListItemIcon>
@@ -741,7 +768,7 @@ function Newmap() {
                     </ListItem>
 
                     {/*Turkana inside Kenya */}
-                    <Collapse in={overlaysOpen} timeout="auto" unmountOnExit>
+                    <Collapse in={kenyaOpen} timeout="auto" unmountOnExit>
                       <List component="div" disablePadding sx={{ pl: 6 }}>
                         <ListItem disablePadding sx={{ pl: 2 }}>
                           <ListItemButton onClick={handleTurkanaClick}>
