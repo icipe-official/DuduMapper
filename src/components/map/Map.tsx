@@ -19,6 +19,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import BugReportIcon from "@mui/icons-material/BugReport";
 import LayersIcon from "@mui/icons-material/Layers";
+import { Place } from "@mui/icons-material";
 import Collapse from "@mui/material/Collapse";
 import Checkbox from "@mui/material/Checkbox";
 import PeopleIcon from "@mui/icons-material/People";
@@ -159,6 +160,7 @@ function Newmap() {
   // States for drawer and layer control UI
   const [open, setOpen] = useState(true); // default to open
   const [overlaysOpen, setOverlaysOpen] = useState(true);
+  const [turkanaOpen, setTurkanaOpen] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {}
   );
@@ -363,6 +365,7 @@ function Newmap() {
   };
 
   const handleOverlaysClick = () => setOverlaysOpen(!overlaysOpen);
+  const handleTurkanaClick = () => setTurkanaOpen(!turkanaOpen);
 
   const handleGroupClick = (groupTitle: string) => {
     setExpandedGroups((prev) => ({
@@ -643,7 +646,20 @@ function Newmap() {
             </ListItem>*/}
             {/*<ListItem disablePadding>
               <Box
-                sx={{
+                  <ListItemText
+                    primary="Download Data"
+                    secondary="Export map data"
+                    primaryTypographyProps={{
+                      fontWeight: downloadPopupOpen ? 600 : 400,
+                      color: downloadPopupOpen ? green[500] : "inherit",
+                    }}
+                  />
+                  {downloadPopupOpen ? (
+                    <ChevronLeftIcon sx={{ color: green[500] }} />
+                  ) : (
+                    <ChevronRightIcon />
+                  )}
+                </ListItemButton>        sx={{
                   width: "100%",
                   display: "flex",
                   flexDirection: "column",
@@ -707,6 +723,7 @@ function Newmap() {
                 </ListItem>
 
                 {/* Overlays inside Leishmaniasis */}
+                {/*change overlays name only to Kenya*/}
                 <Collapse in={leishOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     <ListItem disablePadding sx={{ pl: 4 }}>
@@ -714,7 +731,7 @@ function Newmap() {
                         <ListItemIcon>
                           <LayersIcon />
                         </ListItemIcon>
-                        <ListItemText primary="Overlays" />
+                        <ListItemText primary="Kenya" />
                         {overlaysOpen ? (
                           <ChevronLeftIcon />
                         ) : (
@@ -723,7 +740,26 @@ function Newmap() {
                       </ListItemButton>
                     </ListItem>
 
+                    {/*Turkana inside Kenya */}
                     <Collapse in={overlaysOpen} timeout="auto" unmountOnExit>
+                      <List component="div" disablePadding sx={{ pl: 6 }}>
+                        <ListItem disablePadding sx={{ pl: 2 }}>
+                          <ListItemButton onClick={handleTurkanaClick}>
+                            <ListItemIcon>
+                              <Place />
+                            </ListItemIcon>
+                            <ListItemText primary="Turkana" />
+                            {turkanaOpen ? (
+                              <ChevronLeftIcon />
+                            ) : (
+                              <ChevronRightIcon />
+                            )}
+                          </ListItemButton>
+                        </ListItem>
+                      </List>
+                    </Collapse>
+
+                    <Collapse in={turkanaOpen} timeout="auto" unmountOnExit>
                       <List component="div" disablePadding sx={{ pl: 6 }}>
                         {renderLayerControls()}
                       </List>
