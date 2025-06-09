@@ -1,202 +1,219 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
-    Box,
-    Typography,
-    Grid,
-    FormControlLabel,
-    Radio,
-    RadioGroup,
-    IconButton,
-    Button, CircularProgress,
+  Box,
+  Button,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  Paper,
+  Select,
+  MenuItem,
+  TextField,
+  Typography,
+  CircularProgress,
+  Alert,
+  Snackbar,
+  IconButton,
+  Tooltip,
+  Checkbox,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import axios from "axios";
-import {geoServerBaseUrl} from "@/api/requests";
-import {green} from "@mui/material/colors";
-
-const DOWNLOAD_URL = "/geoserver/vector/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vector:download_v&outputFormat=FORMAT";
-
+import {
+  FormatListBulleted as FormatListIcon,
+  HelpOutline as HelpIcon,
+  Download as DownloadIcon,
+  Clear as ClearIcon,
+} from "@mui/icons-material";
+import { SelectChangeEvent } from "@mui/material/Select";
 interface DownloadPopupProps {
-    isOpen: boolean;
-    onClose: () => void;
-    cqlFilter: string;
+  isOpen: boolean;
+  onClose: () => void;
+  cqlFilter: string;
 }
 
 const DownloadPopup: React.FC<DownloadPopupProps> = ({
-                                                         isOpen,
-                                                         onClose,
-                                                         cqlFilter,
-                                                     }) => {
-    const [selectedFormat, setSelectedFormat] = useState("CSV");
-    const [downloading, setLoading] = React.useState(false);
-    const handleFormatChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedFormat(event.target.value);
-    };
+  isOpen,
+  onClose,
+  cqlFilter,
+}) => {
+  const [format, setFormat] = useState("shp");
+  const [selectedLayers, setSelectedLayers] = useState<string[]>([]);
+  const [areaOfInterest, setAreaOfInterest] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-    const handleDownload = () => {
-        setLoading(true)
-        axiosDownloadFile()
-    };
-    const axiosDownloadFile = () => {
-        let url = geoServerBaseUrl + DOWNLOAD_URL.replace("FORMAT", selectedFormat);
-        console.log(`URL ${url}`)
-        if (cqlFilter) {
-            url += `&cql_filter=${cqlFilter}`
-            console.log(`URL ${url}`)
-        }
+  const formats = [
+    { value: "shp", label: "Shapefile (SHP)" },
+    { value: "geojson", label: "GeoJSON" },
+    { value: "kml", label: "KML" },
+    { value: "csv", label: "CSV" },
+  ];
 
-        return axios.get(
-            url,
-            {
-                responseType: 'blob',
-            }
-        )
-            .then(response => {
-                const href = window.URL.createObjectURL(response.data);
+  const handleFormatChange = (event: SelectChangeEvent<string>) => {
+    const selectedFormat = event.target.value;
+    setFormat(selectedFormat);
+  };
 
-                const anchorElement = document.createElement('a');
+  const handleLayerToggle = (layer: string) => {
+    setSelectedLayers((prev) =>
+      prev.includes(layer) ? prev.filter((l) => l !== layer) : [...prev, layer]
+    );
+  };
 
-                anchorElement.href = href;
-                anchorElement.download = 'Occurrence';
-
-                document.body.appendChild(anchorElement);
-                anchorElement.click();
-
-                document.body.removeChild(anchorElement);
-                window.URL.revokeObjectURL(href);
-                setLoading(false)
-            })
-            .catch(error => {
-                setLoading(false)
-                console.log('error: ', error);
-            });
+  const handleDownload = async () => {
+    if (selectedLayers.length === 0) {
+      setError("Please select at least one layer to download");
+      return;
     }
 
-    return (
-        <Box
-            className={`download-popup ${isOpen ? "open" : "closed"}`}
-            sx={{
-                position: "absolute",
-                top: "40%",
-                left: "13%",
-                transform: "translate(-50%, -50%)",
-                bgcolor: "background.paper",
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-                borderRadius: "6px ",
-                p: 4,
-            }}
-        >
-            <IconButton
-                onClick={onClose}
-                sx={{
-                    position: "absolute",
-                    top: "5px",
-                    right: "5px",
-                    marginBottom: "15px",
-                }}
-            >
-                <CloseIcon/>
-            </IconButton>
+    setLoading(true);
+    setError(null);
 
-            <Grid item>
-                <Typography
-                    variant="h2"
-                    sx={{
-                        fontSize: "1.8rem",
-                        fontWeight: "600",
-                        marginBottom: "15px",
-                        color: "#555",
-                    }}
-                >
-                    Download Data
-                </Typography>
-            </Grid>
-            <Grid container direction="column" spacing={2}>
-                <Grid item>
-                    <Typography
-                        variant="h2"
-                        sx={{
-                            fontSize: "1.1rem",
-                            fontWeight: "500",
-                            marginBottom: "0rem",
-                        }}
-                    >
-                        Select data download format
-                    </Typography>
-                </Grid>
-                <Grid item>
-                    <RadioGroup
-                        aria-label="download-format"
-                        name="download-format"
-                        value={selectedFormat}
-                        onChange={handleFormatChange}
-                    >
-                        <FormControlLabel
-                            value="CSV"
-                            control={<Radio color="success"/>}
-                            label="CSV"
-                        />
-                        {/*<FormControlLabel*/}
-                        {/*  value="Excel"*/}
-                        {/*  control={<Radio color="success" />}*/}
-                        {/*  label="Excel"*/}
-                        {/*/>*/}
-                        <FormControlLabel
-                            value="json"
-                            control={<Radio color="success"/>}
-                            label="GeoJSON"
-                        />
-                        <FormControlLabel
-                            value="KML"
-                            control={<Radio color="success"/>}
-                            label="KML"
-                        />
-                        <FormControlLabel
-                            value="shape-zip"
-                            control={<Radio color="success"/>}
-                            label="SHP"
-                        />
-                        {/* Add more options as needed */}
-                    </RadioGroup>
-                </Grid>
-                <Grid item>
-                    <div className="button-container-style">
-                        <Box sx={{display: 'flex', alignItems: 'center', m: 1, position: 'relative'}}>
-                            <Button
-                                variant="contained"
-                                sx={{
-                                    backgroundColor: "#2e7d32",
-                                    "&:hover": {
-                                        backgroundColor: "#ebbd40",
-                                        // Background color on hover
-                                    },
-                                }}
-                                size="small"
-                                style={{fontSize: "0.7rem"}}
-                                disabled={downloading}
-                                onClick={handleDownload}
-                            >
-                                Download
-                            </Button>
-                            {downloading && (
-                                <CircularProgress
-                                    size={24}
-                                    sx={{
-                                        color: green[500],
-                                        position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        marginTop: '-12px',
-                                        marginLeft: '-12px',
-                                    }}
-                                />
-                            )}
-                        </Box>
-                    </div>
-                </Grid>
-            </Grid>
-        </Box>
-    );
+    try {
+      // Here you would implement your actual download logic
+      // For example:
+      //await downloadLayers({
+      //   layers: selectedLayers,
+      //   format,
+      //   areaOfInterest,
+      //   cqlFilter
+      // });
+
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setSuccess(true);
+      onClose();
+    } catch (err) {
+      setError("Failed to download data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClear = () => {
+    setSelectedLayers([]);
+    setFormat("shp");
+    setAreaOfInterest("");
+    setError(null);
+    setSuccess(false);
+  };
+
+  return (
+    <Box sx={{ p: 2 }}>
+      <Grid container spacing={3}>
+        {/* Format Selection */}
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <FormatListIcon sx={{ mr: 1 }} />
+              <Typography variant="subtitle1">Download Format</Typography>
+              <Tooltip title="Choose the file format for your download">
+                <IconButton size="small" sx={{ ml: 1 }}>
+                  <HelpIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            <FormControl fullWidth>
+              <Select value={format} onChange={handleFormatChange} displayEmpty>
+                {formats.map((f) => (
+                  <MenuItem key={f.value} value={f.value}>
+                    {f.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Paper>
+        </Grid>
+
+        {/* Layer Selection */}
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2 }}>
+              Select Layers
+            </Typography>
+            <FormGroup>
+              {["Layer 1", "Layer 2", "Layer 3"].map((layer) => (
+                <FormControlLabel
+                  key={layer}
+                  control={
+                    <Checkbox
+                      checked={selectedLayers.includes(layer)}
+                      onChange={() => handleLayerToggle(layer)}
+                    />
+                  }
+                  label={layer}
+                />
+              ))}
+            </FormGroup>
+          </Paper>
+        </Grid>
+
+        {/* Area of Interest */}
+        <Grid item xs={12}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2 }}>
+              Area of Interest (Optional)
+            </Typography>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              placeholder="Enter coordinates or draw on map..."
+              value={areaOfInterest}
+              onChange={(e) => setAreaOfInterest(e.target.value)}
+            />
+          </Paper>
+        </Grid>
+
+        {/* Action Buttons */}
+        <Grid item xs={12}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+            <Button
+              startIcon={<ClearIcon />}
+              onClick={handleClear}
+              disabled={loading}
+            >
+              Clear
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={
+                loading ? <CircularProgress size={20} /> : <DownloadIcon />
+              }
+              onClick={handleDownload}
+              disabled={loading || selectedLayers.length === 0}
+            >
+              Download
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
+
+      {/* Error Snackbar */}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+      >
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      </Snackbar>
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess(false)}
+      >
+        <Alert severity="success" onClose={() => setSuccess(false)}>
+          Download started successfully!
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
 };
 
 export default DownloadPopup;
