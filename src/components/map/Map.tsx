@@ -538,13 +538,18 @@ function Newmap() {
         
               .icon-spinner{
               display : inline-block;
-              animation: spin 1s linear infinite;
+              animation: spinner 1s infinite linear , colorCycle 2s linear infinite;
               }
-        
-              @keyframes spin{
-               0% { transform: rotate(0deg); }
+              @keyframes spinner {
+              0%   { transform: rotate(0deg); } 
               100% { transform: rotate(360deg); }
               }
+        
+              @keyframes colorCycle {
+  0%   { color: green; }
+  100%  { color: blue; }
+   }
+}
               `}
         <div id="map" style={{ width: "100%", height: "100vh" }} />
       </style>
