@@ -19,7 +19,13 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import BugReportIcon from "@mui/icons-material/BugReport";
 import LayersIcon from "@mui/icons-material/Layers";
-import { Place, Map } from "@mui/icons-material";
+import {
+  Place,
+  Map,
+  CalendarMonth,
+  DateRange,
+  ModelTraining,
+} from "@mui/icons-material";
 
 import Collapse from "@mui/material/Collapse";
 import Checkbox from "@mui/material/Checkbox";
@@ -163,7 +169,10 @@ function Newmap() {
   const [overlaysOpen, setOverlaysOpen] = useState(true);
   const [turkanaOpen, setTurkanaOpen] = useState(false);
   const [kenyaOpen, setKenyaOpen] = useState(false);
+  const [yearsOpen, setYearsOpen] = useState(false);
+  const [monthsOpen, setMonthsOpen] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
+  const [modelsOpen, setModelsOpen] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     {}
   );
@@ -189,6 +198,18 @@ function Newmap() {
   const handleKenyaClick = () => {
     setKenyaOpen(!kenyaOpen);
   };
+  const handleTurkanaClick = () => setTurkanaOpen(!turkanaOpen);
+  const handleYearsClick = () => {
+    setYearsOpen(!yearsOpen);
+  };
+  const handleMonthsClick = () => {
+    setMonthsOpen(!monthsOpen);
+  };
+  const handleModelsClick = () => {
+    setModelsOpen(!modelsOpen);
+  };
+  //lets try to handleTrurkana layers click
+  //const handleLayerClick = (layer: any) => {};
   // ── Fetch WMTS Layers (remains as in the second code) ──
   useEffect(() => {
     const fetchLayers = async () => {
@@ -373,7 +394,6 @@ function Newmap() {
   };
 
   const handleOverlaysClick = () => setOverlaysOpen(!overlaysOpen);
-  const handleTurkanaClick = () => setTurkanaOpen(!turkanaOpen);
 
   const handleGroupClick = (groupTitle: string) => {
     setExpandedGroups((prev) => ({
@@ -751,49 +771,209 @@ function Newmap() {
                         )}
                       </ListItemButton>
                     </ListItem>
-                  </List>
-                </Collapse>
 
-                {/* Overlays inside Leishmaniasis */}
-                {/*change overlays name only to Kenya*/}
-                <Collapse in={countryOpen} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    <ListItem disablePadding sx={{ pl: 4 }}>
-                      <ListItemButton onClick={handleKenyaClick}>
-                        <ListItemIcon>
-                          <LayersIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Kenya" />
-                        {overlaysOpen ? (
-                          <ChevronLeftIcon />
-                        ) : (
-                          <ChevronRightIcon />
-                        )}
-                      </ListItemButton>
-                    </ListItem>
-
-                    {/*Turkana inside Kenya */}
-                    <Collapse in={kenyaOpen} timeout="auto" unmountOnExit>
-                      <List component="div" disablePadding sx={{ pl: 6 }}>
-                        <ListItem disablePadding sx={{ pl: 2 }}>
-                          <ListItemButton onClick={handleTurkanaClick}>
+                    {/* Overlays inside Leishmaniasis */}
+                    {/*change overlays name only to Kenya*/}
+                    <Collapse in={countryOpen} timeout="auto" unmountOnExit>
+                      <List component="div" disablePadding>
+                        <ListItem disablePadding sx={{ pl: 4 }}>
+                          <ListItemButton onClick={handleKenyaClick}>
                             <ListItemIcon>
-                              <Place />
+                              <LayersIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Turkana" />
-                            {turkanaOpen ? (
+                            <ListItemText primary="Kenya" />
+                            {countryOpen ? (
                               <ChevronLeftIcon />
                             ) : (
                               <ChevronRightIcon />
                             )}
                           </ListItemButton>
                         </ListItem>
-                      </List>
-                    </Collapse>
 
-                    <Collapse in={turkanaOpen} timeout="auto" unmountOnExit>
-                      <List component="div" disablePadding sx={{ pl: 6 }}>
-                        {renderLayerControls()}
+                        {/*Turkana inside Kenya */}
+                        <Collapse in={kenyaOpen} timeout="auto" unmountOnExit>
+                          <List component="div" disablePadding sx={{ pl: 6 }}>
+                            <ListItem disablePadding sx={{ pl: 2 }}>
+                              <ListItemButton onClick={handleTurkanaClick}>
+                                <ListItemIcon>
+                                  <Place />
+                                </ListItemIcon>
+                                <ListItemText primary="Turkana" />
+                                {turkanaOpen ? (
+                                  <ChevronLeftIcon />
+                                ) : (
+                                  <ChevronRightIcon />
+                                )}
+                              </ListItemButton>
+                            </ListItem>
+
+                            {/*years inside turkana*
+                            <Collapse
+                              in={turkanaOpen}
+                              timeout="auto"
+                              unmountOnExit
+                            >
+                              <List
+                                component="div"
+                                disablePadding
+                                sx={{ pl: 6 }}
+                              >
+                                <ListItem disablePadding sx={{ pl: 2 }}>
+                                  <ListItemButton onClick={handleYearsClick}>
+                                    <ListItemIcon>
+                                      <DateRange />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Years" />
+                                    {yearsOpen ? (
+                                      <ChevronLeftIcon />
+                                    ) : (
+                                      <ChevronRightIcon />
+                                    )}
+                                  </ListItemButton>
+                                </ListItem>
+
+                                {/* Year List *
+                                <Collapse
+                                  in={yearsOpen}
+                                  timeout="auto"
+                                  unmountOnExit
+                                >
+                                  <List
+                                    component="div"
+                                    disablePadding
+                                    sx={{ pl: 8 }}
+                                  >
+                                    {["2024", "2025"].map((year) => (
+                                      <React.Fragment key={year}>
+                                        <ListItem disablePadding>
+                                          <ListItemButton
+                                            onClick={handleMonthsClick}
+                                          >
+                                            <ListItemIcon>
+                                              <DateRange />
+                                            </ListItemIcon>
+                                            <ListItemText primary={year} />
+                                            {monthsOpen ? (
+                                              <ChevronLeftIcon />
+                                            ) : (
+                                              <ChevronRightIcon />
+                                            )}
+                                          </ListItemButton>
+                                        </ListItem>
+                                      </React.Fragment>
+                                    ))}
+
+                                    {/*Months inside years*
+                                    <Collapse
+                                      in={yearsOpen}
+                                      timeout="auto"
+                                      unmountOnExit
+                                    >
+                                      <List
+                                        component="div"
+                                        disablePadding
+                                        sx={{ pl: 6 }}
+                                      >
+                                        <ListItem disablePadding sx={{ pl: 2 }}>
+                                          <ListItemButton
+                                            onClick={handleMonthsClick}
+                                          >
+                                            <ListItemIcon>
+                                              <CalendarMonth />
+                                            </ListItemIcon>
+                                            <ListItemText primary="Months" />
+                                            {monthsOpen ? (
+                                              <ChevronLeftIcon />
+                                            ) : (
+                                              <ChevronRightIcon />
+                                            )}
+                                          </ListItemButton>
+                                        </ListItem>
+
+                                        {/*month may and december *
+                                        <Collapse
+                                          in={monthsOpen}
+                                          timeout="auto"
+                                          unmountOnExit
+                                        >
+                                          <List
+                                            component="div"
+                                            disablePadding
+                                            sx={{ pl: 6 }}
+                                          >
+                                            {["May", "December"].map(
+                                              (month) => (
+                                                <React.Fragment key={month}>
+                                                  <ListItem
+                                                    disablePadding
+                                                    sx={{ pl: 2 }}
+                                                  >
+                                                    <ListItemButton
+                                                      onClick={
+                                                        handleModelsClick
+                                                      }
+                                                    >
+                                                      <ListItemIcon>
+                                                        <CalendarMonth />
+                                                      </ListItemIcon>
+                                                      <ListItemText
+                                                        primary={month}
+                                                      />
+                                                      {modelsOpen ? (
+                                                        <ChevronLeftIcon />
+                                                      ) : (
+                                                        <ChevronRightIcon />
+                                                      )}
+                                                    </ListItemButton>
+                                                  </ListItem>
+                                                </React.Fragment>
+                                              )
+                                            )}
+
+                                            {/*models inside months *
+                                            <Collapse
+                                              in={monthsOpen}
+                                              timeout="auto"
+                                            >
+                                              <List
+                                                component="div"
+                                                disablePadding
+                                                sx={{ pl: 6 }}
+                                              >
+                                                <ListItem
+                                                  disablePadding
+                                                  sx={{ pl: 2 }}
+                                                >
+                                                  <ListItemButton
+                                                    onClick={handleModelsClick}
+                                                  >
+                                                    <ListItemIcon>
+                                                      <ModelTraining />
+                                                    </ListItemIcon>
+                                                    <ListItemText primary="Models" />
+                                                    {modelsOpen ? (
+                                                      <ChevronLeftIcon />
+                                                    ) : (
+                                                      <ChevronRightIcon />
+                                                    )}
+                                                  </ListItemButton>
+                                                </ListItem>*/}
+
+                            <Collapse
+                              in={turkanaOpen}
+                              timeout="auto"
+                              unmountOnExit
+                            >
+                              <List
+                                component="div"
+                                disablePadding
+                                sx={{ pl: 6 }}
+                              >
+                                {renderLayerControls()}
+                              </List>
+                            </Collapse>
+                          </List>
+                        </Collapse>
                       </List>
                     </Collapse>
                   </List>
