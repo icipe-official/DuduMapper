@@ -34,7 +34,7 @@ model VectorRiskData {
   description String?  @db.Text
   highRisk    Boolean
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now())
 
   notifications Notification[] // 👈 Back-relation from Notification
 }
