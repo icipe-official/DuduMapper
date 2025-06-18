@@ -69,6 +69,13 @@ const SignIn: React.FC = () => {
       
   };*/
   const handleEmailSignIn = async () => {
+    // restrict email
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!isValidEmail) {
+      setEmailError(true);
+      return;
+    }
+
     try {
       const response = await fetch("/api/session", {
         method: "POST",

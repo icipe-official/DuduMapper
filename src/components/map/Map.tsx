@@ -172,7 +172,15 @@ function Newmap() {
   const [expandedModelTypes, setExpandedModelTypes] = useState<
     Record<string, boolean>
   >({});
+  // Add these new state variables
+  const [genericModelsOpen, setGenericModelsOpen] = useState(false);
+  const [datedModelsOpen, setDatedModelsOpen] = useState(false);
 
+  // Add these new handlers
+  const handleGenericModelsClick = () =>
+    setGenericModelsOpen(!genericModelsOpen);
+
+  const handleDatedModelsClick = () => setDatedModelsOpen(!datedModelsOpen);
   // States for map layers and active layer name
   const [wmtsLayers, setWmtsLayers] = useState<any[]>([]);
   const [activeLayerName, setActiveLayerName] = useState<string | null>(null);
@@ -264,11 +272,21 @@ function Newmap() {
   // utility functions for layer classification
   const extractYear = (layerName: string): string | null => {
     const yearMatch = layerName.match(/\b(20\d{2})\b/);
-    return yearMatch ? yearMatch[1] : null;
+    if (yearMatch) return yearMatch[1];
+
+    // fallback logic for IDW models that have a month but no year
+    if (
+      layerName.toLowerCase().includes("idw_model") &&
+      extractMonth(layerName)
+    ) {
+      return "2025"; // fallback assumption
+    }
+
+    return null;
   };
 
   const extractMonth = (layerName: string): string | null => {
-    const monthsMap = {
+    const monthsMap: { [key: string]: string } = {
       JAN: "January",
       FEB: "February",
       MAR: "March",
@@ -281,25 +299,39 @@ function Newmap() {
       OCT: "October",
       NOV: "November",
       DEC: "December",
+      dec: "Dec",
     };
 
     const upperLayerName = layerName.toUpperCase();
-    for (const [abbr, full] of Object.entries(monthsMap)) {
+    for (const abbr in monthsMap) {
       if (upperLayerName.includes(abbr)) {
-        return full;
+        return monthsMap[abbr]; // Always return capitalized short form e.g. "Dec"
       }
     }
     return null;
   };
 
+  // Updated classification functions
   const extractModelType = (layerName: string): string | null => {
     const modelTypes = ["AdaBoost", "CMP_Model", "GPR_Model", "GAM_Model"];
     const lowerLayerName = layerName.toLowerCase();
-    return (
-      modelTypes.find((model) =>
-        lowerLayerName.includes(model.toLowerCase())
-      ) || null
+
+    // Check for exact model type matches first
+    const exactMatch = modelTypes.find((model) =>
+      lowerLayerName.includes(model.toLowerCase())
     );
+
+    if (exactMatch) return exactMatch;
+
+    // Check for other model patterns
+    //if (lowerLayerName.includes("idw_model")) return "Dated_IDW_Model";
+    //if (lowerLayerName.includes("May 2025")) return "Dated_Model";
+    // Fallback for custom or dated models
+    if (lowerLayerName.includes("idw_model")) return "DEC_IDW_Model";
+    if (lowerLayerName.includes("vl")) return "VL";
+    if (lowerLayerName.match(/\bmay\s?2025\b/i)) return "Dated_Model";
+
+    return null;
   };
 
   const isPopulationLayer = (layerName: string): boolean => {
@@ -307,96 +339,107 @@ function Newmap() {
   };
 
   const isPredictiveModelLayer = (layerName: string): boolean => {
-    const year = extractYear(layerName);
-    const month = extractMonth(layerName);
     const modelType = extractModelType(layerName);
-
-    const result = !!(year && month && modelType);
-    if (result) {
-      console.log("Found predictive model layer:", {
-        layerName,
-        year,
-        month,
-        modelType,
-      });
-    }
-    return result;
+    return !!modelType; // Any layer with a model type is a predictive model
   };
+
+  // Updated organization structure
   interface Layer {
     title?: string;
     name?: string;
     group?: {
       groupTitle?: string;
     };
-    [key: string]: any;
+    supportedCRS?: string;
+    matrixSet?: string;
+    // Add other properties as needed
+  }
+  interface OrganizedLayers {
+    population: Layer[];
+    predictiveModels: {
+      generic: Layer[]; // Models without dates
+      dated: Record<string, Record<string, Record<string, Layer[]>>>; // Year > Month > ModelType > Layers
+    };
   }
 
-  const organizeLayersByStructure = (layers: Layer[]) => {
-    const organized = {
-      population: [] as Layer[],
-      predictiveModels: {} as Record<
-        string,
-        Record<string, Record<string, Layer[]>>
-      >,
+  const organizeLayersByStructure = (layers: Layer[]): OrganizedLayers => {
+    const organized: OrganizedLayers = {
+      population: [],
+      predictiveModels: {
+        generic: [],
+        dated: {},
+      },
     };
 
-    console.log("Organizing layers:", layers.length);
+    console.log("=== STARTING LAYER ORGANIZATION ===");
+    console.log("Total layers to process:", layers.length);
 
-    layers.forEach((layer) => {
+    layers.forEach((layer, index) => {
       const identifier = layer.title || layer.name || "";
-      console.log("Processing layer:", identifier);
+      console.log(`\n--- Processing Layer ${index + 1}/${layers.length} ---`);
+      console.log("Layer identifier:", identifier);
 
       if (isPopulationLayer(identifier)) {
         console.log("Adding to population:", identifier);
         organized.population.push(layer);
-      } else if (isPredictiveModelLayer(identifier)) {
+        return;
+      }
+
+      if (isPredictiveModelLayer(identifier)) {
         const year = extractYear(identifier);
         const month = extractMonth(identifier);
         const modelType = extractModelType(identifier);
 
-        console.log("Predictive Layer metadata:", {
-          identifier,
-          year,
-          month,
-          modelType,
-        });
+        console.log("Extracted metadata:");
+        console.log("- Year:", year);
+        console.log("- Month:", month);
+        console.log("- Model Type:", modelType);
 
-        if (!year || !month || !modelType) {
-          console.warn(
-            "Skipping predictive model layer due to missing metadata:",
-            {
-              identifier,
-              year,
-              month,
-              modelType,
-            }
-          );
-          return;
-        }
+        if (year && month && modelType) {
+          // Dated model
+          console.log(" Adding to dated predictive models:", identifier);
 
-        // Initialize nested structure
-        if (!organized.predictiveModels[year]) {
-          organized.predictiveModels[year] = {};
-        }
-        if (!organized.predictiveModels[year][month]) {
-          organized.predictiveModels[year][month] = {};
-        }
-        if (!organized.predictiveModels[year][month][modelType]) {
-          organized.predictiveModels[year][month][modelType] = [];
-        }
+          if (!organized.predictiveModels.dated[year]) {
+            organized.predictiveModels.dated[year] = {};
+            console.log(`Created year group: ${year}`);
+          }
+          if (!organized.predictiveModels.dated[year][month]) {
+            organized.predictiveModels.dated[year][month] = {};
+            console.log(`Created month group: ${year}-${month}`);
+          }
+          if (!organized.predictiveModels.dated[year][month][modelType]) {
+            organized.predictiveModels.dated[year][month][modelType] = [];
+            console.log(
+              `Created model type group: ${year}-${month}-${modelType}`
+            );
+          }
 
-        organized.predictiveModels[year][month][modelType].push(layer);
-        console.log("Added predictive model layer:", identifier);
+          organized.predictiveModels.dated[year][month][modelType].push(layer);
+          console.log(`Added dated layer to: ${year}-${month}-${modelType}`);
+        } else if (modelType) {
+          // Generic model (no date info)
+          console.log("Adding to generic predictive models:", identifier);
+          organized.predictiveModels.generic.push(layer);
+        }
+      } else {
+        console.log(" Layer doesn't match any category:", identifier);
       }
     });
 
-    console.log("Final organized structure:", {
-      populationCount: organized.population.length,
-      predictiveModelsYears: Object.keys(organized.predictiveModels),
-    });
+    console.log("\n=== FINAL ORGANIZATION RESULTS ===");
+    console.log("Population layers count:", organized.population.length);
+    console.log(
+      "Generic models count:",
+      organized.predictiveModels.generic.length
+    );
+    console.log(
+      "Dated models years:",
+      Object.keys(organized.predictiveModels.dated)
+    );
 
     return organized;
   };
+
   //lets try to handleTrurkana layers click
   //const handleLayerClick = (layer: any) => {};
   // ── Fetch WMTS Layers (remains as in the second code) ──
@@ -707,7 +750,7 @@ function Newmap() {
       ))}
     </Collapse>
   );
-  const organizedLayers = organizeLayersByStructure(wmtsLayers);
+
   // ── Render ──
   return (
     <div
@@ -944,7 +987,7 @@ function Newmap() {
                   </ListItemButton>
                 </ListItem>
 
-                {/*Country nesting */}
+                {/*Country nesting 
                 <Collapse in={leishOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                     <ListItem disablePadding sx={{ pl: 4 }}>
@@ -959,19 +1002,38 @@ function Newmap() {
                           <ChevronRightIcon />
                         )}
                       </ListItemButton>
+                    </ListItem>*/}
+
+                {/* Overlays inside Leishmaniasis */}
+                {/*change overlays name only to Kenya*/}
+                <Collapse in={leishOpen} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    <ListItem disablePadding sx={{ pl: 4 }}>
+                      <ListItemButton onClick={handleKenyaClick}>
+                        <ListItemIcon>
+                          <LayersIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Kenya" />
+                        {countryOpen ? (
+                          <ChevronLeftIcon />
+                        ) : (
+                          <ChevronRightIcon />
+                        )}
+                      </ListItemButton>
                     </ListItem>
 
-                    {/* Overlays inside Leishmaniasis */}
-                    {/*change overlays name only to Kenya*/}
-                    <Collapse in={countryOpen} timeout="auto" unmountOnExit>
-                      <List component="div" disablePadding>
-                        <ListItem disablePadding sx={{ pl: 4 }}>
-                          <ListItemButton onClick={handleKenyaClick}>
+                    {/*Turkana inside Kenya */}
+
+                    {/*Turkana inside Kenya */}
+                    <Collapse in={kenyaOpen} timeout="auto" unmountOnExit>
+                      <List component="div" disablePadding sx={{ pl: 6 }}>
+                        <ListItem disablePadding sx={{ pl: 2 }}>
+                          <ListItemButton onClick={handleTurkanaClick}>
                             <ListItemIcon>
-                              <LayersIcon />
+                              <Place />
                             </ListItemIcon>
-                            <ListItemText primary="Kenya" />
-                            {countryOpen ? (
+                            <ListItemText primary="Turkana" />
+                            {turkanaOpen ? (
                               <ChevronLeftIcon />
                             ) : (
                               <ChevronRightIcon />
@@ -979,18 +1041,18 @@ function Newmap() {
                           </ListItemButton>
                         </ListItem>
 
-                        {/*Turkana inside Kenya */}
-
-                        {/*Turkana inside Kenya */}
-                        <Collapse in={kenyaOpen} timeout="auto" unmountOnExit>
+                        {/* Predictive Models Branch 
+                        <Collapse in={turkanaOpen} timeout="auto" unmountOnExit>
                           <List component="div" disablePadding sx={{ pl: 6 }}>
                             <ListItem disablePadding sx={{ pl: 2 }}>
-                              <ListItemButton onClick={handleTurkanaClick}>
+                              <ListItemButton
+                                onClick={handlePredictiveModelsClick}
+                              >
                                 <ListItemIcon>
-                                  <Place />
+                                  <ModelTraining />
                                 </ListItemIcon>
-                                <ListItemText primary="Turkana" />
-                                {turkanaOpen ? (
+                                <ListItemText primary="Predictive Models" />
+                                {predictiveModelsOpen ? (
                                   <ChevronLeftIcon />
                                 ) : (
                                   <ChevronRightIcon />
@@ -998,350 +1060,416 @@ function Newmap() {
                               </ListItemButton>
                             </ListItem>
 
-                            {/* Population Data Branch */}
+                            {/* Predictive Models Content *}
                             <Collapse
-                              in={turkanaOpen}
+                              in={predictiveModelsOpen}
                               timeout="auto"
                               unmountOnExit
                             >
                               <List
                                 component="div"
                                 disablePadding
-                                sx={{ pl: 8 }}
+                                sx={{ pl: 4 }}
+                              >*/}
+                        {/* Dated Models Section */}
+                        <Collapse in={turkanaOpen} timeout="auto" unmountOnExit>
+                          <List component="div" disablePadding sx={{ pl: 6 }}>
+                            <ListItem disablePadding sx={{ pl: 2 }}>
+                              <ListItemButton onClick={handleDatedModelsClick}>
+                                <ListItemIcon>
+                                  <DateRange />
+                                </ListItemIcon>
+                                <ListItemText primary="Years" />
+                                {datedModelsOpen ? (
+                                  <ChevronLeftIcon />
+                                ) : (
+                                  <ChevronRightIcon />
+                                )}
+                              </ListItemButton>
+                            </ListItem>
+
+                            {/* Years for Dated Models */}
+                            <Collapse
+                              in={datedModelsOpen}
+                              timeout="auto"
+                              unmountOnExit
+                            >
+                              <List
+                                component="div"
+                                disablePadding
+                                sx={{ pl: 6 }}
                               >
-                                <ListItem disablePadding sx={{ pl: 2 }}>
-                                  <ListItemButton
-                                    onClick={handlePopulationClick}
-                                  >
-                                    <ListItemIcon>
-                                      <PeopleIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Population Data" />
-                                    {populationOpen ? (
-                                      <ChevronLeftIcon />
-                                    ) : (
-                                      <ChevronRightIcon />
-                                    )}
-                                  </ListItemButton>
-                                </ListItem>
+                                {Object.keys(
+                                  organizeLayersByStructure(wmtsLayers)
+                                    .predictiveModels.dated
+                                ).map((year) => (
+                                  <React.Fragment key={year}>
+                                    <ListItem disablePadding sx={{ pl: 2 }}>
+                                      <ListItemButton
+                                        onClick={() => handleYearClick(year)}
+                                      >
+                                        <ListItemIcon>
+                                          <DateRange />
+                                        </ListItemIcon>
+                                        <ListItemText primary={year} />
+                                        {expandedYears[year] ? (
+                                          <ChevronLeftIcon />
+                                        ) : (
+                                          <ChevronRightIcon />
+                                        )}
+                                      </ListItemButton>
+                                    </ListItem>
 
-                                {/* Population Layers */}
-                                <Collapse
-                                  in={populationOpen}
-                                  timeout="auto"
-                                  unmountOnExit
-                                >
-                                  <List
-                                    component="div"
-                                    disablePadding
-                                    sx={{ pl: 10 }}
-                                  >
-                                    {organizeLayersByStructure(
-                                      wmtsLayers
-                                    ).population.map((layer) => {
-                                      const group = mapRef.current
-                                        ?.getLayers()
-                                        .getArray()
-                                        .find(
-                                          (l) =>
-                                            l.get("title") ===
-                                            (layer.group?.groupTitle ||
-                                              "Ungrouped")
-                                        );
-
-                                      const olLayer =
-                                        group instanceof LayerGroup
-                                          ? group
-                                              .getLayers()
-                                              .getArray()
-                                              .find(
-                                                (l) =>
-                                                  l.get("title") === layer.title
-                                              )
-                                          : null;
-
-                                      return (
-                                        <ListItemButton
-                                          key={layer.title}
-                                          sx={{ pl: 12 }}
-                                          onClick={() =>
-                                            handleLayerToggle(olLayer)
-                                          }
-                                        >
-                                          <Checkbox
-                                            edge="start"
-                                            checked={
-                                              olLayer?.getVisible() || false
-                                            }
-                                            tabIndex={-1}
-                                            color="success"
-                                            disableRipple
-                                          />
-                                          <ListItemText primary={layer.title} />
-                                        </ListItemButton>
-                                      );
-                                    })}
-                                  </List>
-                                </Collapse>
-
-                                {/* Predictive Models Branch */}
-                                <ListItem disablePadding sx={{ pl: 2 }}>
-                                  <ListItemButton
-                                    onClick={handlePredictiveModelsClick}
-                                  >
-                                    <ListItemIcon>
-                                      <ModelTraining />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Predictive Models" />
-                                    {predictiveModelsOpen ? (
-                                      <ChevronLeftIcon />
-                                    ) : (
-                                      <ChevronRightIcon />
-                                    )}
-                                  </ListItemButton>
-                                </ListItem>
-
-                                {/* Years */}
-                                <Collapse
-                                  in={predictiveModelsOpen}
-                                  timeout="auto"
-                                  unmountOnExit
-                                >
-                                  <List
-                                    component="div"
-                                    disablePadding
-                                    sx={{ pl: 4 }}
-                                  >
-                                    {Object.keys(
-                                      organizeLayersByStructure(wmtsLayers)
-                                        .predictiveModels
-                                    ).map((year) => (
-                                      <React.Fragment key={year}>
-                                        <ListItem disablePadding sx={{ pl: 2 }}>
-                                          <ListItemButton
-                                            onClick={() =>
-                                              handleYearClick(year)
-                                            }
+                                    {/* Months */}
+                                    <Collapse
+                                      in={expandedYears[year]}
+                                      timeout="auto"
+                                      unmountOnExit
+                                    >
+                                      <List
+                                        component="div"
+                                        disablePadding
+                                        sx={{ pl: 8 }}
+                                      >
+                                        {Object.keys(
+                                          organizeLayersByStructure(wmtsLayers)
+                                            .predictiveModels.dated[year]
+                                        ).map((month) => (
+                                          <React.Fragment
+                                            key={`${year}-${month}`}
                                           >
-                                            <ListItemIcon>
-                                              <DateRange />
-                                            </ListItemIcon>
-                                            <ListItemText primary={year} />
-                                            {expandedYears[year] ? (
-                                              <ChevronLeftIcon />
-                                            ) : (
-                                              <ChevronRightIcon />
-                                            )}
-                                          </ListItemButton>
-                                        </ListItem>
-
-                                        {/* Months */}
-                                        <Collapse
-                                          in={expandedYears[year]}
-                                          timeout="auto"
-                                          unmountOnExit
-                                        >
-                                          <List
-                                            component="div"
-                                            disablePadding
-                                            sx={{ pl: 12 }}
-                                          >
-                                            {Object.keys(
-                                              organizeLayersByStructure(
-                                                wmtsLayers
-                                              ).predictiveModels[year]
-                                            ).map((month) => (
-                                              <React.Fragment
-                                                key={`${year}-${month}`}
+                                            <ListItem
+                                              disablePadding
+                                              sx={{ pl: 2 }}
+                                            >
+                                              <ListItemButton
+                                                onClick={() =>
+                                                  handleMonthClick(year, month)
+                                                }
                                               >
-                                                <ListItem
-                                                  disablePadding
-                                                  sx={{ pl: 2 }}
-                                                >
-                                                  <ListItemButton
-                                                    onClick={() =>
-                                                      handleMonthClick(
-                                                        year,
-                                                        month
-                                                      )
-                                                    }
-                                                  >
-                                                    <ListItemIcon>
-                                                      <CalendarMonth />
-                                                    </ListItemIcon>
-                                                    <ListItemText
-                                                      primary={month}
-                                                    />
-                                                    {expandedMonths[
-                                                      `${year}-${month}`
-                                                    ] ? (
-                                                      <ChevronLeftIcon />
-                                                    ) : (
-                                                      <ChevronRightIcon />
-                                                    )}
-                                                  </ListItemButton>
-                                                </ListItem>
+                                                <ListItemIcon>
+                                                  <CalendarMonth />
+                                                </ListItemIcon>
+                                                <ListItemText primary={month} />
+                                                {expandedMonths[
+                                                  `${year}-${month}`
+                                                ] ? (
+                                                  <ChevronLeftIcon />
+                                                ) : (
+                                                  <ChevronRightIcon />
+                                                )}
+                                              </ListItemButton>
+                                            </ListItem>
 
-                                                {/* Model Types */}
-                                                <Collapse
-                                                  in={
-                                                    expandedMonths[
-                                                      `${year}-${month}`
-                                                    ]
-                                                  }
-                                                  timeout="auto"
-                                                  unmountOnExit
-                                                >
-                                                  <List
-                                                    component="div"
-                                                    disablePadding
-                                                    sx={{ pl: 14 }}
+                                            {/* Model Types */}
+                                            <Collapse
+                                              in={
+                                                expandedMonths[
+                                                  `${year}-${month}`
+                                                ]
+                                              }
+                                              timeout="auto"
+                                              unmountOnExit
+                                            >
+                                              <List
+                                                component="div"
+                                                disablePadding
+                                                sx={{ pl: 8 }}
+                                              >
+                                                {Object.keys(
+                                                  organizeLayersByStructure(
+                                                    wmtsLayers
+                                                  ).predictiveModels.dated[
+                                                    year
+                                                  ][month]
+                                                ).map((modelType) => (
+                                                  <React.Fragment
+                                                    key={`${year}-${month}-${modelType}`}
                                                   >
-                                                    {Object.keys(
-                                                      organizeLayersByStructure(
-                                                        wmtsLayers
-                                                      ).predictiveModels[year][
-                                                        month
-                                                      ]
-                                                    ).map((modelType) => (
-                                                      <React.Fragment
-                                                        key={`${year}-${month}-${modelType}`}
+                                                    <ListItem
+                                                      disablePadding
+                                                      sx={{
+                                                        pl: 2,
+                                                      }}
+                                                    >
+                                                      <ListItemButton
+                                                        onClick={() =>
+                                                          handleModelTypeClick(
+                                                            year,
+                                                            month,
+                                                            modelType
+                                                          )
+                                                        }
                                                       >
-                                                        <ListItem
-                                                          disablePadding
-                                                          sx={{ pl: 2 }}
-                                                        >
-                                                          <ListItemButton
-                                                            onClick={() =>
-                                                              handleModelTypeClick(
-                                                                year,
-                                                                month,
-                                                                modelType
-                                                              )
-                                                            }
-                                                          >
-                                                            <ListItemIcon>
-                                                              <LayersIcon />
-                                                            </ListItemIcon>
-                                                            <ListItemText
-                                                              primary={
-                                                                modelType
-                                                              }
-                                                            />
-                                                            {expandedModelTypes[
-                                                              `${year}-${month}-${modelType}`
-                                                            ] ? (
-                                                              <ChevronLeftIcon />
-                                                            ) : (
-                                                              <ChevronRightIcon />
-                                                            )}
-                                                          </ListItemButton>
-                                                        </ListItem>
+                                                        <ListItemIcon>
+                                                          <LayersIcon />
+                                                        </ListItemIcon>
+                                                        <ListItemText
+                                                          primary={modelType}
+                                                        />
+                                                        {expandedModelTypes[
+                                                          `${year}-${month}-${modelType}`
+                                                        ] ? (
+                                                          <ChevronLeftIcon />
+                                                        ) : (
+                                                          <ChevronRightIcon />
+                                                        )}
+                                                      </ListItemButton>
+                                                    </ListItem>
 
-                                                        {/* Individual Layers */}
-                                                        <Collapse
-                                                          in={
-                                                            expandedModelTypes[
-                                                              `${year}-${month}-${modelType}`
-                                                            ]
-                                                          }
-                                                          timeout="auto"
-                                                          unmountOnExit
-                                                        >
-                                                          <List
-                                                            component="div"
-                                                            disablePadding
-                                                            sx={{ pl: 16 }}
-                                                          >
-                                                            {organizeLayersByStructure(
-                                                              wmtsLayers
-                                                            ).predictiveModels[
-                                                              year
-                                                            ][month][
-                                                              modelType
-                                                            ].map((layer) => {
-                                                              const group =
-                                                                mapRef.current
-                                                                  ?.getLayers()
-                                                                  .getArray()
-                                                                  .find(
-                                                                    (l) =>
-                                                                      l.get(
-                                                                        "title"
-                                                                      ) ===
-                                                                      (layer
-                                                                        .group
-                                                                        ?.groupTitle ||
-                                                                        "Ungrouped")
-                                                                  );
+                                                    {/* Individual Layers */}
+                                                    <Collapse
+                                                      in={
+                                                        expandedModelTypes[
+                                                          `${year}-${month}-${modelType}`
+                                                        ]
+                                                      }
+                                                      timeout="auto"
+                                                      unmountOnExit
+                                                    >
+                                                      <List
+                                                        component="div"
+                                                        disablePadding
+                                                        sx={{
+                                                          pl: 10,
+                                                        }}
+                                                      >
+                                                        {organizeLayersByStructure(
+                                                          wmtsLayers
+                                                        ).predictiveModels.dated[
+                                                          year
+                                                        ][month][modelType].map(
+                                                          (layer) => {
+                                                            const group =
+                                                              mapRef.current
+                                                                ?.getLayers()
+                                                                .getArray()
+                                                                .find(
+                                                                  (l) =>
+                                                                    l.get(
+                                                                      "title"
+                                                                    ) ===
+                                                                    (layer.group
+                                                                      ?.groupTitle ||
+                                                                      "Ungrouped")
+                                                                );
 
-                                                              const olLayer =
-                                                                group instanceof
-                                                                LayerGroup
-                                                                  ? group
-                                                                      .getLayers()
-                                                                      .getArray()
-                                                                      .find(
-                                                                        (l) =>
-                                                                          l.get(
-                                                                            "title"
-                                                                          ) ===
-                                                                          layer.title
-                                                                      )
-                                                                  : null;
+                                                            const olLayer =
+                                                              group instanceof
+                                                              LayerGroup
+                                                                ? group
+                                                                    .getLayers()
+                                                                    .getArray()
+                                                                    .find(
+                                                                      (l) =>
+                                                                        l.get(
+                                                                          "title"
+                                                                        ) ===
+                                                                        layer.title
+                                                                    )
+                                                                : null;
 
-                                                              return (
-                                                                <ListItemButton
-                                                                  key={
+                                                            return (
+                                                              <ListItemButton
+                                                                key={
+                                                                  layer.title ||
+                                                                  layer.name ||
+                                                                  "unknown"
+                                                                }
+                                                                sx={{
+                                                                  pl: 14,
+                                                                }}
+                                                                onClick={() =>
+                                                                  handleLayerToggle(
+                                                                    olLayer
+                                                                  )
+                                                                }
+                                                              >
+                                                                <Checkbox
+                                                                  edge="start"
+                                                                  checked={
+                                                                    olLayer?.getVisible() ||
+                                                                    false
+                                                                  }
+                                                                  tabIndex={-1}
+                                                                  color="success"
+                                                                  disableRipple
+                                                                />
+                                                                <ListItemText
+                                                                  primary={
                                                                     layer.title ||
                                                                     layer.name ||
-                                                                    "unknown"
+                                                                    "Unknown Layer"
                                                                   }
-                                                                  sx={{
-                                                                    pl: 18,
-                                                                  }}
-                                                                  onClick={() =>
-                                                                    handleLayerToggle(
-                                                                      olLayer
-                                                                    )
-                                                                  }
-                                                                >
-                                                                  <Checkbox
-                                                                    edge="start"
-                                                                    checked={
-                                                                      olLayer?.getVisible() ||
-                                                                      false
-                                                                    }
-                                                                    tabIndex={
-                                                                      -1
-                                                                    }
-                                                                    color="success"
-                                                                    disableRipple
-                                                                  />
-                                                                  <ListItemText
-                                                                    primary={
-                                                                      layer.title ||
-                                                                      layer.name ||
-                                                                      "Unknown Layer"
-                                                                    }
-                                                                  />
-                                                                </ListItemButton>
-                                                              );
-                                                            })}
-                                                          </List>
-                                                        </Collapse>
-                                                      </React.Fragment>
-                                                    ))}
-                                                  </List>
-                                                </Collapse>
-                                              </React.Fragment>
-                                            ))}
-                                          </List>
-                                        </Collapse>
-                                      </React.Fragment>
-                                    ))}
-                                  </List>
-                                </Collapse>
+                                                                />
+                                                              </ListItemButton>
+                                                            );
+                                                          }
+                                                        )}
+                                                      </List>
+                                                    </Collapse>
+                                                  </React.Fragment>
+                                                ))}
+                                              </List>
+                                            </Collapse>
+                                          </React.Fragment>
+                                        ))}
+                                      </List>
+                                    </Collapse>
+                                  </React.Fragment>
+                                ))}
+                              </List>
+                            </Collapse>
+                            {/* Generic Models Section */}
+                            <ListItem disablePadding sx={{ pl: 2 }}>
+                              <ListItemButton
+                                onClick={handleGenericModelsClick}
+                              >
+                                <ListItemIcon>
+                                  <LayersIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Generic Models" />
+                                {genericModelsOpen ? (
+                                  <ChevronLeftIcon />
+                                ) : (
+                                  <ChevronRightIcon />
+                                )}
+                              </ListItemButton>
+                            </ListItem>
+
+                            {/* Generic Models Layers */}
+                            <Collapse
+                              in={genericModelsOpen}
+                              timeout="auto"
+                              unmountOnExit
+                            >
+                              <List
+                                component="div"
+                                disablePadding
+                                sx={{ pl: 6 }}
+                              >
+                                {organizeLayersByStructure(
+                                  wmtsLayers
+                                ).predictiveModels.generic.map((layer) => {
+                                  const group = mapRef.current
+                                    ?.getLayers()
+                                    .getArray()
+                                    .find(
+                                      (l) =>
+                                        l.get("title") ===
+                                        (layer.group?.groupTitle || "Ungrouped")
+                                    );
+
+                                  const olLayer =
+                                    group instanceof LayerGroup
+                                      ? group
+                                          .getLayers()
+                                          .getArray()
+                                          .find(
+                                            (l) =>
+                                              l.get("title") === layer.title
+                                          )
+                                      : null;
+
+                                  return (
+                                    <ListItemButton
+                                      key={
+                                        layer.title || layer.name || "unknown"
+                                      }
+                                      sx={{ pl: 8 }}
+                                      onClick={() => handleLayerToggle(olLayer)}
+                                    >
+                                      <Checkbox
+                                        edge="start"
+                                        checked={olLayer?.getVisible() || false}
+                                        tabIndex={-1}
+                                        color="success"
+                                        disableRipple
+                                      />
+                                      <ListItemText
+                                        primary={
+                                          layer.title ||
+                                          layer.name ||
+                                          "Unknown Layer"
+                                        }
+                                      />
+                                    </ListItemButton>
+                                  );
+                                })}
+                              </List>
+                            </Collapse>
+                          </List>
+                        </Collapse>
+
+                        {/* Population Data Branch */}
+
+                        <Collapse in={turkanaOpen} timeout="auto" unmountOnExit>
+                          <List component="div" disablePadding sx={{ pl: 6 }}>
+                            <ListItem disablePadding sx={{ pl: 2 }}>
+                              <ListItemButton onClick={handlePopulationClick}>
+                                <ListItemIcon>
+                                  <PeopleIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Population Data" />
+                                {populationOpen ? (
+                                  <ChevronLeftIcon />
+                                ) : (
+                                  <ChevronRightIcon />
+                                )}
+                              </ListItemButton>
+                            </ListItem>
+
+                            {/* Population Layers */}
+                            <Collapse
+                              in={populationOpen}
+                              timeout="auto"
+                              unmountOnExit
+                            >
+                              <List
+                                component="div"
+                                disablePadding
+                                sx={{ pl: 10 }}
+                              >
+                                {organizeLayersByStructure(
+                                  wmtsLayers
+                                ).population.map((layer) => {
+                                  const group = mapRef.current
+                                    ?.getLayers()
+                                    .getArray()
+                                    .find(
+                                      (l) =>
+                                        l.get("title") ===
+                                        (layer.group?.groupTitle || "Ungrouped")
+                                    );
+
+                                  const olLayer =
+                                    group instanceof LayerGroup
+                                      ? group
+                                          .getLayers()
+                                          .getArray()
+                                          .find(
+                                            (l) =>
+                                              l.get("title") === layer.title
+                                          )
+                                      : null;
+
+                                  return (
+                                    <ListItemButton
+                                      key={layer.title}
+                                      sx={{ pl: 12 }}
+                                      onClick={() => handleLayerToggle(olLayer)}
+                                    >
+                                      <Checkbox
+                                        edge="start"
+                                        checked={olLayer?.getVisible() || false}
+                                        tabIndex={-1}
+                                        color="success"
+                                        disableRipple
+                                      />
+                                      <ListItemText primary={layer.title} />
+                                    </ListItemButton>
+                                  );
+                                })}
                               </List>
                             </Collapse>
                           </List>

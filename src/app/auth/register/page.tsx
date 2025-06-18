@@ -90,6 +90,13 @@ const Register: React.FC = ({}) => {
     router.push("/auth/login");
   };
   const handleRegister = async () => {
+    //restrict email
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!isValidEmail) {
+      setEmailError(true);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
       return;
