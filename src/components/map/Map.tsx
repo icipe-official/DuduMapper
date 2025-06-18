@@ -1328,7 +1328,7 @@ function Newmap() {
                                 <ListItemIcon>
                                   <LayersIcon />
                                 </ListItemIcon>
-                                <ListItemText primary="Generic Models" />
+                                <ListItemText primary=" Models" />
                                 {genericModelsOpen ? (
                                   <ChevronLeftIcon />
                                 ) : (
