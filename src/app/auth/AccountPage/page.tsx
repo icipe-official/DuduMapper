@@ -9,6 +9,7 @@ import {
   IconButton,
   Paper,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
@@ -238,7 +239,9 @@ const AccountProfile = () => {
               height: 30,
             }}
           >
-            <CameraAltIcon fontSize="small" />
+            <Tooltip title="click to expand">
+              <CameraAltIcon fontSize="small" />
+            </Tooltip>
           </IconButton>
           <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
             <DialogContent sx={{ p: 2 }}>
