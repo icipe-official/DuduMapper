@@ -19,6 +19,14 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleIcon from "@mui/icons-material/People";
 import PostAddIcon from "@mui/icons-material/PostAdd";
@@ -34,6 +42,7 @@ interface User {
   role: string;
   createdAt: string;
 }
+const COLORS = ["#0088FE", "#FF8042"]; // User, Admin
 export default function AdminPanelDynamic() {
   const [selectedSection, setSelectedSection] = useState<
     "dashboard" | "users" | "Posts"
@@ -42,8 +51,27 @@ export default function AdminPanelDynamic() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const hasRedirected = React.useRef(false);
-  const hasWelcomed = React.useRef(false);
+  //dashboard logic
+  const [data, setData] = useState<User[]>([]);
 
+  useEffect(() => {
+    fetch("/api/users")
+      .then((res) => res.json())
+      .then((users: User[]) => setData(users))
+      .catch((err) => console.error("Error fetching users", err));
+  }, []);
+
+  const roleStats = [
+    {
+      name: "Users",
+      value: data.filter((user) => user.role === "user").length,
+    },
+    {
+      name: "Admins",
+      value: data.filter((user) => user.role === "admin").length,
+    },
+  ];
+  //users logic
   useEffect(() => {
     if (selectedSection === "users") {
       fetch("/api/users")
@@ -152,9 +180,32 @@ export default function AdminPanelDynamic() {
             <Typography variant="h5" gutterBottom>
               📊 Dashboard
             </Typography>
-            <Typography variant="body2">
-              Overview and analytics of the admin system.
-            </Typography>
+
+            <Paper elevation={3} sx={{ p: 4, width: 400, margin: "auto" }}>
+              <Typography variant="h6" align="center" gutterBottom>
+                User Role Distribution
+              </Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={roleStats}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    fill="#8884d8"
+                    label
+                  >
+                    {roleStats.map((entry, index) => (
+                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend verticalAlign="bottom" />
+                </PieChart>
+              </ResponsiveContainer>
+            </Paper>
           </>
         );
     }
