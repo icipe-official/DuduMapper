@@ -1428,7 +1428,7 @@ function Newmap() {
                               <List
                                 component="div"
                                 disablePadding
-                                sx={{ pl: 10 }}
+                                sx={{ pl: 8 }}
                               >
                                 {organizeLayersByStructure(
                                   wmtsLayers

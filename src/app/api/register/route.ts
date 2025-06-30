@@ -15,6 +15,7 @@ export async function POST(req: Request) {
       lastName,
       gender,
       profilePicture,
+
       //wantsNotification = false,
     } = await req.json();
 

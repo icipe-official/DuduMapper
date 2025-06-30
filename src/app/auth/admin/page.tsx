@@ -17,10 +17,14 @@ import {
   Table,
   Paper,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleIcon from "@mui/icons-material/People";
 import PostAddIcon from "@mui/icons-material/PostAdd";
+import { useAuth } from "@/context/context";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 interface User {
   id: string;
   firstName: string;
@@ -35,6 +39,10 @@ export default function AdminPanelDynamic() {
     "dashboard" | "users" | "Posts"
   >("dashboard");
   const [users, setUsers] = useState<User[]>([]);
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const hasRedirected = React.useRef(false);
+  const hasWelcomed = React.useRef(false);
 
   useEffect(() => {
     if (selectedSection === "users") {
@@ -49,6 +57,29 @@ export default function AdminPanelDynamic() {
         .catch((err) => console.error("Failed to fetch users", err));
     }
   }, [selectedSection]);
+
+  //restricting user access to admin
+  useEffect(() => {
+    if (
+      !loading &&
+      (!user || user.role !== "admin") &&
+      !hasRedirected.current
+    ) {
+      hasRedirected.current = true;
+      toast.error("Unauthorized Access.");
+      router.push("/auth/AccountPage");
+    }
+
+    if (!loading && user && user.role === "admin" && !hasRedirected.current) {
+      // Optional: Prevent duplicate toasts
+      hasRedirected.current = true;
+
+      // delay a little bit before greeting
+      setTimeout(() => {
+        toast.success("Welcome Admin!");
+      }, 1000);
+    }
+  }, [user, loading, router]);
 
   const renderContent = () => {
     switch (selectedSection) {

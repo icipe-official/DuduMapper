@@ -132,6 +132,8 @@ const Register: React.FC = ({}) => {
         lastName: data.user.lastName,
         gender: data.user.gender,
         profilePicture: data.user.profileProfile ?? null,
+        //added role
+        role: "",
       });
       toast.success("User Registered Successfully"),
         {
@@ -142,7 +144,7 @@ const Register: React.FC = ({}) => {
         };
 
       // No need for explicit redirect here - the login function now handles it
-      router.push("/"); // REMOVED this line
+      router.push("/");
     } catch (err) {
       console.error("Registration failed:", err);
       setError("Something went wrong. Please try again.");
