@@ -52,7 +52,7 @@ const Register: React.FC = ({}) => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     setEmail(input);
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/i.test(input);
 
     setEmailError(!isValidEmail && input.length > 0);
   };
@@ -91,7 +91,7 @@ const Register: React.FC = ({}) => {
   };
   const handleRegister = async () => {
     //restrict email
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/i.test(email);
     if (!isValidEmail) {
       setEmailError(true);
       return;
@@ -114,7 +114,7 @@ const Register: React.FC = ({}) => {
           firstName,
           lastName,
           gender,
-          wantsNotification,
+          wantsnotification: wantsNotification,
         }),
       });
 
@@ -130,6 +130,8 @@ const Register: React.FC = ({}) => {
         email: data.user.email,
         firstName: data.user.firstName,
         lastName: data.user.lastName,
+        //added line
+        wantsnotification: data.user.wantsnotification,
         gender: data.user.gender,
         profilePicture: data.user.profileProfile ?? null,
         //added role
@@ -305,26 +307,6 @@ const Register: React.FC = ({}) => {
                   <>
                     <FemaleIcon sx={{ verticalAlign: "middle", mr: 0.5 }} />
                     Female
-                  </>
-                }
-              />
-              <FormControlLabel
-                value="other"
-                control={
-                  <Radio
-                    sx={{
-                      "&.Mui-checked": {
-                        color: "green",
-                      },
-                    }}
-                  />
-                }
-                label={
-                  <>
-                    <TransgenderIcon
-                      sx={{ verticalAlign: "middle", mr: 0.5 }}
-                    />
-                    Other
                   </>
                 }
               />

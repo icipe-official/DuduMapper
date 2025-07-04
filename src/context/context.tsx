@@ -16,7 +16,7 @@ type User = {
   lastName: string;
   gender: string;
   profilePicture?: string;
-  //wantsNotification: boolean;
+  wantsnotification: boolean;
 };
 
 type AuthContextType = {

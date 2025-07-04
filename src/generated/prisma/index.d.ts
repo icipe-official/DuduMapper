@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type users = $Result.DefaultSelection<Prisma.$usersPayload>
 /**
+ * Model SentEmail
+ * 
+ */
+export type SentEmail = $Result.DefaultSelection<Prisma.$SentEmailPayload>
+/**
  * Model VectorRiskData
  * 
  */
@@ -163,6 +168,16 @@ export class PrismaClient<
     * ```
     */
   get users(): Prisma.usersDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.sentEmail`: Exposes CRUD operations for the **SentEmail** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SentEmails
+    * const sentEmails = await prisma.sentEmail.findMany()
+    * ```
+    */
+  get sentEmail(): Prisma.SentEmailDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.vectorRiskData`: Exposes CRUD operations for the **VectorRiskData** model.
@@ -624,6 +639,7 @@ export namespace Prisma {
 
   export const ModelName: {
     users: 'users',
+    SentEmail: 'SentEmail',
     VectorRiskData: 'VectorRiskData',
     Notification: 'Notification'
   };
@@ -644,7 +660,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "users" | "vectorRiskData" | "notification"
+      modelProps: "users" | "sentEmail" | "vectorRiskData" | "notification"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -719,6 +735,80 @@ export namespace Prisma {
           count: {
             args: Prisma.usersCountArgs<ExtArgs>
             result: $Utils.Optional<UsersCountAggregateOutputType> | number
+          }
+        }
+      }
+      SentEmail: {
+        payload: Prisma.$SentEmailPayload<ExtArgs>
+        fields: Prisma.SentEmailFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SentEmailFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SentEmailPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SentEmailFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SentEmailPayload>
+          }
+          findFirst: {
+            args: Prisma.SentEmailFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SentEmailPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SentEmailFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SentEmailPayload>
+          }
+          findMany: {
+            args: Prisma.SentEmailFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SentEmailPayload>[]
+          }
+          create: {
+            args: Prisma.SentEmailCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SentEmailPayload>
+          }
+          createMany: {
+            args: Prisma.SentEmailCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SentEmailCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SentEmailPayload>[]
+          }
+          delete: {
+            args: Prisma.SentEmailDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SentEmailPayload>
+          }
+          update: {
+            args: Prisma.SentEmailUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SentEmailPayload>
+          }
+          deleteMany: {
+            args: Prisma.SentEmailDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SentEmailUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SentEmailUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SentEmailPayload>[]
+          }
+          upsert: {
+            args: Prisma.SentEmailUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SentEmailPayload>
+          }
+          aggregate: {
+            args: Prisma.SentEmailAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSentEmail>
+          }
+          groupBy: {
+            args: Prisma.SentEmailGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SentEmailGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SentEmailCountArgs<ExtArgs>
+            result: $Utils.Optional<SentEmailCountAggregateOutputType> | number
           }
         }
       }
@@ -955,6 +1045,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     users?: usersOmit
+    sentEmail?: SentEmailOmit
     vectorRiskData?: VectorRiskDataOmit
     notification?: NotificationOmit
   }
@@ -2278,6 +2369,1001 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: usersInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SentEmail
+   */
+
+  export type AggregateSentEmail = {
+    _count: SentEmailCountAggregateOutputType | null
+    _min: SentEmailMinAggregateOutputType | null
+    _max: SentEmailMaxAggregateOutputType | null
+  }
+
+  export type SentEmailMinAggregateOutputType = {
+    id: string | null
+    email: string | null
+    subject: string | null
+    body: string | null
+    sentAt: Date | null
+  }
+
+  export type SentEmailMaxAggregateOutputType = {
+    id: string | null
+    email: string | null
+    subject: string | null
+    body: string | null
+    sentAt: Date | null
+  }
+
+  export type SentEmailCountAggregateOutputType = {
+    id: number
+    email: number
+    subject: number
+    body: number
+    sentAt: number
+    _all: number
+  }
+
+
+  export type SentEmailMinAggregateInputType = {
+    id?: true
+    email?: true
+    subject?: true
+    body?: true
+    sentAt?: true
+  }
+
+  export type SentEmailMaxAggregateInputType = {
+    id?: true
+    email?: true
+    subject?: true
+    body?: true
+    sentAt?: true
+  }
+
+  export type SentEmailCountAggregateInputType = {
+    id?: true
+    email?: true
+    subject?: true
+    body?: true
+    sentAt?: true
+    _all?: true
+  }
+
+  export type SentEmailAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SentEmail to aggregate.
+     */
+    where?: SentEmailWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SentEmails to fetch.
+     */
+    orderBy?: SentEmailOrderByWithRelationInput | SentEmailOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SentEmailWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SentEmails from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SentEmails.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SentEmails
+    **/
+    _count?: true | SentEmailCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SentEmailMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SentEmailMaxAggregateInputType
+  }
+
+  export type GetSentEmailAggregateType<T extends SentEmailAggregateArgs> = {
+        [P in keyof T & keyof AggregateSentEmail]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSentEmail[P]>
+      : GetScalarType<T[P], AggregateSentEmail[P]>
+  }
+
+
+
+
+  export type SentEmailGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SentEmailWhereInput
+    orderBy?: SentEmailOrderByWithAggregationInput | SentEmailOrderByWithAggregationInput[]
+    by: SentEmailScalarFieldEnum[] | SentEmailScalarFieldEnum
+    having?: SentEmailScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SentEmailCountAggregateInputType | true
+    _min?: SentEmailMinAggregateInputType
+    _max?: SentEmailMaxAggregateInputType
+  }
+
+  export type SentEmailGroupByOutputType = {
+    id: string
+    email: string
+    subject: string
+    body: string
+    sentAt: Date
+    _count: SentEmailCountAggregateOutputType | null
+    _min: SentEmailMinAggregateOutputType | null
+    _max: SentEmailMaxAggregateOutputType | null
+  }
+
+  type GetSentEmailGroupByPayload<T extends SentEmailGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SentEmailGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SentEmailGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SentEmailGroupByOutputType[P]>
+            : GetScalarType<T[P], SentEmailGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SentEmailSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    email?: boolean
+    subject?: boolean
+    body?: boolean
+    sentAt?: boolean
+  }, ExtArgs["result"]["sentEmail"]>
+
+  export type SentEmailSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    email?: boolean
+    subject?: boolean
+    body?: boolean
+    sentAt?: boolean
+  }, ExtArgs["result"]["sentEmail"]>
+
+  export type SentEmailSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    email?: boolean
+    subject?: boolean
+    body?: boolean
+    sentAt?: boolean
+  }, ExtArgs["result"]["sentEmail"]>
+
+  export type SentEmailSelectScalar = {
+    id?: boolean
+    email?: boolean
+    subject?: boolean
+    body?: boolean
+    sentAt?: boolean
+  }
+
+  export type SentEmailOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "subject" | "body" | "sentAt", ExtArgs["result"]["sentEmail"]>
+
+  export type $SentEmailPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SentEmail"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      email: string
+      subject: string
+      body: string
+      sentAt: Date
+    }, ExtArgs["result"]["sentEmail"]>
+    composites: {}
+  }
+
+  type SentEmailGetPayload<S extends boolean | null | undefined | SentEmailDefaultArgs> = $Result.GetResult<Prisma.$SentEmailPayload, S>
+
+  type SentEmailCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SentEmailFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SentEmailCountAggregateInputType | true
+    }
+
+  export interface SentEmailDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SentEmail'], meta: { name: 'SentEmail' } }
+    /**
+     * Find zero or one SentEmail that matches the filter.
+     * @param {SentEmailFindUniqueArgs} args - Arguments to find a SentEmail
+     * @example
+     * // Get one SentEmail
+     * const sentEmail = await prisma.sentEmail.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SentEmailFindUniqueArgs>(args: SelectSubset<T, SentEmailFindUniqueArgs<ExtArgs>>): Prisma__SentEmailClient<$Result.GetResult<Prisma.$SentEmailPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SentEmail that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SentEmailFindUniqueOrThrowArgs} args - Arguments to find a SentEmail
+     * @example
+     * // Get one SentEmail
+     * const sentEmail = await prisma.sentEmail.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SentEmailFindUniqueOrThrowArgs>(args: SelectSubset<T, SentEmailFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SentEmailClient<$Result.GetResult<Prisma.$SentEmailPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SentEmail that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SentEmailFindFirstArgs} args - Arguments to find a SentEmail
+     * @example
+     * // Get one SentEmail
+     * const sentEmail = await prisma.sentEmail.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SentEmailFindFirstArgs>(args?: SelectSubset<T, SentEmailFindFirstArgs<ExtArgs>>): Prisma__SentEmailClient<$Result.GetResult<Prisma.$SentEmailPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SentEmail that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SentEmailFindFirstOrThrowArgs} args - Arguments to find a SentEmail
+     * @example
+     * // Get one SentEmail
+     * const sentEmail = await prisma.sentEmail.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SentEmailFindFirstOrThrowArgs>(args?: SelectSubset<T, SentEmailFindFirstOrThrowArgs<ExtArgs>>): Prisma__SentEmailClient<$Result.GetResult<Prisma.$SentEmailPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SentEmails that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SentEmailFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SentEmails
+     * const sentEmails = await prisma.sentEmail.findMany()
+     * 
+     * // Get first 10 SentEmails
+     * const sentEmails = await prisma.sentEmail.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const sentEmailWithIdOnly = await prisma.sentEmail.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SentEmailFindManyArgs>(args?: SelectSubset<T, SentEmailFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SentEmailPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SentEmail.
+     * @param {SentEmailCreateArgs} args - Arguments to create a SentEmail.
+     * @example
+     * // Create one SentEmail
+     * const SentEmail = await prisma.sentEmail.create({
+     *   data: {
+     *     // ... data to create a SentEmail
+     *   }
+     * })
+     * 
+     */
+    create<T extends SentEmailCreateArgs>(args: SelectSubset<T, SentEmailCreateArgs<ExtArgs>>): Prisma__SentEmailClient<$Result.GetResult<Prisma.$SentEmailPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SentEmails.
+     * @param {SentEmailCreateManyArgs} args - Arguments to create many SentEmails.
+     * @example
+     * // Create many SentEmails
+     * const sentEmail = await prisma.sentEmail.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SentEmailCreateManyArgs>(args?: SelectSubset<T, SentEmailCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SentEmails and returns the data saved in the database.
+     * @param {SentEmailCreateManyAndReturnArgs} args - Arguments to create many SentEmails.
+     * @example
+     * // Create many SentEmails
+     * const sentEmail = await prisma.sentEmail.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SentEmails and only return the `id`
+     * const sentEmailWithIdOnly = await prisma.sentEmail.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SentEmailCreateManyAndReturnArgs>(args?: SelectSubset<T, SentEmailCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SentEmailPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SentEmail.
+     * @param {SentEmailDeleteArgs} args - Arguments to delete one SentEmail.
+     * @example
+     * // Delete one SentEmail
+     * const SentEmail = await prisma.sentEmail.delete({
+     *   where: {
+     *     // ... filter to delete one SentEmail
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SentEmailDeleteArgs>(args: SelectSubset<T, SentEmailDeleteArgs<ExtArgs>>): Prisma__SentEmailClient<$Result.GetResult<Prisma.$SentEmailPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SentEmail.
+     * @param {SentEmailUpdateArgs} args - Arguments to update one SentEmail.
+     * @example
+     * // Update one SentEmail
+     * const sentEmail = await prisma.sentEmail.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SentEmailUpdateArgs>(args: SelectSubset<T, SentEmailUpdateArgs<ExtArgs>>): Prisma__SentEmailClient<$Result.GetResult<Prisma.$SentEmailPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SentEmails.
+     * @param {SentEmailDeleteManyArgs} args - Arguments to filter SentEmails to delete.
+     * @example
+     * // Delete a few SentEmails
+     * const { count } = await prisma.sentEmail.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SentEmailDeleteManyArgs>(args?: SelectSubset<T, SentEmailDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SentEmails.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SentEmailUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SentEmails
+     * const sentEmail = await prisma.sentEmail.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SentEmailUpdateManyArgs>(args: SelectSubset<T, SentEmailUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SentEmails and returns the data updated in the database.
+     * @param {SentEmailUpdateManyAndReturnArgs} args - Arguments to update many SentEmails.
+     * @example
+     * // Update many SentEmails
+     * const sentEmail = await prisma.sentEmail.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SentEmails and only return the `id`
+     * const sentEmailWithIdOnly = await prisma.sentEmail.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SentEmailUpdateManyAndReturnArgs>(args: SelectSubset<T, SentEmailUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SentEmailPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SentEmail.
+     * @param {SentEmailUpsertArgs} args - Arguments to update or create a SentEmail.
+     * @example
+     * // Update or create a SentEmail
+     * const sentEmail = await prisma.sentEmail.upsert({
+     *   create: {
+     *     // ... data to create a SentEmail
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SentEmail we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SentEmailUpsertArgs>(args: SelectSubset<T, SentEmailUpsertArgs<ExtArgs>>): Prisma__SentEmailClient<$Result.GetResult<Prisma.$SentEmailPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SentEmails.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SentEmailCountArgs} args - Arguments to filter SentEmails to count.
+     * @example
+     * // Count the number of SentEmails
+     * const count = await prisma.sentEmail.count({
+     *   where: {
+     *     // ... the filter for the SentEmails we want to count
+     *   }
+     * })
+    **/
+    count<T extends SentEmailCountArgs>(
+      args?: Subset<T, SentEmailCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SentEmailCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SentEmail.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SentEmailAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SentEmailAggregateArgs>(args: Subset<T, SentEmailAggregateArgs>): Prisma.PrismaPromise<GetSentEmailAggregateType<T>>
+
+    /**
+     * Group by SentEmail.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SentEmailGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SentEmailGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SentEmailGroupByArgs['orderBy'] }
+        : { orderBy?: SentEmailGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SentEmailGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSentEmailGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SentEmail model
+   */
+  readonly fields: SentEmailFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SentEmail.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SentEmailClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SentEmail model
+   */
+  interface SentEmailFieldRefs {
+    readonly id: FieldRef<"SentEmail", 'String'>
+    readonly email: FieldRef<"SentEmail", 'String'>
+    readonly subject: FieldRef<"SentEmail", 'String'>
+    readonly body: FieldRef<"SentEmail", 'String'>
+    readonly sentAt: FieldRef<"SentEmail", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SentEmail findUnique
+   */
+  export type SentEmailFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
+    /**
+     * Filter, which SentEmail to fetch.
+     */
+    where: SentEmailWhereUniqueInput
+  }
+
+  /**
+   * SentEmail findUniqueOrThrow
+   */
+  export type SentEmailFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
+    /**
+     * Filter, which SentEmail to fetch.
+     */
+    where: SentEmailWhereUniqueInput
+  }
+
+  /**
+   * SentEmail findFirst
+   */
+  export type SentEmailFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
+    /**
+     * Filter, which SentEmail to fetch.
+     */
+    where?: SentEmailWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SentEmails to fetch.
+     */
+    orderBy?: SentEmailOrderByWithRelationInput | SentEmailOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SentEmails.
+     */
+    cursor?: SentEmailWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SentEmails from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SentEmails.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SentEmails.
+     */
+    distinct?: SentEmailScalarFieldEnum | SentEmailScalarFieldEnum[]
+  }
+
+  /**
+   * SentEmail findFirstOrThrow
+   */
+  export type SentEmailFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
+    /**
+     * Filter, which SentEmail to fetch.
+     */
+    where?: SentEmailWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SentEmails to fetch.
+     */
+    orderBy?: SentEmailOrderByWithRelationInput | SentEmailOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SentEmails.
+     */
+    cursor?: SentEmailWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SentEmails from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SentEmails.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SentEmails.
+     */
+    distinct?: SentEmailScalarFieldEnum | SentEmailScalarFieldEnum[]
+  }
+
+  /**
+   * SentEmail findMany
+   */
+  export type SentEmailFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
+    /**
+     * Filter, which SentEmails to fetch.
+     */
+    where?: SentEmailWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SentEmails to fetch.
+     */
+    orderBy?: SentEmailOrderByWithRelationInput | SentEmailOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SentEmails.
+     */
+    cursor?: SentEmailWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SentEmails from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SentEmails.
+     */
+    skip?: number
+    distinct?: SentEmailScalarFieldEnum | SentEmailScalarFieldEnum[]
+  }
+
+  /**
+   * SentEmail create
+   */
+  export type SentEmailCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
+    /**
+     * The data needed to create a SentEmail.
+     */
+    data: XOR<SentEmailCreateInput, SentEmailUncheckedCreateInput>
+  }
+
+  /**
+   * SentEmail createMany
+   */
+  export type SentEmailCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SentEmails.
+     */
+    data: SentEmailCreateManyInput | SentEmailCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SentEmail createManyAndReturn
+   */
+  export type SentEmailCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
+    /**
+     * The data used to create many SentEmails.
+     */
+    data: SentEmailCreateManyInput | SentEmailCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SentEmail update
+   */
+  export type SentEmailUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
+    /**
+     * The data needed to update a SentEmail.
+     */
+    data: XOR<SentEmailUpdateInput, SentEmailUncheckedUpdateInput>
+    /**
+     * Choose, which SentEmail to update.
+     */
+    where: SentEmailWhereUniqueInput
+  }
+
+  /**
+   * SentEmail updateMany
+   */
+  export type SentEmailUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SentEmails.
+     */
+    data: XOR<SentEmailUpdateManyMutationInput, SentEmailUncheckedUpdateManyInput>
+    /**
+     * Filter which SentEmails to update
+     */
+    where?: SentEmailWhereInput
+    /**
+     * Limit how many SentEmails to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SentEmail updateManyAndReturn
+   */
+  export type SentEmailUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
+    /**
+     * The data used to update SentEmails.
+     */
+    data: XOR<SentEmailUpdateManyMutationInput, SentEmailUncheckedUpdateManyInput>
+    /**
+     * Filter which SentEmails to update
+     */
+    where?: SentEmailWhereInput
+    /**
+     * Limit how many SentEmails to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SentEmail upsert
+   */
+  export type SentEmailUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
+    /**
+     * The filter to search for the SentEmail to update in case it exists.
+     */
+    where: SentEmailWhereUniqueInput
+    /**
+     * In case the SentEmail found by the `where` argument doesn't exist, create a new SentEmail with this data.
+     */
+    create: XOR<SentEmailCreateInput, SentEmailUncheckedCreateInput>
+    /**
+     * In case the SentEmail was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SentEmailUpdateInput, SentEmailUncheckedUpdateInput>
+  }
+
+  /**
+   * SentEmail delete
+   */
+  export type SentEmailDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
+    /**
+     * Filter which SentEmail to delete.
+     */
+    where: SentEmailWhereUniqueInput
+  }
+
+  /**
+   * SentEmail deleteMany
+   */
+  export type SentEmailDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SentEmails to delete
+     */
+    where?: SentEmailWhereInput
+    /**
+     * Limit how many SentEmails to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SentEmail without action
+   */
+  export type SentEmailDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SentEmail
+     */
+    select?: SentEmailSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SentEmail
+     */
+    omit?: SentEmailOmit<ExtArgs> | null
   }
 
 
@@ -4596,6 +5682,17 @@ export namespace Prisma {
   export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
 
 
+  export const SentEmailScalarFieldEnum: {
+    id: 'id',
+    email: 'email',
+    subject: 'subject',
+    body: 'body',
+    sentAt: 'sentAt'
+  };
+
+  export type SentEmailScalarFieldEnum = (typeof SentEmailScalarFieldEnum)[keyof typeof SentEmailScalarFieldEnum]
+
+
   export const VectorRiskDataScalarFieldEnum: {
     id: 'id',
     title: 'title',
@@ -4798,6 +5895,58 @@ export namespace Prisma {
     wantsnotification?: BoolNullableWithAggregatesFilter<"users"> | boolean | null
     role?: StringWithAggregatesFilter<"users"> | string
     createdAt?: DateTimeWithAggregatesFilter<"users"> | Date | string
+  }
+
+  export type SentEmailWhereInput = {
+    AND?: SentEmailWhereInput | SentEmailWhereInput[]
+    OR?: SentEmailWhereInput[]
+    NOT?: SentEmailWhereInput | SentEmailWhereInput[]
+    id?: StringFilter<"SentEmail"> | string
+    email?: StringFilter<"SentEmail"> | string
+    subject?: StringFilter<"SentEmail"> | string
+    body?: StringFilter<"SentEmail"> | string
+    sentAt?: DateTimeFilter<"SentEmail"> | Date | string
+  }
+
+  export type SentEmailOrderByWithRelationInput = {
+    id?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    body?: SortOrder
+    sentAt?: SortOrder
+  }
+
+  export type SentEmailWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SentEmailWhereInput | SentEmailWhereInput[]
+    OR?: SentEmailWhereInput[]
+    NOT?: SentEmailWhereInput | SentEmailWhereInput[]
+    email?: StringFilter<"SentEmail"> | string
+    subject?: StringFilter<"SentEmail"> | string
+    body?: StringFilter<"SentEmail"> | string
+    sentAt?: DateTimeFilter<"SentEmail"> | Date | string
+  }, "id">
+
+  export type SentEmailOrderByWithAggregationInput = {
+    id?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    body?: SortOrder
+    sentAt?: SortOrder
+    _count?: SentEmailCountOrderByAggregateInput
+    _max?: SentEmailMaxOrderByAggregateInput
+    _min?: SentEmailMinOrderByAggregateInput
+  }
+
+  export type SentEmailScalarWhereWithAggregatesInput = {
+    AND?: SentEmailScalarWhereWithAggregatesInput | SentEmailScalarWhereWithAggregatesInput[]
+    OR?: SentEmailScalarWhereWithAggregatesInput[]
+    NOT?: SentEmailScalarWhereWithAggregatesInput | SentEmailScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SentEmail"> | string
+    email?: StringWithAggregatesFilter<"SentEmail"> | string
+    subject?: StringWithAggregatesFilter<"SentEmail"> | string
+    body?: StringWithAggregatesFilter<"SentEmail"> | string
+    sentAt?: DateTimeWithAggregatesFilter<"SentEmail"> | Date | string
   }
 
   export type VectorRiskDataWhereInput = {
@@ -5032,6 +6181,62 @@ export namespace Prisma {
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
     role?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SentEmailCreateInput = {
+    id?: string
+    email: string
+    subject: string
+    body: string
+    sentAt?: Date | string
+  }
+
+  export type SentEmailUncheckedCreateInput = {
+    id?: string
+    email: string
+    subject: string
+    body: string
+    sentAt?: Date | string
+  }
+
+  export type SentEmailUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    sentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SentEmailUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    sentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SentEmailCreateManyInput = {
+    id?: string
+    email: string
+    subject: string
+    body: string
+    sentAt?: Date | string
+  }
+
+  export type SentEmailUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    sentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SentEmailUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    sentAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type VectorRiskDataCreateInput = {
@@ -5368,6 +6573,30 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type SentEmailCountOrderByAggregateInput = {
+    id?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    body?: SortOrder
+    sentAt?: SortOrder
+  }
+
+  export type SentEmailMaxOrderByAggregateInput = {
+    id?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    body?: SortOrder
+    sentAt?: SortOrder
+  }
+
+  export type SentEmailMinOrderByAggregateInput = {
+    id?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    body?: SortOrder
+    sentAt?: SortOrder
   }
 
   export type BoolFilter<$PrismaModel = never> = {

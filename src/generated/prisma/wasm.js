@@ -133,6 +133,14 @@ exports.Prisma.UsersScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.SentEmailScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  subject: 'subject',
+  body: 'body',
+  sentAt: 'sentAt'
+};
+
 exports.Prisma.VectorRiskDataScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -172,6 +180,7 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.ModelName = {
   users: 'users',
+  SentEmail: 'SentEmail',
   VectorRiskData: 'VectorRiskData',
   Notification: 'Notification'
 };

@@ -20,7 +20,7 @@ import {
   Divider,
 } from "@mui/material";
 import Menu from "@mui/material/Menu";
-
+import Image from "next/image";
 import EmailIcon from "@mui/icons-material/Email";
 
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -156,7 +156,19 @@ const NavbarLoggedIn: React.FC = () => {
                 color="success"
                 onClick={handleMenuOpen}
               >
-                <AccountCircle />
+                {user?.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt="Profile"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                    }}
+                  />
+                ) : (
+                  <AccountCircle />
+                )}
               </IconButton>
               <Menu
                 anchorEl={anchorEl}

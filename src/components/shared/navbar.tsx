@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
 
   const navMenuItems = [
     <NavLink key="About" url="/about" text="About" />,
-    <NavLink key="Register" url="/auth/register" text="Register" />,
+    <NavLink key="Login" url="/auth/login" text="Login" />,
   ];
 
   return (

@@ -17,10 +17,17 @@ model users {
   lastName          String?        @db.VarChar(100)
   gender            String?        @db.VarChar(50)
   profilePicture    String?        @db.Text
-  wantsnotification Boolean?       @default(true)
+  wantsnotification Boolean?       @default(false)
    role             String         @default("user") // or "admin"
    createdAt        DateTime       @default(now())
   notifications     Notification[] // 👈 Back-relation from Notification
+}
+model SentEmail {
+  id        String   @id @default(uuid())
+  email     String
+  subject   String
+  body      String
+  sentAt    DateTime @default(now())
 }
 
 model VectorRiskData {

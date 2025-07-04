@@ -6,8 +6,12 @@ import {
   Dialog,
   DialogContent,
   Divider,
+  FormControl,
+  FormControlLabel,
   IconButton,
   Paper,
+  Radio,
+  RadioGroup,
   TextField,
   Tooltip,
   Typography,
@@ -27,6 +31,9 @@ import { toast } from "react-toastify";
 import { AccountCircle } from "@mui/icons-material";
 import { useRef } from "react";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
+
+<SubscriptionsIcon />;
 
 const AccountProfile = () => {
   const { user, logout, updateUser } = useAuth();
@@ -37,6 +44,12 @@ const AccountProfile = () => {
   const [isEditLastName, setIsEditLastName] = React.useState(false);
   const [firstNameEditted, setFirstNameEditted] = React.useState("");
   const [lastNameEditted, setLastNameEditted] = React.useState("");
+  const [isEditSubscription, setIsEditSubscription] = React.useState(false);
+  const [wantsNotification, setWantsNotification] = React.useState(
+    user?.wantsnotification ?? true
+  );
+
+  const [subcriptionEdit, setEditSubcriptionEdited] = React.useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleMenuClose = () => {
@@ -52,7 +65,10 @@ const AccountProfile = () => {
     setLastNameEditted(user?.lastName || "");
     setIsEditLastName(true);
   };
-
+  //edit the subscription
+  const handleSubscriptionEdit = () => {
+    setIsEditSubscription(true);
+  };
   //saving them
   const handleFirstNameSave = async () => {
     //send to database
@@ -97,7 +113,26 @@ const AccountProfile = () => {
       console.error("Error updating last name:", error);
     }
   };
-
+  //saving the subscription
+  const handleSubscriptionSave = async () => {
+    try {
+      const res = await fetch("/api/accountPage", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", //
+        body: JSON.stringify({ wantsnotification: wantsNotification }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update subscription");
+      }
+      const data = await res.json();
+      updateUser(data.user);
+      setIsEditSubscription(false);
+      toast.success("Subscription updated successfully");
+    } catch (error) {
+      console.error("Error updating subscription:", error);
+    }
+  };
   //updating user
 
   const getGenderIcon = (gender: string | undefined) => {
@@ -427,7 +462,79 @@ const AccountProfile = () => {
             </>
           )}
         </Box>
-
+        {/*subsscription details */}
+        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+          {isEditSubscription ? (
+            <>
+              <RadioGroup
+                row
+                value={wantsNotification}
+                onChange={(e) =>
+                  setWantsNotification(e.target.value === "true")
+                }
+                sx={{
+                  padding: "5px",
+                  mr: 1,
+                  backgroundColor: "#e0e5ec",
+                  borderRadius: "20px",
+                  boxShadow:
+                    "inset 2px 2px 5px #babecc, inset -6px -6px 10px #ffffff",
+                  input: {
+                    padding: "12px",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    border: "none",
+                  },
+                }}
+              >
+                <FormControlLabel
+                  value="true"
+                  control={<Radio />}
+                  label="Yes"
+                />
+                <FormControlLabel
+                  value="false"
+                  control={<Radio />}
+                  label="No"
+                />
+              </RadioGroup>
+              <Button
+                //variant="contained"
+                size="small"
+                onClick={handleSubscriptionSave}
+                sx={{
+                  mt: 2,
+                  borderRadius: "20px",
+                  backgroundColor: "green",
+                  color: "#ffffff",
+                  boxShadow: "6px 6px 10px #babecc, -6px -6px 10px #ffffff",
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  "&:hover": {
+                    backgroundColor: "#00acc1",
+                  },
+                }}
+              >
+                Save
+              </Button>
+            </>
+          ) : (
+            <>
+              <Typography sx={{ padding: "5px", gap: 1 }}>
+                {" "}
+                <SubscriptionsIcon
+                  sx={{ mr: 1, color: "text.secondary" }}
+                />{" "}
+                Subscription:&nbsp;
+                {user?.wantsnotification ? "Yes" : "No"}
+              </Typography>
+              <EditIcon
+                onClick={handleSubscriptionEdit}
+                sx={{ color: "text.secondary", ml: 2 }}
+              />
+            </>
+          )}
+        </Box>
         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
           <Typography sx={{ padding: "5px", gap: 1 }}>
             {""}
@@ -435,7 +542,6 @@ const AccountProfile = () => {
             {user?.gender}
           </Typography>
         </Box>
-
         {/* Name input field */}
         {/*<Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                       <TextField

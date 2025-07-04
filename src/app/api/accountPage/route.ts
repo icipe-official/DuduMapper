@@ -25,9 +25,13 @@ export async function PUT(req: NextRequest) {
     };
 
     // Parse request body
-    const { firstName, lastName } = await req.json();
+    const { firstName, lastName, wantsnotification } = await req.json();
 
-    if (!firstName && !lastName) {
+    if (
+      firstName === undefined &&
+      lastName === undefined &&
+      wantsnotification === undefined
+    ) {
       return NextResponse.json(
         { message: "Nothing to update" },
         { status: 400 }
@@ -40,6 +44,7 @@ export async function PUT(req: NextRequest) {
       data: {
         ...(firstName && { firstName }),
         ...(lastName && { lastName }),
+        ...(typeof wantsnotification === "boolean" && { wantsnotification }),
       },
       select: {
         id: true,
@@ -47,6 +52,7 @@ export async function PUT(req: NextRequest) {
         firstName: true,
         lastName: true,
         gender: true,
+        wantsnotification: true,
       },
     });
 
@@ -101,6 +107,7 @@ export async function POST(req: NextRequest) {
         lastName: true,
         gender: true,
         profilePicture: true,
+        wantsnotification: true,
       },
     });
 

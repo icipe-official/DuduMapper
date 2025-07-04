@@ -15,8 +15,7 @@ export async function POST(req: Request) {
       lastName,
       gender,
       profilePicture,
-
-      //wantsNotification = false,
+      wantsnotification = true,
     } = await req.json();
 
     // Validate inputs
@@ -57,7 +56,7 @@ export async function POST(req: Request) {
         profilePicture,
         password: hashedPassword,
 
-        //wantsNotification,
+        wantsnotification,
       },
     });
     //generate jwt

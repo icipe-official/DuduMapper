@@ -30,9 +30,11 @@ import {
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleIcon from "@mui/icons-material/People";
 import PostAddIcon from "@mui/icons-material/PostAdd";
+import EmailIcon from "@mui/icons-material/Email";
 import { useAuth } from "@/context/context";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { Email } from "@mui/icons-material";
 interface User {
   id: string;
   firstName: string;
@@ -41,13 +43,27 @@ interface User {
   gender: string;
   role: string;
   createdAt: string;
+  wantsnotification: boolean;
+  subject: string;
+  body: string;
+  sentAt: string;
 }
+interface SentEmail {
+  id: string;
+  email: string;
+  subject: string;
+  body: string;
+  sentAt: string;
+}
+
 const COLORS = ["#0088FE", "#FF8042"]; // User, Admin
 export default function AdminPanelDynamic() {
   const [selectedSection, setSelectedSection] = useState<
-    "dashboard" | "users" | "Posts"
+    "dashboard" | "users" | "Posts" | "Emails"
   >("dashboard");
   const [users, setUsers] = useState<User[]>([]);
+  const [post, setPosts] = useState<User[]>([]);
+  const [emails, setEmails] = useState<SentEmail[]>([]);
   const { user, loading } = useAuth();
   const router = useRouter();
   const hasRedirected = React.useRef(false);
@@ -85,6 +101,35 @@ export default function AdminPanelDynamic() {
         .catch((err) => console.error("Failed to fetch users", err));
     }
   }, [selectedSection]);
+  //posts logic
+  useEffect(() => {
+    if (selectedSection === "Posts") {
+      fetch("/api/posts")
+        .then((res) => res.json())
+        .then((data) => {
+          const sorted = data.sort(
+            (a: { id: number }, b: { id: number }) => a.id - b.id
+          );
+          setPosts(sorted);
+        })
+        .catch((err) => console.error("Failed to fetch posts", err));
+    }
+  }, [selectedSection]);
+  //emails logic
+  useEffect(() => {
+    if (selectedSection === "Emails") {
+      fetch("/api/sendEmail")
+        .then((res) => res.json())
+        .then((data: SentEmail[]) => {
+          const sorted = data.sort(
+            (a, b) =>
+              new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime()
+          );
+          setEmails(sorted);
+        })
+        .catch((err) => console.error("Failed to fetch emails", err));
+    }
+  }, [selectedSection]);
 
   //restricting user access to admin
   useEffect(() => {
@@ -117,7 +162,60 @@ export default function AdminPanelDynamic() {
             <Typography variant="h5" gutterBottom>
               📝 Posts
             </Typography>
-            <Typography variant="body2">Manage all posts here.</Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              Manage all posts here.
+            </Typography>
+            <TableContainer component={Paper}>
+              <Table size="small" aria-label="Posts Table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell>Email</TableCell>
+                    <TableCell>Subscribed</TableCell>
+                    <TableCell>Role</TableCell>
+                    <TableCell>Created</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {post.map((post) => (
+                    <TableRow key={post.id}>
+                      <TableCell>{post.id}</TableCell>
+                      <TableCell>{post.email}</TableCell>
+                      <TableCell>
+                        {post.wantsnotification ? "Yes" : "No"}
+                      </TableCell>
+                      <TableCell>{post.role}</TableCell>
+                      <TableCell>
+                        {new Date(post.createdAt).toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Box>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={async () => {
+                  try {
+                    const res = await fetch("/api/sendEmail", {
+                      method: "POST",
+                    });
+                    if (!res.ok) throw new Error("Failed to send Emails");
+                    const data = await res.json();
+                    toast.success(data.message);
+                  } catch (error) {
+                    toast.error("Failed to send Emails to users");
+                  }
+                }}
+                sx={{
+                  mt: 2,
+                }}
+              >
+                Send Emails
+              </Button>
+            </Box>
           </>
         );
       case "users":
@@ -125,6 +223,9 @@ export default function AdminPanelDynamic() {
           <>
             <Typography variant="h5" gutterBottom>
               👥 Users
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              Manage all users here.
             </Typography>
             <TableContainer component={Paper}>
               <Table size="small" aria-label="users table">
@@ -174,14 +275,16 @@ export default function AdminPanelDynamic() {
           </>
         );
       case "dashboard":
-      default:
         return (
           <>
             <Typography variant="h5" gutterBottom>
               📊 Dashboard
             </Typography>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              User Stats!
+            </Typography>
 
-            <Paper elevation={3} sx={{ p: 4, width: 400, margin: "auto" }}>
+            <Paper elevation={3} sx={{ p: 3, width: 400, margin: "auto" }}>
               <Typography variant="h6" align="center" gutterBottom>
                 User Role Distribution
               </Typography>
@@ -206,6 +309,44 @@ export default function AdminPanelDynamic() {
                 </PieChart>
               </ResponsiveContainer>
             </Paper>
+          </>
+        );
+      case "Emails":
+      default:
+        return (
+          <>
+            <Typography variant="h5" gutterBottom>
+              📧 Emails
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              Manage all sent emails here.
+            </Typography>
+            <TableContainer component={Paper}>
+              <Table size="small" aria-label="sent emails table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>UUID</TableCell>
+                    <TableCell>Email</TableCell>
+                    <TableCell>Subject</TableCell>
+                    <TableCell>Body</TableCell>
+                    <TableCell>Sent At</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {emails.map((email) => (
+                    <TableRow key={email.id}>
+                      <TableCell>{email.id}</TableCell>
+                      <TableCell>{email.email}</TableCell>
+                      <TableCell>{email.subject}</TableCell>
+                      <TableCell>{email.body}</TableCell>
+                      <TableCell>
+                        {new Date(email.sentAt).toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </>
         );
     }
@@ -276,6 +417,16 @@ export default function AdminPanelDynamic() {
                 <PostAddIcon />
               </ListItemIcon>
               <ListItemText primary="Posts" />
+            </ListItem>
+            <ListItem
+              button
+              selected={selectedSection === "Emails"}
+              onClick={() => setSelectedSection("Emails")}
+            >
+              <ListItemIcon>
+                <EmailIcon />
+              </ListItemIcon>
+              <ListItemText primary="Emails" />
             </ListItem>
           </List>
         </Box>
