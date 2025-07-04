@@ -6,6 +6,7 @@ import { useState } from "react";
 import React from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -26,12 +27,38 @@ const ForgotPassword = () => {
   };
 
   //handle send reset link
-  const handleSendLink = () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSendLink = async () => {
     if (!emailError && email) {
-      console.log("email reset link sent successfully", email);
-      //api caall to send link
+      setLoading(true);
+      try {
+        const res = await fetch("/api/forgotPassword", {
+          method: "POST",
+          body: JSON.stringify({ email }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          toast.error(data.message || "Failed to send reset link");
+        } else {
+          toast.success("Password reset request sent to admin");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("An error occurred");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      toast.error("Please enter a valid email");
     }
   };
+
   return (
     <div
       style={{
@@ -115,12 +142,10 @@ const ForgotPassword = () => {
               textTransform: "none",
               fontWeight: "bold",
             }}
-            onClick={() => {
-              handleSendLink();
-              alert("This feature is not yet available😞😞");
-            }}
+            onClick={handleSendLink}
+            disabled={loading}
           >
-            Send
+            {loading ? "Sending..." : "Send Reset Link"}
           </Button>
 
           <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
