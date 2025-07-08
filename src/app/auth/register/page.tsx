@@ -137,13 +137,13 @@ const Register: React.FC = ({}) => {
         //added role
         role: "",
       });
-      toast.success("User Registered Successfully"),
+      (toast.success("User Registered Successfully"),
         {
           position: "top-right",
           autoclose: 5000,
           hideProgressBar: false,
           pauseOnHover: true,
-        };
+        });
 
       // No need for explicit redirect here - the login function now handles it
       router.push("/");

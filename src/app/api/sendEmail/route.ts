@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Simple email format check
+// Function to validate email format check
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
 import nodemailer from "nodemailer";
+import crypto from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -27,7 +28,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Send email to admin
+    //2. create reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const expires = new Date(Date.now() + 1000 * 60 * 60);
+
+    //3.store token
+    await prisma.passwordResetToken.upsert({
+      where: { userId: user.id },
+      update: { token: resetToken, expires },
+      create: { token: resetToken, userId: user.id, expires },
+    });
+
+    //4.automate user email send
+    const resetLink = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/resetPassword?token=${resetToken}`;
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -36,17 +50,28 @@ export async function POST(req: Request) {
       },
     });
 
-    const mailOptions = {
+    //5. user reset
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Reset your password",
+      html: `
+      <p>Click the link below to change your password</p>
+      <a href="${resetLink}">${resetLink}</a>
+      <p>Token is valid for 1 hour</p>
+      `,
+    });
+
+    //6.admin notification
+    await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_USER,
       subject: "Password Reset Request",
       html: `
         <p>User <strong>${email}</strong> has requested a password reset.</p>
-        <p>You can respond manually or send them a reset link.</p>
+        <p>The proccess is automated.</p>
       `,
-    };
-
-    await transporter.sendMail(mailOptions);
+    });
 
     return NextResponse.json(
       { message: "Reset request sent to admin" },

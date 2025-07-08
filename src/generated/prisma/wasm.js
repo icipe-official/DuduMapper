@@ -127,8 +127,8 @@ exports.Prisma.UsersScalarFieldEnum = {
   firstName: 'firstName',
   lastName: 'lastName',
   gender: 'gender',
-  profilePicture: 'profilePicture',
   wantsnotification: 'wantsnotification',
+  profilePicture: 'profilePicture',
   role: 'role',
   createdAt: 'createdAt'
 };
@@ -139,6 +139,14 @@ exports.Prisma.SentEmailScalarFieldEnum = {
   subject: 'subject',
   body: 'body',
   sentAt: 'sentAt'
+};
+
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  userId: 'userId',
+  expires: 'expires',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.VectorRiskDataScalarFieldEnum = {
@@ -181,6 +189,7 @@ exports.Prisma.NullsOrder = {
 exports.Prisma.ModelName = {
   users: 'users',
   SentEmail: 'SentEmail',
+  PasswordResetToken: 'PasswordResetToken',
   VectorRiskData: 'VectorRiskData',
   Notification: 'Notification'
 };
