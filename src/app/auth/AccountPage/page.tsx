@@ -135,7 +135,8 @@ const AccountProfile = () => {
   };
   //updating user
 
-  const getGenderIcon = (gender: string | undefined) => {
+  {
+    /* const getGenderIcon = (gender: string | undefined) => {
     switch (gender?.toLowerCase()) {
       case "male":
         return (
@@ -156,7 +157,8 @@ const AccountProfile = () => {
           />
         );
     }
-  };
+  };*/
+  }
 
   //user profile picture
   const handleProfilePicture = () => {
@@ -535,13 +537,13 @@ const AccountProfile = () => {
             </>
           )}
         </Box>
-        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+        {/*<Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
           <Typography sx={{ padding: "5px", gap: 1 }}>
             {""}
             {getGenderIcon(user?.gender)} Gender:&nbsp;
             {user?.gender}
           </Typography>
-        </Box>
+        </Box>*/}
         {/* Name input field */}
         {/*<Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                       <TextField

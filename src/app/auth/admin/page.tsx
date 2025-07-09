@@ -40,7 +40,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
-  gender: string;
+  //gender: string;
   role: string;
   createdAt: string;
   wantsnotification: boolean;
@@ -235,7 +235,7 @@ export default function AdminPanelDynamic() {
                     <TableCell>First Name</TableCell>
                     <TableCell>Last Name</TableCell>
                     <TableCell>Email</TableCell>
-                    <TableCell>Gender</TableCell>
+                    {/*<TableCell>Gender</TableCell>*/}
                     <TableCell>Role</TableCell>
                     <TableCell>Created </TableCell>
                   </TableRow>
@@ -247,7 +247,7 @@ export default function AdminPanelDynamic() {
                       <TableCell>{user.firstName}</TableCell>
                       <TableCell>{user.lastName}</TableCell>
                       <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.gender}</TableCell>
+                      {/*<TableCell>{user.gender}</TableCell>*/}
                       <TableCell>{user.role}</TableCell>
                       <TableCell>
                         {new Date(user.createdAt).toLocaleString()}

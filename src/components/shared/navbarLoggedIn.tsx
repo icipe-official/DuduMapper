@@ -68,13 +68,13 @@ const NavbarLoggedIn: React.FC = () => {
   };
   const handleLogout = async () => {
     await logout();
-    toast.success("Logging out Successfully"),
+    (toast.success("Logging out Successfully"),
       {
         position: "top-right",
         hideProgressBar: false,
         pauseOnHover: false,
         autoClose: 5000,
-      };
+      });
     router.push("/");
     handleMenuClose();
   };
@@ -87,7 +87,8 @@ const NavbarLoggedIn: React.FC = () => {
     router.push("/auth/admin");
   };
   //icon for gender
-  const getGenderIcon = (gender: string | undefined) => {
+  {
+    /*const getGenderIcon = (gender: string | undefined) => {
     switch (gender?.toLowerCase()) {
       case "male":
         return (
@@ -111,7 +112,8 @@ const NavbarLoggedIn: React.FC = () => {
         return null;
     }
   };
-
+*/
+  }
   const handleLogoClick = () => {
     router.push("/");
   };

@@ -51,7 +51,7 @@ export async function PUT(req: NextRequest) {
         email: true,
         firstName: true,
         lastName: true,
-        gender: true,
+        //gender: true,
         wantsnotification: true,
       },
     });
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
         email: true,
         firstName: true,
         lastName: true,
-        gender: true,
+        //gender: true,
         profilePicture: true,
         wantsnotification: true,
       },

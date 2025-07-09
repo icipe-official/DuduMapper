@@ -1329,7 +1329,6 @@ export namespace Prisma {
     password: string | null
     firstName: string | null
     lastName: string | null
-    gender: string | null
     wantsnotification: boolean | null
     profilePicture: string | null
     role: string | null
@@ -1342,7 +1341,6 @@ export namespace Prisma {
     password: string | null
     firstName: string | null
     lastName: string | null
-    gender: string | null
     wantsnotification: boolean | null
     profilePicture: string | null
     role: string | null
@@ -1355,7 +1353,6 @@ export namespace Prisma {
     password: number
     firstName: number
     lastName: number
-    gender: number
     wantsnotification: number
     profilePicture: number
     role: number
@@ -1378,7 +1375,6 @@ export namespace Prisma {
     password?: true
     firstName?: true
     lastName?: true
-    gender?: true
     wantsnotification?: true
     profilePicture?: true
     role?: true
@@ -1391,7 +1387,6 @@ export namespace Prisma {
     password?: true
     firstName?: true
     lastName?: true
-    gender?: true
     wantsnotification?: true
     profilePicture?: true
     role?: true
@@ -1404,7 +1399,6 @@ export namespace Prisma {
     password?: true
     firstName?: true
     lastName?: true
-    gender?: true
     wantsnotification?: true
     profilePicture?: true
     role?: true
@@ -1504,7 +1498,6 @@ export namespace Prisma {
     password: string
     firstName: string | null
     lastName: string | null
-    gender: string | null
     wantsnotification: boolean | null
     profilePicture: string | null
     role: string
@@ -1536,7 +1529,6 @@ export namespace Prisma {
     password?: boolean
     firstName?: boolean
     lastName?: boolean
-    gender?: boolean
     wantsnotification?: boolean
     profilePicture?: boolean
     role?: boolean
@@ -1552,7 +1544,6 @@ export namespace Prisma {
     password?: boolean
     firstName?: boolean
     lastName?: boolean
-    gender?: boolean
     wantsnotification?: boolean
     profilePicture?: boolean
     role?: boolean
@@ -1565,7 +1556,6 @@ export namespace Prisma {
     password?: boolean
     firstName?: boolean
     lastName?: boolean
-    gender?: boolean
     wantsnotification?: boolean
     profilePicture?: boolean
     role?: boolean
@@ -1578,14 +1568,13 @@ export namespace Prisma {
     password?: boolean
     firstName?: boolean
     lastName?: boolean
-    gender?: boolean
     wantsnotification?: boolean
     profilePicture?: boolean
     role?: boolean
     createdAt?: boolean
   }
 
-  export type usersOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "gender" | "wantsnotification" | "profilePicture" | "role" | "createdAt", ExtArgs["result"]["users"]>
+  export type usersOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "firstName" | "lastName" | "wantsnotification" | "profilePicture" | "role" | "createdAt", ExtArgs["result"]["users"]>
   export type usersInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     notifications?: boolean | users$notificationsArgs<ExtArgs>
     PasswordResetToken?: boolean | users$PasswordResetTokenArgs<ExtArgs>
@@ -1606,7 +1595,6 @@ export namespace Prisma {
       password: string
       firstName: string | null
       lastName: string | null
-      gender: string | null
       wantsnotification: boolean | null
       profilePicture: string | null
       role: string
@@ -2041,7 +2029,6 @@ export namespace Prisma {
     readonly password: FieldRef<"users", 'String'>
     readonly firstName: FieldRef<"users", 'String'>
     readonly lastName: FieldRef<"users", 'String'>
-    readonly gender: FieldRef<"users", 'String'>
     readonly wantsnotification: FieldRef<"users", 'Boolean'>
     readonly profilePicture: FieldRef<"users", 'String'>
     readonly role: FieldRef<"users", 'String'>
@@ -6896,7 +6883,6 @@ export namespace Prisma {
     password: 'password',
     firstName: 'firstName',
     lastName: 'lastName',
-    gender: 'gender',
     wantsnotification: 'wantsnotification',
     profilePicture: 'profilePicture',
     role: 'role',
@@ -7059,7 +7045,6 @@ export namespace Prisma {
     password?: StringFilter<"users"> | string
     firstName?: StringNullableFilter<"users"> | string | null
     lastName?: StringNullableFilter<"users"> | string | null
-    gender?: StringNullableFilter<"users"> | string | null
     wantsnotification?: BoolNullableFilter<"users"> | boolean | null
     profilePicture?: StringNullableFilter<"users"> | string | null
     role?: StringFilter<"users"> | string
@@ -7074,7 +7059,6 @@ export namespace Prisma {
     password?: SortOrder
     firstName?: SortOrderInput | SortOrder
     lastName?: SortOrderInput | SortOrder
-    gender?: SortOrderInput | SortOrder
     wantsnotification?: SortOrderInput | SortOrder
     profilePicture?: SortOrderInput | SortOrder
     role?: SortOrder
@@ -7092,7 +7076,6 @@ export namespace Prisma {
     password?: StringFilter<"users"> | string
     firstName?: StringNullableFilter<"users"> | string | null
     lastName?: StringNullableFilter<"users"> | string | null
-    gender?: StringNullableFilter<"users"> | string | null
     wantsnotification?: BoolNullableFilter<"users"> | boolean | null
     profilePicture?: StringNullableFilter<"users"> | string | null
     role?: StringFilter<"users"> | string
@@ -7107,7 +7090,6 @@ export namespace Prisma {
     password?: SortOrder
     firstName?: SortOrderInput | SortOrder
     lastName?: SortOrderInput | SortOrder
-    gender?: SortOrderInput | SortOrder
     wantsnotification?: SortOrderInput | SortOrder
     profilePicture?: SortOrderInput | SortOrder
     role?: SortOrder
@@ -7128,7 +7110,6 @@ export namespace Prisma {
     password?: StringWithAggregatesFilter<"users"> | string
     firstName?: StringNullableWithAggregatesFilter<"users"> | string | null
     lastName?: StringNullableWithAggregatesFilter<"users"> | string | null
-    gender?: StringNullableWithAggregatesFilter<"users"> | string | null
     wantsnotification?: BoolNullableWithAggregatesFilter<"users"> | boolean | null
     profilePicture?: StringNullableWithAggregatesFilter<"users"> | string | null
     role?: StringWithAggregatesFilter<"users"> | string
@@ -7391,7 +7372,6 @@ export namespace Prisma {
     password: string
     firstName?: string | null
     lastName?: string | null
-    gender?: string | null
     wantsnotification?: boolean | null
     profilePicture?: string | null
     role?: string
@@ -7406,7 +7386,6 @@ export namespace Prisma {
     password: string
     firstName?: string | null
     lastName?: string | null
-    gender?: string | null
     wantsnotification?: boolean | null
     profilePicture?: string | null
     role?: string
@@ -7420,7 +7399,6 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     role?: StringFieldUpdateOperationsInput | string
@@ -7435,7 +7413,6 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     role?: StringFieldUpdateOperationsInput | string
@@ -7450,7 +7427,6 @@ export namespace Prisma {
     password: string
     firstName?: string | null
     lastName?: string | null
-    gender?: string | null
     wantsnotification?: boolean | null
     profilePicture?: string | null
     role?: string
@@ -7462,7 +7438,6 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     role?: StringFieldUpdateOperationsInput | string
@@ -7475,7 +7450,6 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     role?: StringFieldUpdateOperationsInput | string
@@ -7821,7 +7795,6 @@ export namespace Prisma {
     password?: SortOrder
     firstName?: SortOrder
     lastName?: SortOrder
-    gender?: SortOrder
     wantsnotification?: SortOrder
     profilePicture?: SortOrder
     role?: SortOrder
@@ -7838,7 +7811,6 @@ export namespace Prisma {
     password?: SortOrder
     firstName?: SortOrder
     lastName?: SortOrder
-    gender?: SortOrder
     wantsnotification?: SortOrder
     profilePicture?: SortOrder
     role?: SortOrder
@@ -7851,7 +7823,6 @@ export namespace Prisma {
     password?: SortOrder
     firstName?: SortOrder
     lastName?: SortOrder
-    gender?: SortOrder
     wantsnotification?: SortOrder
     profilePicture?: SortOrder
     role?: SortOrder
@@ -8564,7 +8535,6 @@ export namespace Prisma {
     password: string
     firstName?: string | null
     lastName?: string | null
-    gender?: string | null
     wantsnotification?: boolean | null
     profilePicture?: string | null
     role?: string
@@ -8578,7 +8548,6 @@ export namespace Prisma {
     password: string
     firstName?: string | null
     lastName?: string | null
-    gender?: string | null
     wantsnotification?: boolean | null
     profilePicture?: string | null
     role?: string
@@ -8607,7 +8576,6 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     role?: StringFieldUpdateOperationsInput | string
@@ -8621,7 +8589,6 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     role?: StringFieldUpdateOperationsInput | string
@@ -8671,7 +8638,6 @@ export namespace Prisma {
     password: string
     firstName?: string | null
     lastName?: string | null
-    gender?: string | null
     wantsnotification?: boolean | null
     profilePicture?: string | null
     role?: string
@@ -8685,7 +8651,6 @@ export namespace Prisma {
     password: string
     firstName?: string | null
     lastName?: string | null
-    gender?: string | null
     wantsnotification?: boolean | null
     profilePicture?: string | null
     role?: string
@@ -8746,7 +8711,6 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     role?: StringFieldUpdateOperationsInput | string
@@ -8760,7 +8724,6 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
     wantsnotification?: NullableBoolFieldUpdateOperationsInput | boolean | null
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     role?: StringFieldUpdateOperationsInput | string

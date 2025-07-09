@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       password,
       firstName,
       lastName,
-      gender,
+      //gender,
       profilePicture,
       wantsnotification = true,
     } = await req.json();
@@ -26,9 +26,9 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!firstName || !lastName || !gender) {
+    if (!firstName || !lastName /*|| !gender*/) {
       return NextResponse.json(
-        { message: "First name, last name, and gender are required" },
+        { message: "First name, last name are required" },
         { status: 400 }
       );
     }
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
         email,
         firstName,
         lastName,
-        gender,
+        //gender,
         profilePicture,
         password: hashedPassword,
 

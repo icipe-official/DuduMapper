@@ -14,7 +14,7 @@ type User = {
   email: string;
   firstName: string;
   lastName: string;
-  gender: string;
+  //gender: string;
   profilePicture?: string;
   wantsnotification: boolean;
 };

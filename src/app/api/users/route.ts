@@ -14,7 +14,7 @@ export async function GET() {
         email: true,
         role: true,
         createdAt: true,
-        gender: true,
+        // gender: true,
       },
     });
     return NextResponse.json(users);

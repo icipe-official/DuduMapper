@@ -37,7 +37,7 @@ const Register: React.FC = ({}) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
-  const [gender, setGender] = useState("");
+  //const [gender, setGender] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   //errors
   const [error, setError] = useState("");
@@ -70,9 +70,9 @@ const Register: React.FC = ({}) => {
   };
 
   //gender
-  const handleGenderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setGender(event.target.value);
-  };
+  //const handleGenderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // setGender(event.target.value);
+  //};
 
   //PASSWORD VALIDATION
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,7 +113,7 @@ const Register: React.FC = ({}) => {
           password,
           firstName,
           lastName,
-          gender,
+          //gender,
           wantsnotification: wantsNotification,
         }),
       });
@@ -132,7 +132,7 @@ const Register: React.FC = ({}) => {
         lastName: data.user.lastName,
         //added line
         wantsnotification: data.user.wantsnotification,
-        gender: data.user.gender,
+        //gender: data.user.gender,
         profilePicture: data.user.profileProfile ?? null,
         //added role
         role: "",
@@ -255,7 +255,7 @@ const Register: React.FC = ({}) => {
               },
             }}
           />
-
+          {/* 
           <FormControl component="fieldset" margin="normal">
             <FormLabel
               component="legend"
@@ -312,7 +312,7 @@ const Register: React.FC = ({}) => {
               />
             </RadioGroup>
           </FormControl>
-
+*/}
           <TextField
             label="Email"
             fullWidth

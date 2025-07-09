@@ -15,7 +15,6 @@ model users {
   password           String               @db.VarChar(255)
   firstName          String?              @db.VarChar(100)
   lastName           String?              @db.VarChar(100)
-  gender             String?              @db.VarChar(50)
   wantsnotification  Boolean?             @default(false)
   profilePicture     String?
   role               String               @default("user")

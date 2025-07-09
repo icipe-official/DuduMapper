@@ -982,7 +982,7 @@ function Newmap() {
                     <ListItemIcon>
                       <BugReportIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Leishmaniasis" />
+                    <ListItemText primary="Visceral Leishmaniasis" />
                     {leishOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                   </ListItemButton>
                 </ListItem>
