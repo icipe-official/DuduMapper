@@ -31,7 +31,7 @@ import Collapse from "@mui/material/Collapse";
 import Checkbox from "@mui/material/Checkbox";
 import PeopleIcon from "@mui/icons-material/People";
 import Link from "next/link";
-//import HealthAndSafety  from "@mui/icons-material/HealthAndSafety";
+
 import CloseIcon from "@mui/icons-material/Close";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -55,9 +55,7 @@ import { green } from "@mui/material/colors";
 import DownloadPopup from "./DownloadPopup";
 import { Options as LayerGroupOptions } from "ol/layer/Group";
 import { FaGlobe, FaMapMarkerAlt } from "react-icons/fa";
-//import { Button } from "@mui/material";
-import NavLink from "../shared/navlink";
-import { useRouter } from "next/router";
+
 import { HealthAndSafety } from "@mui/icons-material";
 
 // ─── Constants & Styled Components ────────────────────────────────────────────
@@ -89,47 +87,6 @@ const useDrawerDrag = () => {
 
   return { drawerWidth, startDragging };
 };
-
-/*const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
-  open?: boolean;
-}>(({ theme, open }) => ({
-  flexGrow: 1,
-  transition: theme.transitions.create("margin", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  marginLeft: `-${drawerWidth}px`,
-  ...(open && {
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-    marginTop: 0,
-  }),
-}));*/
-/*
-interface AppBarProps extends MuiAppBarProps {
-  open?: boolean;
-}
-
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})<AppBarProps>(({ theme, open }) => ({
-  backgroundColor: "white",
-  transition: theme.transitions.create(["margin", "width"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: `${drawerWidth}px`,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));*/
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -220,16 +177,7 @@ function Newmap() {
     setKenyaOpen(!kenyaOpen);
   };
   const handleTurkanaClick = () => setTurkanaOpen(!turkanaOpen);
-  /* const handleYearsClick = () => {
-    setYearsOpen(!yearsOpen);
-  };
-  const handleMonthsClick = () => {
-    setMonthsOpen(!monthsOpen);
-  };
-  const handleModelsClick = () => {
-    setModelsOpen(!modelsOpen);
-  };*/
-  // Add these new handler functions
+
   const handlePopulationClick = () => setPopulationOpen(!populationOpen);
   const handlePredictiveModelsClick = () => {
     console.log(
@@ -324,9 +272,7 @@ function Newmap() {
     if (exactMatch) return exactMatch;
 
     // Check for other model patterns
-    //if (lowerLayerName.includes("idw_model")) return "Dated_IDW_Model";
-    //if (lowerLayerName.includes("May 2025")) return "Dated_Model";
-    // Fallback for custom or dated models
+
     if (lowerLayerName.includes("idw_model")) return "DEC_IDW_Model";
     if (lowerLayerName.includes("vl")) return "VL";
     if (lowerLayerName.match(/\bmay\s?2025\b/i)) return "Dated_Model";
@@ -441,7 +387,7 @@ function Newmap() {
   };
 
   //lets try to handleTrurkana layers click
-  //const handleLayerClick = (layer: any) => {};
+
   // ── Fetch WMTS Layers (remains as in the second code) ──
   useEffect(() => {
     const fetchLayers = async () => {
@@ -704,16 +650,7 @@ function Newmap() {
             <List component="div" disablePadding>
               {groupLayers.map((layer) => {
                 // Find the corresponding OL layer from the map
-                {
-                  /*const olLayer = mapRef.current
-                  ?.getLayers()
-                  .getArray()
-                  .find((l: any) => l.get("title") === groupTitle)
-                  ?.getLayers()
-                  .getArray()
-                  .find((l: any) => l.get("title") === layer.title);*/
-                }
-                //change the above code to this
+
                 const group = mapRef.current
                   ?.getLayers()
                   .getArray()
@@ -808,17 +745,7 @@ function Newmap() {
 
       <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
         <CssBaseline />
-        {/*<AppBar
-          position="fixed"
-          open={open}
-          sx={{
-            bgcolor: "white",
-            margin: 0,
-            padding: 0,
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            borderBottom: "1px solid rgba(0,0,0,0.1)",
-          }}
-        >*/}
+
         <Toolbar>
           <IconButton
             aria-label="open drawer"
@@ -849,9 +776,6 @@ function Newmap() {
               }}
             />
           </IconButton>
-
-          {/*<NavLink key="About" url="./about" text="About" />
-          <NavLink key="Register" url="./auth/register" text="Register" />*/}
         </Toolbar>
         {/*</AppBar>*/}
         <Drawer
@@ -893,76 +817,6 @@ function Newmap() {
           </DrawerHeader>
           <Divider />
           <List>
-            {/*<ListItem disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <InboxIcon />
-                </ListItemIcon>
-                <ListItemText primary="Layer Controls" />
-              </ListItemButton>
-            </ListItem>*/}
-            {/* <ListItem disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <InboxIcon />
-                </ListItemIcon>
-                <ListItemText primary="Base Maps" />
-              </ListItemButton>
-            </ListItem>*/}
-            {/*<ListItem disablePadding>
-              <Box
-                  <ListItemText
-                    primary="Download Data"
-                    secondary="Export map data"
-                    primaryTypographyProps={{
-                      fontWeight: downloadPopupOpen ? 600 : 400,
-                      color: downloadPopupOpen ? green[500] : "inherit",
-                    }}
-                  />
-                  {downloadPopupOpen ? (
-                    <ChevronLeftIcon sx={{ color: green[500] }} />
-                  ) : (
-                    <ChevronRightIcon />
-                  )}
-                </ListItemButton>        sx={{
-                  width: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  transition: "all 0.3s ease",
-                }}
-              >
-                <ListItemButton
-                  onClick={() => setDownloadPopupOpen(!downloadPopupOpen)}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                    },
-                    backgroundColor: downloadPopupOpen
-                      ? alpha(green[500], 0.1)
-                      : "transparent",
-                  }}
-                >
-                  <ListItemIcon>
-                    <DownloadIcon
-                      sx={{ color: downloadPopupOpen ? green[500] : "inherit" }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Download Data"
-                    secondary="Export map data"
-                    primaryTypographyProps={{
-                      fontWeight: downloadPopupOpen ? 600 : 400,
-                      color: downloadPopupOpen ? green[500] : "inherit",
-                    }}
-                  />
-                  {downloadPopupOpen ? (
-                    <ChevronLeftIcon sx={{ color: green[500] }} />
-                  ) : (
-                    <ChevronRightIcon />
-                  )}
-                </ListItemButton>
-              </Box>
-            </ListItem>*/}
             {/* Diseases */}
             <ListItem disablePadding>
               <ListItemButton onClick={handleDiseasesClick}>
@@ -986,23 +840,6 @@ function Newmap() {
                     {leishOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                   </ListItemButton>
                 </ListItem>
-
-                {/*Country nesting 
-                <Collapse in={leishOpen} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    <ListItem disablePadding sx={{ pl: 4 }}>
-                      <ListItemButton onClick={handleCountryClick}>
-                        <ListItemIcon>
-                          <Map />
-                        </ListItemIcon>
-                        <ListItemText primary="Country" />
-                        {countryOpen ? (
-                          <ChevronLeftIcon />
-                        ) : (
-                          <ChevronRightIcon />
-                        )}
-                      </ListItemButton>
-                    </ListItem>*/}
 
                 {/* Overlays inside Leishmaniasis */}
                 {/*change overlays name only to Kenya*/}
@@ -1041,59 +878,6 @@ function Newmap() {
                           </ListItemButton>
                         </ListItem>
 
-                        {/* Predictive Models Branch 
-                        <Collapse in={turkanaOpen} timeout="auto" unmountOnExit>
-                          <List component="div" disablePadding sx={{ pl: 6 }}>
-                            <ListItem disablePadding sx={{ pl: 2 }}>
-                              <ListItemButton
-                                onClick={handlePredictiveModelsClick}
-                              >
-                                <ListItemIcon>
-                                  <ModelTraining />
-                                </ListItemIcon>
-                                <ListItemText primary="Predictive Models" />
-                                {predictiveModelsOpen ? (
-                                  <ChevronLeftIcon />
-                                ) : (
-                                  <ChevronRightIcon />
-                                )}
-                              </ListItemButton>
-                            </ListItem>
-
-                            {/* Predictive Models Content *}
-                            <Collapse
-                              in={predictiveModelsOpen}
-                              timeout="auto"
-                              unmountOnExit
-                            >
-                              <List
-                                component="div"
-                                disablePadding
-                                sx={{ pl: 4 }}
-                              >*/}
-                        {/* Dated Models Section *
-                        <Collapse in={turkanaOpen} timeout="auto" unmountOnExit>
-                          <List component="div" disablePadding sx={{ pl: 6 }}>
-                            <ListItem disablePadding sx={{ pl: 2 }}>
-                              <ListItemButton onClick={handleDatedModelsClick}>
-                                <ListItemIcon>
-                                  <DateRange />
-                                </ListItemIcon>
-                                <ListItemText primary="Years" />
-                                {datedModelsOpen ? (
-                                  <ChevronLeftIcon />
-                                ) : (
-                                  <ChevronRightIcon />
-                                )}
-                              </ListItemButton>
-                            </ListItem>*/}
-
-                        {/* Years for Dated Models 
-                        <Collapse
-                          in={datedModelsOpen}
-                          timeout="auto"
-                          unmountOnExit
-                        >*/}
                         <Collapse in={turkanaOpen} timeout="auto" unmountOnExit>
                           <List component="div" disablePadding sx={{ pl: 6 }}>
                             {Object.keys(
@@ -1474,39 +1258,7 @@ function Newmap() {
             </Collapse>
           </List>
         </Drawer>
-        {/*<Main open={open}>*/}
-        {/*
-          //its another form of drawer in the body enclosed
-          <DrawerHeader />
-          <Box
-            sx={{
-              //position: "fixed",
-              //left: 0,
-              //top: "80px",
-              //zIndex: (theme) => theme.zIndex.drawer + 4,
-              display: open ? "none" : "block",
-              bgcolor: "white",
-              //borderRadius: "0 4px 4px 0",
-              //boxShadow: "2px 0 4px rgba(0,0,0,0.1)",
-              p: 1.5,
-              //cursor: "pointer",
-              //transition: "all 0.2s ease-in-out",
-              // "&:hover": {
-              // bgcolor: "rgba(0,0,0,0.04)",
-              // transform: "translateX(4px)",
-              //boxShadow: "4px 0 8px rgba(0,0,0,0.15)",
-              // },
-            }}
-            //onClick={handleDrawerOpen}
-          >
-            <MenuIcon
-              sx={{
-                color: "primary.main",
-                fontSize: "28px",
-                display: "block",
-              }}
-            />
-          </Box>*/}
+
         <div
           ref={mapElement}
           className="map-container"
