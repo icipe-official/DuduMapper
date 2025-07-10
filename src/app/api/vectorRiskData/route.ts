@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
+
 const prisma = new PrismaClient();
 
-export async function GET(res: Request) {
+export async function GET(_req: Request): Promise<NextResponse> {
   try {
-    const VectorRiskData = await prisma.vectorRiskData.findMany();
-    return NextResponse.json(VectorRiskData);
+    const vectorRiskData = await prisma.vectorRiskData.findMany();
+
+    return NextResponse.json(vectorRiskData, { status: 200 });
   } catch (error) {
-    return NextResponse.json({
-      error: "Failed to fetch VectorRiskData",
-      status: 500,
-    });
+    console.error("Error fetching vector risk data:", error);
+
+    return NextResponse.json(
+      { error: "Failed to fetch VectorRiskData" },
+      { status: 500 }
+    );
   }
 }

@@ -255,16 +255,18 @@ const AccountProfile = () => {
               alt="profile"
             />
           ) : (
-            <AccountCircle
-              fontSize="large"
-              onClick={handleProfilePicture}
-              sx={{
-                position: "absolute",
-                top: 2,
-                right: 8,
-                cursor: "pointer",
-              }}
-            />
+            <Tooltip title=" Please Upload not more than 5mbs">
+              <AccountCircle
+                fontSize="large"
+                onClick={handleProfilePicture}
+                sx={{
+                  position: "absolute",
+                  top: 2,
+                  right: 8,
+                  cursor: "pointer",
+                }}
+              />
+            </Tooltip>
           )}
           <IconButton
             onClick={handleEnhanceSize}
