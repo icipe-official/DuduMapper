@@ -1,7 +1,3 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code 
-#  For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-
 name: UI build
 
 on:
@@ -38,10 +34,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
-      #- name: Audit packages
-      #  run: npm audit --production --audit-level=high
+
       - name: Install packages
         run: npm ci
+
       - uses: actions/cache@v3
         with:
           path: |
@@ -50,10 +46,45 @@ jobs:
           key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
       - name: Build
         run: npm run build
+
       - name: Lint
         run: npm run lint
-      # - name: Test
-      #   run: npm run test:ci
 
+  docker-push:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker tags
+        id: docker_tag
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          IMAGE_TAG=ghcr.io/${{ github.repository_owner }}/dudumapper
+          echo "short_sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ steps.docker_tag.outputs.image_tag }}:latest \
+                       -t ${{ steps.docker_tag.outputs.image_tag }}:${{ steps.docker_tag.outputs.short_sha }} .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ steps.docker_tag.outputs.image_tag }}:latest
+          docker push ${{ steps.docker_tag.outputs.image_tag }}:${{ steps.docker_tag.outputs.short_sha }}
