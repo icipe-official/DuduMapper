@@ -23,9 +23,46 @@ export async function POST() {
       where: { wantsnotification: true },
       select: { email: true },
     });
+    //model sending notification logic
+    const recentModels = await prisma.vectorRiskData.findMany({
+      where: {
+        createdAt: {
+          gt: new Date(Date.now() - 24 * 60 * 60 * 1000), //5days
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    if (recentModels.length === 0) {
+      return NextResponse.json(
+        { message: "No new models found" },
+        { status: 201 }
+      );
+    }
+    const modelListHTML = recentModels
+      .map(
+        (model) =>
+          `
+      <li>
+      <b>${model.title}</b> (${model.country}, ${model.year}/${model.month}) - 
+          <span style="color:${model.highRisk ? "red" : "green"}">
+            ${model.highRisk ? "High Risk" : "Low Risk"}
+          </span>
+          — <a href="https://dudumapper.icipe.org/${model.id}">View on Map</a>
+      </li>
+      `
+      )
+      .join("");
 
-    const subject = "Model Notification";
-    const html = "Hello, please check on updated models";
+    const subject = "New Model Notification";
+    //
+    const html = `
+      
+      <p>Hi.Here are the latest added models:</p>
+      <ul>${modelListHTML}</ul>
+      <p>Visit your <a href="https://dudumapper.icipe.org">Model Mapped into the map</a> for details.</p>
+      <p>Best Regards.</p>
+     
+    `;
 
     let successCount = 0;
     let failureCount = 0;
