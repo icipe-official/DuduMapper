@@ -34,7 +34,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import { useAuth } from "@/context/context";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { Email } from "@mui/icons-material";
+import { Email, ModelTraining } from "@mui/icons-material";
 interface User {
   id: string;
   firstName: string;
@@ -55,14 +55,27 @@ interface SentEmail {
   body: string;
   sentAt: string;
 }
-
+interface Model {
+  id: string;
+  title: string;
+  country: string;
+  region: string;
+  year: number;
+  month: number;
+  model: string;
+  description: string;
+  highRisk: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 const COLORS = ["#0088FE", "#FF8042"]; // User, Admin
 export default function AdminPanelDynamic() {
   const [selectedSection, setSelectedSection] = useState<
-    "dashboard" | "users" | "Posts" | "Emails"
+    "dashboard" | "users" | "Posts" | "Emails" | "Models"
   >("dashboard");
   const [users, setUsers] = useState<User[]>([]);
   const [post, setPosts] = useState<User[]>([]);
+  const [model, setModels] = useState<Model[]>([]);
   const [emails, setEmails] = useState<SentEmail[]>([]);
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -130,6 +143,62 @@ export default function AdminPanelDynamic() {
         .catch((err) => console.error("Failed to fetch emails", err));
     }
   }, [selectedSection]);
+
+  //models logic ie two parts: post and add
+  //posting added models
+  useEffect(() => {
+    if (selectedSection === "Models") {
+      fetch("/api/model")
+        .then((res) => res.json())
+        .then((data) => {
+          const sorted = data.sort(
+            (a: { id: number }, b: { id: number }) => a.id - b.id
+          );
+          setModels(sorted);
+        })
+        .catch((err) => console.error("Failed to fetch models", err));
+    }
+  }, [selectedSection]);
+  //adding models
+  const [newModel, setNewModel] = useState<Partial<Model>>({
+    title: "",
+    country: "",
+    region: "",
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    model: "",
+    description: "",
+    highRisk: false,
+  });
+
+  //HANDLE MODEL SUBMISSION
+  const handleAddModel = async () => {
+    try {
+      const res = await fetch("/api/model", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newModel),
+      });
+      if (!res.ok) throw new Error("Failed to add model");
+      const added = await res.json();
+      setModels((prev) => [...prev, added]);
+      setNewModel({
+        title: "",
+        country: "",
+        region: "",
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() + 1,
+        model: "",
+        description: "",
+        highRisk: false,
+      });
+      toast.success("Model added successfully");
+    } catch (error) {
+      toast.error("couldn`t add a Model");
+    }
+  };
 
   //restricting user access to admin
   useEffect(() => {
@@ -312,7 +381,6 @@ export default function AdminPanelDynamic() {
           </>
         );
       case "Emails":
-      default:
         return (
           <>
             <Typography variant="h5" gutterBottom>
@@ -344,6 +412,155 @@ export default function AdminPanelDynamic() {
                       </TableCell>
                     </TableRow>
                   ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </>
+        );
+      case "Models":
+      default:
+        return (
+          <>
+            <Typography variant="h5" gutterBottom>
+              📊 Models
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              Manage all models here ( New and Posted models)
+            </Typography>
+            <TableContainer component={Paper}>
+              <Table size="small" aria-label="models table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell>Title</TableCell>
+                    <TableCell>Country</TableCell>
+                    <TableCell>Region</TableCell>
+                    <TableCell>Year</TableCell>
+                    <TableCell>Month</TableCell>
+                    <TableCell>Model</TableCell>
+                    <TableCell>Description</TableCell>
+                    <TableCell>HighRisk</TableCell>
+                    <TableCell>Created At</TableCell>
+                    <TableCell>Updated At</TableCell>
+                    <TableCell>Notifications</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {model.map((model) => (
+                    <TableRow key={model.id}>
+                      <TableCell>{model.id}</TableCell>
+                      <TableCell>{model.title}</TableCell>
+                      <TableCell>{model.country}</TableCell>
+                      <TableCell>{model.region}</TableCell>
+                      <TableCell>{model.year}</TableCell>
+                      <TableCell>{model.month}</TableCell>
+                      <TableCell>{model.model}</TableCell>
+                      <TableCell>{model.description}</TableCell>
+                      <TableCell>{model.highRisk ? "Yes" : "No"}</TableCell>
+                      <TableCell>
+                        {new Date(model.createdAt).toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(model.updatedAt).toLocaleString()}
+                      </TableCell>
+                      <TableCell>N/A</TableCell>
+                    </TableRow>
+                  ))}
+
+                  {/* editable row for input */}
+                  <TableRow>
+                    <TableCell>Auto</TableCell>
+                    <TableCell>
+                      <input
+                        value={newModel.title || ""}
+                        onChange={(e) =>
+                          setNewModel({ ...newModel, title: e.target.value })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <input
+                        value={newModel.country || ""}
+                        onChange={(e) =>
+                          setNewModel({ ...newModel, country: e.target.value })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <input
+                        value={newModel.region || ""}
+                        onChange={(e) =>
+                          setNewModel({ ...newModel, region: e.target.value })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <input
+                        type="number"
+                        value={newModel.year || ""}
+                        onChange={(e) =>
+                          setNewModel({ ...newModel, year: +e.target.value })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <input
+                        type="number"
+                        value={newModel.month || ""}
+                        onChange={(e) =>
+                          setNewModel({ ...newModel, month: +e.target.value })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <input
+                        value={newModel.model || ""}
+                        onChange={(e) =>
+                          setNewModel({ ...newModel, model: e.target.value })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <input
+                        value={newModel.description || ""}
+                        onChange={(e) =>
+                          setNewModel({
+                            ...newModel,
+                            description: e.target.value,
+                          })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        checked={newModel.highRisk || false}
+                        onChange={(e) =>
+                          setNewModel({
+                            ...newModel,
+                            highRisk: e.target.checked,
+                          })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell colSpan={3}>
+                      <Button
+                        onClick={handleAddModel}
+                        size="small"
+                        variant="contained"
+                        color="success"
+                        disabled={
+                          !newModel.title ||
+                          !newModel.country ||
+                          !newModel.region ||
+                          !newModel.year ||
+                          !newModel.month
+                        }
+                      >
+                        Add
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </TableContainer>
@@ -427,6 +644,16 @@ export default function AdminPanelDynamic() {
                 <EmailIcon />
               </ListItemIcon>
               <ListItemText primary="Emails" />
+            </ListItem>
+            <ListItem
+              button
+              selected={selectedSection === "Models"}
+              onClick={() => setSelectedSection("Models")}
+            >
+              <ListItemIcon>
+                <ModelTraining />
+              </ListItemIcon>
+              <ListItemText primary="Models" />
             </ListItem>
           </List>
         </Box>
