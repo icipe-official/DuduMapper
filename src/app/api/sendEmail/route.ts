@@ -57,7 +57,7 @@ export async function POST() {
     //
     const html = `
       
-      <p>Hi.Here are the latest added models:</p>
+      <p style="font-size: 1.2em">Hi. Here are the latest added models:</p>
       <ul>${modelListHTML}</ul>
       <p>Visit your <a href="https://dudumapper.icipe.org">Model Mapped into the map</a> for details.</p>
       <p>Best Regards.</p>

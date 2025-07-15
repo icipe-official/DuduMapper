@@ -18,6 +18,12 @@ import {
   Paper,
   Button,
   CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import {
   PieChart,
@@ -34,7 +40,8 @@ import EmailIcon from "@mui/icons-material/Email";
 import { useAuth } from "@/context/context";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { Email, ModelTraining } from "@mui/icons-material";
+
+import { CheckBox, Email, ModelTraining } from "@mui/icons-material";
 interface User {
   id: string;
   firstName: string;
@@ -78,6 +85,13 @@ export default function AdminPanelDynamic() {
   const [model, setModels] = useState<Model[]>([]);
   const [emails, setEmails] = useState<SentEmail[]>([]);
   const { user, loading } = useAuth();
+  //dialog for add, delete, update logic model
+  const [openDialog, setOpenDialog] = useState<
+    "Add" | "Update" | "Delete" | null
+  >(null);
+  const handleClose = () => {
+    setOpenDialog(null);
+  };
   const router = useRouter();
   const hasRedirected = React.useRef(false);
   //dashboard logic
@@ -171,7 +185,7 @@ export default function AdminPanelDynamic() {
     highRisk: false,
   });
 
-  //HANDLE MODEL SUBMISSION
+  //HANDLE ADD MODEL SUBMISSION
   const handleAddModel = async () => {
     try {
       const res = await fetch("/api/model", {
@@ -445,6 +459,7 @@ export default function AdminPanelDynamic() {
                     <TableCell>Notifications</TableCell>
                   </TableRow>
                 </TableHead>
+
                 <TableBody>
                   {model.map((model) => (
                     <TableRow key={model.id}>
@@ -468,102 +483,470 @@ export default function AdminPanelDynamic() {
                   ))}
 
                   {/* editable row for input */}
-                  <TableRow>
-                    <TableCell>Auto</TableCell>
-                    <TableCell>
-                      <input
-                        value={newModel.title || ""}
-                        onChange={(e) =>
-                          setNewModel({ ...newModel, title: e.target.value })
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        value={newModel.country || ""}
-                        onChange={(e) =>
-                          setNewModel({ ...newModel, country: e.target.value })
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        value={newModel.region || ""}
-                        onChange={(e) =>
-                          setNewModel({ ...newModel, region: e.target.value })
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        type="number"
-                        value={newModel.year || ""}
-                        onChange={(e) =>
-                          setNewModel({ ...newModel, year: +e.target.value })
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        type="number"
-                        value={newModel.month || ""}
-                        onChange={(e) =>
-                          setNewModel({ ...newModel, month: +e.target.value })
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        value={newModel.model || ""}
-                        onChange={(e) =>
-                          setNewModel({ ...newModel, model: e.target.value })
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        value={newModel.description || ""}
-                        onChange={(e) =>
-                          setNewModel({
-                            ...newModel,
-                            description: e.target.value,
-                          })
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <input
-                        type="checkbox"
-                        checked={newModel.highRisk || false}
-                        onChange={(e) =>
-                          setNewModel({
-                            ...newModel,
-                            highRisk: e.target.checked,
-                          })
-                        }
-                      />
-                    </TableCell>
-                    <TableCell colSpan={3}>
-                      <Button
-                        onClick={handleAddModel}
-                        size="small"
-                        variant="contained"
-                        color="success"
-                        disabled={
-                          !newModel.title ||
-                          !newModel.country ||
-                          !newModel.region ||
-                          !newModel.year ||
-                          !newModel.month
-                        }
+
+                  {/*Add dialogue */}
+                  <Dialog
+                    open={openDialog === "Add"}
+                    onClose={handleClose}
+                    maxWidth="md"
+                    fullWidth
+                  >
+                    <DialogTitle>Add New Model</DialogTitle>
+                    <DialogContent sx={{ p: 3 }}>
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr", // 2 columns
+                          gap: 3,
+                          maxWidth: 800,
+                          margin: "auto",
+                        }}
                       >
-                        Add
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                        {/* Left Column */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                          }}
+                        >
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              ID
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value="Auto"
+                              disabled
+                              size="small"
+                            />
+                          </Box>
+
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Title
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={newModel.title || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  title: e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Country
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={newModel.country || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  country: e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Region
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={newModel.region || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  region: e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Year
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              type="number"
+                              value={newModel.year || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  year: +e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+                        </Box>
+
+                        {/* Right Column */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                          }}
+                        >
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Month
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              type="number"
+                              value={newModel.month || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  month: +e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Model
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={newModel.model || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  model: e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Description
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              multiline
+                              rows={2}
+                              value={newModel.description || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  description: e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              High Risk
+                            </Typography>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={newModel.highRisk || false}
+                                  onChange={(e: { target: { checked: any } }) =>
+                                    setNewModel({
+                                      ...newModel,
+                                      highRisk: e.target.checked,
+                                    })
+                                  }
+                                />
+                              }
+                              label="High Risk"
+                            />
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Upload{" "}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+
+                      {/* Action Button */}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          mt: 3,
+                        }}
+                      >
+                        <Button
+                          onClick={handleAddModel}
+                          variant="contained"
+                          color="success"
+                          disabled={
+                            !newModel.title ||
+                            !newModel.country ||
+                            !newModel.region ||
+                            !newModel.year ||
+                            !newModel.month
+                          }
+                        >
+                          Add Model
+                        </Button>
+                      </Box>
+                    </DialogContent>
+                  </Dialog>
+
+                  {/*update dialogue */}
+                  <Dialog
+                    open={openDialog === "Update"}
+                    onClose={handleClose}
+                    maxWidth="md"
+                    fullWidth
+                  >
+                    <DialogTitle>Update Model</DialogTitle>
+                    <DialogContent sx={{ p: 3 }}>
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr", // 2 columns
+                          gap: 3,
+                          maxWidth: 800,
+                          margin: "auto",
+                        }}
+                      >
+                        {/* Left Column */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                          }}
+                        >
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              ID
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={newModel.id || ""}
+                              disabled
+                              size="small"
+                            />
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Title
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={newModel.title || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  title: e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Country
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={newModel.country || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  country: e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Region
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={newModel.region || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  region: e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Year
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              type="number"
+                              value={newModel.year || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  year: +e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+                        </Box>
+
+                        {/* Right Column */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                          }}
+                        >
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Month
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              type="number"
+                              value={newModel.month || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  month: +e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Model
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={newModel.model || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  model: e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Description
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              multiline
+                              rows={2}
+                              value={newModel.description || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  description: e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              High Risk
+                            </Typography>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={newModel.highRisk || false}
+                                  onChange={(e: { target: { checked: any } }) =>
+                                    setNewModel({
+                                      ...newModel,
+                                      highRisk: e.target.checked,
+                                    })
+                                  }
+                                />
+                              }
+                              label="High Risk"
+                            />
+                          </Box>
+                        </Box>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          mt: 3,
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          color="success"
+                          disabled={
+                            !newModel.title ||
+                            !newModel.model ||
+                            !newModel.country
+                          }
+                          //onClick={handleUpdateModel}
+                        >
+                          Update
+                        </Button>
+                      </Box>
+                    </DialogContent>
+                  </Dialog>
                 </TableBody>
               </Table>
             </TableContainer>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                p: 2,
+                gap: 1,
+                mt: 2,
+              }}
+            >
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => setOpenDialog("Add")}
+              >
+                Add
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setOpenDialog("Update")}
+              >
+                Update
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => setOpenDialog("Delete")}
+              >
+                Delete
+              </Button>
+            </Box>
           </>
         );
     }
@@ -584,18 +967,38 @@ export default function AdminPanelDynamic() {
       <Box
         sx={{
           display: "flex",
-          flexDirection: "row",
-          width: 900,
-          height: 500,
+          flexDirection: {
+            sm: "row",
+            xs: "column",
+          },
+          width: {
+            xs: "95vw", //mobile
+            sm: "85vw",
+            md: "80vw",
+            lg: "75vw",
+            xl: "75vw", //extra 1/2large
+          },
+          height: {
+            xs: "95vw", //mobile
+            sm: "80vw",
+            md: "60vw",
+            lg: "50vw",
+            xl: "40vw", //extra 1/2large
+          },
           borderRadius: "20px",
           boxShadow: "6px 6px 12px #babecc, -6px -6px 12px #ffffff",
+          mt: 4,
+
           //backgroundColor: "#e0e5ec",
         }}
       >
         {/* Side Drawer */}
         <Box
           sx={{
-            width: 180,
+            width: {
+              sm: 180,
+              xs: "100%",
+            },
             borderRight: "1px solid #ccc",
             padding: 2,
           }}
