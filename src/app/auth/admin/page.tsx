@@ -89,6 +89,10 @@ export default function AdminPanelDynamic() {
   const [openDialog, setOpenDialog] = useState<
     "Add" | "Update" | "Delete" | null
   >(null);
+  //const for delete
+  const [selectedDeleteModelId, setSelectedDeletedModelId] = useState<string[]>(
+    []
+  );
   const handleClose = () => {
     setOpenDialog(null);
   };
@@ -211,6 +215,29 @@ export default function AdminPanelDynamic() {
       toast.success("Model added successfully");
     } catch (error) {
       toast.error("couldn`t add a Model");
+    }
+  };
+  //HANDLE DELETE MODEL
+  const handleDeleteModel = async () => {
+    try {
+      const res = await fetch("/api/model", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: selectedDeleteModelId }),
+      });
+      if (!res.ok) throw new Error("Failed to delete model");
+      const deletedId: string[] = await res.json();
+      setModels((prev) =>
+        prev.filter((model) => !deletedId.includes(model.id))
+      );
+      toast.success("Model deleted successfully");
+      //reset
+      setSelectedDeletedModelId([]);
+    } catch (error) {
+      console.error("Error deleting model:", error);
+      toast.error("couldn`t delete a Model");
     }
   };
 
@@ -516,7 +543,7 @@ export default function AdminPanelDynamic() {
                             </Typography>
                             <TextField
                               fullWidth
-                              value="Auto"
+                              value={newModel.id || "Auto"}
                               disabled
                               size="small"
                             />
@@ -739,7 +766,7 @@ export default function AdminPanelDynamic() {
                             </Typography>
                             <TextField
                               fullWidth
-                              value={newModel.id || ""}
+                              value={newModel.id || "Auto"}
                               disabled
                               size="small"
                             />
@@ -909,6 +936,118 @@ export default function AdminPanelDynamic() {
                           //onClick={handleUpdateModel}
                         >
                           Update
+                        </Button>
+                      </Box>
+                    </DialogContent>
+                  </Dialog>
+                  {/* Delete Dialog */}
+                  <Dialog
+                    open={openDialog === "Delete"}
+                    maxWidth="md"
+                    onClose={handleClose}
+                    fullWidth
+                  >
+                    <DialogTitle>Delete a Model</DialogTitle>
+                    <DialogContent sx={{ p: 3 }}>
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr", // 2 columns
+                          gap: 3,
+                          maxWidth: 800,
+                          margin: "auto",
+                        }}
+                      >
+                        {/* Left Column */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                          }}
+                        >
+                          <TableContainer component={Paper}>
+                            <Table size="small" aria-label="models table">
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell>ID</TableCell>
+                                  <TableCell>Title</TableCell>
+                                  <TableCell>Country</TableCell>
+                                  <TableCell>Region</TableCell>
+                                  <TableCell>Year</TableCell>
+                                  <TableCell>Month</TableCell>
+                                  <TableCell>Model</TableCell>
+                                  <TableCell>Description</TableCell>
+                                  <TableCell>HighRisk</TableCell>
+
+                                  <TableCell>Select</TableCell>
+                                </TableRow>
+                              </TableHead>
+
+                              <TableBody>
+                                {model.map((model) => (
+                                  <TableRow key={model.id}>
+                                    <TableCell>{model.id}</TableCell>
+                                    <TableCell>{model.title}</TableCell>
+                                    <TableCell>{model.country}</TableCell>
+                                    <TableCell>{model.region}</TableCell>
+                                    <TableCell>{model.year}</TableCell>
+                                    <TableCell>{model.month}</TableCell>
+                                    <TableCell>{model.model}</TableCell>
+                                    <TableCell>{model.description}</TableCell>
+                                    <TableCell>
+                                      {model.highRisk ? "Yes" : "No"}
+                                    </TableCell>
+
+                                    <TableCell>
+                                      <Checkbox
+                                        checked={selectedDeleteModelId.includes(
+                                          model.id
+                                        )}
+                                        onChange={(e) => {
+                                          if (e.target.checked) {
+                                            setSelectedDeletedModelId(
+                                              (prev) => [...prev, model.id]
+                                            );
+                                          } else {
+                                            setSelectedDeletedModelId((prev) =>
+                                              prev.filter(
+                                                (id) => id !== model.id
+                                              )
+                                            );
+                                          }
+                                        }}
+                                      />
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+                        </Box>
+                        {/* Right Column */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                          }}
+                        ></Box>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          mt: 3,
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          color="error"
+                          disabled={selectedDeleteModelId.length === 0}
+                          onClick={handleDeleteModel}
+                        >
+                          Delete
                         </Button>
                       </Box>
                     </DialogContent>
