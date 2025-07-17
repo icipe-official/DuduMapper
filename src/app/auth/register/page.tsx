@@ -92,8 +92,15 @@ const Register: React.FC = ({}) => {
   const handleRegister = async () => {
     //restrict email
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/i.test(email);
+    const isValidPassword = /^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/.test(
+      password
+    );
     if (!isValidEmail) {
       setEmailError(true);
+      return;
+    }
+    if (!isValidPassword) {
+      setPasswordError(true);
       return;
     }
 

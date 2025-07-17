@@ -41,7 +41,7 @@ import { useAuth } from "@/context/context";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
-import { CheckBox, Email, ModelTraining } from "@mui/icons-material";
+import { ModelTraining } from "@mui/icons-material";
 interface User {
   id: string;
   firstName: string;
@@ -74,6 +74,7 @@ interface Model {
   highRisk: boolean;
   createdAt: string;
   updatedAt: string;
+  file?: File;
 }
 const COLORS = ["#0088FE", "#FF8042"]; // User, Admin
 export default function AdminPanelDynamic() {
@@ -89,7 +90,10 @@ export default function AdminPanelDynamic() {
   const [openDialog, setOpenDialog] = useState<
     "Add" | "Update" | "Delete" | null
   >(null);
-  //const for delete
+  //const for add, update, delete
+  const [selectedAddModel, setSelectedAddModel] = useState<string[]>([]);
+  const [selectedUpdateModel, setSelectedUpdateModel] = useState<string[]>([]);
+  const [selectModelEdit, setSelectedModelEdit] = useState<Model | null>(null);
   const [selectedDeleteModelId, setSelectedDeletedModelId] = useState<string[]>(
     []
   );
@@ -188,7 +192,78 @@ export default function AdminPanelDynamic() {
     description: "",
     highRisk: false,
   });
-
+  //updating model
+  const [updateModel, setUpdatedModel] = useState<Partial<Model>>({
+    id: "",
+    title: "",
+    country: "",
+    region: "",
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    model: "",
+    description: "",
+    highRisk: false,
+  });
+  //prefill data for update model
+  const handleOpenUpdateDialog = (modelData: Model) => {
+    setUpdatedModel(modelData);
+    setSelectedModelEdit(modelData);
+    setOpenDialog("Update");
+  };
+  //handle upload for add
+  const handleFileAddChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    //upload to geo server
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch("geoserver address..", {
+        method: "POST",
+        headers: {
+          Authorization: "Basic" + btoa("username:password"),
+        },
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Geo upload failed");
+      setNewModel((prev) => ({
+        ...prev,
+        model: file.name,
+        file,
+      }));
+    } catch (error) {
+      console.error(" upload failed", error);
+    }
+  };
+  //handle upload for update
+  const handleFileUpdateChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    //uploads to geoserver
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch("geoserver address..", {
+        method: "POST",
+        headers: {
+          Authorization: "Basic" + btoa("username:password"),
+        },
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Geo upload failed");
+      setUpdatedModel((prev) => ({
+        ...prev,
+        model: file.name,
+        file,
+      }));
+    } catch (error) {
+      console.error(" upload failed", error);
+    }
+  };
   //HANDLE ADD MODEL SUBMISSION
   const handleAddModel = async () => {
     try {
@@ -215,6 +290,37 @@ export default function AdminPanelDynamic() {
       toast.success("Model added successfully");
     } catch (error) {
       toast.error("couldn`t add a Model");
+    }
+  };
+  //HANDLE UPDATE MODEL
+  const handleUpdateModel = async () => {
+    try {
+      const res = await fetch("/api/model", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateModel),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+      const updated = await res.json();
+      setModels((prev) =>
+        prev.map((model) => (model.id === updated.id ? updated : model))
+      );
+      setUpdatedModel({
+        id: "",
+        title: "",
+        country: "",
+        region: "",
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() + 1,
+        model: "",
+        description: "",
+        highRisk: false,
+      });
+      toast.success("Model updated successfully");
+    } catch (error) {
+      toast.error("couldn`t update a Model");
     }
   };
   //HANDLE DELETE MODEL
@@ -375,10 +481,10 @@ export default function AdminPanelDynamic() {
                 gap: 1,
               }}
             >
-              <Button variant="contained" color="success">
+              <Button variant="contained" color="success" disabled>
                 Update
               </Button>
-              <Button variant="contained" color="error">
+              <Button variant="contained" color="error" disabled>
                 Delete
               </Button>
             </Box>
@@ -484,6 +590,7 @@ export default function AdminPanelDynamic() {
                     <TableCell>Created At</TableCell>
                     <TableCell>Updated At</TableCell>
                     <TableCell>Notifications</TableCell>
+                    <TableCell>Edit</TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -506,6 +613,16 @@ export default function AdminPanelDynamic() {
                         {new Date(model.updatedAt).toLocaleString()}
                       </TableCell>
                       <TableCell>N/A</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          color="primary"
+                          onClick={() => handleOpenUpdateDialog(model)}
+                        >
+                          Edit
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
 
@@ -688,6 +805,7 @@ export default function AdminPanelDynamic() {
                             <FormControlLabel
                               control={
                                 <Checkbox
+                                  color="success"
                                   checked={newModel.highRisk || false}
                                   onChange={(e: { target: { checked: any } }) =>
                                     setNewModel({
@@ -702,8 +820,13 @@ export default function AdminPanelDynamic() {
                           </Box>
                           <Box>
                             <Typography variant="subtitle2" gutterBottom>
-                              Upload{" "}
+                              Upload Geo{" "}
                             </Typography>
+                            <input
+                              type="file"
+                              accept=".zip, .shp, .geojson, .tif"
+                              onChange={handleFileAddChange}
+                            />
                           </Box>
                         </Box>
                       </Box>
@@ -725,7 +848,8 @@ export default function AdminPanelDynamic() {
                             !newModel.country ||
                             !newModel.region ||
                             !newModel.year ||
-                            !newModel.month
+                            !newModel.month ||
+                            !newModel.file?.name
                           }
                         >
                           Add Model
@@ -766,7 +890,7 @@ export default function AdminPanelDynamic() {
                             </Typography>
                             <TextField
                               fullWidth
-                              value={newModel.id || "Auto"}
+                              value={updateModel.id || "Auto"}
                               disabled
                               size="small"
                             />
@@ -777,10 +901,10 @@ export default function AdminPanelDynamic() {
                             </Typography>
                             <TextField
                               fullWidth
-                              value={newModel.title || ""}
+                              value={updateModel.title || ""}
                               onChange={(e) =>
-                                setNewModel({
-                                  ...newModel,
+                                setUpdatedModel({
+                                  ...updateModel,
                                   title: e.target.value,
                                 })
                               }
@@ -793,10 +917,10 @@ export default function AdminPanelDynamic() {
                             </Typography>
                             <TextField
                               fullWidth
-                              value={newModel.country || ""}
+                              value={updateModel.country || ""}
                               onChange={(e) =>
-                                setNewModel({
-                                  ...newModel,
+                                setUpdatedModel({
+                                  ...updateModel,
                                   country: e.target.value,
                                 })
                               }
@@ -809,10 +933,10 @@ export default function AdminPanelDynamic() {
                             </Typography>
                             <TextField
                               fullWidth
-                              value={newModel.region || ""}
+                              value={updateModel.region || ""}
                               onChange={(e) =>
-                                setNewModel({
-                                  ...newModel,
+                                setUpdatedModel({
+                                  ...updateModel,
                                   region: e.target.value,
                                 })
                               }
@@ -826,10 +950,10 @@ export default function AdminPanelDynamic() {
                             <TextField
                               fullWidth
                               type="number"
-                              value={newModel.year || ""}
+                              value={updateModel.year || ""}
                               onChange={(e) =>
-                                setNewModel({
-                                  ...newModel,
+                                setUpdatedModel({
+                                  ...updateModel,
                                   year: +e.target.value,
                                 })
                               }
@@ -853,10 +977,10 @@ export default function AdminPanelDynamic() {
                             <TextField
                               fullWidth
                               type="number"
-                              value={newModel.month || ""}
+                              value={updateModel.month || ""}
                               onChange={(e) =>
-                                setNewModel({
-                                  ...newModel,
+                                setUpdatedModel({
+                                  ...updateModel,
                                   month: +e.target.value,
                                 })
                               }
@@ -869,10 +993,10 @@ export default function AdminPanelDynamic() {
                             </Typography>
                             <TextField
                               fullWidth
-                              value={newModel.model || ""}
+                              value={updateModel.model || ""}
                               onChange={(e) =>
-                                setNewModel({
-                                  ...newModel,
+                                setUpdatedModel({
+                                  ...updateModel,
                                   model: e.target.value,
                                 })
                               }
@@ -887,10 +1011,10 @@ export default function AdminPanelDynamic() {
                               fullWidth
                               multiline
                               rows={2}
-                              value={newModel.description || ""}
+                              value={updateModel.description || ""}
                               onChange={(e) =>
-                                setNewModel({
-                                  ...newModel,
+                                setUpdatedModel({
+                                  ...updateModel,
                                   description: e.target.value,
                                 })
                               }
@@ -904,16 +1028,27 @@ export default function AdminPanelDynamic() {
                             <FormControlLabel
                               control={
                                 <Checkbox
-                                  checked={newModel.highRisk || false}
+                                  color="success"
+                                  checked={updateModel.highRisk || false}
                                   onChange={(e: { target: { checked: any } }) =>
-                                    setNewModel({
-                                      ...newModel,
+                                    setUpdatedModel({
+                                      ...updateModel,
                                       highRisk: e.target.checked,
                                     })
                                   }
                                 />
                               }
                               label="High Risk"
+                            />
+                          </Box>
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              Upload Geospatial{" "}
+                            </Typography>
+                            <input
+                              type="file"
+                              accept=".zip, .shp, .geojson, .tiff"
+                              onChange={handleFileUpdateChange}
                             />
                           </Box>
                         </Box>
@@ -929,11 +1064,12 @@ export default function AdminPanelDynamic() {
                           variant="contained"
                           color="success"
                           disabled={
-                            !newModel.title ||
-                            !newModel.model ||
-                            !newModel.country
+                            !updateModel.title ||
+                            !updateModel.model ||
+                            !updateModel.country ||
+                            !updateModel.region
                           }
-                          //onClick={handleUpdateModel}
+                          onClick={handleUpdateModel}
                         >
                           Update
                         </Button>
@@ -947,7 +1083,7 @@ export default function AdminPanelDynamic() {
                     onClose={handleClose}
                     fullWidth
                   >
-                    <DialogTitle>Delete a Model</DialogTitle>
+                    <DialogTitle>Delete Model</DialogTitle>
                     <DialogContent sx={{ p: 3 }}>
                       <Box
                         sx={{
@@ -980,7 +1116,9 @@ export default function AdminPanelDynamic() {
                                   <TableCell>Description</TableCell>
                                   <TableCell>HighRisk</TableCell>
 
-                                  <TableCell>Select</TableCell>
+                                  <TableCell sx={{ color: "red" }}>
+                                    Select
+                                  </TableCell>
                                 </TableRow>
                               </TableHead>
 
@@ -1001,6 +1139,7 @@ export default function AdminPanelDynamic() {
 
                                     <TableCell>
                                       <Checkbox
+                                        color="success"
                                         checked={selectedDeleteModelId.includes(
                                           model.id
                                         )}
@@ -1074,7 +1213,12 @@ export default function AdminPanelDynamic() {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => setOpenDialog("Update")}
+                disabled={!selectModelEdit}
+                onClick={() => {
+                  if (selectModelEdit) {
+                    setOpenDialog("Update");
+                  }
+                }}
               >
                 Update
               </Button>
