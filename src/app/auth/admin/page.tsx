@@ -30,10 +30,11 @@ import {
   Pie,
   Cell,
   Legend,
-  Tooltip,
   ResponsiveContainer,
+  Tooltip,
 } from "recharts";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+
 import PeopleIcon from "@mui/icons-material/People";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import EmailIcon from "@mui/icons-material/Email";
@@ -217,20 +218,30 @@ export default function AdminPanelDynamic() {
     const file = event.target.files?.[0];
     if (!file) return;
     //upload to geo server
+    const workspace = "dudu";
+    const storeName = file.name.replace(/\.[^/.]+$/, "");
+
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const res = await fetch("geoserver address..", {
-        method: "POST",
-        headers: {
-          Authorization: "Basic" + btoa("username:password"),
-        },
-        body: formData,
-      });
-      if (!res.ok) throw new Error("Geo upload failed");
+      const res = await fetch(
+        `http://<GEOSERVER-HOST>/geoserver/rest/workspaces/${workspace}
+        /coveragestores/${storeName}/file.geotiff`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: "Basic" + btoa("dudumapper: dudumapper@01"),
+          },
+          body: formData,
+        }
+      );
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Geo upload failed : ${errorText}`);
+      }
       setNewModel((prev) => ({
         ...prev,
-        model: file.name,
+        model: storeName,
         file,
       }));
     } catch (error) {
@@ -244,20 +255,30 @@ export default function AdminPanelDynamic() {
     const file = event.target.files?.[0];
     if (!file) return;
     //uploads to geoserver
+    const workspace = "dudu";
+    const storeName = file.name.replace(/\.[^/.]+$/, "");
+
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const res = await fetch("geoserver address..", {
-        method: "POST",
-        headers: {
-          Authorization: "Basic" + btoa("username:password"),
-        },
-        body: formData,
-      });
-      if (!res.ok) throw new Error("Geo upload failed");
+      const res = await fetch(
+        `http://<GEOSERVER-HOST>/geoserver/rest/workspaces/${workspace}
+        /coveragestores/${storeName}/file.geotiff`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: "Basic" + btoa("dudumapper:dudumapper@01"),
+          },
+          body: formData,
+        }
+      );
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Geo upload failed : ${errorText}`);
+      }
       setUpdatedModel((prev) => ({
         ...prev,
-        model: file.name,
+        model: storeName,
         file,
       }));
     } catch (error) {
@@ -824,7 +845,7 @@ export default function AdminPanelDynamic() {
                             </Typography>
                             <input
                               type="file"
-                              accept=".zip, .shp, .geojson, .tif"
+                              accept=".geotiff"
                               onChange={handleFileAddChange}
                             />
                           </Box>
@@ -1045,10 +1066,12 @@ export default function AdminPanelDynamic() {
                             <Typography variant="subtitle2" gutterBottom>
                               Upload Geospatial{" "}
                             </Typography>
+
                             <input
                               type="file"
-                              accept=".zip, .shp, .geojson, .tiff"
-                              onChange={handleFileUpdateChange}
+                              accept=".geotiff"
+
+                              //onChange={handleFileUpdateChange}
                             />
                           </Box>
                         </Box>
