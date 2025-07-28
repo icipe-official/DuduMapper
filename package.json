@@ -14,7 +14,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
-    "@prisma/client": "^6.6.0",
+    "@prisma/client": "^6.12.0",
     "@tanstack/react-query": "^5.17.1",
     "@tanstack/react-query-devtools": "^5.17.9",
     "@turf/turf": "^6.5.0",
@@ -58,7 +58,7 @@
     "babel-plugin-transform-commonjs": "^1.1.6",
     "eslint": "^8.55.0",
     "eslint-config-next": "^14.0.4",
-    "prisma": "^6.8.2",
+    "prisma": "^6.12.0",
     "typescript": "^5"
   }
 }

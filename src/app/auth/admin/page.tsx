@@ -230,7 +230,11 @@ export default function AdminPanelDynamic() {
         {
           method: "PUT",
           headers: {
-            Authorization: "Basic" + btoa("dudumapper: dudumapper@01"),
+            Authorization:
+              "Basic " +
+              btoa(
+                `${process.env.GEOSERVER_USER}:${process.env.GEOSERVER_PASSWORD}`
+              ),
           },
           body: formData,
         }
@@ -267,7 +271,11 @@ export default function AdminPanelDynamic() {
         {
           method: "PUT",
           headers: {
-            Authorization: "Basic" + btoa("dudumapper:dudumapper@01"),
+            Authorization:
+              "Basic" +
+              btoa(
+                `${process.env.GEOSERVER_USER}:${process.env.GEOSERVER_PASSWORD}`
+              ),
           },
           body: formData,
         }
@@ -633,6 +641,7 @@ export default function AdminPanelDynamic() {
                       <TableCell>
                         {new Date(model.updatedAt).toLocaleString()}
                       </TableCell>
+                      {/**should correct this n/a to provide notifications */}
                       <TableCell>N/A</TableCell>
                       <TableCell>
                         <Button
@@ -1070,8 +1079,7 @@ export default function AdminPanelDynamic() {
                             <input
                               type="file"
                               accept=".geotiff"
-
-                              //onChange={handleFileUpdateChange}
+                              onChange={handleFileUpdateChange}
                             />
                           </Box>
                         </Box>
@@ -1139,7 +1147,13 @@ export default function AdminPanelDynamic() {
                                   <TableCell>Description</TableCell>
                                   <TableCell>HighRisk</TableCell>
 
-                                  <TableCell sx={{ color: "red" }}>
+                                  <TableCell
+                                    sx={{
+                                      color: "red",
+                                      fontWeight: "bold",
+                                      marginRight: "10px",
+                                    }}
+                                  >
                                     Select
                                   </TableCell>
                                 </TableRow>
