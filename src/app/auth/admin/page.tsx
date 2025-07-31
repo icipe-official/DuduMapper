@@ -225,8 +225,8 @@ export default function AdminPanelDynamic() {
     formData.append("file", file);
     try {
       const res = await fetch(
-        `http://<GEOSERVER-HOST>/geoserver/rest/workspaces/${workspace}
-        /coveragestores/${storeName}/file.geotiff`,
+        `${process.env.NEXT_PUBLIC_GEOSERVER_URL}/geoserver/rest/workspaces/${workspace}
+        /coveragestores/${storeName}/file.tiff`,
         {
           method: "PUT",
           headers: {
@@ -266,8 +266,8 @@ export default function AdminPanelDynamic() {
     formData.append("file", file);
     try {
       const res = await fetch(
-        `http://<GEOSERVER-HOST>/geoserver/rest/workspaces/${workspace}
-        /coveragestores/${storeName}/file.geotiff`,
+        `${process.env.NEXT_PUBLIC_GEOSERVER_URL}/geoserver/rest/workspaces/${workspace}
+        /coveragestores/${storeName}/file.tiff`,
         {
           method: "PUT",
           headers: {
@@ -854,7 +854,7 @@ export default function AdminPanelDynamic() {
                             </Typography>
                             <input
                               type="file"
-                              accept=".geotiff"
+                              accept=".tiff"
                               onChange={handleFileAddChange}
                             />
                           </Box>
@@ -1078,7 +1078,7 @@ export default function AdminPanelDynamic() {
 
                             <input
                               type="file"
-                              accept=".geotiff"
+                              accept=".tiff"
                               onChange={handleFileUpdateChange}
                             />
                           </Box>

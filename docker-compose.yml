@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  dudumapper:
+    build: .
+
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./dudumapper:/app
+    depends_on:
+      - geoserver
+
+  geoserver:
+    image: kartoza/geoserver
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./web.xml:/opt/geoserver/webapps/geoserver/WEB-INF/web.xml
