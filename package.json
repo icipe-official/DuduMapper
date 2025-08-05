@@ -24,8 +24,10 @@
     "betterknown": "^1.0.3",
     "colormap": "^2.3.2",
     "cookie": "^1.0.2",
+    "cors": "^2.8.5",
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "fast-xml-parser": "^5.2.1",
+    "formidable": "^3.5.4",
     "framer-motion": "^12.9.1",
     "jsonwebtoken": "^9.0.2",
     "next": "^15.3.1",
@@ -48,6 +50,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/colormap": "^2.3.4",
+    "@types/formidable": "^3.4.5",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20.8.9",
     "@types/nodemailer": "^6.4.17",

@@ -89,7 +89,7 @@ export default function AdminPanelDynamic() {
   const { user, loading } = useAuth();
   //dialog for add, delete, update logic model
   const [openDialog, setOpenDialog] = useState<
-    "Add" | "Update" | "Delete" | null
+    "Add" | "Update" | "Delete" | "Instructions" | null
   >(null);
   //const for add, update, delete
   const [selectedAddModel, setSelectedAddModel] = useState<string[]>([]);
@@ -217,37 +217,29 @@ export default function AdminPanelDynamic() {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    //upload to geo server
-    const workspace = "dudu";
-    const storeName = file.name.replace(/\.[^/.]+$/, "");
 
     const formData = new FormData();
     formData.append("file", file);
+
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_GEOSERVER_URL}/geoserver/rest/workspaces/${workspace}
-        /coveragestores/${storeName}/file.tiff`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization:
-              "Basic " +
-              btoa(
-                `${process.env.GEOSERVER_USER}:${process.env.GEOSERVER_PASSWORD}`
-              ),
-          },
-          body: formData,
-        }
-      );
+      const res = await fetch("/api/geoserverupload", {
+        method: "POST",
+        body: formData,
+      });
+
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(`Geo upload failed : ${errorText}`);
       }
+
+      const data = await res.json();
+
       setNewModel((prev) => ({
         ...prev,
-        model: storeName,
+        model: data.storeName,
         file,
       }));
+      toast.success("File uploaded successfully");
     } catch (error) {
       console.error(" upload failed", error);
     }
@@ -258,39 +250,38 @@ export default function AdminPanelDynamic() {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    //uploads to geoserver
+    /*uploads to geoserver
     const workspace = "dudu";
     const storeName = file.name.replace(/\.[^/.]+$/, "");
+    */
 
     const formData = new FormData();
     formData.append("file", file);
+
+    if (updateModel.model) {
+      formData.append("storeName", updateModel.model);
+    }
+
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_GEOSERVER_URL}/geoserver/rest/workspaces/${workspace}
-        /coveragestores/${storeName}/file.tiff`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization:
-              "Basic" +
-              btoa(
-                `${process.env.GEOSERVER_USER}:${process.env.GEOSERVER_PASSWORD}`
-              ),
-          },
-          body: formData,
-        }
-      );
+      const res = await fetch("/api/geoserverupload", {
+        method: "PUT",
+        body: formData,
+      });
+
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(`Geo upload failed : ${errorText}`);
       }
+      const data = await res.json();
+
       setUpdatedModel((prev) => ({
         ...prev,
-        model: storeName,
+        model: data.storeName,
         file,
       }));
+      toast.success("Model updated successfully");
     } catch (error) {
-      console.error(" upload failed", error);
+      console.error(" update failed", error);
     }
   };
   //HANDLE ADD MODEL SUBMISSION
@@ -1228,6 +1219,52 @@ export default function AdminPanelDynamic() {
                       </Box>
                     </DialogContent>
                   </Dialog>
+                  {/*Instruction Dialog*/}
+
+                  <Dialog
+                    open={openDialog === "Instructions"}
+                    onClose={handleClose}
+                    maxWidth="md"
+                    fullWidth
+                  >
+                    <DialogTitle>
+                      🚨 Important Model Naming Instruction
+                    </DialogTitle>
+                    <DialogContent>
+                      <Typography variant="body2" component="div">
+                        <p
+                          style={{
+                            color: "green",
+                            fontWeight: "bold",
+                            fontSize: "16px",
+                          }}
+                        >
+                          Please save your model with a unique name before
+                          uploading.
+                        </p>
+                        To avoid confusion when adding or updating models in
+                        GeoServer, do NOT include the following in your model
+                        name:
+                        <ul>
+                          <li>
+                            ❌ Month (e.g., &quot;January&quot;,
+                            &quot;Feb&quot;, &quot;08&quot;)
+                          </li>
+                          <li>
+                            ❌ Region or country names (e.g., &quot;Kenya&quot;,
+                            &quot;Nairobi&quot;)
+                          </li>
+                          <li>
+                            ❌ Year or date (e.g., &quot;2025&quot;,
+                            &quot;23_08&quot;)
+                          </li>
+                        </ul>
+                        ✅ Instead, use a descriptive and specific name that
+                        uniquely identifies your model based on its purpose,
+                        type, or feature.
+                      </Typography>
+                    </DialogContent>
+                  </Dialog>
                 </TableBody>
               </Table>
             </TableContainer>
@@ -1265,6 +1302,13 @@ export default function AdminPanelDynamic() {
                 onClick={() => setOpenDialog("Delete")}
               >
                 Delete
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setOpenDialog("Instructions")}
+              >
+                ReadMe
               </Button>
             </Box>
           </>
