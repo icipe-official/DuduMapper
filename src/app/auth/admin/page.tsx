@@ -98,6 +98,8 @@ export default function AdminPanelDynamic() {
   const [selectedDeleteModelId, setSelectedDeletedModelId] = useState<string[]>(
     []
   );
+  //lets try to activate some buttons before others
+  const [modelClicked, setModelClicked] = useState(false);
   const handleClose = () => {
     setOpenDialog(null);
   };
@@ -589,7 +591,7 @@ export default function AdminPanelDynamic() {
         return (
           <>
             <Typography variant="h5" gutterBottom>
-              📊 Models
+              🌍 Models
             </Typography>
             <Typography variant="body2" sx={{ mb: 2 }}>
               Manage all models here ( New and Posted models)
@@ -1281,6 +1283,7 @@ export default function AdminPanelDynamic() {
                 variant="contained"
                 color="success"
                 onClick={() => setOpenDialog("Add")}
+                disabled={!modelClicked}
               >
                 Add
               </Button>
@@ -1300,15 +1303,19 @@ export default function AdminPanelDynamic() {
                 variant="contained"
                 color="error"
                 onClick={() => setOpenDialog("Delete")}
+                disabled={!modelClicked}
               >
                 Delete
               </Button>
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => setOpenDialog("Instructions")}
+                onClick={() => {
+                  setOpenDialog("Instructions");
+                  setModelClicked(true);
+                }}
               >
-                ReadMe
+                Model Guide
               </Button>
             </Box>
           </>
