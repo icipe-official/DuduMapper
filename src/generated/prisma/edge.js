@@ -175,7 +175,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/kelvin/Desktop/jack/DuduMapper/src/generated/prisma",
+      "value": "/home/main/Projects/DuduMapper/src/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -197,7 +197,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/kelvin/Desktop/jack/DuduMapper/prisma/schema.prisma",
+    "sourceFilePath": "/home/main/Projects/DuduMapper/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -211,7 +211,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {

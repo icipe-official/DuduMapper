@@ -1,0 +1,4 @@
+flask
+gunicorn
+python-decouple
+geoserver-rest
