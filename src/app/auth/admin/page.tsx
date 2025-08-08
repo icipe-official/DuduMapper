@@ -346,8 +346,21 @@ export default function AdminPanelDynamic() {
     }
   };
   //HANDLE DELETE MODEL
+  //ALSO DELETE FROM GEOSERVER
   const handleDeleteModel = async () => {
     try {
+      //first delete from geoserver
+      //const storeName = await res.json();
+      const geoRes = await fetch(
+        "/api/geoserverupload?storeName=${storeName}",
+        {
+          method: "DELETE",
+        }
+      );
+      if (!geoRes.ok) throw new Error(" Fialed to delete from geoserver");
+      toast.success("Model deleted from geoserver successfully");
+
+      //then delete from adatabase
       const res = await fetch("/api/model", {
         method: "DELETE",
         headers: {

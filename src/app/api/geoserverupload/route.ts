@@ -40,7 +40,7 @@ async function uploadToGeoServer(
 
     // Upload the file to create a new coverage store
     const geoRes = await fetch(
-      `${geoUrl}/geoserver/rest/workspaces/${workspace}/coveragestores/${storeName}/file.tiff`,
+      `${geoUrl}/geoserver/rest/workspaces/${workspace}/coveragestores/${storeName}/file.geotiff`,
       {
         method: "PUT",
         headers: {
@@ -54,7 +54,14 @@ async function uploadToGeoServer(
 
     if (!geoRes.ok) {
       const errorText = await geoRes.text();
-      throw new Error(`GeoServer error: ${errorText}`);
+      console.error("Geoserver upload error", {
+        status: geoRes.status,
+        statusText: geoRes.statusText,
+        body: errorText,
+      });
+      throw new Error(
+        `GeoServer error (${geoRes.status} ${geoRes.statusText}) : ${errorText}`
+      );
     }
 
     const layerName = await getLayerName(workspace, storeName);
@@ -173,8 +180,8 @@ export async function PUT(req: NextRequest): Promise<Response> {
 }
 
 // DELETE handler: Remove store
-{
-  /*export async function DELETE(req: NextRequest): Promise<Response> {
+
+export async function DELETE(req: NextRequest): Promise<Response> {
   try {
     const { searchParams } = new URL(req.url);
     const storeName = searchParams.get("storeName");
@@ -211,7 +218,7 @@ export async function PUT(req: NextRequest): Promise<Response> {
     }
 
     return NextResponse.json(
-      { message: "Store deleted successfully from GeoServer" },
+      { message: "Store  deleted successfully from GeoServer" },
       { status: 200 }
     );
   } catch (error) {
@@ -223,6 +230,4 @@ export async function PUT(req: NextRequest): Promise<Response> {
       { status: 500 }
     );
   }
-}
-*/
 }
