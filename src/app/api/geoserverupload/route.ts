@@ -199,7 +199,7 @@ export async function DELETE(req: NextRequest): Promise<Response> {
     const workspace = "dudu";
 
     const geoRes = await fetch(
-      `${geoUrl}/geoserver/rest/workspaces/${workspace}/coveragestores/${storeName}?recurse=true`,
+      `${geoUrl}/geoserver/rest/workspaces/${workspace}/layers/${storeName}?recurse=true`,
       {
         method: "DELETE",
         headers: {

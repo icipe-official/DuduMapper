@@ -98,6 +98,9 @@ export default function AdminPanelDynamic() {
   const [selectedDeleteModelId, setSelectedDeletedModelId] = useState<string[]>(
     []
   );
+  const [selectedDeleteModelStoreName, setSelectedDeletedModelStoreName] =
+    useState<string[]>([]);
+
   //lets try to activate some buttons before others
   const [modelClicked, setModelClicked] = useState(false);
   const handleClose = () => {
@@ -241,7 +244,7 @@ export default function AdminPanelDynamic() {
         model: data.storeName,
         file,
       }));
-      toast.success("File uploaded successfully");
+      toast.success("File uploaded Geoserver successfully");
     } catch (error) {
       console.error(" upload failed", error);
     }
@@ -350,15 +353,21 @@ export default function AdminPanelDynamic() {
   const handleDeleteModel = async () => {
     try {
       //first delete from geoserver
-      //const storeName = await res.json();
+
+      //lets use small storename to minimize mixing since its a name
+      const storename = selectedDeleteModelStoreName[0];
       const geoRes = await fetch(
-        "/api/geoserverupload?storeName=${storeName}",
+        `/api/geoserverupload?storeName=${storename}`,
         {
           method: "DELETE",
         }
       );
-      if (!geoRes.ok) throw new Error(" Fialed to delete from geoserver");
+      if (!geoRes.ok) {
+        console.error("Error deleting model:", await geoRes.text());
+        throw new Error(" Fialed to delete from geoserver");
+      }
       toast.success("Model deleted from geoserver successfully");
+      setSelectedDeletedModelStoreName([]);
 
       //then delete from adatabase
       const res = await fetch("/api/model", {
@@ -373,7 +382,7 @@ export default function AdminPanelDynamic() {
       setModels((prev) =>
         prev.filter((model) => !deletedId.includes(model.id))
       );
-      toast.success("Model deleted successfully");
+      toast.success("Model deleted from database successfully");
       //reset
       setSelectedDeletedModelId([]);
     } catch (error) {
@@ -517,7 +526,7 @@ export default function AdminPanelDynamic() {
               }}
             >
               <Button variant="contained" color="success" disabled>
-                Update
+                UpdatesetModels
               </Button>
               <Button variant="contained" color="error" disabled>
                 Delete
@@ -1191,11 +1200,20 @@ export default function AdminPanelDynamic() {
                                             setSelectedDeletedModelId(
                                               (prev) => [...prev, model.id]
                                             );
+                                            setSelectedDeletedModelStoreName(
+                                              (prev) => [...prev, model.model]
+                                            );
                                           } else {
                                             setSelectedDeletedModelId((prev) =>
                                               prev.filter(
                                                 (id) => id !== model.id
                                               )
+                                            );
+                                            setSelectedDeletedModelStoreName(
+                                              (prev) =>
+                                                prev.filter(
+                                                  (name) => name !== model.model
+                                                )
                                             );
                                           }
                                         }}
