@@ -8,7 +8,7 @@ async function uploadToGeoServer(
   storeName: string,
   isUpdate = false
 ) {
-  const workspace = "dudu"; // Default workspace
+  const workspace = "Dudu"; // Default workspace
 
   try {
     const geoUser = process.env.GEOSERVER_USER;
@@ -196,7 +196,7 @@ export async function DELETE(req: NextRequest): Promise<Response> {
     const geoUser = process.env.GEOSERVER_USER;
     const geoPass = process.env.GEOSERVER_PASSWORD;
     const geoUrl = process.env.NEXT_PUBLIC_GEOSERVER_URL;
-    const workspace = "dudu";
+    const workspace = "Dudu";
 
     const geoRes = await fetch(
       `${geoUrl}/geoserver/rest/workspaces/${workspace}/layers/${storeName}?recurse=true`,
