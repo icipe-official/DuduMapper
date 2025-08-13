@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
 import nodemailer from "nodemailer";
+import { toast } from "react-toastify";
 
 const prisma = new PrismaClient();
 
@@ -126,6 +127,19 @@ export async function GET() {
     console.error("Error fetching sent emails:", error);
     return NextResponse.json(
       { message: "Failed to fetch sent emails" },
+      { status: 500 }
+    );
+  }
+}
+//lets try to delete
+export async function DELETE() {
+  try {
+    await prisma.sentEmail.deleteMany(); // Deletes ALL rows
+    return NextResponse.json({ message: "Deleted" }, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting sent emails:", error);
+    return NextResponse.json(
+      { message: "Failed to delete sent emails" },
       { status: 500 }
     );
   }

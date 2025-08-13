@@ -316,6 +316,7 @@ function Newmap() {
     // Add other properties as needed
   }
   interface OrganizedLayers {
+    [key: string]: any;
     population: Layer[];
     predictiveModels: {
       generic: Layer[]; // Models without dates
@@ -689,6 +690,13 @@ function Newmap() {
   const renderLayerControls = () => {
     const organized = organizeLayersByStructure(wmtsLayers);
 
+    const layerMeta = {
+      diseaseCategory: "Diseases",
+      diseaseName: "  Visceral Leishmaniasis",
+      countryName: "Kenya",
+      countyName: " Turkana",
+    };
+
     return (
       <Collapse in={overlaysOpen} timeout="auto" unmountOnExit>
         <List>
@@ -697,7 +705,7 @@ function Newmap() {
             <ListItemIcon>
               <HealthAndSafety />
             </ListItemIcon>
-            <ListItemText primary="Diseases" />
+            <ListItemText primary={layerMeta.diseaseCategory} />
             {diseasesOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </ListItemButton>
 
@@ -708,7 +716,7 @@ function Newmap() {
                 <ListItemIcon>
                   <BugReportIcon />
                 </ListItemIcon>
-                <ListItemText primary="Visceral Leishmaniasis" />
+                <ListItemText primary={layerMeta.diseaseName} />
                 {leishOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
               </ListItemButton>
 
@@ -719,7 +727,7 @@ function Newmap() {
                     <ListItemIcon>
                       <LayersIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Kenya" />
+                    <ListItemText primary={layerMeta.countryName} />
                     {kenyaOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                   </ListItemButton>
 
@@ -733,7 +741,7 @@ function Newmap() {
                         <ListItemIcon>
                           <Place />
                         </ListItemIcon>
-                        <ListItemText primary="Turkana" />
+                        <ListItemText primary={layerMeta.countyName} />
                         {turkanaOpen ? (
                           <ChevronLeftIcon />
                         ) : (

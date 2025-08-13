@@ -391,6 +391,24 @@ export default function AdminPanelDynamic() {
     }
   };
 
+  //delete emails in database
+  const handleDeleteEmails = async () => {
+    try {
+      const res = await fetch("/api/sendEmail", {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        toast.success("Emails Deleted Successfully");
+      } else {
+        throw new Error("Failed to delete Emails");
+      }
+    } catch (error) {
+      console.error("Error deleting emails", error);
+      toast.error("Failed to delete emails");
+    }
+  };
+
   //restricting user access to admin
   useEffect(() => {
     if (
@@ -606,6 +624,17 @@ export default function AdminPanelDynamic() {
                 </TableBody>
               </Table>
             </TableContainer>
+            <Box>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleDeleteEmails}
+                disabled //</Box>={emails.length === 0}
+                sx={{ mt: 2 }}
+              >
+                Delete
+              </Button>
+            </Box>
           </>
         );
       case "Models":
