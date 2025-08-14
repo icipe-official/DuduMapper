@@ -269,7 +269,7 @@ function Newmap() {
 
   // Updated classification functions
   const extractModelType = (layerName: string): string | null => {
-    const modelTypes = ["AdaBoost", "CMP_Model", "GPR_Model", "GAM_Model"];
+    const modelTypes = ["AdaBoost"]; //AdaBoost", "CMP_Model", "GPR_Model", "GAM_Model];
     const lowerLayerName = layerName.toLowerCase();
 
     // Check for exact model type matches first
@@ -333,7 +333,7 @@ function Newmap() {
       },
     };
 
-    console.log("=== STARTING LAYER ORGANIZATION ===");
+    console.log("STARTING LAYER ORGANIZATION");
     console.log("Total layers to process:", layers.length);
 
     //from geoserver

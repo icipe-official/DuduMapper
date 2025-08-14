@@ -1377,7 +1377,7 @@ export default function AdminPanelDynamic() {
               >
                 Add
               </Button>
-              <Button
+              {/*<Button
                 variant="contained"
                 color="primary"
                 disabled={!selectModelEdit}
@@ -1388,7 +1388,7 @@ export default function AdminPanelDynamic() {
                 }}
               >
                 Update
-              </Button>
+              </Button>*/}
               <Button
                 variant="contained"
                 color="error"

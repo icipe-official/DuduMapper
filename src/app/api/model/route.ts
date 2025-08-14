@@ -68,6 +68,7 @@ export async function PUT(req: Request) {
     const updatedFields: any = {};
     if (body.year !== undefined) updatedFields.year = body.year;
     if (body.month !== undefined) updatedFields.month = body.month;
+    //if (body.title !== undefined) updatedFields.title = body.title;
 
     if (body.description !== undefined)
       updatedFields.description = body.description;
