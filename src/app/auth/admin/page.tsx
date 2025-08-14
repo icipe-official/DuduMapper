@@ -24,6 +24,9 @@ import {
   TextField,
   FormControlLabel,
   Checkbox,
+  FormControl,
+  Radio,
+  RadioGroup,
 } from "@mui/material";
 import {
   PieChart,
@@ -103,6 +106,7 @@ export default function AdminPanelDynamic() {
 
   //lets try to activate some buttons before others
   const [modelClicked, setModelClicked] = useState(false);
+  const [updateGeoModel, setUpdateGeoModel] = useState(false);
   const handleClose = () => {
     setOpenDialog(null);
   };
@@ -1115,6 +1119,31 @@ export default function AdminPanelDynamic() {
                               label="High Risk"
                             />
                           </Box>
+                          {/*check for model */}
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              {" "}
+                              Want To Update Tiff File?{" "}
+                            </Typography>
+                            <RadioGroup
+                              row
+                              value={updateGeoModel ? "yes" : "no"}
+                              onChange={(e) =>
+                                setUpdateGeoModel(e.target.value === "yes")
+                              }
+                            >
+                              <FormControlLabel
+                                value="yes"
+                                control={<Radio color="success" />}
+                                label="Yes"
+                              />
+                              <FormControlLabel
+                                value="no"
+                                control={<Radio color="success" />}
+                                label="No"
+                              />
+                            </RadioGroup>
+                          </Box>
                           <Box>
                             <Typography variant="subtitle2" gutterBottom>
                               Upload Geospatial{" "}
@@ -1124,6 +1153,7 @@ export default function AdminPanelDynamic() {
                               type="file"
                               accept=".tiff"
                               onChange={handleFileUpdateChange}
+                              disabled={!updateGeoModel}
                             />
                           </Box>
                         </Box>

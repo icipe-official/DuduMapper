@@ -74,8 +74,9 @@ export async function PUT(req: Request) {
     if (body.country !== undefined) updatedFields.country = body.country;
     if (body.region !== undefined) updatedFields.region = body.region;
 
-    if (typeof body.highRisk !== "boolean")
-      updatedFields.highRisk = body.highRsk;
+    if (typeof body.highRisk === "boolean")
+      updatedFields.highRisk = body.highRisk;
+
     //now check either 1 or 2 fields are updated
     if (Object.keys(updatedFields).length === 0) {
       console.error("No fields to update");

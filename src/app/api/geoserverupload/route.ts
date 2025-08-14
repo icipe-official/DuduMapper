@@ -22,6 +22,20 @@ async function uploadToGeoServer(
     // For updates, optionally delete the existing store
     if (isUpdate) {
       try {
+        //  Delete the layer
+        await fetch(
+          `${geoUrl}/geoserver/rest/workspaces/${workspace}/layers/${storeName}?recurse=true`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization:
+                "Basic " +
+                Buffer.from(`${geoUser}:${geoPass}`).toString("base64"),
+            },
+          }
+        );
+
+        //  Delete the coverage store
         await fetch(
           `${geoUrl}/geoserver/rest/workspaces/${workspace}/coveragestores/${storeName}?recurse=true`,
           {
