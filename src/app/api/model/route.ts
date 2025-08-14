@@ -8,6 +8,7 @@ const prisma = new PrismaClient();
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+
     const newModel = await prisma.vectorRiskData.create({
       data: {
         title: body.title,
@@ -68,7 +69,8 @@ export async function PUT(req: Request) {
     const updatedFields: any = {};
     if (body.year !== undefined) updatedFields.year = body.year;
     if (body.month !== undefined) updatedFields.month = body.month;
-    //if (body.title !== undefined) updatedFields.title = body.title;
+    if (body.title !== undefined) updatedFields.title = body.title;
+    //if (body.model !== undefined) updatedFields.model = body.model;
 
     if (body.description !== undefined)
       updatedFields.description = body.description;

@@ -847,6 +847,7 @@ export default function AdminPanelDynamic() {
                             <TextField
                               fullWidth
                               value={newModel.model || ""}
+                              disabled
                               onChange={(e) =>
                                 setNewModel({
                                   ...newModel,
@@ -1072,6 +1073,7 @@ export default function AdminPanelDynamic() {
                             <TextField
                               fullWidth
                               value={updateModel.model || ""}
+                              disabled
                               onChange={(e) =>
                                 setUpdatedModel({
                                   ...updateModel,
@@ -1336,7 +1338,7 @@ export default function AdminPanelDynamic() {
                         </p>
                         To avoid confusion when adding or updating models in
                         GeoServer, do NOT include the following in your model
-                        name:
+                        name (how you save the model name):
                         <ul>
                           <li>
                             ❌ Month (e.g., &quot;January&quot;,
@@ -1354,6 +1356,9 @@ export default function AdminPanelDynamic() {
                         ✅ Instead, use a descriptive and specific name that
                         uniquely identifies your model based on its purpose,
                         type, or feature.
+                        <br />
+                        ✅Adding or Updating: The Title Name should be the same
+                        as Model Name
                       </Typography>
                     </DialogContent>
                   </Dialog>
