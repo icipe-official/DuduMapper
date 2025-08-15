@@ -988,6 +988,7 @@ export default function AdminPanelDynamic() {
                                 })
                               }
                               size="small"
+                              disabled
                             />
                           </Box>
                           <Box>

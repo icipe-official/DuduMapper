@@ -1,6 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
 import { handleCors } from "@/lib/cors";
+
+// Helper function to delete layer & store from GeoServer
+async function deleteLayerAndStore(workspace: string, storeName: string) {
+  const geoUser = process.env.GEOSERVER_USER;
+  const geoPass = process.env.GEOSERVER_PASSWORD;
+  const geoUrl = process.env.NEXT_PUBLIC_GEOSERVER_URL;
+  const authHeader =
+    "Basic " + Buffer.from(`${geoUser}:${geoPass}`).toString("base64");
+
+  // 1️⃣ Get coverage (layer) name
+  let coverageName = storeName;
+  const covRes = await fetch(
+    `${geoUrl}/geoserver/rest/workspaces/${workspace}/coveragestores/${storeName}/coverages.json`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: authHeader,
+        Accept: "application/json",
+      },
+    }
+  );
+  if (covRes.ok) {
+    const covData = await covRes.json();
+    coverageName = covData?.coverages?.coverage?.[0]?.name || storeName;
+  }
+
+  // 2️⃣ Delete layer
+  await fetch(`${geoUrl}/geoserver/rest/layers/${coverageName}?recurse=true`, {
+    method: "DELETE",
+    headers: { Authorization: authHeader },
+  });
+
+  // 3️⃣ Delete store
+  await fetch(
+    `${geoUrl}/geoserver/rest/workspaces/${workspace}/coveragestores/${storeName}?recurse=true`,
+    {
+      method: "DELETE",
+      headers: { Authorization: authHeader },
+    }
+  );
+}
 
 // Helper function to upload file to GeoServer
 async function uploadToGeoServer(
@@ -8,86 +48,45 @@ async function uploadToGeoServer(
   storeName: string,
   isUpdate = false
 ) {
-  const workspace = "Dudu"; // Default workspace
+  const workspace = "Dudu";
+  const geoUser = process.env.GEOSERVER_USER;
+  const geoPass = process.env.GEOSERVER_PASSWORD;
+  const geoUrl = process.env.NEXT_PUBLIC_GEOSERVER_URL;
 
-  try {
-    const geoUser = process.env.GEOSERVER_USER;
-    const geoPass = process.env.GEOSERVER_PASSWORD;
-    const geoUrl = process.env.NEXT_PUBLIC_GEOSERVER_URL;
-
-    if (!geoUser || !geoPass || !geoUrl) {
-      throw new Error("Missing GeoServer credentials or URL");
-    }
-
-    // For updates, optionally delete the existing store
-    if (isUpdate) {
-      try {
-        //  Delete the layer
-        await fetch(
-          `${geoUrl}/geoserver/rest/workspaces/${workspace}/layers/${storeName}?recurse=true`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization:
-                "Basic " +
-                Buffer.from(`${geoUser}:${geoPass}`).toString("base64"),
-            },
-          }
-        );
-
-        //  Delete the coverage store
-        await fetch(
-          `${geoUrl}/geoserver/rest/workspaces/${workspace}/coveragestores/${storeName}?recurse=true`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization:
-                "Basic " +
-                Buffer.from(`${geoUser}:${geoPass}`).toString("base64"),
-            },
-          }
-        );
-      } catch (deleteError) {
-        console.log("Delete failed or not needed:", deleteError);
-      }
-    }
-
-    // Upload the file to create a new coverage store
-    const geoRes = await fetch(
-      `${geoUrl}/geoserver/rest/workspaces/${workspace}/coveragestores/${storeName}/file.geotiff`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization:
-            "Basic " + Buffer.from(`${geoUser}:${geoPass}`).toString("base64"),
-          "Content-Type": "image/tiff",
-        },
-        body: fileBuffer as unknown as BodyInit,
-      }
-    );
-
-    if (!geoRes.ok) {
-      const errorText = await geoRes.text();
-      console.error("Geoserver upload error", {
-        status: geoRes.status,
-        statusText: geoRes.statusText,
-        body: errorText,
-      });
-      throw new Error(
-        `GeoServer error (${geoRes.status} ${geoRes.statusText}) : ${errorText}`
-      );
-    }
-
-    const layerName = await getLayerName(workspace, storeName);
-
-    return { success: true, storeName, layerName, workspace };
-  } catch (error) {
-    console.error("GeoServer upload failed:", error);
-    throw error;
+  if (!geoUser || !geoPass || !geoUrl) {
+    throw new Error("Missing GeoServer credentials or URL");
   }
+
+  if (isUpdate) {
+    await deleteLayerAndStore(workspace, storeName);
+  }
+
+  // Upload new GeoTIFF
+  const geoRes = await fetch(
+    `${geoUrl}/geoserver/rest/workspaces/${workspace}/coveragestores/${storeName}/file.geotiff`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization:
+          "Basic " + Buffer.from(`${geoUser}:${geoPass}`).toString("base64"),
+        "Content-Type": "image/tiff",
+      },
+      body: fileBuffer as unknown as BodyInit,
+    }
+  );
+
+  if (!geoRes.ok) {
+    const errorText = await geoRes.text();
+    throw new Error(
+      `GeoServer error (${geoRes.status} ${geoRes.statusText}) : ${errorText}`
+    );
+  }
+
+  const layerName = await getLayerName(workspace, storeName);
+  return { success: true, storeName, layerName, workspace };
 }
 
-// Fetch layer name from the uploaded coverage store
+// Fetch layer name from coverage store
 async function getLayerName(workspace: string, storeName: string) {
   try {
     const geoUser = process.env.GEOSERVER_USER;
@@ -109,27 +108,24 @@ async function getLayerName(workspace: string, storeName: string) {
     if (!layersRes.ok) throw new Error("Layer info fetch failed");
 
     const layersData = await layersRes.json();
-
     return layersData?.coverages?.coverage?.[0]?.name || storeName;
-  } catch (error) {
-    console.warn("Layer info fallback to storeName", error);
+  } catch {
     return storeName;
   }
 }
 
-// POST handler: Upload new GeoTIFF
+// POST: Upload new GeoTIFF
 export async function POST(req: NextRequest): Promise<Response> {
   const headers = handleCors(req);
-  if (headers instanceof NextResponse) return headers; // preflight
+  if (headers instanceof NextResponse) return headers;
 
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;
-
     if (!file) {
       return new NextResponse(JSON.stringify({ error: "No file uploaded" }), {
         status: 400,
-        headers: headers,
+        headers,
       });
     }
 
@@ -139,25 +135,22 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     const result = await uploadToGeoServer(fileBuffer, storeName, false);
 
-    return new NextResponse(JSON.stringify(result), {
-      status: 200,
-      headers: headers,
-    });
+    return new NextResponse(JSON.stringify(result), { status: 200, headers });
   } catch (error) {
     return new NextResponse(
       JSON.stringify({
         error: "File upload failed",
         details: error instanceof Error ? error.message : "Unknown error",
       }),
-      { status: 500, headers: headers }
+      { status: 500, headers }
     );
   }
 }
 
-// PUT handler: Replace existing store
+// PUT: Replace existing store
 export async function PUT(req: NextRequest): Promise<Response> {
   const headers = handleCors(req);
-  if (headers instanceof NextResponse) return headers; // preflight
+  if (headers instanceof NextResponse) return headers;
 
   try {
     const formData = await req.formData();
@@ -167,7 +160,7 @@ export async function PUT(req: NextRequest): Promise<Response> {
     if (!file) {
       return new NextResponse(JSON.stringify({ error: "No file uploaded" }), {
         status: 400,
-        headers: headers,
+        headers,
       });
     }
 
@@ -178,28 +171,23 @@ export async function PUT(req: NextRequest): Promise<Response> {
 
     const result = await uploadToGeoServer(fileBuffer, storeName, true);
 
-    return new NextResponse(JSON.stringify(result), {
-      status: 200,
-      headers: headers,
-    });
+    return new NextResponse(JSON.stringify(result), { status: 200, headers });
   } catch (error) {
     return new NextResponse(
       JSON.stringify({
         error: "File update failed",
         details: error instanceof Error ? error.message : "Unknown error",
       }),
-      { status: 500, headers: headers }
+      { status: 500, headers }
     );
   }
 }
 
-// DELETE handler: Remove store
-
+// DELETE: Remove store & layer
 export async function DELETE(req: NextRequest): Promise<Response> {
   try {
     const { searchParams } = new URL(req.url);
     const storeName = searchParams.get("storeName");
-
     if (!storeName) {
       return NextResponse.json(
         { error: "Store name is required" },
@@ -207,32 +195,10 @@ export async function DELETE(req: NextRequest): Promise<Response> {
       );
     }
 
-    const geoUser = process.env.GEOSERVER_USER;
-    const geoPass = process.env.GEOSERVER_PASSWORD;
-    const geoUrl = process.env.NEXT_PUBLIC_GEOSERVER_URL;
-    const workspace = "Dudu";
-
-    const geoRes = await fetch(
-      `${geoUrl}/geoserver/rest/workspaces/${workspace}/layers/${storeName}?recurse=true`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization:
-            "Basic " + Buffer.from(`${geoUser}:${geoPass}`).toString("base64"),
-        },
-      }
-    );
-
-    if (!geoRes.ok && geoRes.status !== 404) {
-      const errorText = await geoRes.text();
-      return NextResponse.json(
-        { error: "GeoServer deletion failed", details: errorText },
-        { status: geoRes.status }
-      );
-    }
+    await deleteLayerAndStore("Dudu", storeName);
 
     return NextResponse.json(
-      { message: "Store  deleted successfully from GeoServer" },
+      { message: "Layer and store deleted successfully from GeoServer" },
       { status: 200 }
     );
   } catch (error) {
