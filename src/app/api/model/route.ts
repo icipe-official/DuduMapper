@@ -11,6 +11,7 @@ export async function POST(req: Request) {
 
     const newModel = await prisma.vectorRiskData.create({
       data: {
+        displayName: body.displayName,
         title: body.title,
         country: body.country,
         region: body.region,
@@ -69,7 +70,9 @@ export async function PUT(req: Request) {
     const updatedFields: any = {};
     if (body.year !== undefined) updatedFields.year = body.year;
     if (body.month !== undefined) updatedFields.month = body.month;
-    if (body.title !== undefined) updatedFields.title = body.title;
+    if (body.displayName !== undefined)
+      updatedFields.displayName = body.displayName;
+
     //if (body.model !== undefined) updatedFields.model = body.model;
 
     if (body.description !== undefined)

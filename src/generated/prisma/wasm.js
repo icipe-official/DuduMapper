@@ -150,6 +150,7 @@ exports.Prisma.PasswordResetTokenScalarFieldEnum = {
 
 exports.Prisma.VectorRiskDataScalarFieldEnum = {
   id: 'id',
+  displayName: 'displayName',
   title: 'title',
   country: 'country',
   region: 'region',

@@ -4604,6 +4604,7 @@ export namespace Prisma {
 
   export type VectorRiskDataMinAggregateOutputType = {
     id: number | null
+    displayName: string | null
     title: string | null
     country: string | null
     region: string | null
@@ -4618,6 +4619,7 @@ export namespace Prisma {
 
   export type VectorRiskDataMaxAggregateOutputType = {
     id: number | null
+    displayName: string | null
     title: string | null
     country: string | null
     region: string | null
@@ -4632,6 +4634,7 @@ export namespace Prisma {
 
   export type VectorRiskDataCountAggregateOutputType = {
     id: number
+    displayName: number
     title: number
     country: number
     region: number
@@ -4660,6 +4663,7 @@ export namespace Prisma {
 
   export type VectorRiskDataMinAggregateInputType = {
     id?: true
+    displayName?: true
     title?: true
     country?: true
     region?: true
@@ -4674,6 +4678,7 @@ export namespace Prisma {
 
   export type VectorRiskDataMaxAggregateInputType = {
     id?: true
+    displayName?: true
     title?: true
     country?: true
     region?: true
@@ -4688,6 +4693,7 @@ export namespace Prisma {
 
   export type VectorRiskDataCountAggregateInputType = {
     id?: true
+    displayName?: true
     title?: true
     country?: true
     region?: true
@@ -4789,6 +4795,7 @@ export namespace Prisma {
 
   export type VectorRiskDataGroupByOutputType = {
     id: number
+    displayName: string
     title: string
     country: string
     region: string
@@ -4822,6 +4829,7 @@ export namespace Prisma {
 
   export type VectorRiskDataSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    displayName?: boolean
     title?: boolean
     country?: boolean
     region?: boolean
@@ -4838,6 +4846,7 @@ export namespace Prisma {
 
   export type VectorRiskDataSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    displayName?: boolean
     title?: boolean
     country?: boolean
     region?: boolean
@@ -4852,6 +4861,7 @@ export namespace Prisma {
 
   export type VectorRiskDataSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    displayName?: boolean
     title?: boolean
     country?: boolean
     region?: boolean
@@ -4866,6 +4876,7 @@ export namespace Prisma {
 
   export type VectorRiskDataSelectScalar = {
     id?: boolean
+    displayName?: boolean
     title?: boolean
     country?: boolean
     region?: boolean
@@ -4878,7 +4889,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type VectorRiskDataOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "country" | "region" | "year" | "month" | "model" | "description" | "highRisk" | "createdAt" | "updatedAt", ExtArgs["result"]["vectorRiskData"]>
+  export type VectorRiskDataOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "displayName" | "title" | "country" | "region" | "year" | "month" | "model" | "description" | "highRisk" | "createdAt" | "updatedAt", ExtArgs["result"]["vectorRiskData"]>
   export type VectorRiskDataInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     notifications?: boolean | VectorRiskData$notificationsArgs<ExtArgs>
     _count?: boolean | VectorRiskDataCountOutputTypeDefaultArgs<ExtArgs>
@@ -4893,6 +4904,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
+      displayName: string
       title: string
       country: string
       region: string
@@ -5328,6 +5340,7 @@ export namespace Prisma {
    */
   interface VectorRiskDataFieldRefs {
     readonly id: FieldRef<"VectorRiskData", 'Int'>
+    readonly displayName: FieldRef<"VectorRiskData", 'String'>
     readonly title: FieldRef<"VectorRiskData", 'String'>
     readonly country: FieldRef<"VectorRiskData", 'String'>
     readonly region: FieldRef<"VectorRiskData", 'String'>
@@ -6916,6 +6929,7 @@ export namespace Prisma {
 
   export const VectorRiskDataScalarFieldEnum: {
     id: 'id',
+    displayName: 'displayName',
     title: 'title',
     country: 'country',
     region: 'region',
@@ -7230,6 +7244,7 @@ export namespace Prisma {
     OR?: VectorRiskDataWhereInput[]
     NOT?: VectorRiskDataWhereInput | VectorRiskDataWhereInput[]
     id?: IntFilter<"VectorRiskData"> | number
+    displayName?: StringFilter<"VectorRiskData"> | string
     title?: StringFilter<"VectorRiskData"> | string
     country?: StringFilter<"VectorRiskData"> | string
     region?: StringFilter<"VectorRiskData"> | string
@@ -7245,6 +7260,7 @@ export namespace Prisma {
 
   export type VectorRiskDataOrderByWithRelationInput = {
     id?: SortOrder
+    displayName?: SortOrder
     title?: SortOrder
     country?: SortOrder
     region?: SortOrder
@@ -7263,6 +7279,7 @@ export namespace Prisma {
     AND?: VectorRiskDataWhereInput | VectorRiskDataWhereInput[]
     OR?: VectorRiskDataWhereInput[]
     NOT?: VectorRiskDataWhereInput | VectorRiskDataWhereInput[]
+    displayName?: StringFilter<"VectorRiskData"> | string
     title?: StringFilter<"VectorRiskData"> | string
     country?: StringFilter<"VectorRiskData"> | string
     region?: StringFilter<"VectorRiskData"> | string
@@ -7278,6 +7295,7 @@ export namespace Prisma {
 
   export type VectorRiskDataOrderByWithAggregationInput = {
     id?: SortOrder
+    displayName?: SortOrder
     title?: SortOrder
     country?: SortOrder
     region?: SortOrder
@@ -7300,6 +7318,7 @@ export namespace Prisma {
     OR?: VectorRiskDataScalarWhereWithAggregatesInput[]
     NOT?: VectorRiskDataScalarWhereWithAggregatesInput | VectorRiskDataScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"VectorRiskData"> | number
+    displayName?: StringWithAggregatesFilter<"VectorRiskData"> | string
     title?: StringWithAggregatesFilter<"VectorRiskData"> | string
     country?: StringWithAggregatesFilter<"VectorRiskData"> | string
     region?: StringWithAggregatesFilter<"VectorRiskData"> | string
@@ -7565,6 +7584,7 @@ export namespace Prisma {
   }
 
   export type VectorRiskDataCreateInput = {
+    displayName: string
     title: string
     country: string
     region: string
@@ -7580,6 +7600,7 @@ export namespace Prisma {
 
   export type VectorRiskDataUncheckedCreateInput = {
     id?: number
+    displayName: string
     title: string
     country: string
     region: string
@@ -7594,6 +7615,7 @@ export namespace Prisma {
   }
 
   export type VectorRiskDataUpdateInput = {
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string
@@ -7609,6 +7631,7 @@ export namespace Prisma {
 
   export type VectorRiskDataUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string
@@ -7624,6 +7647,7 @@ export namespace Prisma {
 
   export type VectorRiskDataCreateManyInput = {
     id?: number
+    displayName: string
     title: string
     country: string
     region: string
@@ -7637,6 +7661,7 @@ export namespace Prisma {
   }
 
   export type VectorRiskDataUpdateManyMutationInput = {
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string
@@ -7651,6 +7676,7 @@ export namespace Prisma {
 
   export type VectorRiskDataUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string
@@ -7977,6 +8003,7 @@ export namespace Prisma {
 
   export type VectorRiskDataCountOrderByAggregateInput = {
     id?: SortOrder
+    displayName?: SortOrder
     title?: SortOrder
     country?: SortOrder
     region?: SortOrder
@@ -7997,6 +8024,7 @@ export namespace Prisma {
 
   export type VectorRiskDataMaxOrderByAggregateInput = {
     id?: SortOrder
+    displayName?: SortOrder
     title?: SortOrder
     country?: SortOrder
     region?: SortOrder
@@ -8011,6 +8039,7 @@ export namespace Prisma {
 
   export type VectorRiskDataMinOrderByAggregateInput = {
     id?: SortOrder
+    displayName?: SortOrder
     title?: SortOrder
     country?: SortOrder
     region?: SortOrder
@@ -8664,6 +8693,7 @@ export namespace Prisma {
   }
 
   export type VectorRiskDataCreateWithoutNotificationsInput = {
+    displayName: string
     title: string
     country: string
     region: string
@@ -8678,6 +8708,7 @@ export namespace Prisma {
 
   export type VectorRiskDataUncheckedCreateWithoutNotificationsInput = {
     id?: number
+    displayName: string
     title: string
     country: string
     region: string
@@ -8743,6 +8774,7 @@ export namespace Prisma {
   }
 
   export type VectorRiskDataUpdateWithoutNotificationsInput = {
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string
@@ -8757,6 +8789,7 @@ export namespace Prisma {
 
   export type VectorRiskDataUncheckedUpdateWithoutNotificationsInput = {
     id?: IntFieldUpdateOperationsInput | number
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string

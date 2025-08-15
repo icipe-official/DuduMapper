@@ -68,6 +68,7 @@ interface SentEmail {
 }
 interface Model {
   id: string;
+  displayName: string;
   title: string;
   country: string;
   region: string;
@@ -193,6 +194,7 @@ export default function AdminPanelDynamic() {
   }, [selectedSection]);
   //adding models
   const [newModel, setNewModel] = useState<Partial<Model>>({
+    displayName: "",
     title: "",
     country: "",
     region: "",
@@ -205,6 +207,7 @@ export default function AdminPanelDynamic() {
   //updating model
   const [updateModel, setUpdatedModel] = useState<Partial<Model>>({
     id: "",
+    displayName: "",
     title: "",
     country: "",
     region: "",
@@ -307,6 +310,7 @@ export default function AdminPanelDynamic() {
       const added = await res.json();
       setModels((prev) => [...prev, added]);
       setNewModel({
+        displayName: "",
         title: "",
         country: "",
         region: "",
@@ -338,6 +342,7 @@ export default function AdminPanelDynamic() {
       );
       setUpdatedModel({
         id: "",
+        displayName: "",
         title: "",
         country: "",
         region: "",
@@ -656,6 +661,7 @@ export default function AdminPanelDynamic() {
                 <TableHead>
                   <TableRow>
                     <TableCell>ID</TableCell>
+                    <TableCell>Display Name</TableCell>
                     <TableCell>Title</TableCell>
                     <TableCell>Country</TableCell>
                     <TableCell>Region</TableCell>
@@ -675,6 +681,7 @@ export default function AdminPanelDynamic() {
                   {model.map((model) => (
                     <TableRow key={model.id}>
                       <TableCell>{model.id}</TableCell>
+                      <TableCell>{model.displayName}</TableCell>
                       <TableCell>{model.title}</TableCell>
                       <TableCell>{model.country}</TableCell>
                       <TableCell>{model.region}</TableCell>
@@ -740,6 +747,23 @@ export default function AdminPanelDynamic() {
                               fullWidth
                               value={newModel.id || "Auto"}
                               disabled
+                              size="small"
+                            />
+                          </Box>
+
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              DisplayName
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={newModel.displayName || ""}
+                              onChange={(e) =>
+                                setNewModel({
+                                  ...newModel,
+                                  displayName: e.target.value,
+                                })
+                              }
                               size="small"
                             />
                           </Box>
@@ -923,6 +947,7 @@ export default function AdminPanelDynamic() {
                           variant="contained"
                           color="success"
                           disabled={
+                            !newModel.displayName ||
                             !newModel.title ||
                             !newModel.country ||
                             !newModel.region ||
@@ -974,6 +999,23 @@ export default function AdminPanelDynamic() {
                               size="small"
                             />
                           </Box>
+                          <Box>
+                            <Typography variant="subtitle2" gutterBottom>
+                              DisplayName
+                            </Typography>
+                            <TextField
+                              fullWidth
+                              value={updateModel.displayName || ""}
+                              onChange={(e) =>
+                                setUpdatedModel({
+                                  ...updateModel,
+                                  displayName: e.target.value,
+                                })
+                              }
+                              size="small"
+                            />
+                          </Box>
+
                           <Box>
                             <Typography variant="subtitle2" gutterBottom>
                               Title
@@ -1172,6 +1214,7 @@ export default function AdminPanelDynamic() {
                           variant="contained"
                           color="success"
                           disabled={
+                            !updateModel.displayName ||
                             !updateModel.title ||
                             !updateModel.model ||
                             !updateModel.country ||
