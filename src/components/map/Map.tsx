@@ -282,7 +282,7 @@ function Newmap() {
     // Check for other model patterns
 
     if (lowerLayerName.includes("idw_model")) return "DEC_IDW_Model";
-    if (lowerLayerName.includes("vl")) return "VL";
+    //if (lowerLayerName.includes("vl")) return "VL";
     if (lowerLayerName.match(/\bmay\s?2025\b/i)) return "Dated_Model";
 
     return null;
@@ -303,11 +303,13 @@ function Newmap() {
     year: string;
     month: string;
     modelType: string;
+    displayName: string;
   }
   // Updated organization structure
   interface Layer {
     title?: string;
     name?: string;
+    displayName?: string;
     group?: {
       groupTitle?: string;
     };
@@ -338,7 +340,7 @@ function Newmap() {
 
     //from geoserver
     layers.forEach((layer, index) => {
-      const identifier = layer.title || layer.name || "";
+      const identifier = layer.displayName || layer.title || layer.name || "";
       console.log(`\n--- Processing Layer ${index + 1}/${layers.length} ---`);
       console.log("Layer identifier:", identifier);
 
@@ -422,7 +424,7 @@ function Newmap() {
           "November",
           "December",
         ];
-        return monthNames[monthNumber - 1] || "iNVALID MONTH";
+        return monthNames[monthNumber - 1] || "Invalid MONTH";
       };
 
       const matchingLayer = layers.find(
@@ -477,16 +479,28 @@ function Newmap() {
         console.error("GeoServer base URL is not set");
         return;
       }
+
       try {
         const layers = await fetchWMTSCapabilities();
-        console.log("Fetched WMTS layers:", layers);
-        setWmtsLayers(layers);
+        //lets try to merge this with db for fetching
+        const mergedb = layers.map((layer) => {
+          const meta = genericModelMetadata.find(
+            (meta) => meta.name === layer.name || meta.title === layer.title
+          );
+
+          return {
+            ...layer,
+            displayName: meta?.displayName || layer.title,
+          };
+        });
+        //changed from layes to mergedb
+        setWmtsLayers(mergedb);
       } catch (error) {
         console.error("Error fetching capabilities:", error);
       }
     };
     fetchLayers();
-  }, []);
+  }, [genericModelMetadata]);
 
   // ── Initialize the Map (same as your second code) ──
   useEffect(() => {
@@ -522,6 +536,7 @@ function Newmap() {
             return new TileLayer({
               properties: {
                 title: layer.title,
+                displayName: layer.displayName,
                 type: "overlay",
               },
               visible: false,
@@ -667,8 +682,11 @@ function Newmap() {
       const newVisibility = !layer.getVisible();
       layer.setVisible(newVisibility);
       if (newVisibility) {
-        setActiveLayerName(layer.get("title"));
-      } else if (activeLayerName === layer.get("title")) {
+        setActiveLayerName(layer.get("displayName") || layer.get("title"));
+      } else if (
+        activeLayerName === layer.get("displayName") ||
+        activeLayerName === layer.get("title")
+      ) {
         setActiveLayerName(null);
       }
     }
@@ -827,15 +845,22 @@ function Newmap() {
                                                             .find(
                                                               (l) =>
                                                                 l.get(
+                                                                  "displayName"
+                                                                ) ===
+                                                                  layer.displayName ||
+                                                                l.get(
                                                                   "title"
                                                                 ) ===
-                                                                layer.title
+                                                                  layer.title
                                                             )
                                                         : null;
 
                                                     return (
                                                       <ListItemButton
-                                                        key={layer.title}
+                                                        key={
+                                                          layer.displayName ||
+                                                          layer.title
+                                                        }
                                                         sx={{ pl: 12 }}
                                                         onClick={() =>
                                                           handleLayerToggle(
@@ -855,6 +880,7 @@ function Newmap() {
                                                         />
                                                         <ListItemText
                                                           primary={
+                                                            layer.displayName ||
                                                             layer.title ||
                                                             layer.name ||
                                                             "Untitled Layer"
@@ -915,13 +941,18 @@ function Newmap() {
                                       .getLayers()
                                       .getArray()
                                       .find(
-                                        (l) => l.get("title") === layer.title
+                                        (l) =>
+                                          l.get("displayName") ===
+                                            layer.displayName ||
+                                          l.get("title") ===
+                                            layer.displayName ||
+                                          layer.title
                                       )
                                   : null;
 
                               return (
                                 <ListItemButton
-                                  key={layer.title}
+                                  key={layer.displayName || layer.title}
                                   sx={{ pl: 10 }}
                                   onClick={() => handleLayerToggle(olLayer)}
                                 >
@@ -934,7 +965,10 @@ function Newmap() {
                                   />
                                   <ListItemText
                                     primary={
-                                      layer.title || layer.name || "Unnamed"
+                                      layer.displayName ||
+                                      layer.title ||
+                                      layer.name ||
+                                      "Unnamed"
                                     }
                                   />
                                 </ListItemButton>
@@ -980,7 +1014,12 @@ function Newmap() {
                                       .getLayers()
                                       .getArray()
                                       .find(
-                                        (l) => l.get("title") === layer.title
+                                        (l) =>
+                                          l.get("displayName") ===
+                                            layer.displayName ||
+                                          l.get("title") ===
+                                            layer.displayName ||
+                                          layer.title
                                       )
                                   : null;
 
@@ -997,7 +1036,9 @@ function Newmap() {
                                     color="success"
                                     disableRipple
                                   />
-                                  <ListItemText primary={layer.title} />
+                                  <ListItemText
+                                    primary={layer.displayName || layer.title}
+                                  />
                                 </ListItemButton>
                               );
                             })}
