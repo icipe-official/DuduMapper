@@ -944,9 +944,7 @@ function Newmap() {
                                         (l) =>
                                           l.get("displayName") ===
                                             layer.displayName ||
-                                          l.get("title") ===
-                                            layer.displayName ||
-                                          layer.title
+                                          l.get("title") === layer.title
                                       )
                                   : null;
 
@@ -1014,12 +1012,7 @@ function Newmap() {
                                       .getLayers()
                                       .getArray()
                                       .find(
-                                        (l) =>
-                                          l.get("displayName") ===
-                                            layer.displayName ||
-                                          l.get("title") ===
-                                            layer.displayName ||
-                                          layer.title
+                                        (l) => l.get("title") === layer.title
                                       )
                                   : null;
 
@@ -1036,9 +1029,7 @@ function Newmap() {
                                     color="success"
                                     disableRipple
                                   />
-                                  <ListItemText
-                                    primary={layer.displayName || layer.title}
-                                  />
+                                  <ListItemText primary={layer.title} />
                                 </ListItemButton>
                               );
                             })}
