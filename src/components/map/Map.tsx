@@ -120,6 +120,9 @@ function Newmap() {
   // Add these new state variables after your existing ones
   const [populationOpen, setPopulationOpen] = useState(false);
   const [predictiveModelsOpen, setPredictiveModelsOpen] = useState(false);
+  const [expandedCountry, setExpandedCountry] = useState<
+    Record<string, boolean>
+  >({});
   const [expandedYears, setExpandedYears] = useState<Record<string, boolean>>(
     {}
   );
@@ -149,6 +152,7 @@ function Newmap() {
   // States for map layers and active layer name
   const [wmtsLayers, setWmtsLayers] = useState<any[]>([]);
   const [activeLayerName, setActiveLayerName] = useState<string | null>(null);
+  const [activeTitleName, setActiveTitleName] = useState<string | null>(null);
 
   // States for drawer and layer control UI
   const [open, setOpen] = useState(true); // default to open
@@ -202,7 +206,12 @@ function Newmap() {
       [year]: !prev[year],
     }));
   };
-
+  const handleCountry = (country: string) => {
+    setExpandedCountry((prev) => ({
+      ...prev,
+      [country]: !prev[country],
+    }));
+  };
   const handleMonthClick = (year: string, month: string) => {
     const key = `${year}-${month}`;
     console.log("Month clicked:", key);
@@ -282,8 +291,8 @@ function Newmap() {
     // Check for other model patterns
 
     if (lowerLayerName.includes("idw_model")) return "DEC_IDW_Model";
-    //if (lowerLayerName.includes("vl")) return "VL";
-    if (lowerLayerName.match(/\bmay\s?2025\b/i)) return "Dated_Model";
+    if (lowerLayerName.includes("vl")) return "VL";
+    //if (lowerLayerName.match(/\bmay\s?2025\b/i)) return "Dated_Model";
 
     return null;
   };
@@ -683,6 +692,7 @@ function Newmap() {
       layer.setVisible(newVisibility);
       if (newVisibility) {
         setActiveLayerName(layer.get("displayName") || layer.get("title"));
+        setActiveTitleName(layer.get("title"));
       } else if (
         activeLayerName === layer.get("displayName") ||
         activeLayerName === layer.get("title")
@@ -1072,7 +1082,7 @@ function Newmap() {
           </div>
         )}
       </div>
-      <Legend layerName={activeLayerName} />
+      <Legend layerName={activeTitleName} />
       {/*inline*/}
       <style>
         {`
@@ -1190,7 +1200,7 @@ function Newmap() {
             position: "relative",
           }}
         ></div>
-        <Legend layerName={activeLayerName} />
+        <Legend layerName={activeTitleName} />
         {/* Download Popup moved outside drawer */}
         <Dialog
           open={downloadPopupOpen}
