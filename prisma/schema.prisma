@@ -42,7 +42,7 @@ model PasswordResetToken {
 
 model VectorRiskData {
   id            Int            @id @default(autoincrement())
-  displayName   String         @db.VarChar(100)
+  displayName   String?         @db.VarChar(100)
   title         String         @db.VarChar(100)
   country       String         @db.VarChar(100)
   region        String         @db.VarChar(100)
