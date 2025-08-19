@@ -240,12 +240,12 @@ function Newmap() {
     if (yearMatch) return yearMatch[1];
 
     // fallback logic for IDW models that have a month but no year
-    if (
+    /* if (
       layerName.toLowerCase().includes("idw_model") &&
       extractMonth(layerName)
     ) {
-      return "2025"; // fallback assumption
-    }
+      return "2024"; // fallback assumption
+    }*/
 
     return null;
   };
