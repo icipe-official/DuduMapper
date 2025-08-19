@@ -4795,7 +4795,7 @@ export namespace Prisma {
 
   export type VectorRiskDataGroupByOutputType = {
     id: number
-    displayName: string | null
+    displayName: string
     title: string
     country: string
     region: string
@@ -4904,7 +4904,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      displayName: string | null
+      displayName: string
       title: string
       country: string
       region: string
@@ -7244,7 +7244,7 @@ export namespace Prisma {
     OR?: VectorRiskDataWhereInput[]
     NOT?: VectorRiskDataWhereInput | VectorRiskDataWhereInput[]
     id?: IntFilter<"VectorRiskData"> | number
-    displayName?: StringNullableFilter<"VectorRiskData"> | string | null
+    displayName?: StringFilter<"VectorRiskData"> | string
     title?: StringFilter<"VectorRiskData"> | string
     country?: StringFilter<"VectorRiskData"> | string
     region?: StringFilter<"VectorRiskData"> | string
@@ -7260,7 +7260,7 @@ export namespace Prisma {
 
   export type VectorRiskDataOrderByWithRelationInput = {
     id?: SortOrder
-    displayName?: SortOrderInput | SortOrder
+    displayName?: SortOrder
     title?: SortOrder
     country?: SortOrder
     region?: SortOrder
@@ -7279,7 +7279,7 @@ export namespace Prisma {
     AND?: VectorRiskDataWhereInput | VectorRiskDataWhereInput[]
     OR?: VectorRiskDataWhereInput[]
     NOT?: VectorRiskDataWhereInput | VectorRiskDataWhereInput[]
-    displayName?: StringNullableFilter<"VectorRiskData"> | string | null
+    displayName?: StringFilter<"VectorRiskData"> | string
     title?: StringFilter<"VectorRiskData"> | string
     country?: StringFilter<"VectorRiskData"> | string
     region?: StringFilter<"VectorRiskData"> | string
@@ -7295,7 +7295,7 @@ export namespace Prisma {
 
   export type VectorRiskDataOrderByWithAggregationInput = {
     id?: SortOrder
-    displayName?: SortOrderInput | SortOrder
+    displayName?: SortOrder
     title?: SortOrder
     country?: SortOrder
     region?: SortOrder
@@ -7318,7 +7318,7 @@ export namespace Prisma {
     OR?: VectorRiskDataScalarWhereWithAggregatesInput[]
     NOT?: VectorRiskDataScalarWhereWithAggregatesInput | VectorRiskDataScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"VectorRiskData"> | number
-    displayName?: StringNullableWithAggregatesFilter<"VectorRiskData"> | string | null
+    displayName?: StringWithAggregatesFilter<"VectorRiskData"> | string
     title?: StringWithAggregatesFilter<"VectorRiskData"> | string
     country?: StringWithAggregatesFilter<"VectorRiskData"> | string
     region?: StringWithAggregatesFilter<"VectorRiskData"> | string
@@ -7584,7 +7584,7 @@ export namespace Prisma {
   }
 
   export type VectorRiskDataCreateInput = {
-    displayName?: string | null
+    displayName: string
     title: string
     country: string
     region: string
@@ -7600,7 +7600,7 @@ export namespace Prisma {
 
   export type VectorRiskDataUncheckedCreateInput = {
     id?: number
-    displayName?: string | null
+    displayName: string
     title: string
     country: string
     region: string
@@ -7615,7 +7615,7 @@ export namespace Prisma {
   }
 
   export type VectorRiskDataUpdateInput = {
-    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string
@@ -7631,7 +7631,7 @@ export namespace Prisma {
 
   export type VectorRiskDataUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
-    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string
@@ -7647,7 +7647,7 @@ export namespace Prisma {
 
   export type VectorRiskDataCreateManyInput = {
     id?: number
-    displayName?: string | null
+    displayName: string
     title: string
     country: string
     region: string
@@ -7661,7 +7661,7 @@ export namespace Prisma {
   }
 
   export type VectorRiskDataUpdateManyMutationInput = {
-    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string
@@ -7676,7 +7676,7 @@ export namespace Prisma {
 
   export type VectorRiskDataUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
-    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string
@@ -8693,7 +8693,7 @@ export namespace Prisma {
   }
 
   export type VectorRiskDataCreateWithoutNotificationsInput = {
-    displayName?: string | null
+    displayName: string
     title: string
     country: string
     region: string
@@ -8708,7 +8708,7 @@ export namespace Prisma {
 
   export type VectorRiskDataUncheckedCreateWithoutNotificationsInput = {
     id?: number
-    displayName?: string | null
+    displayName: string
     title: string
     country: string
     region: string
@@ -8774,7 +8774,7 @@ export namespace Prisma {
   }
 
   export type VectorRiskDataUpdateWithoutNotificationsInput = {
-    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string
@@ -8789,7 +8789,7 @@ export namespace Prisma {
 
   export type VectorRiskDataUncheckedUpdateWithoutNotificationsInput = {
     id?: IntFieldUpdateOperationsInput | number
-    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     region?: StringFieldUpdateOperationsInput | string
