@@ -291,8 +291,8 @@ function Newmap() {
     // Check for other model patterns
 
     if (lowerLayerName.includes("idw_model")) return "DEC_IDW_Model";
-    if (lowerLayerName.includes("vl")) return "VL";
-    //if (lowerLayerName.match(/\bmay\s?2025\b/i)) return "Dated_Model";
+    //if (lowerLayerName.includes("vl")) return "VL";
+    if (lowerLayerName.match(/\bmay\s?2025\b/i)) return "Dated_Model";
 
     return null;
   };
@@ -483,6 +483,9 @@ function Newmap() {
 
   // ── Fetch WMTS Layers (remains as in the second code) ──
   useEffect(() => {
+    //wait untl displayName loads
+
+    if (!genericModelMetadata.length) return;
     const fetchLayers = async () => {
       if (!geoServerBaseUrl) {
         console.error("GeoServer base URL is not set");
