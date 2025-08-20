@@ -8,6 +8,7 @@ import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
+import SearchIcon from "@mui/icons-material/Search";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -25,6 +26,7 @@ import {
   CalendarMonth,
   DateRange,
   ModelTraining,
+  Download,
 } from "@mui/icons-material";
 
 import Collapse from "@mui/material/Collapse";
@@ -57,6 +59,7 @@ import { Options as LayerGroupOptions } from "ol/layer/Group";
 import { FaGlobe, FaMapMarkerAlt } from "react-icons/fa";
 
 import { HealthAndSafety } from "@mui/icons-material";
+import { Button } from "@mui/material";
 
 // ─── Constants & Styled Components ────────────────────────────────────────────
 
@@ -1190,6 +1193,21 @@ function Newmap() {
           </DrawerHeader>
           <Divider />
           <List>{renderLayerControls()}</List>
+          <List sx={{ pl: 2 }}>
+            <ListItem disablePadding>
+              {" "}
+              <Download />
+              <ListItemButton
+                sx={{
+                  color: downloadPopupOpen ? green[600] : "inherit",
+                  pl: 4,
+                }}
+                onClick={() => setDownloadPopupOpen(true)}
+              >
+                <ListItemText primary="Download Map Data" />
+              </ListItemButton>
+            </ListItem>
+          </List>
         </Drawer>
 
         <div
@@ -1231,6 +1249,9 @@ function Newmap() {
               }}
             >
               <Typography variant="h6">Download Map Data</Typography>
+              <Typography variant="body1">Select a filter:</Typography>
+              <SearchIcon />
+
               <IconButton onClick={() => setDownloadPopupOpen(false)}>
                 <CloseIcon />
               </IconButton>

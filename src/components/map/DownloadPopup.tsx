@@ -36,7 +36,7 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
   onClose,
   cqlFilter,
 }) => {
-  const [format, setFormat] = useState("shp");
+  const [format, setFormat] = useState("tiff");
   const [selectedLayers, setSelectedLayers] = useState<string[]>([]);
   const [areaOfInterest, setAreaOfInterest] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,10 +44,12 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
   const [success, setSuccess] = useState(false);
 
   const formats = [
+    { value: "tiff", label: "TIFF" },
     { value: "shp", label: "Shapefile (SHP)" },
     { value: "geojson", label: "GeoJSON" },
     { value: "kml", label: "KML" },
     { value: "csv", label: "CSV" },
+    { value: "xlsx", label: "Excel (XLSX)" },
   ];
 
   const handleFormatChange = (event: SelectChangeEvent<string>) => {
