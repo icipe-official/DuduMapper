@@ -136,6 +136,12 @@ function Newmap() {
   const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>(
     {}
   );
+  const [expandedGenericModels, setExpandedGenericModels] = useState<
+    Record<string, boolean>
+  >({});
+  const [expandedPopulation, setExpandedPopulation] = useState<
+    Record<string, boolean>
+  >({});
   const [expandedModelTypes, setExpandedModelTypes] = useState<
     Record<string, boolean>
   >({});
@@ -224,6 +230,20 @@ function Newmap() {
     setExpandedRegion((prev) => ({
       ...prev,
       [region]: !prev[region],
+    }));
+  };
+  const handlePopulation = (country: string, region: string) => {
+    const key = `${country}-${region}`;
+    setExpandedPopulation((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+  const handleGenericModels = (country: string, region: string) => {
+    const key = `${country}-${region}`;
+    setExpandedGenericModels((prev) => ({
+      ...prev,
+      [key]: !prev[key],
     }));
   };
   const handleMonthClick = (
@@ -388,21 +408,40 @@ function Newmap() {
     // Add other properties as needed
   }
   interface OrganizedLayers {
-    [key: string]: any;
-    population: Layer[];
-    predictiveModels: {
-      generic: Layer[]; // Models without dates
-      dated: Record<string, Record<string, Record<string, Layer[]>>>; // Year > Month > ModelType > Layers
+    //[key: string]: any;
+    [country: string]: {
+      [region: string]: {
+        population: Layer[];
+        predictiveModels: {
+          generic: Layer[]; // Models without dates
+          dated: Record<string, Record<string, Record<string, Layer[]>>>; // Year > Month > ModelType > Layers
+        };
+      };
     };
   }
-
+  const extractCountry = (layerName: string): string => {
+    const countryMatch = layerName.match(/\b([A-Za-z]+)\b/);
+    return countryMatch ? countryMatch[1] : "UnknownCountry";
+  };
+  const extractRegion = (layerName: string): string => {
+    const regionMatch = layerName.match(/\b([A-Za-z]+)\b/);
+    return regionMatch ? regionMatch[1] : "UnknownRegion";
+  };
   const organizeLayersByStructure = (layers: Layer[]): OrganizedLayers => {
-    const organized: OrganizedLayers = {
-      population: [],
-      predictiveModels: {
-        generic: [],
-        dated: {},
-      },
+    const organized: OrganizedLayers = {};
+    const ensureRegion = (country: string, region: string) => {
+      if (!organized[country]) {
+        organized[country] = {};
+      }
+      if (!organized[country][region]) {
+        organized[country][region] = {
+          population: [],
+          predictiveModels: {
+            generic: [],
+            dated: {},
+          },
+        };
+      }
     };
 
     console.log("STARTING LAYER ORGANIZATION");
@@ -415,12 +454,30 @@ function Newmap() {
       console.log("Layer identifier:", identifier);
 
       if (isPopulationLayer(identifier)) {
+        const country = extractCountry(identifier) || "UnknownCountry";
+        const region = extractRegion(identifier) || "UnknownRegion";
         console.log("Adding to population:", identifier);
-        organized.population.push(layer);
+
+        /*if (!organized[country]) {
+          organized[country] = {};
+        }
+        if (!organized[country][region]) {
+          organized[country][region] = {
+            population: [],
+            predictiveModels: {
+              generic: [],
+              dated: {},
+            },
+          };
+        }*/
+        ensureRegion(country, region);
+        organized[country][region].population.push(layer);
         return;
       }
 
       if (isPredictiveModelLayer(identifier)) {
+        const country = extractCountry(identifier);
+        const region = extractRegion(identifier);
         const year = extractYear(identifier);
         const month = extractMonth(identifier);
         const modelType = extractModelType(identifier);
@@ -429,27 +486,39 @@ function Newmap() {
         console.log("- Year:", year);
         console.log("- Month:", month);
         console.log("- Model Type:", modelType);
+        /*if (!organized[country]) {
+          organized[country] = {};
+        }*/
 
+        ensureRegion(country, region);
         if (year && month && modelType) {
           // Dated model
           console.log(" Adding to dated predictive models:", identifier);
 
-          if (!organized.predictiveModels.dated[year]) {
-            organized.predictiveModels.dated[year] = {};
+          if (!organized[country][region].predictiveModels.dated[year]) {
+            organized[country][region].predictiveModels.dated[year] = {};
             console.log(`Created year group: ${year}`);
           }
-          if (!organized.predictiveModels.dated[year][month]) {
-            organized.predictiveModels.dated[year][month] = {};
+          if (!organized[country][region].predictiveModels.dated[year][month]) {
+            organized[country][region].predictiveModels.dated[year][month] = {};
             console.log(`Created month group: ${year}-${month}`);
           }
-          if (!organized.predictiveModels.dated[year][month][modelType]) {
-            organized.predictiveModels.dated[year][month][modelType] = [];
+          if (
+            !organized[country][region].predictiveModels.dated[year][month][
+              modelType
+            ]
+          ) {
+            organized[country][region].predictiveModels.dated[year][month][
+              modelType
+            ] = [];
             console.log(
               `Created model type group: ${year}-${month}-${modelType}`
             );
           }
 
-          organized.predictiveModels.dated[year][month][modelType].push(layer);
+          organized[country][region].predictiveModels.dated[year][month][
+            modelType
+          ].push(layer);
           console.log(`Added dated layer to: ${year}-${month}-${modelType}`);
         } else if (modelType) {
           // Generic model (no date info)
@@ -457,7 +526,7 @@ function Newmap() {
           if (!genericMetadataNames.has(identifier)) {
             console.log("Adding to generic models", identifier);
             //present line for pushing if check from geoserver only
-            organized.predictiveModels.generic.push(layer);
+            organized[country][region].predictiveModels.generic.push(layer);
           } else {
             console.log("Skipping generic models:", identifier);
           }
@@ -467,16 +536,23 @@ function Newmap() {
       }
     });
 
-    console.log("\n=== FINAL ORGANIZATION RESULTS ===");
-    console.log("Population layers count:", organized.population.length);
-    console.log(
-      "Generic models count:",
-      organized.predictiveModels.generic.length
-    );
-    console.log(
-      "Dated models years:",
-      Object.keys(organized.predictiveModels.dated)
-    );
+    console.log("\nFINAL ORGANIZATION RESULTS");
+    Object.entries(organized).forEach(([country, regions]) => {
+      Object.entries(regions).forEach(([region, data]) => {
+        console.log(
+          `Population layers count for ${country} - ${region}:`,
+          data.population.length
+        );
+        console.log(
+          `Generic models count for ${country} - ${region}:`,
+          data.predictiveModels.generic.length
+        );
+        console.log(
+          `Dated models years for ${country} - ${region}:`,
+          Object.keys(data.predictiveModels.dated)
+        );
+      });
+    });
     //from database, choosing generic model for now
     genericModelMetadata.forEach((meta) => {
       const getMonthName = (monthNumber: number): string => {
@@ -502,24 +578,33 @@ function Newmap() {
       );
 
       if (matchingLayer) {
-        //const { year, month, modelType } = meta;
+        //const { country, regionyear, month, modelType } = meta;
+        const country = meta.country;
+        const region = meta.region;
         const year = meta.year;
         const modelType = meta.modelType;
         const month = getMonthName(parseInt(meta.month));
 
-        if (!organized.predictiveModels.dated[year]) {
-          organized.predictiveModels.dated[year] = {};
+        ensureRegion(country, region);
+        if (!organized[country][region].predictiveModels.dated[year]) {
+          organized[country][region].predictiveModels.dated[year] = {};
         }
-        if (!organized.predictiveModels.dated[year][month]) {
-          organized.predictiveModels.dated[year][month] = {};
+        if (!organized[country][region].predictiveModels.dated[year][month]) {
+          organized[country][region].predictiveModels.dated[year][month] = {};
         }
-        if (!organized.predictiveModels.dated[year][month][modelType]) {
-          organized.predictiveModels.dated[year][month][modelType] = [];
+        if (
+          !organized[country][region].predictiveModels.dated[year][month][
+            modelType
+          ]
+        ) {
+          organized[country][region].predictiveModels.dated[year][month][
+            modelType
+          ] = [];
         }
 
-        organized.predictiveModels.dated[year][month][modelType].push(
-          matchingLayer
-        );
+        organized[country][region].predictiveModels.dated[year][month][
+          modelType
+        ].push(matchingLayer);
       }
     });
 
@@ -876,7 +961,9 @@ function Newmap() {
                                             >
                                               {/* Dated Predictive Models */}
                                               {Object.entries(
-                                                organized.predictiveModels.dated
+                                                organized[country]?.[region]
+                                                  ?.predictiveModels?.dated ||
+                                                  {}
                                               ).map(([year, months]) => (
                                                 <React.Fragment key={year}>
                                                   <ListItemButton
@@ -1060,8 +1147,11 @@ function Newmap() {
                                               {/* Generic Predictive Models */}
                                               <ListItemButton
                                                 sx={{ pl: 8 }}
-                                                onClick={
-                                                  handleGenericModelsClick
+                                                onClick={() =>
+                                                  handleGenericModels(
+                                                    country,
+                                                    region
+                                                  )
                                                 }
                                               >
                                                 <ListItemIcon>
@@ -1069,7 +1159,7 @@ function Newmap() {
                                                 </ListItemIcon>
 
                                                 <ListItemText primary="Generic Models" />
-                                                {genericModelsOpen ? (
+                                                {expandedGenericModels ? (
                                                   <ChevronLeftIcon />
                                                 ) : (
                                                   <ChevronRightIcon />
@@ -1084,81 +1174,87 @@ function Newmap() {
                                                   component="div"
                                                   disablePadding
                                                 >
-                                                  {organized.predictiveModels.generic.map(
-                                                    (layer) => {
-                                                      const group =
-                                                        mapRef.current
-                                                          ?.getLayers()
-                                                          .getArray()
-                                                          .find(
-                                                            (l) =>
-                                                              l.get("title") ===
-                                                              (layer.group
-                                                                ?.groupTitle ||
-                                                                "Ungrouped")
-                                                          );
-
-                                                      const olLayer =
-                                                        group instanceof
-                                                        LayerGroup
-                                                          ? group
-                                                              .getLayers()
-                                                              .getArray()
-                                                              .find(
-                                                                (l) =>
-                                                                  l.get(
-                                                                    "displayName"
-                                                                  ) ===
-                                                                    layer.displayName ||
-                                                                  l.get(
-                                                                    "title"
-                                                                  ) ===
-                                                                    layer.title
-                                                              )
-                                                          : null;
-
-                                                      return (
-                                                        <ListItemButton
-                                                          key={
-                                                            layer.displayName ||
-                                                            layer.title
-                                                          }
-                                                          sx={{ pl: 10 }}
-                                                          onClick={() =>
-                                                            handleLayerToggle(
-                                                              olLayer
-                                                            )
-                                                          }
-                                                        >
-                                                          <Checkbox
-                                                            edge="start"
-                                                            checked={
-                                                              olLayer?.getVisible() ||
-                                                              false
-                                                            }
-                                                            tabIndex={-1}
-                                                            color="success"
-                                                            disableRipple
-                                                          />
-                                                          <ListItemText
-                                                            primary={
-                                                              layer.displayName ||
-                                                              layer.title ||
-                                                              layer.name ||
-                                                              "Unnamed"
-                                                            }
-                                                          />
-                                                        </ListItemButton>
+                                                  {(
+                                                    organized[country]?.[region]
+                                                      ?.predictiveModels
+                                                      ?.generic || []
+                                                  ).map((layer) => {
+                                                    const group = mapRef.current
+                                                      ?.getLayers()
+                                                      .getArray()
+                                                      .find(
+                                                        (l) =>
+                                                          l.get("title") ===
+                                                          (layer.group
+                                                            ?.groupTitle ||
+                                                            "Ungrouped")
                                                       );
-                                                    }
-                                                  )}
+
+                                                    const olLayer =
+                                                      group instanceof
+                                                      LayerGroup
+                                                        ? group
+                                                            .getLayers()
+                                                            .getArray()
+                                                            .find(
+                                                              (l) =>
+                                                                l.get(
+                                                                  "displayName"
+                                                                ) ===
+                                                                  layer.displayName ||
+                                                                l.get(
+                                                                  "title"
+                                                                ) ===
+                                                                  layer.title
+                                                            )
+                                                        : null;
+
+                                                    return (
+                                                      <ListItemButton
+                                                        key={
+                                                          layer.displayName ||
+                                                          layer.title
+                                                        }
+                                                        sx={{ pl: 10 }}
+                                                        onClick={() =>
+                                                          handleLayerToggle(
+                                                            olLayer
+                                                          )
+                                                        }
+                                                      >
+                                                        <Checkbox
+                                                          edge="start"
+                                                          checked={
+                                                            olLayer?.getVisible() ||
+                                                            false
+                                                          }
+                                                          tabIndex={-1}
+                                                          color="success"
+                                                          disableRipple
+                                                        />
+                                                        <ListItemText
+                                                          primary={
+                                                            layer.displayName ||
+                                                            layer.title ||
+                                                            layer.name ||
+                                                            "Unnamed"
+                                                          }
+                                                        />
+                                                      </ListItemButton>
+                                                    );
+                                                  })}
                                                 </List>
                                               </Collapse>
 
                                               {/* Population Layers */}
                                               <ListItemButton
                                                 sx={{ pl: 8 }}
-                                                onClick={handlePopulationClick}
+                                                onClick={() =>
+                                                  handlePopulation(
+                                                    country,
+                                                    region
+                                                  )
+                                                }
                                               >
                                                 <ListItemIcon>
                                                   <PeopleIcon />
@@ -1179,64 +1275,62 @@ function Newmap() {
                                                   component="div"
                                                   disablePadding
                                                 >
-                                                  {organized.population.map(
-                                                    (layer) => {
-                                                      const group =
-                                                        mapRef.current
-                                                          ?.getLayers()
-                                                          .getArray()
-                                                          .find(
-                                                            (l) =>
-                                                              l.get("title") ===
-                                                              (layer.group
-                                                                ?.groupTitle ||
-                                                                "Ungrouped")
-                                                          );
-
-                                                      const olLayer =
-                                                        group instanceof
-                                                        LayerGroup
-                                                          ? group
-                                                              .getLayers()
-                                                              .getArray()
-                                                              .find(
-                                                                (l) =>
-                                                                  l.get(
-                                                                    "title"
-                                                                  ) ===
-                                                                  layer.title
-                                                              )
-                                                          : null;
-
-                                                      return (
-                                                        <ListItemButton
-                                                          key={layer.title}
-                                                          sx={{ pl: 10 }}
-                                                          onClick={() =>
-                                                            handleLayerToggle(
-                                                              olLayer
-                                                            )
-                                                          }
-                                                        >
-                                                          <Checkbox
-                                                            edge="start"
-                                                            checked={
-                                                              olLayer?.getVisible() ||
-                                                              false
-                                                            }
-                                                            tabIndex={-1}
-                                                            color="success"
-                                                            disableRipple
-                                                          />
-                                                          <ListItemText
-                                                            primary={
-                                                              layer.title
-                                                            }
-                                                          />
-                                                        </ListItemButton>
+                                                  {(
+                                                    organized[country]?.[region]
+                                                      ?.population || []
+                                                  ).map((layer) => {
+                                                    const group = mapRef.current
+                                                      ?.getLayers()
+                                                      .getArray()
+                                                      .find(
+                                                        (l) =>
+                                                          l.get("title") ===
+                                                          (layer.group
+                                                            ?.groupTitle ||
+                                                            "Ungrouped")
                                                       );
-                                                    }
-                                                  )}
+
+                                                    const olLayer =
+                                                      group instanceof
+                                                      LayerGroup
+                                                        ? group
+                                                            .getLayers()
+                                                            .getArray()
+                                                            .find(
+                                                              (l) =>
+                                                                l.get(
+                                                                  "title"
+                                                                ) ===
+                                                                layer.title
+                                                            )
+                                                        : null;
+
+                                                    return (
+                                                      <ListItemButton
+                                                        key={layer.title}
+                                                        sx={{ pl: 10 }}
+                                                        onClick={() =>
+                                                          handleLayerToggle(
+                                                            olLayer
+                                                          )
+                                                        }
+                                                      >
+                                                        <Checkbox
+                                                          edge="start"
+                                                          checked={
+                                                            olLayer?.getVisible() ||
+                                                            false
+                                                          }
+                                                          tabIndex={-1}
+                                                          color="success"
+                                                          disableRipple
+                                                        />
+                                                        <ListItemText
+                                                          primary={layer.title}
+                                                        />
+                                                      </ListItemButton>
+                                                    );
+                                                  })}
                                                 </List>
                                               </Collapse>
                                             </Collapse>
