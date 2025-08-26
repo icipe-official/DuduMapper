@@ -207,7 +207,8 @@ function Newmap() {
     setPredictiveModelsOpen(!predictiveModelsOpen);
   };
 
-  const handleYearClick = (year: string) => {
+  const handleYearClick = (country: string, region: string, year: string) => {
+    const key = `${country}-${region}-${year}`;
     setExpandedYears((prev) => ({
       ...prev,
       [year]: !prev[year],
@@ -225,12 +226,17 @@ function Newmap() {
       [region]: !prev[region],
     }));
   };
-  const handleMonthClick = (year: string, month: string) => {
-    const key = `${year}-${month}`;
-    console.log("Month clicked:", key);
+  const handleMonthClick = (
+    country: string,
+    region: string,
+    year: string,
+    month: string
+  ) => {
+    const monthKey = `${country}-${region}-${year}-${month}`;
+    console.log("Month clicked:", monthKey);
     setExpandedMonths((prev) => ({
       ...prev,
-      [key]: !prev[key],
+      [monthKey]: !prev[monthKey],
     }));
   };
 
@@ -355,6 +361,7 @@ function Newmap() {
 
     return organized;
   };
+
   //from database
 
   interface GenericModelMetadata {
@@ -875,7 +882,11 @@ function Newmap() {
                                                   <ListItemButton
                                                     sx={{ pl: 8 }}
                                                     onClick={() =>
-                                                      handleYearClick(year)
+                                                      handleYearClick(
+                                                        country,
+                                                        region,
+                                                        year
+                                                      )
                                                     }
                                                   >
                                                     <ListItemIcon>
@@ -898,7 +909,7 @@ function Newmap() {
                                                   >
                                                     {Object.entries(months).map(
                                                       ([month, modelTypes]) => {
-                                                        const monthKey = `${year}-${month}`;
+                                                        const monthKey = `${country}-${region}-${year}-${month}`;
                                                         return (
                                                           <React.Fragment
                                                             key={monthKey}
@@ -907,6 +918,8 @@ function Newmap() {
                                                               sx={{ pl: 10 }}
                                                               onClick={() =>
                                                                 handleMonthClick(
+                                                                  country,
+                                                                  region,
                                                                   year,
                                                                   month
                                                                 )
@@ -943,9 +956,12 @@ function Newmap() {
                                                                   modelType,
                                                                   layers,
                                                                 ]) => {
+                                                                  const modelKey = `${country}-${region}-${year}-${month}-${modelType}`;
                                                                   return (
                                                                     <React.Fragment
-                                                                      key={`${year}-${month}-${modelType}`}
+                                                                      key={
+                                                                        modelKey
+                                                                      }
                                                                     >
                                                                       {layers.map(
                                                                         (
