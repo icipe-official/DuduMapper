@@ -233,17 +233,17 @@ function Newmap() {
     }));
   };
   const handlePopulation = (country: string, region: string) => {
-    const key = `${country}-${region}`;
+    const populationKey = `${country}-${region}`;
     setExpandedPopulation((prev) => ({
       ...prev,
-      [key]: !prev[key],
+      [populationKey]: !prev[populationKey],
     }));
   };
   const handleGenericModels = (country: string, region: string) => {
-    const key = `${country}-${region}`;
+    const generickey = `${country}-${region}`;
     setExpandedGenericModels((prev) => ({
       ...prev,
-      [key]: !prev[key],
+      [generickey]: !prev[generickey],
     }));
   };
   const handleMonthClick = (
@@ -1159,14 +1159,14 @@ function Newmap() {
                                                 </ListItemIcon>
 
                                                 <ListItemText primary="Generic Models" />
-                                                {expandedGenericModels ? (
+                                                {expandedGenericModels[`${country}-${region}`] ? (
                                                   <ChevronLeftIcon />
                                                 ) : (
                                                   <ChevronRightIcon />
                                                 )}
                                               </ListItemButton>
                                               <Collapse
-                                                in={genericModelsOpen}
+                                                in={expandedGenericModels[`${country}-${region}`]}
                                                 timeout="auto"
                                                 unmountOnExit
                                               >
@@ -1260,14 +1260,14 @@ function Newmap() {
                                                   <PeopleIcon />
                                                 </ListItemIcon>
                                                 <ListItemText primary="Population Data" />
-                                                {populationOpen ? (
+                                                {expandedPopulation[`${country}-${region}`] ? (
                                                   <ChevronLeftIcon />
                                                 ) : (
                                                   <ChevronRightIcon />
                                                 )}
                                               </ListItemButton>
                                               <Collapse
-                                                in={populationOpen}
+                                                in={expandedPopulation[`${country}-${region}`]}
                                                 timeout="auto"
                                                 unmountOnExit
                                               >
