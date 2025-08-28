@@ -146,6 +146,16 @@ const NavbarLoggedIn: React.FC = () => {
               </Link>
             </div>
           </Box>
+          <Box sx={{ flexGrow: 1 }}>
+            <Button
+              variant="outlined"
+              color="success"
+              sx={{ borderRadius: 5, fontWeight: "bold" }}
+              //disabled
+            >
+              Download Metadata
+            </Button>
+          </Box>
 
           {isMobile ? (
             <DrawerComp navItems={navMenuItems} />
