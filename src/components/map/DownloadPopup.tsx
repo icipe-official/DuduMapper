@@ -17,6 +17,11 @@ import {
   IconButton,
   Tooltip,
   Checkbox,
+  TableRow,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableBody,
 } from "@mui/material";
 import {
   FormatListBulleted as FormatListIcon,
@@ -36,7 +41,7 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
   onClose,
   cqlFilter,
 }) => {
-  const [format, setFormat] = useState("tiff");
+  const [format, setFormat] = useState("png");
   const [selectedLayers, setSelectedLayers] = useState<string[]>([]);
   const [areaOfInterest, setAreaOfInterest] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,10 +50,10 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
 
   const formats = [
     { value: "tiff", label: "TIFF" },
-    { value: "shp", label: "Shapefile (SHP)" },
-    { value: "geojson", label: "GeoJSON" },
-    { value: "kml", label: "KML" },
-    { value: "csv", label: "CSV" },
+    { value: "png", label: "PNG" },
+    //{ value: "geojson", label: "GeoJSON" },
+    //{ value: "kml", label: "KML" },
+    // { value: "csv", label: "CSV" },
     { value: "xlsx", label: "Excel (XLSX)" },
   ];
 
@@ -133,21 +138,30 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
         <Grid item xs={12}>
           <Paper sx={{ p: 2 }}>
             <Typography variant="subtitle1" sx={{ mb: 2 }}>
-              Select Layers
+              Geo Available Layers
             </Typography>
             <FormGroup>
-              {["Layer 1", "Layer 2", "Layer 3"].map((layer) => (
-                <FormControlLabel
-                  key={layer}
-                  control={
-                    <Checkbox
-                      checked={selectedLayers.includes(layer)}
-                      onChange={() => handleLayerToggle(layer)}
-                    />
-                  }
-                  label={layer}
-                />
-              ))}
+              <TableContainer component={Paper}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Layer Title</TableCell>
+                    <TableCell align="right">Select</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {[].map((layer) => (
+                    <TableRow key={layer}>
+                      <TableCell>{layer}</TableCell>
+                      <TableCell align="right">
+                        <Checkbox
+                          checked={selectedLayers.includes(layer)}
+                          onChange={() => handleLayerToggle(layer)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </TableContainer>
             </FormGroup>
           </Paper>
         </Grid>
