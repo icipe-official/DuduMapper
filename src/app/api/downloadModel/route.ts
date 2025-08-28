@@ -42,5 +42,9 @@ export async function GET(request: NextRequest) {
       l.name?.toLowerCase().includes(title.toLowerCase)
     );
   }
-  return new Response(`You requested model: ${title}`);
+  return new Response(JSON.stringify(result), {
+    status: 200,
+
+    headers: { "Content-Type": "application/json" },
+  });
 }

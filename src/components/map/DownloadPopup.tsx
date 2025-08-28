@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -22,6 +22,7 @@ import {
   TableContainer,
   TableHead,
   TableBody,
+  Table,
 } from "@mui/material";
 import {
   FormatListBulleted as FormatListIcon,
@@ -30,12 +31,16 @@ import {
   Clear as ClearIcon,
 } from "@mui/icons-material";
 import { SelectChangeEvent } from "@mui/material/Select";
+import { toast } from "react-toastify";
 interface DownloadPopupProps {
   isOpen: boolean;
   onClose: () => void;
   cqlFilter: string;
 }
-
+interface LayerItem {
+  name: string;
+  href: string;
+}
 const DownloadPopup: React.FC<DownloadPopupProps> = ({
   isOpen,
   onClose,
@@ -47,6 +52,7 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [layers, setLayers] = useState<LayerItem[]>([]);
 
   const formats = [
     { value: "tiff", label: "TIFF" },
@@ -62,11 +68,31 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
     setFormat(selectedFormat);
   };
 
-  const handleLayerToggle = (layer: string) => {
+  const handleLayerToggle = (layerName: string) => {
     setSelectedLayers((prev) =>
-      prev.includes(layer) ? prev.filter((l) => l !== layer) : [...prev, layer]
+      prev.includes(layerName)
+        ? prev.filter((l) => l !== layerName)
+        : [...prev, layerName]
     );
   };
+  useEffect(() => {
+    const fetchLayers = async () => {
+      try {
+        const res = await fetch("/api/downloadModel");
+        if (!res.ok) {
+          throw new Error("Failed to fetch layers");
+        }
+        toast.success("Layers fetched successfully");
+
+        const data = await res.json();
+        setLayers(data);
+      } catch (err) {
+        console.error(err);
+        setError("Error fetching layers");
+      }
+    };
+    fetchLayers();
+  }, []);
 
   const handleDownload = async () => {
     if (selectedLayers.length === 0) {
@@ -137,32 +163,39 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
         {/* Layer Selection */}
         <Grid item xs={12}>
           <Paper sx={{ p: 2 }}>
-            <Typography variant="subtitle1" sx={{ mb: 2 }}>
-              Geo Available Layers
+            <Typography
+              variant="subtitle1"
+              sx={{
+                mb: 2,
+              }}
+            >
+              🌍 Geo Available Layers
             </Typography>
-            <FormGroup>
-              <TableContainer component={Paper}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Layer Title</TableCell>
-                    <TableCell align="right">Select</TableCell>
+
+            <TableContainer component={Paper}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>ID</TableCell>
+                  <TableCell>Layer Title</TableCell>
+                  <TableCell align="right">Select</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {layers.map((layer, index) => (
+                  <TableRow key={`${layer.name}-${index}`}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{layer.name}</TableCell>
+                    <TableCell align="right">
+                      <Checkbox
+                        color="success"
+                        checked={selectedLayers.includes(layer.name)}
+                        onChange={() => handleLayerToggle(layer.name)}
+                      />
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {[].map((layer) => (
-                    <TableRow key={layer}>
-                      <TableCell>{layer}</TableCell>
-                      <TableCell align="right">
-                        <Checkbox
-                          checked={selectedLayers.includes(layer)}
-                          onChange={() => handleLayerToggle(layer)}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </TableContainer>
-            </FormGroup>
+                ))}
+              </TableBody>
+            </TableContainer>
           </Paper>
         </Grid>
 

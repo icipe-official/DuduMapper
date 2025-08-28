@@ -1562,7 +1562,6 @@ function Newmap() {
                   pl: 4,
                 }}
                 onClick={() => setDownloadPopupOpen(true)}
-                disabled
               >
                 <ListItemText primary="Download Map Data" />
               </ListItemButton>
