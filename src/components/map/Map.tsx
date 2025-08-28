@@ -152,11 +152,16 @@ function Newmap() {
   const [genericModelMetadata, setGenericModelMetadata] = useState<
     GenericModelMetadata[]
   >([]);
+  const [populationMetadata, setPopulationMetadata] = useState<
+    PopulationMetadata[]
+  >([]);
   //skip if generic is dated in database
   const genericMetadataNames = new Set(
     genericModelMetadata.map((m) => m.name || m.title)
   );
-
+  const populationMetadataNames = new Set(
+    populationMetadata.map((m) => m.name || m.title)
+  );
   // Add these new handlers
   const handleGenericModelsClick = () =>
     setGenericModelsOpen(!genericModelsOpen);
@@ -383,7 +388,17 @@ function Newmap() {
   };
 
   //from database
-
+  interface PopulationMetadata {
+    name: string;
+    title: string;
+    year: string;
+    month: string;
+    modelType: string;
+    displayName: string;
+    //lets add this to populate them in map
+    country: string;
+    region: string;
+  }
   interface GenericModelMetadata {
     name: string;
     title: string;
@@ -419,13 +434,30 @@ function Newmap() {
       };
     };
   }
+  /*const extractCountry = (layerName: string, dbCountry: string[]): string => {
+    const match = dbCountry.find((c) =>
+      layerName.toLowerCase().includes(c.toLowerCase())
+    );
+    return match || "UnknownCountry";
+  };*/
   const extractCountry = (layerName: string): string => {
-    const countryMatch = layerName.match(/\b([A-Za-z]+)\b/);
-    return countryMatch ? countryMatch[1] : "UnknownCountry";
+    const countries = ["Kenya", "Uganda", "Tanzania"];
+    const match = countries.find((c) => layerName.toLowerCase());
+    return match || "UnknownCountry";
   };
+
+  /*const extractRegion = (layerName: string, dbRegion: string[]): string => {
+    const match = dbRegion.find((r) =>
+      layerName.toLowerCase().includes(r.toLowerCase())
+    );
+    return match || "UnknownRegion";
+  };*/
   const extractRegion = (layerName: string): string => {
-    const regionMatch = layerName.match(/\b([A-Za-z]+)\b/);
-    return regionMatch ? regionMatch[1] : "UnknownRegion";
+    const regions = ["Turkana", "Isiolo", "Mombasa", "Kisumu"];
+    const match = regions.find((r) =>
+      layerName.toLowerCase().includes(r.toLowerCase())
+    );
+    return match || "UnknownRegion";
   };
   const organizeLayersByStructure = (layers: Layer[]): OrganizedLayers => {
     const organized: OrganizedLayers = {};
@@ -454,7 +486,7 @@ function Newmap() {
       console.log("Layer identifier:", identifier);
 
       if (isPopulationLayer(identifier)) {
-        const country = extractCountry(identifier) || "UnknownCountry";
+        const country = extractCountry(identifier);
         const region = extractRegion(identifier) || "UnknownRegion";
         console.log("Adding to population:", identifier);
 
@@ -525,6 +557,13 @@ function Newmap() {
           //also checking if model is present from db, then skips to post it here
           if (!genericMetadataNames.has(identifier)) {
             console.log("Adding to generic models", identifier);
+            //push to all countries if country or region is unknown
+            //added 3 lines to push to all countries if unknown
+            Object.keys(organized).forEach((country) => {
+              Object.keys(organized[country]).forEach((region) => {
+                organized[country][region].predictiveModels.generic.push(layer);
+              });
+            });
             //present line for pushing if check from geoserver only
             organized[country][region].predictiveModels.generic.push(layer);
           } else {
@@ -536,7 +575,7 @@ function Newmap() {
       }
     });
 
-    console.log("\nFINAL ORGANIZATION RESULTS");
+    console.log("\nFINAL boo");
     Object.entries(organized).forEach(([country, regions]) => {
       Object.entries(regions).forEach(([region, data]) => {
         console.log(
@@ -607,7 +646,23 @@ function Newmap() {
         ].push(matchingLayer);
       }
     });
+    populationMetadata.forEach((meta) => {
+      const country = meta.country;
+      const region = meta.region;
 
+      if (!organized[country]?.[region]) {
+        return;
+      }
+      // Try to match with existing GeoServer layer
+      const matchingLayer = layers.find(
+        (layer) => layer.name === meta.name || layer.title === meta.title
+      );
+
+      if (matchingLayer) {
+        ensureRegion(country, region);
+        organized[country][region].population.push(matchingLayer);
+      }
+    });
     return organized;
   };
 
@@ -1159,14 +1214,20 @@ function Newmap() {
                                                 </ListItemIcon>
 
                                                 <ListItemText primary="Generic Models" />
-                                                {expandedGenericModels[`${country}-${region}`] ? (
+                                                {expandedGenericModels[
+                                                  `${country}-${region}`
+                                                ] ? (
                                                   <ChevronLeftIcon />
                                                 ) : (
                                                   <ChevronRightIcon />
                                                 )}
                                               </ListItemButton>
                                               <Collapse
-                                                in={expandedGenericModels[`${country}-${region}`]}
+                                                in={
+                                                  expandedGenericModels[
+                                                    `${country}-${region}`
+                                                  ]
+                                                }
                                                 timeout="auto"
                                                 unmountOnExit
                                               >
@@ -1260,14 +1321,20 @@ function Newmap() {
                                                   <PeopleIcon />
                                                 </ListItemIcon>
                                                 <ListItemText primary="Population Data" />
-                                                {expandedPopulation[`${country}-${region}`] ? (
+                                                {expandedPopulation[
+                                                  `${country}-${region}`
+                                                ] ? (
                                                   <ChevronLeftIcon />
                                                 ) : (
                                                   <ChevronRightIcon />
                                                 )}
                                               </ListItemButton>
                                               <Collapse
-                                                in={expandedPopulation[`${country}-${region}`]}
+                                                in={
+                                                  expandedPopulation[
+                                                    `${country}-${region}`
+                                                  ]
+                                                }
                                                 timeout="auto"
                                                 unmountOnExit
                                               >
