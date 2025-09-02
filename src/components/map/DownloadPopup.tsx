@@ -75,6 +75,9 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
         : [...prev, layerName]
     );
   };
+  {
+    /*
+  //returning all layers in a list
   useEffect(() => {
     const fetchLayers = async () => {
       try {
@@ -82,6 +85,35 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
         if (!res.ok) {
           throw new Error("Failed to fetch layers");
         }
+        toast.success("Layers fetched successfully");
+
+        const data = await res.json();
+        setLayers(data);
+      } catch (err) {
+        console.error(err);
+        setError("Error fetching layers");
+      }
+    };
+    fetchLayers();
+  }, []);*/
+  }
+  useEffect(() => {
+    const fetchLayers = async () => {
+      try {
+        const res = await fetch(
+          "/api/downloadModel?layer=Turkana children population&format=image/png"
+        );
+        if (!res.ok) {
+          throw new Error("Failed to fetch layers");
+        }
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Turkana children population.png";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
         toast.success("Layers fetched successfully");
 
         const data = await res.json();
@@ -104,17 +136,33 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
     setError(null);
 
     try {
-      // Here you would implement your actual download logic
-      // For example:
-      //await downloadLayers({
-      //   layers: selectedLayers,
-      //   format,
-      //   areaOfInterest,
-      //   cqlFilter
-      // });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const res = await fetch(
+        `/api/downloadModel?layer=${layers}&format=${format}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            layers: selectedLayers,
+            format,
+            areaOfInterest,
+            cqlFilter,
+          }),
+        }
+      );
+      if (!res.ok) {
+        throw new Error("Download request failed");
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `layers.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
 
       setSuccess(true);
       onClose();

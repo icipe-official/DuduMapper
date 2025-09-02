@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -18,11 +18,18 @@ import {
   TextField,
   Button,
   Divider,
+  DialogContent,
+  DialogTitle,
+  Dialog,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import SearchIcon from "@mui/icons-material/Search";
 import Menu from "@mui/material/Menu";
 import Image from "next/image";
 import EmailIcon from "@mui/icons-material/Email";
-
+import DownloadPopup from "@/components/map/DownloadPopup";
+import Map from "@/components/map/Map";
+import Layout from "@/app/layout";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
 import TuneIcon from "@mui/icons-material/Tune";
@@ -38,12 +45,13 @@ import Text from "ol/style/Text";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
+import { set } from "date-fns";
 
 const NavbarLoggedIn: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const router = useRouter();
-  console.log("Rendering NavbarLoggedIn ✅");
+  console.log("Rendering NavbarLoggedIn ");
   const { user, logout } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [settingAnchorEl, setSettingAnchorEl] =
@@ -58,6 +66,9 @@ const NavbarLoggedIn: React.FC = () => {
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+  const [cqlFilter, setCqlFilter] = useState<string | null>(null);
+  const [downloadPopupOpen, setDownloadPopupOpen] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -128,7 +139,81 @@ const NavbarLoggedIn: React.FC = () => {
     return email.split("@")[0];
   }*/
   }
+  //download image button
+  interface LayerItem {
+    name: string;
+    href: string;
+  }
+  const [loading, setLoading] = useState(false);
+  const [selectedLayers, setSelectedLayers] = useState<string[]>([]);
+  const [format, setFormat] = useState("shp");
+  //const [areaOfInterest, setAreaOfInterest] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [layers, setLayers] = useState<LayerItem[]>([]);
 
+  {
+    /*useEffect(() => {
+    const fetchLayers = async () => {
+      try {
+        const res = await fetch(
+          "/api/downloadModel?layer=Turkana children population&format=image/png"
+        );
+        if (!res.ok) {
+          throw new Error("Failed to fetch layers");
+        }
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Turkana children population.png";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        toast.success("Layers fetched successfully");
+
+        const data = await res.json();
+        setLayers(data);
+      } catch (err) {
+        console.error(err);
+        setError("Error fetching layers");
+      }
+    };
+    fetchLayers();
+  }, []);*/
+  }
+  const handleDownload = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const format = "image/png";
+      const layerName = "DEC_idw_model_raster";
+
+      const res = await fetch(
+        `/api/downloadModel?layerName=${layerName}&format=${format}`
+      );
+      if (!res.ok) {
+        throw new Error("Download request failed");
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `layerName.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      setSuccess(true);
+      //onClose();
+    } catch (err) {
+      setError("Failed to download layer. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Box sx={{ position: "relative", zIndex: 2 }}>
       <AppBar position="fixed" sx={{ bgcolor: "white", margin: 0, padding: 0 }}>
@@ -151,9 +236,10 @@ const NavbarLoggedIn: React.FC = () => {
               variant="outlined"
               color="success"
               sx={{ borderRadius: 5, fontWeight: "bold" }}
-              //disabled
+              onClick={handleDownload}
+              disabled={!!isChecked}
             >
-              Download Metadata
+              {loading ? "Downloading..." : " Download layer"}
             </Button>
           </Box>
 

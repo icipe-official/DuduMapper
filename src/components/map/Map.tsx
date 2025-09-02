@@ -155,6 +155,7 @@ function Newmap() {
   const [populationMetadata, setPopulationMetadata] = useState<
     PopulationMetadata[]
   >([]);
+  const [isChecked, setIsChecked] = useState(false);
   //skip if generic is dated in database
   const genericMetadataNames = new Set(
     genericModelMetadata.map((m) => m.name || m.title)
@@ -1166,6 +1167,7 @@ function Newmap() {
                                                                                 edge="start"
                                                                                 checked={
                                                                                   olLayer?.getVisible() ||
+                                                                                  isChecked ||
                                                                                   false
                                                                                 }
                                                                                 tabIndex={
@@ -1173,6 +1175,15 @@ function Newmap() {
                                                                                 }
                                                                                 color="success"
                                                                                 disableRipple
+                                                                                onChange={(
+                                                                                  e
+                                                                                ) =>
+                                                                                  setIsChecked(
+                                                                                    e
+                                                                                      .target
+                                                                                      .checked
+                                                                                  )
+                                                                                }
                                                                               />
                                                                               <ListItemText
                                                                                 primary={
@@ -1286,12 +1297,18 @@ function Newmap() {
                                                         <Checkbox
                                                           edge="start"
                                                           checked={
+                                                            isChecked ||
                                                             olLayer?.getVisible() ||
                                                             false
                                                           }
                                                           tabIndex={-1}
                                                           color="success"
                                                           disableRipple
+                                                          onChange={(e) =>
+                                                            setIsChecked(
+                                                              e.target.checked
+                                                            )
+                                                          }
                                                         />
                                                         <ListItemText
                                                           primary={
@@ -1386,11 +1403,17 @@ function Newmap() {
                                                           edge="start"
                                                           checked={
                                                             olLayer?.getVisible() ||
+                                                            isChecked ||
                                                             false
                                                           }
                                                           tabIndex={-1}
                                                           color="success"
                                                           disableRipple
+                                                          onChange={(e) =>
+                                                            setIsChecked(
+                                                              e.target.checked
+                                                            )
+                                                          }
                                                         />
                                                         <ListItemText
                                                           primary={layer.title}
@@ -1555,7 +1578,7 @@ function Newmap() {
           <List sx={{ pl: 2 }}>
             <ListItem disablePadding>
               {" "}
-              <Download />
+              {/*<Download />*/}
               <ListItemButton
                 sx={{
                   color: downloadPopupOpen ? green[600] : "inherit",
@@ -1563,7 +1586,7 @@ function Newmap() {
                 }}
                 onClick={() => setDownloadPopupOpen(true)}
               >
-                <ListItemText primary="Download Map Data" />
+                {/*<ListItemText primary="Download Map Data" />*/}
               </ListItemButton>
             </ListItem>
           </List>
