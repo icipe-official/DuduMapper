@@ -29,7 +29,7 @@ import Image from "next/image";
 import EmailIcon from "@mui/icons-material/Email";
 import DownloadPopup from "@/components/map/DownloadPopup";
 import Map from "@/components/map/Map";
-import Layout from "@/app/layout";
+
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
 import TuneIcon from "@mui/icons-material/Tune";
@@ -47,7 +47,12 @@ import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
 import { set } from "date-fns";
 
-const NavbarLoggedIn: React.FC = () => {
+interface NavbarLoggedInProps {
+  isChecked: boolean;
+  //setIsChecked: (checked: boolean) => void;
+}
+
+const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({ isChecked }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const router = useRouter();
@@ -68,7 +73,7 @@ const NavbarLoggedIn: React.FC = () => {
   };
   const [cqlFilter, setCqlFilter] = useState<string | null>(null);
   const [downloadPopupOpen, setDownloadPopupOpen] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
+  //const [isChecked, setIsChecked] = useState(false);
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -237,7 +242,7 @@ const NavbarLoggedIn: React.FC = () => {
               color="success"
               sx={{ borderRadius: 5, fontWeight: "bold" }}
               onClick={handleDownload}
-              disabled={!!isChecked}
+              disabled={!isChecked}
             >
               {loading ? "Downloading..." : " Download layer"}
             </Button>

@@ -111,8 +111,11 @@ const resolutions4326 = projectionExtent4326
 const matrixIds4326 = Array.from({ length: 19 }, (_, z) => `EPSG:4326:${z}`);
 
 // ─── Component ───────────────────────────────────────────────────────────────
-
-function Newmap() {
+interface MapProps {
+  isChecked: boolean;
+  setIsChecked: React.Dispatch<React.SetStateAction<boolean>>;
+}
+function Newmap({ isChecked, setIsChecked }: MapProps) {
   //drag effect
   const { drawerWidth, startDragging } = useDrawerDrag();
   const theme = useTheme();
@@ -155,7 +158,7 @@ function Newmap() {
   const [populationMetadata, setPopulationMetadata] = useState<
     PopulationMetadata[]
   >([]);
-  const [isChecked, setIsChecked] = useState(false);
+  //const [isChecked, setIsChecked] = useState(false);
   //skip if generic is dated in database
   const genericMetadataNames = new Set(
     genericModelMetadata.map((m) => m.name || m.title)
@@ -1297,8 +1300,8 @@ function Newmap() {
                                                         <Checkbox
                                                           edge="start"
                                                           checked={
-                                                            isChecked ||
                                                             olLayer?.getVisible() ||
+                                                            isChecked ||
                                                             false
                                                           }
                                                           tabIndex={-1}
