@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+{
+  /* import React, { useState } from "react";
 import { Button, Checkbox } from "@mui/material";
 import NavbarLoggedIn from "../components/shared/navbarLoggedIn";
 import NewMap from "../components/map/Map";
@@ -12,4 +13,5 @@ export default function CheckedState() {
       <NewMap isChecked={isChecked} setIsChecked={setIsChecked} />
     </>
   );
+}*/
 }

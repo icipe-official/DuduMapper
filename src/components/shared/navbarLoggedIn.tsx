@@ -47,6 +47,9 @@ import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
 import { set } from "date-fns";
 
+//added ischecked prop to receive
+// the value of the state from parent component
+// and use it to disable the button and changed its style
 interface NavbarLoggedInProps {
   isChecked: boolean;
   //setIsChecked: (checked: boolean) => void;

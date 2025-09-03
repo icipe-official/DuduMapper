@@ -6,6 +6,7 @@ import { AuthProvider } from "@/context/context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 //import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastContainer } from "react-toastify";
+import React, { useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,6 +17,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  //add state for ischecked then pass it to navbarcontainer
+  const [isChecked, setIsChecked] = useState(false);
   return (
     <html lang="en">
       <head>
@@ -25,7 +28,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <AuthProvider>
-          <NavbarContainer />
+          <NavbarContainer isChecked={isChecked} />
           <ToastContainer />
 
           <QueryClientProvider client={queryClient}>

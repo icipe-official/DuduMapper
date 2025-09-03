@@ -1,12 +1,22 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/context";
 import Navbar from "./navbar";
 import NavbarLoggedIn from "./navbarLoggedIn";
 
-const NavbarContainer: React.FC = () => {
+//added ischecked prop to receive
+// the value of the state from parent component
+// and use it to pass it down to navbarloggedin
+//added also interface for props
+
+interface NavbarContainerProps {
+  isChecked: boolean;
+}
+
+const NavbarContainer: React.FC<NavbarContainerProps> = ({ isChecked }) => {
   const { user, loading } = useAuth();
+  //const [isChecked, setIsChecked] = useState(false);
 
   // Enhanced debugging with localStorage check
   useEffect(() => {
@@ -55,7 +65,7 @@ const NavbarContainer: React.FC = () => {
   console.log(
     `Rendering navbar with ${user ? "authenticated user" : "no user"}`
   );
-  return user ? <NavbarLoggedIn /> : <Navbar />;
+  return user ? <NavbarLoggedIn isChecked={isChecked} /> : <Navbar />;
 };
 
 export default NavbarContainer;

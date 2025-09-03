@@ -1169,9 +1169,9 @@ function Newmap({ isChecked, setIsChecked }: MapProps) {
                                                                               <Checkbox
                                                                                 edge="start"
                                                                                 checked={
-                                                                                  olLayer?.getVisible() ||
-                                                                                  isChecked ||
-                                                                                  false
+                                                                                  olLayer?.getVisible() &&
+                                                                                  isChecked &&
+                                                                                  true
                                                                                 }
                                                                                 tabIndex={
                                                                                   -1
@@ -1285,43 +1285,45 @@ function Newmap({ isChecked, setIsChecked }: MapProps) {
                                                         : null;
 
                                                     return (
-                                                      <ListItemButton
-                                                        key={
-                                                          layer.displayName ||
-                                                          layer.title
-                                                        }
-                                                        sx={{ pl: 10 }}
-                                                        onClick={() =>
-                                                          handleLayerToggle(
-                                                            olLayer
-                                                          )
-                                                        }
-                                                      >
-                                                        <Checkbox
-                                                          edge="start"
-                                                          checked={
-                                                            olLayer?.getVisible() ||
-                                                            isChecked ||
-                                                            false
+                                                      <>
+                                                        <ListItemButton
+                                                          key={
+                                                            layer.displayName ||
+                                                            layer.title
                                                           }
-                                                          tabIndex={-1}
-                                                          color="success"
-                                                          disableRipple
-                                                          onChange={(e) =>
-                                                            setIsChecked(
-                                                              e.target.checked
+                                                          sx={{ pl: 10 }}
+                                                          onClick={() =>
+                                                            handleLayerToggle(
+                                                              olLayer
                                                             )
                                                           }
-                                                        />
-                                                        <ListItemText
-                                                          primary={
-                                                            layer.displayName ||
-                                                            layer.title ||
-                                                            layer.name ||
-                                                            "Unnamed"
-                                                          }
-                                                        />
-                                                      </ListItemButton>
+                                                        >
+                                                          <Checkbox
+                                                            edge="start"
+                                                            checked={
+                                                              olLayer?.getVisible() &&
+                                                              isChecked &&
+                                                              true
+                                                            }
+                                                            tabIndex={-1}
+                                                            color="success"
+                                                            disableRipple
+                                                            onChange={(e) =>
+                                                              setIsChecked(
+                                                                e.target.checked
+                                                              )
+                                                            }
+                                                          />
+                                                          <ListItemText
+                                                            primary={
+                                                              layer.displayName ||
+                                                              layer.title ||
+                                                              layer.name ||
+                                                              "Unnamed"
+                                                            }
+                                                          />
+                                                        </ListItemButton>
+                                                      </>
                                                     );
                                                   })}
                                                 </List>
@@ -1405,9 +1407,9 @@ function Newmap({ isChecked, setIsChecked }: MapProps) {
                                                         <Checkbox
                                                           edge="start"
                                                           checked={
-                                                            olLayer?.getVisible() ||
-                                                            isChecked ||
-                                                            false
+                                                            olLayer?.getVisible() &&
+                                                            isChecked &&
+                                                            true
                                                           }
                                                           tabIndex={-1}
                                                           color="success"
