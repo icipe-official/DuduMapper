@@ -52,10 +52,14 @@ import { set } from "date-fns";
 // and use it to disable the button and changed its style
 interface NavbarLoggedInProps {
   isChecked: boolean;
+  selectedLayer: string | null;
   //setIsChecked: (checked: boolean) => void;
 }
 
-const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({ isChecked }) => {
+const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({
+  isChecked,
+  selectedLayer,
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const router = useRouter();
@@ -153,7 +157,7 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({ isChecked }) => {
     href: string;
   }
   const [loading, setLoading] = useState(false);
-  const [selectedLayers, setSelectedLayers] = useState<string[]>([]);
+  //const [selectedLayers, setSelectedLayers] = useState<string[]>([]);
   const [format, setFormat] = useState("shp");
   //const [areaOfInterest, setAreaOfInterest] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -190,14 +194,28 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({ isChecked }) => {
     fetchLayers();
   }, []);*/
   }
+  {
+    /*const handleLayerToggle = (layerName: string) => {
+    setSelectedLayers((prev) =>
+      prev.includes(layerName)
+        ? prev.filter((l) => l !== layerName)
+        : [...prev, layerName]
+    );
+  };*/
+  }
   const handleDownload = async () => {
     setLoading(true);
     setError(null);
 
+    if (!selectedLayer) {
+      setError("Please select at least one layer to download.");
+
+      return;
+    }
     try {
       const format = "image/png";
-      const layerName = "DEC_idw_model_raster";
 
+      const layerName = selectedLayer;
       const res = await fetch(
         `/api/downloadModel?layerName=${layerName}&format=${format}`
       );
@@ -208,13 +226,14 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({ isChecked }) => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `layerName.${format}`;
+      a.download = `${layerName}.${format}`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
 
       setSuccess(true);
+
       //onClose();
     } catch (err) {
       setError("Failed to download layer. Please try again.");
@@ -245,7 +264,7 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({ isChecked }) => {
               color="success"
               sx={{ borderRadius: 5, fontWeight: "bold" }}
               onClick={handleDownload}
-              disabled={!isChecked}
+              disabled={!isChecked || !selectedLayer}
             >
               {loading ? "Downloading..." : " Download layer"}
             </Button>

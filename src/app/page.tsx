@@ -31,14 +31,19 @@ const Newmap = dynamic(() => import("../components/map/Map"), { ssr: false });
   //and also to newmap so that it can check on checkbox
 
   const [isChecked, setIsChecked] = useState(false);
+  const [selectedLayer, setSelectedLayer] = useState<string | null>(null);
   return (
     <div
       style={{ overflow: "hidden", height: "100vh", width: "100vw", margin: 0 }}
     >
-      <NavbarContainer isChecked={isChecked} />{" "}
+      <NavbarContainer isChecked={isChecked} selectedLayer={selectedLayer} />
       {/* 👈 This makes the header dynamic */}
       <div style={{ height: "100%", marginTop: "50px" }}>
-        <Newmap isChecked={isChecked} setIsChecked={setIsChecked} />
+        <Newmap
+          isChecked={isChecked}
+          setIsChecked={setIsChecked}
+          setSelectedLayer={setSelectedLayer}
+        />
       </div>
     </div>
   );

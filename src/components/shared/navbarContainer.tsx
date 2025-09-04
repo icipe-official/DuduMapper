@@ -12,9 +12,13 @@ import NavbarLoggedIn from "./navbarLoggedIn";
 
 interface NavbarContainerProps {
   isChecked: boolean;
+  selectedLayer: string | null;
 }
 
-const NavbarContainer: React.FC<NavbarContainerProps> = ({ isChecked }) => {
+const NavbarContainer: React.FC<NavbarContainerProps> = ({
+  isChecked,
+  selectedLayer,
+}) => {
   const { user, loading } = useAuth();
   //const [isChecked, setIsChecked] = useState(false);
 
@@ -65,7 +69,11 @@ const NavbarContainer: React.FC<NavbarContainerProps> = ({ isChecked }) => {
   console.log(
     `Rendering navbar with ${user ? "authenticated user" : "no user"}`
   );
-  return user ? <NavbarLoggedIn isChecked={isChecked} /> : <Navbar />;
+  return user ? (
+    <NavbarLoggedIn isChecked={isChecked} selectedLayer={selectedLayer} />
+  ) : (
+    <Navbar />
+  );
 };
 
 export default NavbarContainer;

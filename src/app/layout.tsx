@@ -19,6 +19,7 @@ export default function RootLayout({
 }) {
   //add state for ischecked then pass it to navbarcontainer
   const [isChecked, setIsChecked] = useState(false);
+  const [selectedLayer, setSelectedLayer] = useState<string | null>(null);
   return (
     <html lang="en">
       <head>
@@ -28,7 +29,10 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <AuthProvider>
-          <NavbarContainer isChecked={isChecked} />
+          <NavbarContainer
+            isChecked={isChecked}
+            selectedLayer={selectedLayer}
+          />
           <ToastContainer />
 
           <QueryClientProvider client={queryClient}>

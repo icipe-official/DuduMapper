@@ -114,8 +114,9 @@ const matrixIds4326 = Array.from({ length: 19 }, (_, z) => `EPSG:4326:${z}`);
 interface MapProps {
   isChecked: boolean;
   setIsChecked: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedLayer: React.Dispatch<React.SetStateAction<string | null>>;
 }
-function Newmap({ isChecked, setIsChecked }: MapProps) {
+function Newmap({ isChecked, setIsChecked, setSelectedLayer }: MapProps) {
   //drag effect
   const { drawerWidth, startDragging } = useDrawerDrag();
   const theme = useTheme();
@@ -1180,13 +1181,33 @@ function Newmap({ isChecked, setIsChecked }: MapProps) {
                                                                                 disableRipple
                                                                                 onChange={(
                                                                                   e
-                                                                                ) =>
-                                                                                  setIsChecked(
+                                                                                ) => {
+                                                                                  const checked =
                                                                                     e
                                                                                       .target
-                                                                                      .checked
-                                                                                  )
-                                                                                }
+                                                                                      .checked;
+                                                                                  setIsChecked(
+                                                                                    checked
+                                                                                  );
+                                                                                  if (
+                                                                                    checked
+                                                                                  ) {
+                                                                                    const name =
+                                                                                      olLayer?.get(
+                                                                                        "displayName"
+                                                                                      ) ||
+                                                                                      olLayer?.get(
+                                                                                        "title"
+                                                                                      );
+                                                                                    setSelectedLayer(
+                                                                                      name
+                                                                                    );
+                                                                                  } else {
+                                                                                    setSelectedLayer(
+                                                                                      null
+                                                                                    );
+                                                                                  }
+                                                                                }}
                                                                               />
                                                                               <ListItemText
                                                                                 primary={
@@ -1308,11 +1329,30 @@ function Newmap({ isChecked, setIsChecked }: MapProps) {
                                                             tabIndex={-1}
                                                             color="success"
                                                             disableRipple
-                                                            onChange={(e) =>
+                                                            onChange={(e) => {
+                                                              const checked =
+                                                                e.target
+                                                                  .checked;
                                                               setIsChecked(
-                                                                e.target.checked
-                                                              )
-                                                            }
+                                                                checked
+                                                              );
+                                                              if (checked) {
+                                                                const name =
+                                                                  olLayer?.get(
+                                                                    "displayName"
+                                                                  ) ||
+                                                                  olLayer?.get(
+                                                                    "title"
+                                                                  );
+                                                                setSelectedLayer(
+                                                                  name
+                                                                );
+                                                              } else {
+                                                                setSelectedLayer(
+                                                                  null
+                                                                );
+                                                              }
+                                                            }}
                                                           />
                                                           <ListItemText
                                                             primary={
@@ -1414,11 +1454,30 @@ function Newmap({ isChecked, setIsChecked }: MapProps) {
                                                           tabIndex={-1}
                                                           color="success"
                                                           disableRipple
-                                                          onChange={(e) =>
+                                                          onChange={(e) => {
+                                                            const checked =
+                                                              e.target.checked;
+
                                                             setIsChecked(
-                                                              e.target.checked
-                                                            )
-                                                          }
+                                                              checked
+                                                            );
+                                                            if (checked) {
+                                                              const name =
+                                                                olLayer?.get(
+                                                                  "displayName"
+                                                                ) ||
+                                                                olLayer?.get(
+                                                                  "title"
+                                                                );
+                                                              setSelectedLayer(
+                                                                name
+                                                              );
+                                                            } else {
+                                                              setSelectedLayer(
+                                                                null
+                                                              );
+                                                            }
+                                                          }}
                                                         />
                                                         <ListItemText
                                                           primary={layer.title}
