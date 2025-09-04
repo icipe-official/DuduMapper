@@ -268,7 +268,7 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({
               onClick={handleDownload}
               disabled={!isChecked || !selectedLayer}
             >
-              {loading ? "Downloading..." : " Download layer"}
+              {loading ? "Downloading..." : " Download Dataset"}
             </Button>
           </Box>
 
