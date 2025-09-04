@@ -226,13 +226,15 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${layerName}_raster.zip`;
+      a.download = `${layerName}.zip`;
+      //a.download = `${layerName}.png`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
 
       setSuccess(true);
+      toast.success("Dataset downloaded successfully");
 
       //onClose();
     } catch (err) {

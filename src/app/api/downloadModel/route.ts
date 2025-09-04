@@ -31,10 +31,12 @@ export async function GET(request: NextRequest) {
       highRisk: true,
     },
   });
-  if (!layerData) {
+  {
+    /*if (!layerData) {
     return new Response("Missing metadata", {
       status: 400,
     });
+  }*/
   }
   if (!layerName) {
     return new Response("Missing layer name", {
@@ -78,7 +80,7 @@ export async function GET(request: NextRequest) {
 
       headers: {
         "Content-Type": "application/zip",
-        "Content-Disposition": `attachment; filename=${layerName}_raster.zip`,
+        "Content-Disposition": `attachment; filename=${layerName}.zip`,
       },
     });
   } catch (err) {
