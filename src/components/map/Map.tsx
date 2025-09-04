@@ -1642,7 +1642,7 @@ function Newmap({ isChecked, setIsChecked, setSelectedLayer }: MapProps) {
           <List sx={{ pl: 2 }}>
             <ListItem disablePadding>
               {" "}
-              {/*<Download />*/}
+              {/*<Download />
               <ListItemButton
                 sx={{
                   color: downloadPopupOpen ? green[600] : "inherit",
@@ -1650,8 +1650,8 @@ function Newmap({ isChecked, setIsChecked, setSelectedLayer }: MapProps) {
                 }}
                 onClick={() => setDownloadPopupOpen(true)}
               >
-                {/*<ListItemText primary="Download Map Data" />*/}
-              </ListItemButton>
+                <ListItemText primary="Download Map Data" />
+              </ListItemButton>*/}
             </ListItem>
           </List>
         </Drawer>
