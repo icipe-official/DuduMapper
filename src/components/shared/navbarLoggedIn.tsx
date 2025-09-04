@@ -226,7 +226,7 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${layerName}.${format}`;
+      a.download = `${layerName}_bundle.zip`;
       document.body.appendChild(a);
       a.click();
       a.remove();

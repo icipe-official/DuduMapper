@@ -1,6 +1,11 @@
 import { NextRequest } from "next/server";
+import { PrismaClient } from "@/generated/prisma";
+import JSZIP from "jszip";
+
+const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
+  //fetching geoserver layers
   const workspace = "Dudu";
   const geoUser = process.env.GEOSERVER_USER;
   const geoPass = process.env.GEOSERVER_PASSWORD;
@@ -9,7 +14,28 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const layerName = searchParams.get("layerName") || searchParams.get("layer");
   //const format = searchParams.get("format") || "image/png";
-
+  //fetching metadata of the layer from db
+  const layerData = await prisma.vectorRiskData.findFirst({
+    where: {
+      displayName: layerName || "",
+    },
+    select: {
+      id: true,
+      displayName: true,
+      title: true,
+      country: true,
+      region: true,
+      year: true,
+      month: true,
+      description: true,
+      highRisk: true,
+    },
+  });
+  if (!layerData) {
+    return new Response("Missing metadata", {
+      status: 400,
+    });
+  }
   if (!layerName) {
     return new Response("Missing layer name", {
       status: 400,
@@ -39,14 +65,20 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const blob = await res.arrayBuffer();
+    const pngBlob = await res.arrayBuffer();
+    //create zip
+    const zip = new JSZIP();
+    zip.file(`${layerName}.png`, pngBlob);
+    zip.file(`${layerName}_metadata.json`, JSON.stringify(layerData, null, 2));
 
-    return new Response(blob, {
+    const zipContent = await zip.generateAsync({ type: "arraybuffer" });
+
+    return new Response(zipContent, {
       status: 200,
 
       headers: {
-        "Content-Type": "image/png",
-        "Content-Disposition": `attachment; filename=${layerName}.png`,
+        "Content-Type": "application/zip",
+        "Content-Disposition": `attachment; filename=${layerName}_bundle.zip`,
       },
     });
   } catch (err) {
@@ -58,7 +90,7 @@ export async function GET(request: NextRequest) {
 }
 {
   /*
-  //rendering interms of a list
+  //rendering all layers interms of a list
   import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
