@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
 
       headers: {
         "Content-Type": "application/zip",
-        "Content-Disposition": `attachment; filename=${layerName}_bundle.zip`,
+        "Content-Disposition": `attachment; filename=${layerName}_raster.zip`,
       },
     });
   } catch (err) {
