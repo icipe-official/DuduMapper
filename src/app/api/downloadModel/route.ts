@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { PrismaClient } from "@/generated/prisma";
 import JSZIP from "jszip";
+import ExcelJS from "exceljs";
 
 const prisma = new PrismaClient();
 
@@ -68,10 +69,25 @@ export async function GET(request: NextRequest) {
     }
 
     const pngBlob = await res.arrayBuffer();
+    //create workbook
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Metadata");
+    //add rows
+    if (layerData) {
+      sheet.addRow(["key", "value"]);
+      Object.entries(layerData).forEach(([key, value]) => {
+        sheet.addRow([key, value !== null ? String(value) : ""]);
+      });
+    } else {
+      sheet.addRow(["Layer", layerName]);
+      sheet.addRow(["Remarks", "No metadata available for this Layer"]);
+    }
+
+    const excelBuffer = await workbook.xlsx.writeBuffer();
     //create zip
     const zip = new JSZIP();
     zip.file(`${layerName}.png`, pngBlob);
-    zip.file(`${layerName}_metadata.json`, JSON.stringify(layerData, null, 2));
+    zip.file(`${layerName}_metadata.xlsx`, excelBuffer);
 
     const zipContent = await zip.generateAsync({ type: "arraybuffer" });
 
