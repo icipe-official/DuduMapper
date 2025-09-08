@@ -580,7 +580,7 @@ function Newmap({ isChecked, setIsChecked, setSelectedLayer }: MapProps) {
       }
     });
 
-    console.log("\nFINAL boo");
+    console.log("\nFINAL Rendered ORGANIZED LAYERS STRUCTURE:");
     Object.entries(organized).forEach(([country, regions]) => {
       Object.entries(regions).forEach(([region, data]) => {
         console.log(
@@ -1182,15 +1182,15 @@ function Newmap({ isChecked, setIsChecked, setSelectedLayer }: MapProps) {
                                                                                 onChange={(
                                                                                   e
                                                                                 ) => {
-                                                                                  const checked =
+                                                                                  const ticked =
                                                                                     e
                                                                                       .target
                                                                                       .checked;
                                                                                   setIsChecked(
-                                                                                    checked
+                                                                                    ticked
                                                                                   );
                                                                                   if (
-                                                                                    checked
+                                                                                    ticked
                                                                                   ) {
                                                                                     const name =
                                                                                       olLayer?.get(
@@ -1330,13 +1330,13 @@ function Newmap({ isChecked, setIsChecked, setSelectedLayer }: MapProps) {
                                                             color="success"
                                                             disableRipple
                                                             onChange={(e) => {
-                                                              const checked =
+                                                              const ticked =
                                                                 e.target
                                                                   .checked;
                                                               setIsChecked(
-                                                                checked
+                                                                ticked
                                                               );
-                                                              if (checked) {
+                                                              if (ticked) {
                                                                 const name =
                                                                   olLayer?.get(
                                                                     "displayName"
@@ -1455,13 +1455,13 @@ function Newmap({ isChecked, setIsChecked, setSelectedLayer }: MapProps) {
                                                           color="success"
                                                           disableRipple
                                                           onChange={(e) => {
-                                                            const checked =
+                                                            const ticked =
                                                               e.target.checked;
 
                                                             setIsChecked(
-                                                              checked
+                                                              ticked
                                                             );
-                                                            if (checked) {
+                                                            if (ticked) {
                                                               const name =
                                                                 olLayer?.get(
                                                                   "displayName"

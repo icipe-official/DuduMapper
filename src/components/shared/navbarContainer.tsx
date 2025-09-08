@@ -72,7 +72,7 @@ const NavbarContainer: React.FC<NavbarContainerProps> = ({
   return user ? (
     <NavbarLoggedIn isChecked={isChecked} selectedLayer={selectedLayer} />
   ) : (
-    <Navbar />
+    <Navbar isChecked={isChecked} selectedLayer={selectedLayer} />
   );
 };
 

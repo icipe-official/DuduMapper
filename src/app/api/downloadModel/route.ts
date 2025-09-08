@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const geoUrl = process.env.NEXT_PUBLIC_GEOSERVER_URL;
 
   const { searchParams } = new URL(request.url);
-  const layerName = searchParams.get("layerName") || searchParams.get("layer");
+  const layerName = searchParams.get("layerName") || searchParams.get("name");
   //const format = searchParams.get("format") || "image/png";
   //fetching metadata of the layer from db
   const layerData = await prisma.vectorRiskData.findFirst({

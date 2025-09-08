@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -10,12 +10,26 @@ import NavLink from "./navlink";
 import { Button, useMediaQuery, useTheme } from "@mui/material";
 import { BASE_PATH } from "@/lib/constants";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  isChecked: boolean;
+  selectedLayer: string | null;
+}
+const Navbar: React.FC<NavbarProps> = ({ isChecked, selectedLayer }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const router = useRouter();
   console.log("Rendering default ✅");
+
+  //button
+  const [loading, setLoading] = useState(false);
+  //const [selectedLayers, setSelectedLayers] = useState<string[]>([]);
+  const [format, setFormat] = useState("shp");
+  //const [areaOfInterest, setAreaOfInterest] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  //const [layers, setLayers] = useState<LayerItem[]>([]);
   const handleLogoClick = () => {
     router.push("/");
   };
@@ -24,7 +38,47 @@ const Navbar: React.FC = () => {
     <NavLink key="About" url="/about" text="About" />,
     <NavLink key="Login" url="/auth/login" text="Login" />,
   ];
+  //download handler
+  const handleDownload = async () => {
+    setLoading(true);
+    setError(null);
 
+    if (!selectedLayer) {
+      setError("Please select at least one layer to download.");
+
+      return;
+    }
+    try {
+      const format = "image/png";
+
+      const layerName = selectedLayer;
+      const res = await fetch(
+        `/api/downloadModel?layerName=${layerName}&format=${format}`
+      );
+      if (!res.ok) {
+        throw new Error("Download request failed");
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${layerName}.zip`;
+      //a.download = `${layerName}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      setSuccess(true);
+      toast.success("Dataset downloaded successfully");
+
+      //onClose();
+    } catch (err) {
+      setError("Failed to download layer. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Box sx={{ position: "relative", zIndex: 2 }}>
       <AppBar
@@ -44,6 +98,17 @@ const Navbar: React.FC = () => {
                 </picture>
               </Link>
             </div>
+          </Box>
+          <Box sx={{ flexGrow: 1 }}>
+            <Button
+              variant="outlined"
+              color="success"
+              sx={{ borderRadius: 5, fontWeight: "bold" }}
+              onClick={handleDownload}
+              disabled={!isChecked || !selectedLayer}
+            >
+              {loading ? "Downloading..." : " Download Dataset"}
+            </Button>
           </Box>
 
           {isMobile ? (
