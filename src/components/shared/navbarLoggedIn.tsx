@@ -215,7 +215,9 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({
     try {
       const format = "image/png";
 
+      //lets use title instead of layername
       const layerName = selectedLayer;
+
       const res = await fetch(
         `/api/downloadModel?layerName=${layerName}&format=${format}`
       );

@@ -1194,10 +1194,10 @@ function Newmap({ isChecked, setIsChecked, setSelectedLayer }: MapProps) {
                                                                                   ) {
                                                                                     const name =
                                                                                       olLayer?.get(
-                                                                                        "displayName"
+                                                                                        "title"
                                                                                       ) ||
                                                                                       olLayer?.get(
-                                                                                        "title"
+                                                                                        "displayName"
                                                                                       );
                                                                                     setSelectedLayer(
                                                                                       name
