@@ -1167,6 +1167,7 @@ function Newmap({ isChecked, setIsChecked, setSelectedLayer }: MapProps) {
                                                                                 )
                                                                               }
                                                                             >
+                                                                              {/*priotize title for download */}
                                                                               <Checkbox
                                                                                 edge="start"
                                                                                 checked={
