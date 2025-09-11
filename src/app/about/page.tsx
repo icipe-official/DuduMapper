@@ -17,6 +17,7 @@ import {
   // PestControl,
   HealthAndSafety,
 } from "@mui/icons-material";
+
 import { PestControl } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import ForestIcon from "@mui/icons-material/Forest";
@@ -82,6 +83,38 @@ const About = () => {
         techniques.
       </Typography>
 
+      <Card sx={{ mb: 4, boxShadow: 3, p: 2 }}>
+        <CardContent>
+          <Typography
+            fontSize="16px"
+            variant="h5"
+            sx={{ fontWeight: "bold", color: "#2E7D32" }}
+          >
+            History
+          </Typography>
+          <Typography
+            fontSize="13px"
+            variant="body1"
+            color="textSecondary"
+            paragraph
+          >
+            Visceral leishmaniasis (VL), also known as kala-azar, is fatal if
+            left untreated in over 95% of cases. It is characterized by
+            irregular bouts of fever, weight loss, enlargement of the spleen and
+            liver, and anaemia. Most cases occur in Brazil, east Africa and
+            India. An estimated 50 000 to 90 000 new cases of VL occur worldwide
+            annually, with only 25–45% reported to WHO. VL has been dated back
+            over 2500 BCE, and numerous primeval accounts of disease present in
+            both earliest literatures and current molecular discoveries from
+            archaeologic resources. Being such a complex, neglected disease,
+            leishmaniasis has a profound effect on community health of the world
+            and is regarded among the six important tropical diseases by World
+            Health Organization. Epidemiologically, leishmaniasis is a
+            non-transmissible, vector-borne disease with broad morbidity and
+            mortality in over 90 tropical and subtropical geographic regions.
+          </Typography>
+        </CardContent>
+      </Card>
       {/* Section: Why DuduMapper? */}
       <Card sx={{ mb: 4, boxShadow: 3, p: 2 }}>
         <CardContent>
@@ -116,15 +149,15 @@ const About = () => {
           {[
             {
               icon: <HealthAndSafety fontSize="large" />,
-              text: "Vector-Borne Diseases – Tracking malaria, dengue, and sleeping sickness hotspots.",
+              text: "Socioeconomic conditions: Poor living conditions like overcrowded housing and inadequate sanitation are associated with increased human exposure to sandflies. Poor waste management and open sewage create ideal breeding grounds for sandflies in rural and low-income urban areas. Limited access to healthcare may delay diagnosis and treatment, which can contribute to more severe disease outcomes..",
             },
             {
               icon: <PestControl fontSize="large" />,
-              text: "Agricultural Risks – Monitoring locust swarms and crop-destroying pests.",
+              text: "Malnutrition: Deficiencies in protein, iron, vitamin A, and zinc weaken the immune system, making it harder to fight Leishmania infections. This increases the risk of both cutaneous and visceral leishmaniasis, leading to more severe illness and poor treatment outcomes.",
             },
             {
               icon: <ForestIcon fontSize="large" />,
-              text: "Climate & Habitat Changes – Understanding how environmental factors influence insect distribution.",
+              text: "Population Mobility  – Migration and displacement due to conflict, economic hardship, or environmental changes contribute to the spread of leishmaniasis, particularly when non-immune individuals enter endemic areas..",
             },
           ].map((item, index) => (
             <Box
@@ -170,19 +203,19 @@ const About = () => {
                 {/* List of insect-related insights */}
                 {[
                   {
-                    icon: <ForestIcon fontSize="medium" />,
-                    title: "Agricultural Pests",
-                    desc: "Tracking locust swarms and their movement patterns.",
+                    icon: <Biotech fontSize="medium" />,
+                    title: "Vector",
+                    desc: "Although most of the literature mentions only one genus transmitting Leishmania to humans (Lutzomyia) in the New World, a 2003 study by Galati suggested a new classification for New World sand flies, elevating several subgenera to the genus level.",
                   },
                   {
                     icon: <LocalFlorist fontSize="medium" />,
-                    title: "Ecosystem Balance",
-                    desc: "Monitoring pollinators like bees for biodiversity insights.",
+                    title: "Spatial Distribution",
+                    desc: "GIS technology: Geographic Information Systems (GIS) integrate entomological, epidemiological, and environmental data to map vector distributions and forecast potential disease outbreaks, enabling more targeted interventions",
                   },
                   {
                     icon: <Public fontSize="medium" />,
                     title: "Climate Impact",
-                    desc: "Studying how temperature and humidity affect insect distribution.",
+                    desc: "Climate change is affecting the spread of leishmaniasis though changes in temperature and rainfall, which affect the size and geographic distribution of sandfly populations. Drought, famine and flood also cause migration of people into areas where the transmission of the parasite is high.",
                   },
                 ].map((item, index) => (
                   <Box
@@ -239,18 +272,18 @@ const About = () => {
                 {[
                   {
                     icon: <Biotech fontSize="medium" />,
-                    title: "Malaria Hotspots",
-                    desc: "Identifying mosquito-breeding areas in affected regions.",
+                    title: "Organismic Factors",
+                    desc: "Visceral disease is usually caused by Leishmania donovani, L. infantum, or L. chagasi,[3] but occasionally these species may cause other forms of disease.[3] The cutaneous form of the disease is caused by more than 15 species of Leishmania.",
                   },
                   {
                     icon: <Public fontSize="medium" />,
-                    title: "Dengue & Zika Risk",
-                    desc: "Tracking climate-driven outbreaks in tropical zones.",
+                    title: "Socio-Economic Factors",
+                    desc: "Poverty increases the risk for leishmaniasis. Poor housing and domestic sanitary conditions (lack of waste management or open sewerage) may increase sandfly breeding and resting sites, as well as their access to humans. Sandflies are attracted to crowded housing because it is easier to bite people and feed on their blood. Human behaviour, such as sleeping outside or on the ground, may increase risk.",
                   },
                   {
                     icon: <ForestIcon fontSize="medium" />,
                     title: "Environmental Factors",
-                    desc: "Examining how deforestation influences disease spread.",
+                    desc: "Examining how deforestation influences disease spread: The incidence of leishmaniasis can be affected by changes in urbanization, deforestation or the human incursion into forested areas.",
                   },
                 ].map((item, index) => (
                   <Box
@@ -302,6 +335,15 @@ const About = () => {
           </Typography>
           <Typography fontSize="13px" variant="body1" color="textSecondary">
             {displayText}
+            <a
+              href="https://www.who.int/news-room/fact-sheets/detail/leishmaniasis"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="WHO Leishmaniasis Fact Sheet"
+              style={{ paddingLeft: "4px" }}
+            >
+              World Health Organization
+            </a>
           </Typography>
         </CardContent>
       </Card>
