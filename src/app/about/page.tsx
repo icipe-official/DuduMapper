@@ -25,17 +25,15 @@ import ForestIcon from "@mui/icons-material/Forest";
 //import { Eco } from "@mui/icons-material/Eco";
 const About = () => {
   const fullText =
-    " At DuduMapper, " +
-    " we believe in the power of data-driven insights to" +
-    " transform public health and environmental sustainability. " +
-    " Our vision aligns with the broader mission of pioneering global " +
-    " science in entomology— leveraging advanced GIS technology to map " +
-    " and analyze insect populations and disease-prone areas. By integrating " +
-    " innovative research with real-world applications, we aim to enhance resilience " +
-    " against vector-borne diseases, agricultural threats, and ecological shifts. Through " +
-    " deep exploratory study, impact assessment, and sustainable capacity building, we strive " +
-    " to make a model for proactive insect-borne disease control, ensuring a healthier, more sustainable " +
-    " future for both people and the environment.";
+    "  DuduMapper, we believe in the power of data-driven insights to transform public" +
+    " health and environmental sustainability. Our vision aligns with the broader mission " +
+    "of pioneering global science inentomology— leveraging advanced GIS technology to map and" +
+    " analyze insect populations and disease-prone areas. By integrating innovative research with" +
+    " real-world applications, we aim to enhance resilience against vector-borne diseases, " +
+    "agricultural threats, and ecological shifts. Through deep exploratory study, impact" +
+    " assessment, and sustainable capacity building, we strive to make a model for proactive" +
+    " insect-borne disease control, ensuring a healthier, more sustainable future for both " +
+    "people and the environment.";
 
   const [displayText, setDisplayText] = useState("");
   const [typing, setTyping] = useState(false);
@@ -74,13 +72,14 @@ const About = () => {
         color="textSecondary"
         paragraph
       >
-        An innovative GIS project which serves as a critical tool in the fight
-        against leishmaniasis, a neglected tropical disease affecting millions
-        worldwide. By visualizing disease prevalence alongside population
-        density data, we empower researchers, healthcare professionals, and
-        policymakers to identify high-risk areas, allocate resources
-        effectively, and develop targeted intervention strategies. raster data
-        techniques.
+        Dudumapper is an innovative GIS project which serves as a critical tool
+        in the fight against leishmaniasis, a neglected tropical disease
+        affecting millions worldwide. Mapping and visualizing disease prevalence
+        alongside population density data is the key to the smarter
+        interventions. It encompases on identifying high-risk areas, allocate
+        resources effectively, and develop targeted intervention strategies
+        through raster data techniques. This project aims to bridge the gap
+        between the health through mapping and notifying about the disease.
       </Typography>
 
       <Card sx={{ mb: 4, boxShadow: 3, p: 2 }}>
@@ -90,7 +89,7 @@ const About = () => {
             variant="h5"
             sx={{ fontWeight: "bold", color: "#2E7D32" }}
           >
-            History
+            Background
           </Typography>
           <Typography
             fontSize="13px"
@@ -131,17 +130,18 @@ const About = () => {
             color="textSecondary"
             paragraph
           >
-            Leishmaniasis is the second-largest parasitic killer after malaria,
-            yet it remains one of the most neglected tropical diseases. With
-            over 1 billion people at risk globally , there is an urgent need for
-            innovative tools that can identify where the disease strikes hardest
-            and who is most vulnerable.
+            Leishmaniasis affects over 1 billion people globally , there is an
+            urgent need for innovative tools that can identify where the disease
+            strikes hardest and who is most vulnerable.
           </Typography>
           <Typography fontSize="13px" variant="body1" color="textSecondary">
             Traditional disease reporting relies on fragmented, often outdated
             information scattered across different health systems. Dudumapper
-            exists because we recognized that raw epidemiological data is
-            meaningless without context :
+            fills this gap by providing real-time data on leishmaniasis through
+            transforming raw data into actionable insights. With Dudumapper,
+            successful tracking is done via notification based system showing
+            how different mapped areas are affected and gauging them if how high
+            risk or low.
           </Typography>
           <Divider sx={{ my: 2 }} />
 
@@ -149,15 +149,27 @@ const About = () => {
           {[
             {
               icon: <HealthAndSafety fontSize="large" />,
-              text: "Socioeconomic conditions: Poor living conditions like overcrowded housing and inadequate sanitation are associated with increased human exposure to sandflies. Poor waste management and open sewage create ideal breeding grounds for sandflies in rural and low-income urban areas. Limited access to healthcare may delay diagnosis and treatment, which can contribute to more severe disease outcomes..",
+              text:
+                "Socioeconomic conditions: Poor living conditions like overcrowded housing and" +
+                " inadequate sanitation are associated with increased human exposure to sandflies. " +
+                "Poor waste management and open sewage create ideal breeding grounds for sandflies in " +
+                "rural and low-income urban areas. Limited access to healthcare may delay diagnosis and treatment, " +
+                "which can contribute to more severe disease outcomes..",
             },
             {
               icon: <PestControl fontSize="large" />,
-              text: "Malnutrition: Deficiencies in protein, iron, vitamin A, and zinc weaken the immune system, making it harder to fight Leishmania infections. This increases the risk of both cutaneous and visceral leishmaniasis, leading to more severe illness and poor treatment outcomes.",
+              text:
+                "Malnutrition: Deficiencies in protein, iron, vitamin A, and zinc weaken the " +
+                "immune system, making it harder to fight Leishmania infections. " +
+                "This increases the risk of both cutaneous and visceral leishmaniasis," +
+                " leading to more severe illness and poor treatment outcomes.",
             },
             {
               icon: <ForestIcon fontSize="large" />,
-              text: "Population Mobility  – Migration and displacement due to conflict, economic hardship, or environmental changes contribute to the spread of leishmaniasis, particularly when non-immune individuals enter endemic areas..",
+              text:
+                "Population Mobility  – Migration and displacement due to conflict, economic " +
+                "hardship, or environmental changes contribute to the spread of leishmaniasis, " +
+                "particularly when non-immune individuals enter endemic areas..",
             },
           ].map((item, index) => (
             <Box
@@ -195,8 +207,8 @@ const About = () => {
                   variant="body1"
                   color="textSecondary"
                 >
-                  Using GIS, we analyze insect activity across Kenya, focusing
-                  on:
+                  Using GIS, we analyze insect activity across East Africa,
+                  focusing on:
                 </Typography>
                 <Divider sx={{ my: 2 }} />
 
@@ -273,12 +285,12 @@ const About = () => {
                   {
                     icon: <Biotech fontSize="medium" />,
                     title: "Organismic Factors",
-                    desc: "Visceral disease is usually caused by Leishmania donovani, L. infantum, or L. chagasi,[3] but occasionally these species may cause other forms of disease.[3] The cutaneous form of the disease is caused by more than 15 species of Leishmania.",
+                    desc: "Visceral disease is usually caused by Leishmania donovani, L. infantum, or L. chagasi, but occasionally these species may cause other forms of disease. The cutaneous form of the disease is caused by more than 15 species of Leishmania.",
                   },
                   {
                     icon: <Public fontSize="medium" />,
                     title: "Socio-Economic Factors",
-                    desc: "Poverty increases the risk for leishmaniasis. Poor housing and domestic sanitary conditions (lack of waste management or open sewerage) may increase sandfly breeding and resting sites, as well as their access to humans. Sandflies are attracted to crowded housing because it is easier to bite people and feed on their blood. Human behaviour, such as sleeping outside or on the ground, may increase risk.",
+                    desc: "Poor housing and domestic sanitary conditions (lack of waste management or open sewerage) may increase sandfly breeding and resting sites, as well as their access to humans. Sandflies are attracted to crowded housing because it is easier to bite people and feed on their blood. Human behaviour, such as sleeping outside or on the ground, may increase risk.",
                   },
                   {
                     icon: <ForestIcon fontSize="medium" />,
@@ -323,7 +335,6 @@ const About = () => {
             boxShadow: 6,
           },
         }}
-        onMouseEnter={handleMouseEnter}
       >
         <CardContent>
           <Typography
@@ -334,13 +345,19 @@ const About = () => {
             Our Vision
           </Typography>
           <Typography fontSize="13px" variant="body1" color="textSecondary">
-            {displayText}
+            The main aim of our project is a healthier, more resilient world
+            where data drives proactive disease control and environmental
+            sustainability.
+            <a onMouseEnter={handleMouseEnter} style={{ color: "green" }}>
+              {" "}
+              {!typing ? "Read More" : displayText}
+            </a>
             <a
               href="https://www.who.int/news-room/fact-sheets/detail/leishmaniasis"
               target="_blank"
               rel="noopener noreferrer"
               title="WHO Leishmaniasis Fact Sheet"
-              style={{ paddingLeft: "4px" }}
+              style={{ paddingLeft: "4px", paddingRight: "4px" }}
             >
               World Health Organization
             </a>
