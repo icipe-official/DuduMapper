@@ -60,6 +60,7 @@ import { FaGlobe, FaMapMarkerAlt } from "react-icons/fa";
 
 import { HealthAndSafety } from "@mui/icons-material";
 import { Button } from "@mui/material";
+import { useMapDrilldown } from "../../../doiContext";
 
 // ─── Constants & Styled Components ────────────────────────────────────────────
 
@@ -111,18 +112,21 @@ const resolutions4326 = projectionExtent4326
 const matrixIds4326 = Array.from({ length: 19 }, (_, z) => `EPSG:4326:${z}`);
 
 // ─── Component ───────────────────────────────────────────────────────────────
-interface MapProps {
-  isChecked: boolean;
-  setIsChecked: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedLayer: React.Dispatch<React.SetStateAction<string | null>>;
-}
-function Newmap({ isChecked, setIsChecked, setSelectedLayer }: MapProps) {
+//interface MapProps {
+// isChecked: boolean;
+//setIsChecked: React.Dispatch<React.SetStateAction<boolean>>;
+//setSelectedLayer: React.Dispatch<React.SetStateAction<string | null>>;
+//}
+function Newmap() {
   //drag effect
   const { drawerWidth, startDragging } = useDrawerDrag();
   const theme = useTheme();
   const mapRef = useRef<OlMap>();
 
   const mapElement = useRef<HTMLDivElement>(null);
+  //map states
+  const { isChecked, setIsChecked, selectedLayer, setSelectedLayer } =
+    useMapDrilldown();
 
   // Add these new state variables after your existing ones
   const [populationOpen, setPopulationOpen] = useState(false);

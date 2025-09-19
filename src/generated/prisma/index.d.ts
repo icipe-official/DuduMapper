@@ -34,6 +34,11 @@ export type PasswordResetToken = $Result.DefaultSelection<Prisma.$PasswordResetT
  */
 export type VectorRiskData = $Result.DefaultSelection<Prisma.$VectorRiskDataPayload>
 /**
+ * Model Doi
+ * 
+ */
+export type Doi = $Result.DefaultSelection<Prisma.$DoiPayload>
+/**
  * Model Notification
  * 
  */
@@ -55,7 +60,7 @@ export type Notification = $Result.DefaultSelection<Prisma.$NotificationPayload>
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
-  U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
+  const U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
   ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs
 > {
   [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
@@ -87,13 +92,6 @@ export class PrismaClient<
    * Disconnect from the database
    */
   $disconnect(): $Utils.JsPromise<void>;
-
-  /**
-   * Add a middleware
-   * @deprecated since 4.16.0. For new code, prefer client extensions instead.
-   * @see https://pris.ly/d/extensions
-   */
-  $use(cb: Prisma.Middleware): void
 
 /**
    * Executes a prepared raw query and returns the number of affected rows.
@@ -205,6 +203,16 @@ export class PrismaClient<
   get vectorRiskData(): Prisma.VectorRiskDataDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.doi`: Exposes CRUD operations for the **Doi** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Dois
+    * const dois = await prisma.doi.findMany()
+    * ```
+    */
+  get doi(): Prisma.DoiDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.notification`: Exposes CRUD operations for the **Notification** model.
     * Example usage:
     * ```ts
@@ -271,8 +279,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.12.0
-   * Query Engine version: 8047c96bbd92db98a2abc7c9323ce77c02c89dbc
+   * Prisma Client JS version: 6.16.2
+   * Query Engine version: 1c57fdcd7e44b29b9313256c76699e91c3ac3c43
    */
   export type PrismaVersion = {
     client: string
@@ -657,6 +665,7 @@ export namespace Prisma {
     SentEmail: 'SentEmail',
     PasswordResetToken: 'PasswordResetToken',
     VectorRiskData: 'VectorRiskData',
+    Doi: 'Doi',
     Notification: 'Notification'
   };
 
@@ -676,7 +685,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "users" | "sentEmail" | "passwordResetToken" | "vectorRiskData" | "notification"
+      modelProps: "users" | "sentEmail" | "passwordResetToken" | "vectorRiskData" | "doi" | "notification"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -976,6 +985,80 @@ export namespace Prisma {
           }
         }
       }
+      Doi: {
+        payload: Prisma.$DoiPayload<ExtArgs>
+        fields: Prisma.DoiFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DoiFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DoiPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DoiFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DoiPayload>
+          }
+          findFirst: {
+            args: Prisma.DoiFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DoiPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DoiFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DoiPayload>
+          }
+          findMany: {
+            args: Prisma.DoiFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DoiPayload>[]
+          }
+          create: {
+            args: Prisma.DoiCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DoiPayload>
+          }
+          createMany: {
+            args: Prisma.DoiCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DoiCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DoiPayload>[]
+          }
+          delete: {
+            args: Prisma.DoiDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DoiPayload>
+          }
+          update: {
+            args: Prisma.DoiUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DoiPayload>
+          }
+          deleteMany: {
+            args: Prisma.DoiDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DoiUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DoiUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DoiPayload>[]
+          }
+          upsert: {
+            args: Prisma.DoiUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DoiPayload>
+          }
+          aggregate: {
+            args: Prisma.DoiAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDoi>
+          }
+          groupBy: {
+            args: Prisma.DoiGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DoiGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DoiCountArgs<ExtArgs>
+            result: $Utils.Optional<DoiCountAggregateOutputType> | number
+          }
+        }
+      }
       Notification: {
         payload: Prisma.$NotificationPayload<ExtArgs>
         fields: Prisma.NotificationFieldRefs
@@ -1093,16 +1176,24 @@ export namespace Prisma {
     /**
      * @example
      * ```
-     * // Defaults to stdout
+     * // Shorthand for `emit: 'stdout'`
      * log: ['query', 'info', 'warn', 'error']
      * 
-     * // Emit as events
+     * // Emit as events only
      * log: [
-     *   { emit: 'stdout', level: 'query' },
-     *   { emit: 'stdout', level: 'info' },
-     *   { emit: 'stdout', level: 'warn' }
-     *   { emit: 'stdout', level: 'error' }
+     *   { emit: 'event', level: 'query' },
+     *   { emit: 'event', level: 'info' },
+     *   { emit: 'event', level: 'warn' }
+     *   { emit: 'event', level: 'error' }
      * ]
+     * 
+     * / Emit as events and log to stdout
+     * og: [
+     *  { emit: 'stdout', level: 'query' },
+     *  { emit: 'stdout', level: 'info' },
+     *  { emit: 'stdout', level: 'warn' }
+     *  { emit: 'stdout', level: 'error' }
+     * 
      * ```
      * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
      */
@@ -1117,6 +1208,10 @@ export namespace Prisma {
       timeout?: number
       isolationLevel?: Prisma.TransactionIsolationLevel
     }
+    /**
+     * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
+     */
+    adapter?: runtime.SqlDriverAdapterFactory | null
     /**
      * Global configuration for omitting model fields by default.
      * 
@@ -1138,6 +1233,7 @@ export namespace Prisma {
     sentEmail?: SentEmailOmit
     passwordResetToken?: PasswordResetTokenOmit
     vectorRiskData?: VectorRiskDataOmit
+    doi?: DoiOmit
     notification?: NotificationOmit
   }
 
@@ -1148,10 +1244,15 @@ export namespace Prisma {
     emit: 'stdout' | 'event'
   }
 
-  export type GetLogType<T extends LogLevel | LogDefinition> = T extends LogDefinition ? T['emit'] extends 'event' ? T['level'] : never : never
-  export type GetEvents<T extends any> = T extends Array<LogLevel | LogDefinition> ?
-    GetLogType<T[0]> | GetLogType<T[1]> | GetLogType<T[2]> | GetLogType<T[3]>
-    : never
+  export type CheckIsLogLevel<T> = T extends LogLevel ? T : never;
+
+  export type GetLogType<T> = CheckIsLogLevel<
+    T extends LogDefinition ? T['level'] : T
+  >;
+
+  export type GetEvents<T extends any[]> = T extends Array<LogLevel | LogDefinition>
+    ? GetLogType<T[number]>
+    : never;
 
   export type QueryEvent = {
     timestamp: Date
@@ -1191,25 +1292,6 @@ export namespace Prisma {
     | 'runCommandRaw'
     | 'findRaw'
     | 'groupBy'
-
-  /**
-   * These options are being passed into the middleware as "params"
-   */
-  export type MiddlewareParams = {
-    model?: ModelName
-    action: PrismaAction
-    args: any
-    dataPath: string[]
-    runInTransaction: boolean
-  }
-
-  /**
-   * The `T` type makes sure, that the `return proceed` is not forgotten in the middleware implementation
-   */
-  export type Middleware<T = any> = (
-    params: MiddlewareParams,
-    next: (params: MiddlewareParams) => $Utils.JsPromise<T>,
-  ) => $Utils.JsPromise<T>
 
   // tested in getLogLevel.test.ts
   export function getLogLevel(log: Array<LogLevel | LogDefinition>): LogLevel | undefined;
@@ -5782,6 +5864,1065 @@ export namespace Prisma {
 
 
   /**
+   * Model Doi
+   */
+
+  export type AggregateDoi = {
+    _count: DoiCountAggregateOutputType | null
+    _avg: DoiAvgAggregateOutputType | null
+    _sum: DoiSumAggregateOutputType | null
+    _min: DoiMinAggregateOutputType | null
+    _max: DoiMaxAggregateOutputType | null
+  }
+
+  export type DoiAvgAggregateOutputType = {
+    id: number | null
+    publicationYear: number | null
+  }
+
+  export type DoiSumAggregateOutputType = {
+    id: number | null
+    publicationYear: number | null
+  }
+
+  export type DoiMinAggregateOutputType = {
+    id: number | null
+    title: string | null
+    creator: string | null
+    publisher: string | null
+    publicationYear: number | null
+    resourceType: string | null
+    url: string | null
+  }
+
+  export type DoiMaxAggregateOutputType = {
+    id: number | null
+    title: string | null
+    creator: string | null
+    publisher: string | null
+    publicationYear: number | null
+    resourceType: string | null
+    url: string | null
+  }
+
+  export type DoiCountAggregateOutputType = {
+    id: number
+    title: number
+    creator: number
+    publisher: number
+    publicationYear: number
+    resourceType: number
+    url: number
+    _all: number
+  }
+
+
+  export type DoiAvgAggregateInputType = {
+    id?: true
+    publicationYear?: true
+  }
+
+  export type DoiSumAggregateInputType = {
+    id?: true
+    publicationYear?: true
+  }
+
+  export type DoiMinAggregateInputType = {
+    id?: true
+    title?: true
+    creator?: true
+    publisher?: true
+    publicationYear?: true
+    resourceType?: true
+    url?: true
+  }
+
+  export type DoiMaxAggregateInputType = {
+    id?: true
+    title?: true
+    creator?: true
+    publisher?: true
+    publicationYear?: true
+    resourceType?: true
+    url?: true
+  }
+
+  export type DoiCountAggregateInputType = {
+    id?: true
+    title?: true
+    creator?: true
+    publisher?: true
+    publicationYear?: true
+    resourceType?: true
+    url?: true
+    _all?: true
+  }
+
+  export type DoiAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Doi to aggregate.
+     */
+    where?: DoiWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Dois to fetch.
+     */
+    orderBy?: DoiOrderByWithRelationInput | DoiOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DoiWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Dois from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Dois.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Dois
+    **/
+    _count?: true | DoiCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DoiAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DoiSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DoiMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DoiMaxAggregateInputType
+  }
+
+  export type GetDoiAggregateType<T extends DoiAggregateArgs> = {
+        [P in keyof T & keyof AggregateDoi]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDoi[P]>
+      : GetScalarType<T[P], AggregateDoi[P]>
+  }
+
+
+
+
+  export type DoiGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DoiWhereInput
+    orderBy?: DoiOrderByWithAggregationInput | DoiOrderByWithAggregationInput[]
+    by: DoiScalarFieldEnum[] | DoiScalarFieldEnum
+    having?: DoiScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DoiCountAggregateInputType | true
+    _avg?: DoiAvgAggregateInputType
+    _sum?: DoiSumAggregateInputType
+    _min?: DoiMinAggregateInputType
+    _max?: DoiMaxAggregateInputType
+  }
+
+  export type DoiGroupByOutputType = {
+    id: number
+    title: string
+    creator: string
+    publisher: string
+    publicationYear: number
+    resourceType: string
+    url: string
+    _count: DoiCountAggregateOutputType | null
+    _avg: DoiAvgAggregateOutputType | null
+    _sum: DoiSumAggregateOutputType | null
+    _min: DoiMinAggregateOutputType | null
+    _max: DoiMaxAggregateOutputType | null
+  }
+
+  type GetDoiGroupByPayload<T extends DoiGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DoiGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DoiGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DoiGroupByOutputType[P]>
+            : GetScalarType<T[P], DoiGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DoiSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    title?: boolean
+    creator?: boolean
+    publisher?: boolean
+    publicationYear?: boolean
+    resourceType?: boolean
+    url?: boolean
+  }, ExtArgs["result"]["doi"]>
+
+  export type DoiSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    title?: boolean
+    creator?: boolean
+    publisher?: boolean
+    publicationYear?: boolean
+    resourceType?: boolean
+    url?: boolean
+  }, ExtArgs["result"]["doi"]>
+
+  export type DoiSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    title?: boolean
+    creator?: boolean
+    publisher?: boolean
+    publicationYear?: boolean
+    resourceType?: boolean
+    url?: boolean
+  }, ExtArgs["result"]["doi"]>
+
+  export type DoiSelectScalar = {
+    id?: boolean
+    title?: boolean
+    creator?: boolean
+    publisher?: boolean
+    publicationYear?: boolean
+    resourceType?: boolean
+    url?: boolean
+  }
+
+  export type DoiOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "creator" | "publisher" | "publicationYear" | "resourceType" | "url", ExtArgs["result"]["doi"]>
+
+  export type $DoiPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Doi"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      title: string
+      creator: string
+      publisher: string
+      publicationYear: number
+      resourceType: string
+      url: string
+    }, ExtArgs["result"]["doi"]>
+    composites: {}
+  }
+
+  type DoiGetPayload<S extends boolean | null | undefined | DoiDefaultArgs> = $Result.GetResult<Prisma.$DoiPayload, S>
+
+  type DoiCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DoiFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DoiCountAggregateInputType | true
+    }
+
+  export interface DoiDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Doi'], meta: { name: 'Doi' } }
+    /**
+     * Find zero or one Doi that matches the filter.
+     * @param {DoiFindUniqueArgs} args - Arguments to find a Doi
+     * @example
+     * // Get one Doi
+     * const doi = await prisma.doi.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DoiFindUniqueArgs>(args: SelectSubset<T, DoiFindUniqueArgs<ExtArgs>>): Prisma__DoiClient<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Doi that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DoiFindUniqueOrThrowArgs} args - Arguments to find a Doi
+     * @example
+     * // Get one Doi
+     * const doi = await prisma.doi.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DoiFindUniqueOrThrowArgs>(args: SelectSubset<T, DoiFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DoiClient<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Doi that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DoiFindFirstArgs} args - Arguments to find a Doi
+     * @example
+     * // Get one Doi
+     * const doi = await prisma.doi.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DoiFindFirstArgs>(args?: SelectSubset<T, DoiFindFirstArgs<ExtArgs>>): Prisma__DoiClient<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Doi that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DoiFindFirstOrThrowArgs} args - Arguments to find a Doi
+     * @example
+     * // Get one Doi
+     * const doi = await prisma.doi.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DoiFindFirstOrThrowArgs>(args?: SelectSubset<T, DoiFindFirstOrThrowArgs<ExtArgs>>): Prisma__DoiClient<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Dois that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DoiFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Dois
+     * const dois = await prisma.doi.findMany()
+     * 
+     * // Get first 10 Dois
+     * const dois = await prisma.doi.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const doiWithIdOnly = await prisma.doi.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DoiFindManyArgs>(args?: SelectSubset<T, DoiFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Doi.
+     * @param {DoiCreateArgs} args - Arguments to create a Doi.
+     * @example
+     * // Create one Doi
+     * const Doi = await prisma.doi.create({
+     *   data: {
+     *     // ... data to create a Doi
+     *   }
+     * })
+     * 
+     */
+    create<T extends DoiCreateArgs>(args: SelectSubset<T, DoiCreateArgs<ExtArgs>>): Prisma__DoiClient<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Dois.
+     * @param {DoiCreateManyArgs} args - Arguments to create many Dois.
+     * @example
+     * // Create many Dois
+     * const doi = await prisma.doi.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DoiCreateManyArgs>(args?: SelectSubset<T, DoiCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Dois and returns the data saved in the database.
+     * @param {DoiCreateManyAndReturnArgs} args - Arguments to create many Dois.
+     * @example
+     * // Create many Dois
+     * const doi = await prisma.doi.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Dois and only return the `id`
+     * const doiWithIdOnly = await prisma.doi.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DoiCreateManyAndReturnArgs>(args?: SelectSubset<T, DoiCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Doi.
+     * @param {DoiDeleteArgs} args - Arguments to delete one Doi.
+     * @example
+     * // Delete one Doi
+     * const Doi = await prisma.doi.delete({
+     *   where: {
+     *     // ... filter to delete one Doi
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DoiDeleteArgs>(args: SelectSubset<T, DoiDeleteArgs<ExtArgs>>): Prisma__DoiClient<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Doi.
+     * @param {DoiUpdateArgs} args - Arguments to update one Doi.
+     * @example
+     * // Update one Doi
+     * const doi = await prisma.doi.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DoiUpdateArgs>(args: SelectSubset<T, DoiUpdateArgs<ExtArgs>>): Prisma__DoiClient<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Dois.
+     * @param {DoiDeleteManyArgs} args - Arguments to filter Dois to delete.
+     * @example
+     * // Delete a few Dois
+     * const { count } = await prisma.doi.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DoiDeleteManyArgs>(args?: SelectSubset<T, DoiDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Dois.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DoiUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Dois
+     * const doi = await prisma.doi.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DoiUpdateManyArgs>(args: SelectSubset<T, DoiUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Dois and returns the data updated in the database.
+     * @param {DoiUpdateManyAndReturnArgs} args - Arguments to update many Dois.
+     * @example
+     * // Update many Dois
+     * const doi = await prisma.doi.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Dois and only return the `id`
+     * const doiWithIdOnly = await prisma.doi.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DoiUpdateManyAndReturnArgs>(args: SelectSubset<T, DoiUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Doi.
+     * @param {DoiUpsertArgs} args - Arguments to update or create a Doi.
+     * @example
+     * // Update or create a Doi
+     * const doi = await prisma.doi.upsert({
+     *   create: {
+     *     // ... data to create a Doi
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Doi we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DoiUpsertArgs>(args: SelectSubset<T, DoiUpsertArgs<ExtArgs>>): Prisma__DoiClient<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Dois.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DoiCountArgs} args - Arguments to filter Dois to count.
+     * @example
+     * // Count the number of Dois
+     * const count = await prisma.doi.count({
+     *   where: {
+     *     // ... the filter for the Dois we want to count
+     *   }
+     * })
+    **/
+    count<T extends DoiCountArgs>(
+      args?: Subset<T, DoiCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DoiCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Doi.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DoiAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DoiAggregateArgs>(args: Subset<T, DoiAggregateArgs>): Prisma.PrismaPromise<GetDoiAggregateType<T>>
+
+    /**
+     * Group by Doi.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DoiGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DoiGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DoiGroupByArgs['orderBy'] }
+        : { orderBy?: DoiGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DoiGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDoiGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Doi model
+   */
+  readonly fields: DoiFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Doi.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DoiClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Doi model
+   */
+  interface DoiFieldRefs {
+    readonly id: FieldRef<"Doi", 'Int'>
+    readonly title: FieldRef<"Doi", 'String'>
+    readonly creator: FieldRef<"Doi", 'String'>
+    readonly publisher: FieldRef<"Doi", 'String'>
+    readonly publicationYear: FieldRef<"Doi", 'Int'>
+    readonly resourceType: FieldRef<"Doi", 'String'>
+    readonly url: FieldRef<"Doi", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Doi findUnique
+   */
+  export type DoiFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Filter, which Doi to fetch.
+     */
+    where: DoiWhereUniqueInput
+  }
+
+  /**
+   * Doi findUniqueOrThrow
+   */
+  export type DoiFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Filter, which Doi to fetch.
+     */
+    where: DoiWhereUniqueInput
+  }
+
+  /**
+   * Doi findFirst
+   */
+  export type DoiFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Filter, which Doi to fetch.
+     */
+    where?: DoiWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Dois to fetch.
+     */
+    orderBy?: DoiOrderByWithRelationInput | DoiOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Dois.
+     */
+    cursor?: DoiWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Dois from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Dois.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Dois.
+     */
+    distinct?: DoiScalarFieldEnum | DoiScalarFieldEnum[]
+  }
+
+  /**
+   * Doi findFirstOrThrow
+   */
+  export type DoiFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Filter, which Doi to fetch.
+     */
+    where?: DoiWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Dois to fetch.
+     */
+    orderBy?: DoiOrderByWithRelationInput | DoiOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Dois.
+     */
+    cursor?: DoiWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Dois from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Dois.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Dois.
+     */
+    distinct?: DoiScalarFieldEnum | DoiScalarFieldEnum[]
+  }
+
+  /**
+   * Doi findMany
+   */
+  export type DoiFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Filter, which Dois to fetch.
+     */
+    where?: DoiWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Dois to fetch.
+     */
+    orderBy?: DoiOrderByWithRelationInput | DoiOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Dois.
+     */
+    cursor?: DoiWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Dois from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Dois.
+     */
+    skip?: number
+    distinct?: DoiScalarFieldEnum | DoiScalarFieldEnum[]
+  }
+
+  /**
+   * Doi create
+   */
+  export type DoiCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * The data needed to create a Doi.
+     */
+    data: XOR<DoiCreateInput, DoiUncheckedCreateInput>
+  }
+
+  /**
+   * Doi createMany
+   */
+  export type DoiCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Dois.
+     */
+    data: DoiCreateManyInput | DoiCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Doi createManyAndReturn
+   */
+  export type DoiCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * The data used to create many Dois.
+     */
+    data: DoiCreateManyInput | DoiCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Doi update
+   */
+  export type DoiUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * The data needed to update a Doi.
+     */
+    data: XOR<DoiUpdateInput, DoiUncheckedUpdateInput>
+    /**
+     * Choose, which Doi to update.
+     */
+    where: DoiWhereUniqueInput
+  }
+
+  /**
+   * Doi updateMany
+   */
+  export type DoiUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Dois.
+     */
+    data: XOR<DoiUpdateManyMutationInput, DoiUncheckedUpdateManyInput>
+    /**
+     * Filter which Dois to update
+     */
+    where?: DoiWhereInput
+    /**
+     * Limit how many Dois to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Doi updateManyAndReturn
+   */
+  export type DoiUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * The data used to update Dois.
+     */
+    data: XOR<DoiUpdateManyMutationInput, DoiUncheckedUpdateManyInput>
+    /**
+     * Filter which Dois to update
+     */
+    where?: DoiWhereInput
+    /**
+     * Limit how many Dois to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Doi upsert
+   */
+  export type DoiUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * The filter to search for the Doi to update in case it exists.
+     */
+    where: DoiWhereUniqueInput
+    /**
+     * In case the Doi found by the `where` argument doesn't exist, create a new Doi with this data.
+     */
+    create: XOR<DoiCreateInput, DoiUncheckedCreateInput>
+    /**
+     * In case the Doi was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DoiUpdateInput, DoiUncheckedUpdateInput>
+  }
+
+  /**
+   * Doi delete
+   */
+  export type DoiDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Filter which Doi to delete.
+     */
+    where: DoiWhereUniqueInput
+  }
+
+  /**
+   * Doi deleteMany
+   */
+  export type DoiDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Dois to delete
+     */
+    where?: DoiWhereInput
+    /**
+     * Limit how many Dois to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Doi without action
+   */
+  export type DoiDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model Notification
    */
 
@@ -6945,6 +8086,19 @@ export namespace Prisma {
   export type VectorRiskDataScalarFieldEnum = (typeof VectorRiskDataScalarFieldEnum)[keyof typeof VectorRiskDataScalarFieldEnum]
 
 
+  export const DoiScalarFieldEnum: {
+    id: 'id',
+    title: 'title',
+    creator: 'creator',
+    publisher: 'publisher',
+    publicationYear: 'publicationYear',
+    resourceType: 'resourceType',
+    url: 'url'
+  };
+
+  export type DoiScalarFieldEnum = (typeof DoiScalarFieldEnum)[keyof typeof DoiScalarFieldEnum]
+
+
   export const NotificationScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
@@ -7331,6 +8485,70 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"VectorRiskData"> | Date | string
   }
 
+  export type DoiWhereInput = {
+    AND?: DoiWhereInput | DoiWhereInput[]
+    OR?: DoiWhereInput[]
+    NOT?: DoiWhereInput | DoiWhereInput[]
+    id?: IntFilter<"Doi"> | number
+    title?: StringFilter<"Doi"> | string
+    creator?: StringFilter<"Doi"> | string
+    publisher?: StringFilter<"Doi"> | string
+    publicationYear?: IntFilter<"Doi"> | number
+    resourceType?: StringFilter<"Doi"> | string
+    url?: StringFilter<"Doi"> | string
+  }
+
+  export type DoiOrderByWithRelationInput = {
+    id?: SortOrder
+    title?: SortOrder
+    creator?: SortOrder
+    publisher?: SortOrder
+    publicationYear?: SortOrder
+    resourceType?: SortOrder
+    url?: SortOrder
+  }
+
+  export type DoiWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: DoiWhereInput | DoiWhereInput[]
+    OR?: DoiWhereInput[]
+    NOT?: DoiWhereInput | DoiWhereInput[]
+    title?: StringFilter<"Doi"> | string
+    creator?: StringFilter<"Doi"> | string
+    publisher?: StringFilter<"Doi"> | string
+    publicationYear?: IntFilter<"Doi"> | number
+    resourceType?: StringFilter<"Doi"> | string
+    url?: StringFilter<"Doi"> | string
+  }, "id">
+
+  export type DoiOrderByWithAggregationInput = {
+    id?: SortOrder
+    title?: SortOrder
+    creator?: SortOrder
+    publisher?: SortOrder
+    publicationYear?: SortOrder
+    resourceType?: SortOrder
+    url?: SortOrder
+    _count?: DoiCountOrderByAggregateInput
+    _avg?: DoiAvgOrderByAggregateInput
+    _max?: DoiMaxOrderByAggregateInput
+    _min?: DoiMinOrderByAggregateInput
+    _sum?: DoiSumOrderByAggregateInput
+  }
+
+  export type DoiScalarWhereWithAggregatesInput = {
+    AND?: DoiScalarWhereWithAggregatesInput | DoiScalarWhereWithAggregatesInput[]
+    OR?: DoiScalarWhereWithAggregatesInput[]
+    NOT?: DoiScalarWhereWithAggregatesInput | DoiScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Doi"> | number
+    title?: StringWithAggregatesFilter<"Doi"> | string
+    creator?: StringWithAggregatesFilter<"Doi"> | string
+    publisher?: StringWithAggregatesFilter<"Doi"> | string
+    publicationYear?: IntWithAggregatesFilter<"Doi"> | number
+    resourceType?: StringWithAggregatesFilter<"Doi"> | string
+    url?: StringWithAggregatesFilter<"Doi"> | string
+  }
+
   export type NotificationWhereInput = {
     AND?: NotificationWhereInput | NotificationWhereInput[]
     OR?: NotificationWhereInput[]
@@ -7687,6 +8905,73 @@ export namespace Prisma {
     highRisk?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DoiCreateInput = {
+    title: string
+    creator: string
+    publisher: string
+    publicationYear: number
+    resourceType: string
+    url: string
+  }
+
+  export type DoiUncheckedCreateInput = {
+    id?: number
+    title: string
+    creator: string
+    publisher: string
+    publicationYear: number
+    resourceType: string
+    url: string
+  }
+
+  export type DoiUpdateInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    creator?: StringFieldUpdateOperationsInput | string
+    publisher?: StringFieldUpdateOperationsInput | string
+    publicationYear?: IntFieldUpdateOperationsInput | number
+    resourceType?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type DoiUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    creator?: StringFieldUpdateOperationsInput | string
+    publisher?: StringFieldUpdateOperationsInput | string
+    publicationYear?: IntFieldUpdateOperationsInput | number
+    resourceType?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type DoiCreateManyInput = {
+    id?: number
+    title: string
+    creator: string
+    publisher: string
+    publicationYear: number
+    resourceType: string
+    url: string
+  }
+
+  export type DoiUpdateManyMutationInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    creator?: StringFieldUpdateOperationsInput | string
+    publisher?: StringFieldUpdateOperationsInput | string
+    publicationYear?: IntFieldUpdateOperationsInput | number
+    resourceType?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type DoiUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    creator?: StringFieldUpdateOperationsInput | string
+    publisher?: StringFieldUpdateOperationsInput | string
+    publicationYear?: IntFieldUpdateOperationsInput | number
+    resourceType?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
   }
 
   export type NotificationCreateInput = {
@@ -8064,6 +9349,46 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type DoiCountOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    creator?: SortOrder
+    publisher?: SortOrder
+    publicationYear?: SortOrder
+    resourceType?: SortOrder
+    url?: SortOrder
+  }
+
+  export type DoiAvgOrderByAggregateInput = {
+    id?: SortOrder
+    publicationYear?: SortOrder
+  }
+
+  export type DoiMaxOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    creator?: SortOrder
+    publisher?: SortOrder
+    publicationYear?: SortOrder
+    resourceType?: SortOrder
+    url?: SortOrder
+  }
+
+  export type DoiMinOrderByAggregateInput = {
+    id?: SortOrder
+    title?: SortOrder
+    creator?: SortOrder
+    publisher?: SortOrder
+    publicationYear?: SortOrder
+    resourceType?: SortOrder
+    url?: SortOrder
+  }
+
+  export type DoiSumOrderByAggregateInput = {
+    id?: SortOrder
+    publicationYear?: SortOrder
   }
 
   export type VectorRiskDataScalarRelationFilter = {

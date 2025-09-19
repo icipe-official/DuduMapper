@@ -18,8 +18,8 @@ import NewMap from "./Map";
 const MapWrapper = () => {
   //aded state for ischecked then pass it
   // to newmap so that it can check on checkbox
-  const [isChecked, setIsChecked] = useState(false);
-  const [selectedLayer, setSelectedLayer] = useState<string | null>(null);
+  //const [isChecked, setIsChecked] = useState(false);
+  //const [selectedLayer, setSelectedLayer] = useState<string | null>(null);
   return (
     <div
       style={{
@@ -31,11 +31,7 @@ const MapWrapper = () => {
         overflow: "hidden",
       }}
     >
-      <NewMap
-        isChecked={isChecked}
-        setIsChecked={setIsChecked}
-        setSelectedLayer={setSelectedLayer}
-      />
+      <NewMap />
     </div>
   );
 };

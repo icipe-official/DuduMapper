@@ -11,12 +11,13 @@ import { Button, useMediaQuery, useTheme } from "@mui/material";
 import { BASE_PATH } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { useMapDrilldown } from "../../../doiContext";
 
-interface NavbarProps {
-  isChecked: boolean;
-  selectedLayer: string | null;
-}
-const Navbar: React.FC<NavbarProps> = ({ isChecked, selectedLayer }) => {
+//interface NavbarProps {
+//isChecked: boolean;
+//selectedLayer: string | null;
+//}
+const Navbar: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const router = useRouter();
@@ -30,6 +31,8 @@ const Navbar: React.FC<NavbarProps> = ({ isChecked, selectedLayer }) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   //const [layers, setLayers] = useState<LayerItem[]>([]);
+  const { selectedLayer, setSelectedLayer, isChecked, setIsChecked } =
+    useMapDrilldown();
   const handleLogoClick = () => {
     router.push("/");
   };

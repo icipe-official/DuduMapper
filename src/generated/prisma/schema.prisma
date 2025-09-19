@@ -56,6 +56,16 @@ model VectorRiskData {
   notifications Notification[]
 }
 
+model Doi {
+  id              Int    @id @default(autoincrement())
+  title           String @db.VarChar(100)
+  creator         String @db.VarChar(100)
+  publisher       String @db.VarChar(100)
+  publicationYear Int
+  resourceType    String
+  url             String
+}
+
 model Notification {
   id               Int            @id @default(autoincrement())
   userId           Int

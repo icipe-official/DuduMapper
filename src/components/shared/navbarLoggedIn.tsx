@@ -7,6 +7,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Link from "next/link";
 import DrawerComp from "./DrawerComp";
 import NavLink from "./navlink";
+import { useMapDrilldown } from "../../../doiContext";
 import {
   useMediaQuery,
   useTheme,
@@ -50,68 +51,71 @@ import { set } from "date-fns";
 //added ischecked prop to receive
 // the value of the state from parent component
 // and use it to disable the button and changed its style
-interface NavbarLoggedInProps {
-  isChecked: boolean;
-  selectedLayer: string | null;
-  //setIsChecked: (checked: boolean) => void;
-}
+//interface NavbarLoggedInProps {
+//isChecked: boolean;
+// selectedLayer: string | null;
+//setIsChecked: (checked: boolean) => void;
+//}
 
-const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({
-  isChecked,
-  selectedLayer,
-}) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const router = useRouter();
-  console.log("Rendering NavbarLoggedIn ");
-  const { user, logout } = useAuth();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [settingAnchorEl, setSettingAnchorEl] =
-    React.useState<null | HTMLElement>(null);
-
-  /*************  ✨ Windsurf Command ⭐  *************/
-  /**
-   * Opens the user menu.
-   * @param {React.MouseEvent<HTMLElement>} event The event that triggered the function.
-   */
-  /*******  f3559e20-e1b3-4bf5-a28a-82a02d448521  *******/
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const [cqlFilter, setCqlFilter] = useState<string | null>(null);
-  const [downloadPopupOpen, setDownloadPopupOpen] = useState(false);
-  //const [isChecked, setIsChecked] = useState(false);
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSettingAnchorEl(null);
-  };
-  const handleSettingClick = (event: React.MouseEvent<HTMLElement>) => {
-    setSettingAnchorEl(event.currentTarget);
-  };
-  const handleLogout = async () => {
-    await logout();
-    (toast.success("Logging out Successfully"),
-      {
-        position: "top-right",
-        hideProgressBar: false,
-        pauseOnHover: false,
-        autoClose: 5000,
-      });
-    router.push("/");
-    handleMenuClose();
-  };
-  //route
-  const accountpage = () => {
-    router.push("/auth/AccountPage");
-  };
-  //admin page
-  const handleAdminPage = () => {
-    router.push("/auth/admin");
-  };
-  //icon for gender
+const NavbarLoggedIn: React.FC = () =>
+  //{
+  //isChecked,
+  //selectedLayer,
+  //}
   {
-    /*const getGenderIcon = (gender: string | undefined) => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const router = useRouter();
+    console.log("Rendering NavbarLoggedIn ");
+    const { user, logout } = useAuth();
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [settingAnchorEl, setSettingAnchorEl] =
+      React.useState<null | HTMLElement>(null);
+    const { isChecked, setIsChecked, selectedLayer } = useMapDrilldown();
+
+    /*************  ✨ Windsurf Command ⭐  *************/
+    /**
+     * Opens the user menu.
+     * @param {React.MouseEvent<HTMLElement>} event The event that triggered the function.
+     */
+    /*******  f3559e20-e1b3-4bf5-a28a-82a02d448521  *******/
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorEl(event.currentTarget);
+    };
+    const [cqlFilter, setCqlFilter] = useState<string | null>(null);
+    const [downloadPopupOpen, setDownloadPopupOpen] = useState(false);
+    //const [isChecked, setIsChecked] = useState(false);
+
+    const handleMenuClose = () => {
+      setAnchorEl(null);
+      setSettingAnchorEl(null);
+    };
+    const handleSettingClick = (event: React.MouseEvent<HTMLElement>) => {
+      setSettingAnchorEl(event.currentTarget);
+    };
+    const handleLogout = async () => {
+      await logout();
+      (toast.success("Logging out Successfully"),
+        {
+          position: "top-right",
+          hideProgressBar: false,
+          pauseOnHover: false,
+          autoClose: 5000,
+        });
+      router.push("/");
+      handleMenuClose();
+    };
+    //route
+    const accountpage = () => {
+      router.push("/auth/AccountPage");
+    };
+    //admin page
+    const handleAdminPage = () => {
+      router.push("/auth/admin");
+    };
+    //icon for gender
+    {
+      /*const getGenderIcon = (gender: string | undefined) => {
     switch (gender?.toLowerCase()) {
       case "male":
         return (
@@ -136,36 +140,36 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({
     }
   };
 */
-  }
-  const handleLogoClick = () => {
-    router.push("/");
-  };
-  const [open, setOpen] = React.useState(false);
+    }
+    const handleLogoClick = () => {
+      router.push("/");
+    };
+    const [open, setOpen] = React.useState(false);
 
-  const navMenuItems = [<NavLink key="About" url="/about" text="About" />];
+    const navMenuItems = [<NavLink key="About" url="/about" text="About" />];
 
-  //using this as name in my field
-  {
-    /*function getNameFromEmail(email?: string): string {
+    //using this as name in my field
+    {
+      /*function getNameFromEmail(email?: string): string {
     if (!email) return "user"; // handle for undefined email
     return email.split("@")[0];
   }*/
-  }
-  //download image button
-  interface LayerItem {
-    name: string;
-    href: string;
-  }
-  const [loading, setLoading] = useState(false);
-  //const [selectedLayers, setSelectedLayers] = useState<string[]>([]);
-  const [format, setFormat] = useState("shp");
-  //const [areaOfInterest, setAreaOfInterest] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [layers, setLayers] = useState<LayerItem[]>([]);
+    }
+    //download image button
+    interface LayerItem {
+      name: string;
+      href: string;
+    }
+    const [loading, setLoading] = useState(false);
+    //const [selectedLayers, setSelectedLayers] = useState<string[]>([]);
+    const [format, setFormat] = useState("shp");
+    //const [areaOfInterest, setAreaOfInterest] = useState("");
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState(false);
+    const [layers, setLayers] = useState<LayerItem[]>([]);
 
-  {
-    /*useEffect(() => {
+    {
+      /*useEffect(() => {
     const fetchLayers = async () => {
       try {
         const res = await fetch(
@@ -193,148 +197,151 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({
     };
     fetchLayers();
   }, []);*/
-  }
-  {
-    /*const handleLayerToggle = (layerName: string) => {
+    }
+    {
+      /*const handleLayerToggle = (layerName: string) => {
     setSelectedLayers((prev) =>
       prev.includes(layerName)
         ? prev.filter((l) => l !== layerName)
         : [...prev, layerName]
     );
   };*/
-  }
-  const handleDownload = async () => {
-    setLoading(true);
-    setError(null);
-
-    if (!selectedLayer) {
-      setError("Please select at least one layer to download.");
-
-      return;
     }
-    try {
-      const format = "image/png";
+    const handleDownload = async () => {
+      setLoading(true);
+      setError(null);
 
-      //lets use title instead of layername
-      const layerName = selectedLayer;
+      if (!selectedLayer) {
+        setError("Please select at least one layer to download.");
 
-      const res = await fetch(
-        `/api/downloadModel?layerName=${layerName}&format=${format}`
-      );
-      if (!res.ok) {
-        throw new Error("Download request failed");
+        return;
       }
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${layerName}.zip`;
-      //a.download = `${layerName}.png`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
+      try {
+        const format = "image/png";
 
-      setSuccess(true);
-      toast.success("Dataset downloaded successfully");
+        //lets use title instead of layername
+        const layerName = selectedLayer;
 
-      //onClose();
-    } catch (err) {
-      setError("Failed to download layer. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-  return (
-    <Box sx={{ position: "relative", zIndex: 2 }}>
-      <AppBar position="fixed" sx={{ bgcolor: "white", margin: 0, padding: 0 }}>
-        <Toolbar>
-          <Box sx={{ flexGrow: 1, mt: "6px" }}>
-            <div onClick={handleLogoClick} style={{ cursor: "pointer" }}>
-              <Link href="/">
-                <picture>
-                  <img
-                    src={`/Animals-Mosquito-icon.png`}
-                    style={{ maxHeight: "70px" }}
-                    alt="Dudu Mapper logo"
-                  />
-                </picture>
-              </Link>
-            </div>
-          </Box>
-          <Box sx={{ flexGrow: 1 }}>
-            <Button
-              variant="outlined"
-              color="success"
-              sx={{ borderRadius: 5, fontWeight: "bold" }}
-              onClick={handleDownload}
-              disabled={!isChecked || !selectedLayer}
-            >
-              {loading ? "Downloading..." : " Download Dataset"}
-            </Button>
-          </Box>
+        const res = await fetch(
+          `/api/downloadModel?layerName=${layerName}&format=${format}`
+        );
+        if (!res.ok) {
+          throw new Error("Download request failed");
+        }
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${layerName}.zip`;
+        //a.download = `${layerName}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
 
-          {isMobile ? (
-            <DrawerComp navItems={navMenuItems} />
-          ) : (
-            <>
-              {navMenuItems}
-              <IconButton
-                size="large"
-                edge="end"
+        setSuccess(true);
+        toast.success("Dataset downloaded successfully");
+
+        //onClose();
+      } catch (err) {
+        setError("Failed to download layer. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    return (
+      <Box sx={{ position: "relative", zIndex: 2 }}>
+        <AppBar
+          position="fixed"
+          sx={{ bgcolor: "white", margin: 0, padding: 0 }}
+        >
+          <Toolbar>
+            <Box sx={{ flexGrow: 1, mt: "6px" }}>
+              <div onClick={handleLogoClick} style={{ cursor: "pointer" }}>
+                <Link href="/">
+                  <picture>
+                    <img
+                      src={`/Animals-Mosquito-icon.png`}
+                      style={{ maxHeight: "70px" }}
+                      alt="Dudu Mapper logo"
+                    />
+                  </picture>
+                </Link>
+              </div>
+            </Box>
+            <Box sx={{ flexGrow: 1 }}>
+              <Button
+                variant="outlined"
                 color="success"
-                onClick={handleMenuOpen}
+                sx={{ borderRadius: 5, fontWeight: "bold" }}
+                onClick={handleDownload}
+                disabled={!isChecked || !selectedLayer}
               >
-                {user?.profilePicture ? (
-                  <img
-                    src={user.profilePicture}
-                    alt="Profile"
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "50%",
-                    }}
-                  />
-                ) : (
-                  <AccountCircle />
-                )}
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-              >
-                <MenuItem disabled>
-                  <Typography
-                    sx={{
-                      color: "black",
-                      fontFamily: "sans-serif",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Welcome &nbsp;
-                  </Typography>
-                  {user?.firstName}
-                  <PersonIcon />
-                </MenuItem>
+                {loading ? "Downloading..." : " Download Dataset"}
+              </Button>
+            </Box>
 
-                <Divider sx={{ my: 0.5 }} />
-
-                {user?.role === "admin" && (
-                  <MenuItem onClick={handleAdminPage}>
-                    Admin Panel &nbsp;
-                    <AdminPanelSettings sx={{ ml: "auto", mr: 1 }} />
+            {isMobile ? (
+              <DrawerComp navItems={navMenuItems} />
+            ) : (
+              <>
+                {navMenuItems}
+                <IconButton
+                  size="large"
+                  edge="end"
+                  color="success"
+                  onClick={handleMenuOpen}
+                >
+                  {user?.profilePicture ? (
+                    <img
+                      src={user.profilePicture}
+                      alt="Profile"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  ) : (
+                    <AccountCircle />
+                  )}
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem disabled>
+                    <Typography
+                      sx={{
+                        color: "black",
+                        fontFamily: "sans-serif",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Welcome &nbsp;
+                    </Typography>
+                    {user?.firstName}
+                    <PersonIcon />
                   </MenuItem>
-                )}
 
-                <Divider sx={{ my: 0.5 }} />
+                  <Divider sx={{ my: 0.5 }} />
 
-                <MenuItem onClick={accountpage}>
-                  Profile &nbsp;
-                  <AccountCircle sx={{ ml: "auto", mr: 1 }} />
-                </MenuItem>
+                  {user?.role === "admin" && (
+                    <MenuItem onClick={handleAdminPage}>
+                      Admin Panel &nbsp;
+                      <AdminPanelSettings sx={{ ml: "auto", mr: 1 }} />
+                    </MenuItem>
+                  )}
 
-                {/*<MenuItem
+                  <Divider sx={{ my: 0.5 }} />
+
+                  <MenuItem onClick={accountpage}>
+                    Profile &nbsp;
+                    <AccountCircle sx={{ ml: "auto", mr: 1 }} />
+                  </MenuItem>
+
+                  {/*<MenuItem
                   //onClick={() => {
                   // router.push("/auth/settings");
                   //handleMenuClose();
@@ -345,13 +352,13 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({
                   <SettingsIcon sx={{ ml: "auto", mr: 1 }} />
                 </MenuItem>*/}
 
-                <MenuItem onClick={handleLogout}>
-                  Logout
-                  <Logout sx={{ ml: "auto", mr: 1 }} />
-                </MenuItem>
-              </Menu>
+                  <MenuItem onClick={handleLogout}>
+                    Logout
+                    <Logout sx={{ ml: "auto", mr: 1 }} />
+                  </MenuItem>
+                </Menu>
 
-              {/**setting dropdown *
+                {/**setting dropdown *
               <Menu
                 anchorEl={settingAnchorEl}
                 open={Boolean(settingAnchorEl)}
@@ -456,12 +463,12 @@ const NavbarLoggedIn: React.FC<NavbarLoggedInProps> = ({
                   </Box>
                 </MenuItem>
               </Menu>*/}
-            </>
-          )}
-        </Toolbar>
-      </AppBar>
-    </Box>
-  );
-};
+              </>
+            )}
+          </Toolbar>
+        </AppBar>
+      </Box>
+    );
+  };
 
 export default NavbarLoggedIn;

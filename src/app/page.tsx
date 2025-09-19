@@ -7,6 +7,7 @@ import NavbarContainer from "../components/shared/navbarContainer"; //
 import NavbarLoggedIn from "../components/shared/navbarLoggedIn";
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
+import { MapDrilldownProvider } from "../../doiContext";
 
 // Dynamically import the map to prevent server-side rendering issues
 const Newmap = dynamic(() => import("../components/map/Map"), { ssr: false });
@@ -30,21 +31,19 @@ const Newmap = dynamic(() => import("../components/map/Map"), { ssr: false });
   //added state for ischecked then pass it to navbarcontainer
   //and also to newmap so that it can check on checkbox
 
-  const [isChecked, setIsChecked] = useState(false);
-  const [selectedLayer, setSelectedLayer] = useState<string | null>(null);
+  //const [isChecked, setIsChecked] = useState(false);
+  //const [selectedLayer, setSelectedLayer] = useState<string | null>(null);
   return (
     <div
       style={{ overflow: "hidden", height: "100vh", width: "100vw", margin: 0 }}
     >
-      <NavbarContainer isChecked={isChecked} selectedLayer={selectedLayer} />
-      {/* 👈 This makes the header dynamic */}
-      <div style={{ height: "100%", marginTop: "50px" }}>
-        <Newmap
-          isChecked={isChecked}
-          setIsChecked={setIsChecked}
-          setSelectedLayer={setSelectedLayer}
-        />
-      </div>
+      <MapDrilldownProvider>
+        <NavbarContainer />
+        {/* 👈 This makes the header dynamic */}
+        <div style={{ height: "100%", marginTop: "50px" }}>
+          <Newmap />
+        </div>
+      </MapDrilldownProvider>
     </div>
   );
 }

@@ -20,12 +20,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.12.0
- * Query Engine version: 8047c96bbd92db98a2abc7c9323ce77c02c89dbc
+ * Prisma Client JS version: 6.16.2
+ * Query Engine version: 1c57fdcd7e44b29b9313256c76699e91c3ac3c43
  */
 Prisma.prismaVersion = {
-  client: "6.12.0",
-  engine: "8047c96bbd92db98a2abc7c9323ce77c02c89dbc"
+  client: "6.16.2",
+  engine: "1c57fdcd7e44b29b9313256c76699e91c3ac3c43"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -163,6 +163,16 @@ exports.Prisma.VectorRiskDataScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.DoiScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  creator: 'creator',
+  publisher: 'publisher',
+  publicationYear: 'publicationYear',
+  resourceType: 'resourceType',
+  url: 'url'
+};
+
 exports.Prisma.NotificationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -191,6 +201,7 @@ exports.Prisma.ModelName = {
   SentEmail: 'SentEmail',
   PasswordResetToken: 'PasswordResetToken',
   VectorRiskData: 'VectorRiskData',
+  Doi: 'Doi',
   Notification: 'Notification'
 };
 
