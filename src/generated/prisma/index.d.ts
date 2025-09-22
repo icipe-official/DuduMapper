@@ -4923,6 +4923,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     notifications?: boolean | VectorRiskData$notificationsArgs<ExtArgs>
+    doi?: boolean | VectorRiskData$doiArgs<ExtArgs>
     _count?: boolean | VectorRiskDataCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["vectorRiskData"]>
 
@@ -4974,6 +4975,7 @@ export namespace Prisma {
   export type VectorRiskDataOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "displayName" | "title" | "country" | "region" | "year" | "month" | "model" | "description" | "highRisk" | "createdAt" | "updatedAt", ExtArgs["result"]["vectorRiskData"]>
   export type VectorRiskDataInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     notifications?: boolean | VectorRiskData$notificationsArgs<ExtArgs>
+    doi?: boolean | VectorRiskData$doiArgs<ExtArgs>
     _count?: boolean | VectorRiskDataCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type VectorRiskDataIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4983,6 +4985,7 @@ export namespace Prisma {
     name: "VectorRiskData"
     objects: {
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
+      doi: Prisma.$DoiPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -5392,6 +5395,7 @@ export namespace Prisma {
   export interface Prisma__VectorRiskDataClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     notifications<T extends VectorRiskData$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, VectorRiskData$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    doi<T extends VectorRiskData$doiArgs<ExtArgs> = {}>(args?: Subset<T, VectorRiskData$doiArgs<ExtArgs>>): Prisma__DoiClient<$Result.GetResult<Prisma.$DoiPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5845,6 +5849,25 @@ export namespace Prisma {
   }
 
   /**
+   * VectorRiskData.doi
+   */
+  export type VectorRiskData$doiArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doi
+     */
+    select?: DoiSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doi
+     */
+    omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiInclude<ExtArgs> | null
+    where?: DoiWhereInput
+  }
+
+  /**
    * VectorRiskData without action
    */
   export type VectorRiskDataDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5878,41 +5901,43 @@ export namespace Prisma {
   export type DoiAvgAggregateOutputType = {
     id: number | null
     publicationYear: number | null
+    modelId: number | null
   }
 
   export type DoiSumAggregateOutputType = {
     id: number | null
     publicationYear: number | null
+    modelId: number | null
   }
 
   export type DoiMinAggregateOutputType = {
     id: number | null
-    title: string | null
     creator: string | null
     publisher: string | null
     publicationYear: number | null
     resourceType: string | null
     url: string | null
+    modelId: number | null
   }
 
   export type DoiMaxAggregateOutputType = {
     id: number | null
-    title: string | null
     creator: string | null
     publisher: string | null
     publicationYear: number | null
     resourceType: string | null
     url: string | null
+    modelId: number | null
   }
 
   export type DoiCountAggregateOutputType = {
     id: number
-    title: number
     creator: number
     publisher: number
     publicationYear: number
     resourceType: number
     url: number
+    modelId: number
     _all: number
   }
 
@@ -5920,41 +5945,43 @@ export namespace Prisma {
   export type DoiAvgAggregateInputType = {
     id?: true
     publicationYear?: true
+    modelId?: true
   }
 
   export type DoiSumAggregateInputType = {
     id?: true
     publicationYear?: true
+    modelId?: true
   }
 
   export type DoiMinAggregateInputType = {
     id?: true
-    title?: true
     creator?: true
     publisher?: true
     publicationYear?: true
     resourceType?: true
     url?: true
+    modelId?: true
   }
 
   export type DoiMaxAggregateInputType = {
     id?: true
-    title?: true
     creator?: true
     publisher?: true
     publicationYear?: true
     resourceType?: true
     url?: true
+    modelId?: true
   }
 
   export type DoiCountAggregateInputType = {
     id?: true
-    title?: true
     creator?: true
     publisher?: true
     publicationYear?: true
     resourceType?: true
     url?: true
+    modelId?: true
     _all?: true
   }
 
@@ -6046,12 +6073,12 @@ export namespace Prisma {
 
   export type DoiGroupByOutputType = {
     id: number
-    title: string
     creator: string
     publisher: string
     publicationYear: number
     resourceType: string
     url: string
+    modelId: number
     _count: DoiCountAggregateOutputType | null
     _avg: DoiAvgAggregateOutputType | null
     _sum: DoiSumAggregateOutputType | null
@@ -6075,57 +6102,71 @@ export namespace Prisma {
 
   export type DoiSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    title?: boolean
     creator?: boolean
     publisher?: boolean
     publicationYear?: boolean
     resourceType?: boolean
     url?: boolean
+    modelId?: boolean
+    vectorRiskData?: boolean | VectorRiskDataDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["doi"]>
 
   export type DoiSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    title?: boolean
     creator?: boolean
     publisher?: boolean
     publicationYear?: boolean
     resourceType?: boolean
     url?: boolean
+    modelId?: boolean
+    vectorRiskData?: boolean | VectorRiskDataDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["doi"]>
 
   export type DoiSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    title?: boolean
     creator?: boolean
     publisher?: boolean
     publicationYear?: boolean
     resourceType?: boolean
     url?: boolean
+    modelId?: boolean
+    vectorRiskData?: boolean | VectorRiskDataDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["doi"]>
 
   export type DoiSelectScalar = {
     id?: boolean
-    title?: boolean
     creator?: boolean
     publisher?: boolean
     publicationYear?: boolean
     resourceType?: boolean
     url?: boolean
+    modelId?: boolean
   }
 
-  export type DoiOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "creator" | "publisher" | "publicationYear" | "resourceType" | "url", ExtArgs["result"]["doi"]>
+  export type DoiOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "creator" | "publisher" | "publicationYear" | "resourceType" | "url" | "modelId", ExtArgs["result"]["doi"]>
+  export type DoiInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    vectorRiskData?: boolean | VectorRiskDataDefaultArgs<ExtArgs>
+  }
+  export type DoiIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    vectorRiskData?: boolean | VectorRiskDataDefaultArgs<ExtArgs>
+  }
+  export type DoiIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    vectorRiskData?: boolean | VectorRiskDataDefaultArgs<ExtArgs>
+  }
 
   export type $DoiPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Doi"
-    objects: {}
+    objects: {
+      vectorRiskData: Prisma.$VectorRiskDataPayload<ExtArgs>
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      title: string
       creator: string
       publisher: string
       publicationYear: number
       resourceType: string
       url: string
+      modelId: number
     }, ExtArgs["result"]["doi"]>
     composites: {}
   }
@@ -6520,6 +6561,7 @@ export namespace Prisma {
    */
   export interface Prisma__DoiClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    vectorRiskData<T extends VectorRiskDataDefaultArgs<ExtArgs> = {}>(args?: Subset<T, VectorRiskDataDefaultArgs<ExtArgs>>): Prisma__VectorRiskDataClient<$Result.GetResult<Prisma.$VectorRiskDataPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6550,12 +6592,12 @@ export namespace Prisma {
    */
   interface DoiFieldRefs {
     readonly id: FieldRef<"Doi", 'Int'>
-    readonly title: FieldRef<"Doi", 'String'>
     readonly creator: FieldRef<"Doi", 'String'>
     readonly publisher: FieldRef<"Doi", 'String'>
     readonly publicationYear: FieldRef<"Doi", 'Int'>
     readonly resourceType: FieldRef<"Doi", 'String'>
     readonly url: FieldRef<"Doi", 'String'>
+    readonly modelId: FieldRef<"Doi", 'Int'>
   }
     
 
@@ -6572,6 +6614,10 @@ export namespace Prisma {
      * Omit specific fields from the Doi
      */
     omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiInclude<ExtArgs> | null
     /**
      * Filter, which Doi to fetch.
      */
@@ -6591,6 +6637,10 @@ export namespace Prisma {
      */
     omit?: DoiOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiInclude<ExtArgs> | null
+    /**
      * Filter, which Doi to fetch.
      */
     where: DoiWhereUniqueInput
@@ -6608,6 +6658,10 @@ export namespace Prisma {
      * Omit specific fields from the Doi
      */
     omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiInclude<ExtArgs> | null
     /**
      * Filter, which Doi to fetch.
      */
@@ -6657,6 +6711,10 @@ export namespace Prisma {
      */
     omit?: DoiOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiInclude<ExtArgs> | null
+    /**
      * Filter, which Doi to fetch.
      */
     where?: DoiWhereInput
@@ -6705,6 +6763,10 @@ export namespace Prisma {
      */
     omit?: DoiOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiInclude<ExtArgs> | null
+    /**
      * Filter, which Dois to fetch.
      */
     where?: DoiWhereInput
@@ -6748,6 +6810,10 @@ export namespace Prisma {
      */
     omit?: DoiOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiInclude<ExtArgs> | null
+    /**
      * The data needed to create a Doi.
      */
     data: XOR<DoiCreateInput, DoiUncheckedCreateInput>
@@ -6781,6 +6847,10 @@ export namespace Prisma {
      */
     data: DoiCreateManyInput | DoiCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6795,6 +6865,10 @@ export namespace Prisma {
      * Omit specific fields from the Doi
      */
     omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiInclude<ExtArgs> | null
     /**
      * The data needed to update a Doi.
      */
@@ -6847,6 +6921,10 @@ export namespace Prisma {
      * Limit how many Dois to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6861,6 +6939,10 @@ export namespace Prisma {
      * Omit specific fields from the Doi
      */
     omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiInclude<ExtArgs> | null
     /**
      * The filter to search for the Doi to update in case it exists.
      */
@@ -6887,6 +6969,10 @@ export namespace Prisma {
      * Omit specific fields from the Doi
      */
     omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiInclude<ExtArgs> | null
     /**
      * Filter which Doi to delete.
      */
@@ -6919,6 +7005,10 @@ export namespace Prisma {
      * Omit specific fields from the Doi
      */
     omit?: DoiOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoiInclude<ExtArgs> | null
   }
 
 
@@ -8088,12 +8178,12 @@ export namespace Prisma {
 
   export const DoiScalarFieldEnum: {
     id: 'id',
-    title: 'title',
     creator: 'creator',
     publisher: 'publisher',
     publicationYear: 'publicationYear',
     resourceType: 'resourceType',
-    url: 'url'
+    url: 'url',
+    modelId: 'modelId'
   };
 
   export type DoiScalarFieldEnum = (typeof DoiScalarFieldEnum)[keyof typeof DoiScalarFieldEnum]
@@ -8410,6 +8500,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"VectorRiskData"> | Date | string
     updatedAt?: DateTimeFilter<"VectorRiskData"> | Date | string
     notifications?: NotificationListRelationFilter
+    doi?: XOR<DoiNullableScalarRelationFilter, DoiWhereInput> | null
   }
 
   export type VectorRiskDataOrderByWithRelationInput = {
@@ -8426,6 +8517,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     notifications?: NotificationOrderByRelationAggregateInput
+    doi?: DoiOrderByWithRelationInput
   }
 
   export type VectorRiskDataWhereUniqueInput = Prisma.AtLeast<{
@@ -8445,6 +8537,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"VectorRiskData"> | Date | string
     updatedAt?: DateTimeFilter<"VectorRiskData"> | Date | string
     notifications?: NotificationListRelationFilter
+    doi?: XOR<DoiNullableScalarRelationFilter, DoiWhereInput> | null
   }, "id">
 
   export type VectorRiskDataOrderByWithAggregationInput = {
@@ -8490,45 +8583,48 @@ export namespace Prisma {
     OR?: DoiWhereInput[]
     NOT?: DoiWhereInput | DoiWhereInput[]
     id?: IntFilter<"Doi"> | number
-    title?: StringFilter<"Doi"> | string
     creator?: StringFilter<"Doi"> | string
     publisher?: StringFilter<"Doi"> | string
     publicationYear?: IntFilter<"Doi"> | number
     resourceType?: StringFilter<"Doi"> | string
     url?: StringFilter<"Doi"> | string
+    modelId?: IntFilter<"Doi"> | number
+    vectorRiskData?: XOR<VectorRiskDataScalarRelationFilter, VectorRiskDataWhereInput>
   }
 
   export type DoiOrderByWithRelationInput = {
     id?: SortOrder
-    title?: SortOrder
     creator?: SortOrder
     publisher?: SortOrder
     publicationYear?: SortOrder
     resourceType?: SortOrder
     url?: SortOrder
+    modelId?: SortOrder
+    vectorRiskData?: VectorRiskDataOrderByWithRelationInput
   }
 
   export type DoiWhereUniqueInput = Prisma.AtLeast<{
     id?: number
+    modelId?: number
     AND?: DoiWhereInput | DoiWhereInput[]
     OR?: DoiWhereInput[]
     NOT?: DoiWhereInput | DoiWhereInput[]
-    title?: StringFilter<"Doi"> | string
     creator?: StringFilter<"Doi"> | string
     publisher?: StringFilter<"Doi"> | string
     publicationYear?: IntFilter<"Doi"> | number
     resourceType?: StringFilter<"Doi"> | string
     url?: StringFilter<"Doi"> | string
-  }, "id">
+    vectorRiskData?: XOR<VectorRiskDataScalarRelationFilter, VectorRiskDataWhereInput>
+  }, "id" | "modelId">
 
   export type DoiOrderByWithAggregationInput = {
     id?: SortOrder
-    title?: SortOrder
     creator?: SortOrder
     publisher?: SortOrder
     publicationYear?: SortOrder
     resourceType?: SortOrder
     url?: SortOrder
+    modelId?: SortOrder
     _count?: DoiCountOrderByAggregateInput
     _avg?: DoiAvgOrderByAggregateInput
     _max?: DoiMaxOrderByAggregateInput
@@ -8541,12 +8637,12 @@ export namespace Prisma {
     OR?: DoiScalarWhereWithAggregatesInput[]
     NOT?: DoiScalarWhereWithAggregatesInput | DoiScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Doi"> | number
-    title?: StringWithAggregatesFilter<"Doi"> | string
     creator?: StringWithAggregatesFilter<"Doi"> | string
     publisher?: StringWithAggregatesFilter<"Doi"> | string
     publicationYear?: IntWithAggregatesFilter<"Doi"> | number
     resourceType?: StringWithAggregatesFilter<"Doi"> | string
     url?: StringWithAggregatesFilter<"Doi"> | string
+    modelId?: IntWithAggregatesFilter<"Doi"> | number
   }
 
   export type NotificationWhereInput = {
@@ -8814,6 +8910,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     notifications?: NotificationCreateNestedManyWithoutVectorRiskDataInput
+    doi?: DoiCreateNestedOneWithoutVectorRiskDataInput
   }
 
   export type VectorRiskDataUncheckedCreateInput = {
@@ -8830,6 +8927,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     notifications?: NotificationUncheckedCreateNestedManyWithoutVectorRiskDataInput
+    doi?: DoiUncheckedCreateNestedOneWithoutVectorRiskDataInput
   }
 
   export type VectorRiskDataUpdateInput = {
@@ -8845,6 +8943,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notifications?: NotificationUpdateManyWithoutVectorRiskDataNestedInput
+    doi?: DoiUpdateOneWithoutVectorRiskDataNestedInput
   }
 
   export type VectorRiskDataUncheckedUpdateInput = {
@@ -8861,6 +8960,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notifications?: NotificationUncheckedUpdateManyWithoutVectorRiskDataNestedInput
+    doi?: DoiUncheckedUpdateOneWithoutVectorRiskDataNestedInput
   }
 
   export type VectorRiskDataCreateManyInput = {
@@ -8908,55 +9008,54 @@ export namespace Prisma {
   }
 
   export type DoiCreateInput = {
-    title: string
     creator: string
     publisher: string
     publicationYear: number
     resourceType: string
     url: string
+    vectorRiskData: VectorRiskDataCreateNestedOneWithoutDoiInput
   }
 
   export type DoiUncheckedCreateInput = {
     id?: number
-    title: string
     creator: string
     publisher: string
     publicationYear: number
     resourceType: string
     url: string
+    modelId: number
   }
 
   export type DoiUpdateInput = {
-    title?: StringFieldUpdateOperationsInput | string
     creator?: StringFieldUpdateOperationsInput | string
     publisher?: StringFieldUpdateOperationsInput | string
     publicationYear?: IntFieldUpdateOperationsInput | number
     resourceType?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
+    vectorRiskData?: VectorRiskDataUpdateOneRequiredWithoutDoiNestedInput
   }
 
   export type DoiUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
-    title?: StringFieldUpdateOperationsInput | string
     creator?: StringFieldUpdateOperationsInput | string
     publisher?: StringFieldUpdateOperationsInput | string
     publicationYear?: IntFieldUpdateOperationsInput | number
     resourceType?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
+    modelId?: IntFieldUpdateOperationsInput | number
   }
 
   export type DoiCreateManyInput = {
     id?: number
-    title: string
     creator: string
     publisher: string
     publicationYear: number
     resourceType: string
     url: string
+    modelId: number
   }
 
   export type DoiUpdateManyMutationInput = {
-    title?: StringFieldUpdateOperationsInput | string
     creator?: StringFieldUpdateOperationsInput | string
     publisher?: StringFieldUpdateOperationsInput | string
     publicationYear?: IntFieldUpdateOperationsInput | number
@@ -8966,12 +9065,12 @@ export namespace Prisma {
 
   export type DoiUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
-    title?: StringFieldUpdateOperationsInput | string
     creator?: StringFieldUpdateOperationsInput | string
     publisher?: StringFieldUpdateOperationsInput | string
     publicationYear?: IntFieldUpdateOperationsInput | number
     resourceType?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
+    modelId?: IntFieldUpdateOperationsInput | number
   }
 
   export type NotificationCreateInput = {
@@ -9286,6 +9385,11 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type DoiNullableScalarRelationFilter = {
+    is?: DoiWhereInput | null
+    isNot?: DoiWhereInput | null
+  }
+
   export type VectorRiskDataCountOrderByAggregateInput = {
     id?: SortOrder
     displayName?: SortOrder
@@ -9351,49 +9455,51 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type VectorRiskDataScalarRelationFilter = {
+    is?: VectorRiskDataWhereInput
+    isNot?: VectorRiskDataWhereInput
+  }
+
   export type DoiCountOrderByAggregateInput = {
     id?: SortOrder
-    title?: SortOrder
     creator?: SortOrder
     publisher?: SortOrder
     publicationYear?: SortOrder
     resourceType?: SortOrder
     url?: SortOrder
+    modelId?: SortOrder
   }
 
   export type DoiAvgOrderByAggregateInput = {
     id?: SortOrder
     publicationYear?: SortOrder
+    modelId?: SortOrder
   }
 
   export type DoiMaxOrderByAggregateInput = {
     id?: SortOrder
-    title?: SortOrder
     creator?: SortOrder
     publisher?: SortOrder
     publicationYear?: SortOrder
     resourceType?: SortOrder
     url?: SortOrder
+    modelId?: SortOrder
   }
 
   export type DoiMinOrderByAggregateInput = {
     id?: SortOrder
-    title?: SortOrder
     creator?: SortOrder
     publisher?: SortOrder
     publicationYear?: SortOrder
     resourceType?: SortOrder
     url?: SortOrder
+    modelId?: SortOrder
   }
 
   export type DoiSumOrderByAggregateInput = {
     id?: SortOrder
     publicationYear?: SortOrder
-  }
-
-  export type VectorRiskDataScalarRelationFilter = {
-    is?: VectorRiskDataWhereInput
-    isNot?: VectorRiskDataWhereInput
+    modelId?: SortOrder
   }
 
   export type NotificationCountOrderByAggregateInput = {
@@ -9558,11 +9664,23 @@ export namespace Prisma {
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
   }
 
+  export type DoiCreateNestedOneWithoutVectorRiskDataInput = {
+    create?: XOR<DoiCreateWithoutVectorRiskDataInput, DoiUncheckedCreateWithoutVectorRiskDataInput>
+    connectOrCreate?: DoiCreateOrConnectWithoutVectorRiskDataInput
+    connect?: DoiWhereUniqueInput
+  }
+
   export type NotificationUncheckedCreateNestedManyWithoutVectorRiskDataInput = {
     create?: XOR<NotificationCreateWithoutVectorRiskDataInput, NotificationUncheckedCreateWithoutVectorRiskDataInput> | NotificationCreateWithoutVectorRiskDataInput[] | NotificationUncheckedCreateWithoutVectorRiskDataInput[]
     connectOrCreate?: NotificationCreateOrConnectWithoutVectorRiskDataInput | NotificationCreateOrConnectWithoutVectorRiskDataInput[]
     createMany?: NotificationCreateManyVectorRiskDataInputEnvelope
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
+  export type DoiUncheckedCreateNestedOneWithoutVectorRiskDataInput = {
+    create?: XOR<DoiCreateWithoutVectorRiskDataInput, DoiUncheckedCreateWithoutVectorRiskDataInput>
+    connectOrCreate?: DoiCreateOrConnectWithoutVectorRiskDataInput
+    connect?: DoiWhereUniqueInput
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -9583,6 +9701,16 @@ export namespace Prisma {
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
   }
 
+  export type DoiUpdateOneWithoutVectorRiskDataNestedInput = {
+    create?: XOR<DoiCreateWithoutVectorRiskDataInput, DoiUncheckedCreateWithoutVectorRiskDataInput>
+    connectOrCreate?: DoiCreateOrConnectWithoutVectorRiskDataInput
+    upsert?: DoiUpsertWithoutVectorRiskDataInput
+    disconnect?: DoiWhereInput | boolean
+    delete?: DoiWhereInput | boolean
+    connect?: DoiWhereUniqueInput
+    update?: XOR<XOR<DoiUpdateToOneWithWhereWithoutVectorRiskDataInput, DoiUpdateWithoutVectorRiskDataInput>, DoiUncheckedUpdateWithoutVectorRiskDataInput>
+  }
+
   export type NotificationUncheckedUpdateManyWithoutVectorRiskDataNestedInput = {
     create?: XOR<NotificationCreateWithoutVectorRiskDataInput, NotificationUncheckedCreateWithoutVectorRiskDataInput> | NotificationCreateWithoutVectorRiskDataInput[] | NotificationUncheckedCreateWithoutVectorRiskDataInput[]
     connectOrCreate?: NotificationCreateOrConnectWithoutVectorRiskDataInput | NotificationCreateOrConnectWithoutVectorRiskDataInput[]
@@ -9595,6 +9723,30 @@ export namespace Prisma {
     update?: NotificationUpdateWithWhereUniqueWithoutVectorRiskDataInput | NotificationUpdateWithWhereUniqueWithoutVectorRiskDataInput[]
     updateMany?: NotificationUpdateManyWithWhereWithoutVectorRiskDataInput | NotificationUpdateManyWithWhereWithoutVectorRiskDataInput[]
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
+  export type DoiUncheckedUpdateOneWithoutVectorRiskDataNestedInput = {
+    create?: XOR<DoiCreateWithoutVectorRiskDataInput, DoiUncheckedCreateWithoutVectorRiskDataInput>
+    connectOrCreate?: DoiCreateOrConnectWithoutVectorRiskDataInput
+    upsert?: DoiUpsertWithoutVectorRiskDataInput
+    disconnect?: DoiWhereInput | boolean
+    delete?: DoiWhereInput | boolean
+    connect?: DoiWhereUniqueInput
+    update?: XOR<XOR<DoiUpdateToOneWithWhereWithoutVectorRiskDataInput, DoiUpdateWithoutVectorRiskDataInput>, DoiUncheckedUpdateWithoutVectorRiskDataInput>
+  }
+
+  export type VectorRiskDataCreateNestedOneWithoutDoiInput = {
+    create?: XOR<VectorRiskDataCreateWithoutDoiInput, VectorRiskDataUncheckedCreateWithoutDoiInput>
+    connectOrCreate?: VectorRiskDataCreateOrConnectWithoutDoiInput
+    connect?: VectorRiskDataWhereUniqueInput
+  }
+
+  export type VectorRiskDataUpdateOneRequiredWithoutDoiNestedInput = {
+    create?: XOR<VectorRiskDataCreateWithoutDoiInput, VectorRiskDataUncheckedCreateWithoutDoiInput>
+    connectOrCreate?: VectorRiskDataCreateOrConnectWithoutDoiInput
+    upsert?: VectorRiskDataUpsertWithoutDoiInput
+    connect?: VectorRiskDataWhereUniqueInput
+    update?: XOR<XOR<VectorRiskDataUpdateToOneWithWhereWithoutDoiInput, VectorRiskDataUpdateWithoutDoiInput>, VectorRiskDataUncheckedUpdateWithoutDoiInput>
   }
 
   export type usersCreateNestedOneWithoutNotificationsInput = {
@@ -9971,6 +10123,28 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DoiCreateWithoutVectorRiskDataInput = {
+    creator: string
+    publisher: string
+    publicationYear: number
+    resourceType: string
+    url: string
+  }
+
+  export type DoiUncheckedCreateWithoutVectorRiskDataInput = {
+    id?: number
+    creator: string
+    publisher: string
+    publicationYear: number
+    resourceType: string
+    url: string
+  }
+
+  export type DoiCreateOrConnectWithoutVectorRiskDataInput = {
+    where: DoiWhereUniqueInput
+    create: XOR<DoiCreateWithoutVectorRiskDataInput, DoiUncheckedCreateWithoutVectorRiskDataInput>
+  }
+
   export type NotificationUpsertWithWhereUniqueWithoutVectorRiskDataInput = {
     where: NotificationWhereUniqueInput
     update: XOR<NotificationUpdateWithoutVectorRiskDataInput, NotificationUncheckedUpdateWithoutVectorRiskDataInput>
@@ -9985,6 +10159,112 @@ export namespace Prisma {
   export type NotificationUpdateManyWithWhereWithoutVectorRiskDataInput = {
     where: NotificationScalarWhereInput
     data: XOR<NotificationUpdateManyMutationInput, NotificationUncheckedUpdateManyWithoutVectorRiskDataInput>
+  }
+
+  export type DoiUpsertWithoutVectorRiskDataInput = {
+    update: XOR<DoiUpdateWithoutVectorRiskDataInput, DoiUncheckedUpdateWithoutVectorRiskDataInput>
+    create: XOR<DoiCreateWithoutVectorRiskDataInput, DoiUncheckedCreateWithoutVectorRiskDataInput>
+    where?: DoiWhereInput
+  }
+
+  export type DoiUpdateToOneWithWhereWithoutVectorRiskDataInput = {
+    where?: DoiWhereInput
+    data: XOR<DoiUpdateWithoutVectorRiskDataInput, DoiUncheckedUpdateWithoutVectorRiskDataInput>
+  }
+
+  export type DoiUpdateWithoutVectorRiskDataInput = {
+    creator?: StringFieldUpdateOperationsInput | string
+    publisher?: StringFieldUpdateOperationsInput | string
+    publicationYear?: IntFieldUpdateOperationsInput | number
+    resourceType?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type DoiUncheckedUpdateWithoutVectorRiskDataInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    creator?: StringFieldUpdateOperationsInput | string
+    publisher?: StringFieldUpdateOperationsInput | string
+    publicationYear?: IntFieldUpdateOperationsInput | number
+    resourceType?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type VectorRiskDataCreateWithoutDoiInput = {
+    displayName: string
+    title: string
+    country: string
+    region: string
+    year: number
+    month: number
+    model: string
+    description?: string | null
+    highRisk: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    notifications?: NotificationCreateNestedManyWithoutVectorRiskDataInput
+  }
+
+  export type VectorRiskDataUncheckedCreateWithoutDoiInput = {
+    id?: number
+    displayName: string
+    title: string
+    country: string
+    region: string
+    year: number
+    month: number
+    model: string
+    description?: string | null
+    highRisk: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutVectorRiskDataInput
+  }
+
+  export type VectorRiskDataCreateOrConnectWithoutDoiInput = {
+    where: VectorRiskDataWhereUniqueInput
+    create: XOR<VectorRiskDataCreateWithoutDoiInput, VectorRiskDataUncheckedCreateWithoutDoiInput>
+  }
+
+  export type VectorRiskDataUpsertWithoutDoiInput = {
+    update: XOR<VectorRiskDataUpdateWithoutDoiInput, VectorRiskDataUncheckedUpdateWithoutDoiInput>
+    create: XOR<VectorRiskDataCreateWithoutDoiInput, VectorRiskDataUncheckedCreateWithoutDoiInput>
+    where?: VectorRiskDataWhereInput
+  }
+
+  export type VectorRiskDataUpdateToOneWithWhereWithoutDoiInput = {
+    where?: VectorRiskDataWhereInput
+    data: XOR<VectorRiskDataUpdateWithoutDoiInput, VectorRiskDataUncheckedUpdateWithoutDoiInput>
+  }
+
+  export type VectorRiskDataUpdateWithoutDoiInput = {
+    displayName?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    region?: StringFieldUpdateOperationsInput | string
+    year?: IntFieldUpdateOperationsInput | number
+    month?: IntFieldUpdateOperationsInput | number
+    model?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    highRisk?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUpdateManyWithoutVectorRiskDataNestedInput
+  }
+
+  export type VectorRiskDataUncheckedUpdateWithoutDoiInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    displayName?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    region?: StringFieldUpdateOperationsInput | string
+    year?: IntFieldUpdateOperationsInput | number
+    month?: IntFieldUpdateOperationsInput | number
+    model?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    highRisk?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutVectorRiskDataNestedInput
   }
 
   export type usersCreateWithoutNotificationsInput = {
@@ -10029,6 +10309,7 @@ export namespace Prisma {
     highRisk: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    doi?: DoiCreateNestedOneWithoutVectorRiskDataInput
   }
 
   export type VectorRiskDataUncheckedCreateWithoutNotificationsInput = {
@@ -10044,6 +10325,7 @@ export namespace Prisma {
     highRisk: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    doi?: DoiUncheckedCreateNestedOneWithoutVectorRiskDataInput
   }
 
   export type VectorRiskDataCreateOrConnectWithoutNotificationsInput = {
@@ -10110,6 +10392,7 @@ export namespace Prisma {
     highRisk?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    doi?: DoiUpdateOneWithoutVectorRiskDataNestedInput
   }
 
   export type VectorRiskDataUncheckedUpdateWithoutNotificationsInput = {
@@ -10125,6 +10408,7 @@ export namespace Prisma {
     highRisk?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    doi?: DoiUncheckedUpdateOneWithoutVectorRiskDataNestedInput
   }
 
   export type NotificationCreateManyUserInput = {

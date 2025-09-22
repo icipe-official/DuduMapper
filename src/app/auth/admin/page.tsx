@@ -1012,7 +1012,7 @@ export default function AdminPanelDynamic() {
                             </Box>
                             <Box>
                               <Typography variant="subtitle2" gutterBottom>
-                                Mint Doi
+                                Request Doi
                               </Typography>
                               <FormControlLabel
                                 control={
@@ -1024,7 +1024,7 @@ export default function AdminPanelDynamic() {
                                     }
                                   />
                                 }
-                                label="Doi"
+                                label=""
                                 disabled
                               />
                               {mintDoi && (
@@ -1239,7 +1239,7 @@ export default function AdminPanelDynamic() {
                         position: "absolute",
                         right: 8,
                         top: 8,
-                        color: (theme) => theme.palette.error.main,
+                        color: (theme) => theme.palette.grey[500],
                         cursor: "pointer",
                       }}
                     />
@@ -1515,7 +1515,7 @@ export default function AdminPanelDynamic() {
                         position: "absolute",
                         right: 8,
                         top: 8,
-                        color: (theme) => theme.palette.error.main,
+                        color: (theme) => theme.palette.grey[500],
                         cursor: "pointer",
                       }}
                     />
@@ -1655,7 +1655,7 @@ export default function AdminPanelDynamic() {
                         position: "absolute",
                         right: 8,
                         top: 8,
-                        color: (theme) => theme.palette.error.main,
+                        color: (theme) => theme.palette.grey[500],
                         cursor: "pointer",
                       }}
                     />
@@ -1723,7 +1723,7 @@ export default function AdminPanelDynamic() {
                         position: "absolute",
                         right: 8,
                         top: 8,
-                        color: (theme) => theme.palette.error.main,
+                        color: (theme) => theme.palette.grey[900],
                         cursor: "pointer",
                       }}
                     />

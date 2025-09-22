@@ -165,12 +165,12 @@ exports.Prisma.VectorRiskDataScalarFieldEnum = {
 
 exports.Prisma.DoiScalarFieldEnum = {
   id: 'id',
-  title: 'title',
   creator: 'creator',
   publisher: 'publisher',
   publicationYear: 'publicationYear',
   resourceType: 'resourceType',
-  url: 'url'
+  url: 'url',
+  modelId: 'modelId'
 };
 
 exports.Prisma.NotificationScalarFieldEnum = {

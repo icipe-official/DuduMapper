@@ -55,16 +55,19 @@ model VectorRiskData {
   updatedAt     DateTime       @updatedAt
   notifications Notification[]
   
+  doi           Doi?
 }
 
 model Doi{
   id                Int            @id @default(autoincrement()) 
-  title             String         @db.VarChar(100)
-  creator           String         @db.VarChar(100)
+  creator           String[]       
   publisher         String         @db.VarChar(100)
   publicationYear   Int 
   resourceType      String 
   url               String     
+
+  modelId           Int            @unique
+  vectorRiskData    VectorRiskData @relation(fields : [modelId], references : [id])
 }
 
 model Notification {
