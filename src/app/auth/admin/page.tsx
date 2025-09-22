@@ -41,13 +41,14 @@ import {
 import DashboardIcon from "@mui/icons-material/Dashboard";
 
 import PeopleIcon from "@mui/icons-material/People";
+import CloseIcon from "@mui/icons-material/Close";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import EmailIcon from "@mui/icons-material/Email";
 import { useAuth } from "@/context/context";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
-import { ModelTraining } from "@mui/icons-material";
+import { Close, ModelTraining } from "@mui/icons-material";
 interface User {
   id: string;
   firstName: string;
@@ -344,6 +345,12 @@ export default function AdminPanelDynamic() {
         description: "",
         highRisk: false,
       });
+
+      setNewDoi({
+        publisher: "",
+        creator: "",
+      });
+      setMintDoi(false);
       toast.success("Model added successfully");
     } catch (error) {
       toast.error("couldn`t add a Model");
@@ -788,7 +795,7 @@ export default function AdminPanelDynamic() {
                         }}
                       >
                         <Tab label="Model" />
-                        <Tab label="Mint " />
+                        <Tab label="Mint " disabled />
                       </Tabs>
                       {/*model */}
                       {tab === 0 && (
@@ -1018,6 +1025,7 @@ export default function AdminPanelDynamic() {
                                   />
                                 }
                                 label="Doi"
+                                disabled
                               />
                               {mintDoi && (
                                 <Box
@@ -1217,13 +1225,24 @@ export default function AdminPanelDynamic() {
                             !newModel.region ||
                             !newModel.year ||
                             !newModel.month ||
-                            !newModel.file?.name
+                            !newModel.file?.name ||
+                            (mintDoi && (!newDoi.creator || !newDoi.publisher))
                           }
                         >
                           Add Model
                         </Button>
                       </Box>
                     </DialogContent>
+                    <CloseIcon
+                      onClick={handleClose}
+                      sx={{
+                        position: "absolute",
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.error.main,
+                        cursor: "pointer",
+                      }}
+                    />
                   </Dialog>
 
                   {/*update dialogue */}
@@ -1490,6 +1509,16 @@ export default function AdminPanelDynamic() {
                         </Button>
                       </Box>
                     </DialogContent>
+                    <CloseIcon
+                      onClick={handleClose}
+                      sx={{
+                        position: "absolute",
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.error.main,
+                        cursor: "pointer",
+                      }}
+                    />
                   </Dialog>
                   {/* Delete Dialog */}
                   <Dialog
@@ -1620,6 +1649,16 @@ export default function AdminPanelDynamic() {
                         </Button>
                       </Box>
                     </DialogContent>
+                    <CloseIcon
+                      onClick={handleClose}
+                      sx={{
+                        position: "absolute",
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.error.main,
+                        cursor: "pointer",
+                      }}
+                    />
                   </Dialog>
                   {/*Instruction Dialog*/}
 
@@ -1667,8 +1706,27 @@ export default function AdminPanelDynamic() {
                         <br />
                         ✅Adding or Updating: The Title Name should be the same
                         as Model Name
+                        <p
+                          style={{
+                            color: "green",
+                            fontWeight: "bold",
+                            fontSize: "16px",
+                          }}
+                        >
+                          Upload Geo first before feeding the metadata.
+                        </p>
                       </Typography>
                     </DialogContent>
+                    <CloseIcon
+                      onClick={handleClose}
+                      sx={{
+                        position: "absolute",
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.error.main,
+                        cursor: "pointer",
+                      }}
+                    />
                   </Dialog>
                 </TableBody>
               </Table>
