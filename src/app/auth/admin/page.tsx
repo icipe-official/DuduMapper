@@ -329,7 +329,7 @@ export default function AdminPanelDynamic() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newModel),
+        body: JSON.stringify({ metadata: newModel, doi: newDoi, mintDoi }),
       });
       if (!res.ok) throw new Error("Failed to add model");
       const added = await res.json();
@@ -349,6 +349,9 @@ export default function AdminPanelDynamic() {
       setNewDoi({
         publisher: "",
         creator: "",
+        //publicationYear: new Date().getFullYear(),
+        //resourceType: "",
+        //url: "",
       });
       setMintDoi(false);
       toast.success("Model added successfully");
@@ -1025,7 +1028,6 @@ export default function AdminPanelDynamic() {
                                   />
                                 }
                                 label=""
-                                disabled
                               />
                               {mintDoi && (
                                 <Box

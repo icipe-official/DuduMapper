@@ -7,22 +7,87 @@ const prisma = new PrismaClient();
 //ADDING new model
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const { metadata, doi, mintDoi } = await req.json();
 
+    //create new model first
     const newModel = await prisma.vectorRiskData.create({
       data: {
-        displayName: body.displayName,
-        title: body.title,
-        country: body.country,
-        region: body.region,
-        year: body.year,
-        month: body.month,
-        model: body.model,
-        description: body.description,
-        highRisk: body.highRisk,
+        displayName: metadata.displayName,
+        title: metadata.title,
+        country: metadata.country,
+        region: metadata.region,
+        year: metadata.year,
+        month: metadata.month,
+        model: metadata.model,
+        description: metadata.description,
+        highRisk: metadata.highRisk,
       },
     });
-    return NextResponse.json(newModel, { status: 200 });
+    //store doi if mintDoi is true
+    let newDoi = null;
+
+    if (mintDoi) {
+      newDoi = await prisma.doi.create({
+        data: {
+          creator: doi.creator,
+          publisher: doi.publisher,
+          publicationYear: doi.publicationYear,
+          resourceType: doi.resourceType,
+          url: doi.url,
+          modelId: newModel.id,
+        },
+      });
+
+      //merge for datacite
+      const doiData = {
+        data: {
+          type: "dois",
+          attributes: {
+            event: "publish",
+            titles: [{ title: newModel.title }],
+            creators: [{ name: newDoi.creator }],
+            publisher: newDoi.publisher,
+            publicationYear: newModel.year,
+            types: { resourceTypeGeneral: newDoi.resourceType },
+            url: `https://dudumapper.org/model/${newModel.id}`,
+          },
+        },
+      };
+      //call datacite api to mint doi
+      const dataciteRes = await fetch("https://doi.test.datacite.org/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/vnd.api+json",
+          Authorization:
+            "Basic " +
+            Buffer.from(
+              `${process.env.DATACITE_USER}: ${process.env.DATACITE_PASSWORD}`
+            ).toString("base64"),
+        },
+        body: JSON.stringify(doiData),
+      });
+      if (!dataciteRes.ok) {
+        console.error(
+          "Error minting DOI with DataCite:",
+          dataciteRes.statusText
+        );
+        //return new Response("Failed to mint DOI with DataCite", { status: 500 });
+      } else {
+        const dataciteOk = await dataciteRes.json();
+
+        //update the field doi
+        newDoi = await prisma.doi.update({
+          where: {
+            id: newDoi.id,
+          },
+          data: {
+            url: dataciteOk.data.attributes.doi,
+          },
+        });
+      }
+    }
+
+    return NextResponse.json({ newModel, doi: newDoi }, { status: 200 });
   } catch (error) {
     console.error("Error adding model:", error);
     return NextResponse.json({ error: "Failed to add model" }, { status: 500 });
@@ -31,7 +96,13 @@ export async function POST(req: Request) {
 //fetch them to post on table
 export async function GET() {
   try {
-    const models = await prisma.vectorRiskData.findMany();
+    const models = await prisma.vectorRiskData.findMany({
+      include: {
+        //pull doi if available
+        doi: true,
+      },
+    });
+
     return NextResponse.json(models, { status: 200 });
   } catch (error) {
     console.error("Error fetching models:", error);

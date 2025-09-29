@@ -249,6 +249,14 @@ const NavbarLoggedIn: React.FC = () =>
         setLoading(false);
       }
     };
+    //lets calculate time for greeting
+    const currentHour = new Date().getHours();
+    const greeting =
+      currentHour < 12
+        ? "Good Morning"
+        : currentHour < 18
+          ? "Good Afternoon"
+          : "Good Evening";
     return (
       <Box sx={{ position: "relative", zIndex: 2 }}>
         <AppBar
@@ -319,7 +327,7 @@ const NavbarLoggedIn: React.FC = () =>
                         fontWeight: "bold",
                       }}
                     >
-                      Welcome &nbsp;
+                      {greeting}, &nbsp;
                     </Typography>
                     {user?.firstName}
                     <PersonIcon />

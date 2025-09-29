@@ -5912,7 +5912,6 @@ export namespace Prisma {
 
   export type DoiMinAggregateOutputType = {
     id: number | null
-    creator: string | null
     publisher: string | null
     publicationYear: number | null
     resourceType: string | null
@@ -5922,7 +5921,6 @@ export namespace Prisma {
 
   export type DoiMaxAggregateOutputType = {
     id: number | null
-    creator: string | null
     publisher: string | null
     publicationYear: number | null
     resourceType: string | null
@@ -5956,7 +5954,6 @@ export namespace Prisma {
 
   export type DoiMinAggregateInputType = {
     id?: true
-    creator?: true
     publisher?: true
     publicationYear?: true
     resourceType?: true
@@ -5966,7 +5963,6 @@ export namespace Prisma {
 
   export type DoiMaxAggregateInputType = {
     id?: true
-    creator?: true
     publisher?: true
     publicationYear?: true
     resourceType?: true
@@ -6073,7 +6069,7 @@ export namespace Prisma {
 
   export type DoiGroupByOutputType = {
     id: number
-    creator: string
+    creator: string[]
     publisher: string
     publicationYear: number
     resourceType: string
@@ -6161,7 +6157,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      creator: string
+      creator: string[]
       publisher: string
       publicationYear: number
       resourceType: string
@@ -6592,7 +6588,7 @@ export namespace Prisma {
    */
   interface DoiFieldRefs {
     readonly id: FieldRef<"Doi", 'Int'>
-    readonly creator: FieldRef<"Doi", 'String'>
+    readonly creator: FieldRef<"Doi", 'String[]'>
     readonly publisher: FieldRef<"Doi", 'String'>
     readonly publicationYear: FieldRef<"Doi", 'Int'>
     readonly resourceType: FieldRef<"Doi", 'String'>
@@ -8583,7 +8579,7 @@ export namespace Prisma {
     OR?: DoiWhereInput[]
     NOT?: DoiWhereInput | DoiWhereInput[]
     id?: IntFilter<"Doi"> | number
-    creator?: StringFilter<"Doi"> | string
+    creator?: StringNullableListFilter<"Doi">
     publisher?: StringFilter<"Doi"> | string
     publicationYear?: IntFilter<"Doi"> | number
     resourceType?: StringFilter<"Doi"> | string
@@ -8609,7 +8605,7 @@ export namespace Prisma {
     AND?: DoiWhereInput | DoiWhereInput[]
     OR?: DoiWhereInput[]
     NOT?: DoiWhereInput | DoiWhereInput[]
-    creator?: StringFilter<"Doi"> | string
+    creator?: StringNullableListFilter<"Doi">
     publisher?: StringFilter<"Doi"> | string
     publicationYear?: IntFilter<"Doi"> | number
     resourceType?: StringFilter<"Doi"> | string
@@ -8637,7 +8633,7 @@ export namespace Prisma {
     OR?: DoiScalarWhereWithAggregatesInput[]
     NOT?: DoiScalarWhereWithAggregatesInput | DoiScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Doi"> | number
-    creator?: StringWithAggregatesFilter<"Doi"> | string
+    creator?: StringNullableListFilter<"Doi">
     publisher?: StringWithAggregatesFilter<"Doi"> | string
     publicationYear?: IntWithAggregatesFilter<"Doi"> | number
     resourceType?: StringWithAggregatesFilter<"Doi"> | string
@@ -9008,7 +9004,7 @@ export namespace Prisma {
   }
 
   export type DoiCreateInput = {
-    creator: string
+    creator?: DoiCreatecreatorInput | string[]
     publisher: string
     publicationYear: number
     resourceType: string
@@ -9018,7 +9014,7 @@ export namespace Prisma {
 
   export type DoiUncheckedCreateInput = {
     id?: number
-    creator: string
+    creator?: DoiCreatecreatorInput | string[]
     publisher: string
     publicationYear: number
     resourceType: string
@@ -9027,7 +9023,7 @@ export namespace Prisma {
   }
 
   export type DoiUpdateInput = {
-    creator?: StringFieldUpdateOperationsInput | string
+    creator?: DoiUpdatecreatorInput | string[]
     publisher?: StringFieldUpdateOperationsInput | string
     publicationYear?: IntFieldUpdateOperationsInput | number
     resourceType?: StringFieldUpdateOperationsInput | string
@@ -9037,7 +9033,7 @@ export namespace Prisma {
 
   export type DoiUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
-    creator?: StringFieldUpdateOperationsInput | string
+    creator?: DoiUpdatecreatorInput | string[]
     publisher?: StringFieldUpdateOperationsInput | string
     publicationYear?: IntFieldUpdateOperationsInput | number
     resourceType?: StringFieldUpdateOperationsInput | string
@@ -9047,7 +9043,7 @@ export namespace Prisma {
 
   export type DoiCreateManyInput = {
     id?: number
-    creator: string
+    creator?: DoiCreatecreatorInput | string[]
     publisher: string
     publicationYear: number
     resourceType: string
@@ -9056,7 +9052,7 @@ export namespace Prisma {
   }
 
   export type DoiUpdateManyMutationInput = {
-    creator?: StringFieldUpdateOperationsInput | string
+    creator?: DoiUpdatecreatorInput | string[]
     publisher?: StringFieldUpdateOperationsInput | string
     publicationYear?: IntFieldUpdateOperationsInput | number
     resourceType?: StringFieldUpdateOperationsInput | string
@@ -9065,7 +9061,7 @@ export namespace Prisma {
 
   export type DoiUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
-    creator?: StringFieldUpdateOperationsInput | string
+    creator?: DoiUpdatecreatorInput | string[]
     publisher?: StringFieldUpdateOperationsInput | string
     publicationYear?: IntFieldUpdateOperationsInput | number
     resourceType?: StringFieldUpdateOperationsInput | string
@@ -9455,6 +9451,14 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type VectorRiskDataScalarRelationFilter = {
     is?: VectorRiskDataWhereInput
     isNot?: VectorRiskDataWhereInput
@@ -9478,7 +9482,6 @@ export namespace Prisma {
 
   export type DoiMaxOrderByAggregateInput = {
     id?: SortOrder
-    creator?: SortOrder
     publisher?: SortOrder
     publicationYear?: SortOrder
     resourceType?: SortOrder
@@ -9488,7 +9491,6 @@ export namespace Prisma {
 
   export type DoiMinOrderByAggregateInput = {
     id?: SortOrder
-    creator?: SortOrder
     publisher?: SortOrder
     publicationYear?: SortOrder
     resourceType?: SortOrder
@@ -9735,10 +9737,19 @@ export namespace Prisma {
     update?: XOR<XOR<DoiUpdateToOneWithWhereWithoutVectorRiskDataInput, DoiUpdateWithoutVectorRiskDataInput>, DoiUncheckedUpdateWithoutVectorRiskDataInput>
   }
 
+  export type DoiCreatecreatorInput = {
+    set: string[]
+  }
+
   export type VectorRiskDataCreateNestedOneWithoutDoiInput = {
     create?: XOR<VectorRiskDataCreateWithoutDoiInput, VectorRiskDataUncheckedCreateWithoutDoiInput>
     connectOrCreate?: VectorRiskDataCreateOrConnectWithoutDoiInput
     connect?: VectorRiskDataWhereUniqueInput
+  }
+
+  export type DoiUpdatecreatorInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type VectorRiskDataUpdateOneRequiredWithoutDoiNestedInput = {
@@ -10124,7 +10135,7 @@ export namespace Prisma {
   }
 
   export type DoiCreateWithoutVectorRiskDataInput = {
-    creator: string
+    creator?: DoiCreatecreatorInput | string[]
     publisher: string
     publicationYear: number
     resourceType: string
@@ -10133,7 +10144,7 @@ export namespace Prisma {
 
   export type DoiUncheckedCreateWithoutVectorRiskDataInput = {
     id?: number
-    creator: string
+    creator?: DoiCreatecreatorInput | string[]
     publisher: string
     publicationYear: number
     resourceType: string
@@ -10173,7 +10184,7 @@ export namespace Prisma {
   }
 
   export type DoiUpdateWithoutVectorRiskDataInput = {
-    creator?: StringFieldUpdateOperationsInput | string
+    creator?: DoiUpdatecreatorInput | string[]
     publisher?: StringFieldUpdateOperationsInput | string
     publicationYear?: IntFieldUpdateOperationsInput | number
     resourceType?: StringFieldUpdateOperationsInput | string
@@ -10182,7 +10193,7 @@ export namespace Prisma {
 
   export type DoiUncheckedUpdateWithoutVectorRiskDataInput = {
     id?: IntFieldUpdateOperationsInput | number
-    creator?: StringFieldUpdateOperationsInput | string
+    creator?: DoiUpdatecreatorInput | string[]
     publisher?: StringFieldUpdateOperationsInput | string
     publicationYear?: IntFieldUpdateOperationsInput | number
     resourceType?: StringFieldUpdateOperationsInput | string

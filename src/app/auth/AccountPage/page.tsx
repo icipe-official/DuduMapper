@@ -218,6 +218,14 @@ const AccountProfile = () => {
   const [open, setOpen] = useState(false);
   const handleEnhanceSize = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  //lets calculate time for greeting
+  const currentHour = new Date().getHours();
+  const greeting =
+    currentHour < 12
+      ? "Good Morning"
+      : currentHour < 18
+        ? "Good Afternoon"
+        : "Good Evening";
   return (
     <Box
       sx={{
@@ -330,7 +338,8 @@ const AccountProfile = () => {
             alignItems: "center",
           }}
         >
-          Hello {user?.firstName}!
+          {greeting}, &nbsp;
+          <span style={{ fontWeight: "bold" }}>{user?.firstName}!</span>
         </Typography>
 
         {/* <ListItemText

@@ -59,9 +59,9 @@ model VectorRiskData {
 }
 
 model Doi {
-  id              Int    @id @default(autoincrement())
-  creator         String @db.VarChar(100)
-  publisher       String @db.VarChar(100)
+  id              Int      @id @default(autoincrement())
+  creator         String[]
+  publisher       String   @db.VarChar(100)
   publicationYear Int
   resourceType    String
   url             String
