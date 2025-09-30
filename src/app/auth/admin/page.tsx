@@ -1055,6 +1055,7 @@ export default function AdminPanelDynamic() {
                                   />
                                 }
                                 label=""
+                                disabled
                               />
                               {mintDoi && (
                                 <Box
