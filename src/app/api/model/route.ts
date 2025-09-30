@@ -49,7 +49,7 @@ export async function POST(req: Request) {
             publisher: newDoi.publisher,
             publicationYear: newModel.year,
             types: { resourceTypeGeneral: newDoi.resourceType },
-            url: `https://dudumapper.org/model/${newModel.id}`,
+            url: `https://dudumapper.org/${newModel.id}`,
           },
         },
       };
