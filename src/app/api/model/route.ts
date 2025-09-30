@@ -43,7 +43,7 @@ export async function POST(req: Request) {
         data: {
           type: "dois",
           attributes: {
-            event: "publish",
+            event: "draft",
             titles: [{ title: newModel.title }],
             creators: [{ name: newDoi.creator }],
             publisher: newDoi.publisher,

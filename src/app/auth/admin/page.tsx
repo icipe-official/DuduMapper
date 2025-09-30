@@ -27,9 +27,11 @@ import {
   FormControlLabel,
   Checkbox,
   FormControl,
+  Chip,
   Radio,
   RadioGroup,
 } from "@mui/material";
+import { MenuItem, Menu } from "@mui/material";
 import {
   PieChart,
   Pie,
@@ -87,7 +89,7 @@ interface Model {
 interface Doi {
   id: string;
   title: string;
-  creator: string;
+  creator: string[];
   publisher: string;
   publicationYear: number;
   resourceType: string;
@@ -122,6 +124,8 @@ export default function AdminPanelDynamic() {
   //lets try to activate some buttons before others
   const [modelClicked, setModelClicked] = useState(false);
   const [updateGeoModel, setUpdateGeoModel] = useState(false);
+  //doi chip logic
+  const [inputValue, setInputValue] = React.useState("");
   const handleClose = () => {
     setOpenDialog(null);
   };
@@ -236,7 +240,7 @@ export default function AdminPanelDynamic() {
   const [newDoi, setNewDoi] = useState<Partial<Doi>>({
     id: "",
     title: "",
-    creator: "",
+    creator: [],
     publisher: "",
     publicationYear: new Date().getFullYear(),
     resourceType: "",
@@ -348,7 +352,7 @@ export default function AdminPanelDynamic() {
 
       setNewDoi({
         publisher: "",
-        creator: "",
+        creator: [],
         //publicationYear: new Date().getFullYear(),
         //resourceType: "",
         //url: "",
@@ -452,7 +456,7 @@ export default function AdminPanelDynamic() {
       setNewDoi({
         id: "",
         title: "",
-        creator: "",
+        creator: [],
         publisher: "",
         publicationYear: new Date().getFullYear(),
         resourceType: "",
@@ -463,6 +467,29 @@ export default function AdminPanelDynamic() {
       console.error("Error generating doi", error);
       toast.error("Failed to generate doi");
     }
+  };
+  //enhance doi creator with chips
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if ((e.key === "Enter" || e.key === ",") && inputValue.trim() !== "") {
+      e.preventDefault();
+      const trimmed = inputValue.trim();
+      //avoid duplicates
+      if (!newDoi.creator?.includes(trimmed)) {
+        setNewDoi({
+          ...newDoi,
+          creator: [...(newDoi.creator ?? []), trimmed],
+        });
+      }
+      setInputValue("");
+    }
+  };
+
+  const handleDeleteChip = (name: string) => {
+    setNewDoi({
+      ...newDoi,
+      creator: (newDoi.creator ?? []).filter((c) => c !== name),
+    });
   };
 
   //delete emails in database
@@ -1048,19 +1075,35 @@ export default function AdminPanelDynamic() {
                                       mt: 2,
                                     }}
                                   >
-                                    <Box>
+                                    <Box
+                                      sx={{
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                        gap: 1,
+                                      }}
+                                    >
                                       <Typography variant="subtitle2">
                                         Creator
                                       </Typography>
+                                      {newDoi.creator &&
+                                        newDoi.creator.map((name, index) => (
+                                          <Chip
+                                            key={index}
+                                            label={name}
+                                            color="primary"
+                                            onDelete={() =>
+                                              handleDeleteChip(name)
+                                            }
+                                          />
+                                        ))}
                                       <TextField
                                         fullWidth
-                                        value={newDoi.creator || ""}
+                                        placeholder={"Add :comma or Enter"}
+                                        value={inputValue}
                                         onChange={(e) =>
-                                          setNewDoi({
-                                            ...newDoi,
-                                            creator: e.target.value,
-                                          })
+                                          setInputValue(e.target.value)
                                         }
+                                        onKeyDown={handleKeyDown}
                                         size="small"
                                       />
                                     </Box>
@@ -1089,6 +1132,30 @@ export default function AdminPanelDynamic() {
                                         }
                                         size="small"
                                       />
+                                    </Box>
+                                    <Box>
+                                      <Typography variant="subtitle2">
+                                        ResourceType
+                                      </Typography>
+                                      <TextField
+                                        select
+                                        value={newDoi.resourceType || ""}
+                                        onChange={(e) =>
+                                          setNewDoi({
+                                            ...newDoi,
+                                            resourceType: e.target.value,
+                                          })
+                                        }
+                                        size="small"
+                                        fullWidth
+                                        //SelectProps={{ native: true }}
+                                      >
+                                        <MenuItem value="Dataset">
+                                          Dataset
+                                        </MenuItem>
+                                        <MenuItem value="Text">Text</MenuItem>
+                                        <MenuItem value="Model">Model</MenuItem>
+                                      </TextField>
                                     </Box>
                                   </Box>
                                 </Box>
@@ -1131,19 +1198,31 @@ export default function AdminPanelDynamic() {
                                 size="small"
                               />
                             </Box>
-                            <Box>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: 1,
+                              }}
+                            >
                               <Typography variant="subtitle2">
                                 Creator
                               </Typography>
+                              {newDoi.creator &&
+                                newDoi.creator.map((name, index) => (
+                                  <Chip
+                                    key={index}
+                                    label={name}
+                                    color="primary"
+                                    onDelete={() => handleDeleteChip(name)}
+                                  />
+                                ))}
                               <TextField
                                 fullWidth
-                                value={newDoi.creator || ""}
-                                onChange={(e) =>
-                                  setNewDoi({
-                                    ...newDoi,
-                                    creator: e.target.value,
-                                  })
-                                }
+                                placeholder={"add creator and press enter"}
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                onKeyDown={handleKeyDown}
                                 size="small"
                               />
                             </Box>
@@ -1228,7 +1307,11 @@ export default function AdminPanelDynamic() {
                             !newModel.year ||
                             !newModel.month ||
                             !newModel.file?.name ||
-                            (mintDoi && (!newDoi.creator || !newDoi.publisher))
+                            (mintDoi &&
+                              (!newDoi.creator ||
+                                newDoi.creator.length === 0 ||
+                                !newDoi.publisher ||
+                                !newDoi.resourceType))
                           }
                         >
                           Add Model
