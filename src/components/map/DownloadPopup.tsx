@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -17,6 +17,12 @@ import {
   IconButton,
   Tooltip,
   Checkbox,
+  TableRow,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableBody,
+  Table,
 } from "@mui/material";
 import {
   FormatListBulleted as FormatListIcon,
@@ -25,29 +31,36 @@ import {
   Clear as ClearIcon,
 } from "@mui/icons-material";
 import { SelectChangeEvent } from "@mui/material/Select";
+import { toast } from "react-toastify";
 interface DownloadPopupProps {
   isOpen: boolean;
   onClose: () => void;
   cqlFilter: string;
 }
-
+interface LayerItem {
+  name: string;
+  href: string;
+}
 const DownloadPopup: React.FC<DownloadPopupProps> = ({
   isOpen,
   onClose,
   cqlFilter,
 }) => {
-  const [format, setFormat] = useState("shp");
+  const [format, setFormat] = useState("png");
   const [selectedLayers, setSelectedLayers] = useState<string[]>([]);
   const [areaOfInterest, setAreaOfInterest] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [layers, setLayers] = useState<LayerItem[]>([]);
 
   const formats = [
-    { value: "shp", label: "Shapefile (SHP)" },
-    { value: "geojson", label: "GeoJSON" },
-    { value: "kml", label: "KML" },
-    { value: "csv", label: "CSV" },
+    { value: "tiff", label: "TIFF" },
+    { value: "png", label: "PNG" },
+    //{ value: "geojson", label: "GeoJSON" },
+    //{ value: "kml", label: "KML" },
+    // { value: "csv", label: "CSV" },
+    { value: "xlsx", label: "Excel (XLSX)" },
   ];
 
   const handleFormatChange = (event: SelectChangeEvent<string>) => {
@@ -55,11 +68,63 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
     setFormat(selectedFormat);
   };
 
-  const handleLayerToggle = (layer: string) => {
+  const handleLayerToggle = (layerName: string) => {
     setSelectedLayers((prev) =>
-      prev.includes(layer) ? prev.filter((l) => l !== layer) : [...prev, layer]
+      prev.includes(layerName)
+        ? prev.filter((l) => l !== layerName)
+        : [...prev, layerName]
     );
   };
+  {
+    /*
+  //returning all layers in a list
+  useEffect(() => {
+    const fetchLayers = async () => {
+      try {
+        const res = await fetch("/api/downloadModel");
+        if (!res.ok) {
+          throw new Error("Failed to fetch layers");
+        }
+        toast.success("Layers fetched successfully");
+
+        const data = await res.json();
+        setLayers(data);
+      } catch (err) {
+        console.error(err);
+        setError("Error fetching layers");
+      }
+    };
+    fetchLayers();
+  }, []);*/
+  }
+  useEffect(() => {
+    const fetchLayers = async () => {
+      try {
+        const res = await fetch(
+          "/api/downloadModel?layer=Turkana children population&format=image/png"
+        );
+        if (!res.ok) {
+          throw new Error("Failed to fetch layers");
+        }
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Turkana children population.png";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        toast.success("Layers fetched successfully");
+
+        const data = await res.json();
+        setLayers(data);
+      } catch (err) {
+        console.error(err);
+        setError("Error fetching layers");
+      }
+    };
+    fetchLayers();
+  }, []);
 
   const handleDownload = async () => {
     if (selectedLayers.length === 0) {
@@ -71,17 +136,33 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
     setError(null);
 
     try {
-      // Here you would implement your actual download logic
-      // For example:
-      //await downloadLayers({
-      //   layers: selectedLayers,
-      //   format,
-      //   areaOfInterest,
-      //   cqlFilter
-      // });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const res = await fetch(
+        `/api/downloadModel?layer=${layers}&format=${format}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            layers: selectedLayers,
+            format,
+            areaOfInterest,
+            cqlFilter,
+          }),
+        }
+      );
+      if (!res.ok) {
+        throw new Error("Download request failed");
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `layers.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
 
       setSuccess(true);
       onClose();
@@ -130,23 +211,39 @@ const DownloadPopup: React.FC<DownloadPopupProps> = ({
         {/* Layer Selection */}
         <Grid item xs={12}>
           <Paper sx={{ p: 2 }}>
-            <Typography variant="subtitle1" sx={{ mb: 2 }}>
-              Select Layers
+            <Typography
+              variant="subtitle1"
+              sx={{
+                mb: 2,
+              }}
+            >
+              🌍 Geo Available Layers
             </Typography>
-            <FormGroup>
-              {["Layer 1", "Layer 2", "Layer 3"].map((layer) => (
-                <FormControlLabel
-                  key={layer}
-                  control={
-                    <Checkbox
-                      checked={selectedLayers.includes(layer)}
-                      onChange={() => handleLayerToggle(layer)}
-                    />
-                  }
-                  label={layer}
-                />
-              ))}
-            </FormGroup>
+
+            <TableContainer component={Paper}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>ID</TableCell>
+                  <TableCell>Layer Title</TableCell>
+                  <TableCell align="right">Select</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {layers.map((layer, index) => (
+                  <TableRow key={`${layer.name}-${index}`}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{layer.name}</TableCell>
+                    <TableCell align="right">
+                      <Checkbox
+                        color="success"
+                        checked={selectedLayers.includes(layer.name)}
+                        onChange={() => handleLayerToggle(layer.name)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </TableContainer>
           </Paper>
         </Grid>
 

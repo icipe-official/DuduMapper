@@ -10,12 +10,13 @@ import {
 import { useRouter } from "next/navigation";
 
 type User = {
+  role: string;
   email: string;
   firstName: string;
   lastName: string;
-  gender: string;
+  //gender: string;
   profilePicture?: string;
-  //wantsNotification: boolean;
+  wantsnotification: boolean;
 };
 
 type AuthContextType = {

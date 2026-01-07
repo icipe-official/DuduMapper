@@ -20,12 +20,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.8.2
- * Query Engine version: 2060c79ba17c6bb9f5823312b6f6b7f4a845738e
+ * Prisma Client JS version: 6.16.2
+ * Query Engine version: 1c57fdcd7e44b29b9313256c76699e91c3ac3c43
  */
 Prisma.prismaVersion = {
-  client: "6.8.2",
-  engine: "2060c79ba17c6bb9f5823312b6f6b7f4a845738e"
+  client: "6.16.2",
+  engine: "1c57fdcd7e44b29b9313256c76699e91c3ac3c43"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -126,15 +126,31 @@ exports.Prisma.UsersScalarFieldEnum = {
   password: 'password',
   firstName: 'firstName',
   lastName: 'lastName',
-  gender: 'gender',
-  profilePicture: 'profilePicture',
   wantsnotification: 'wantsnotification',
+  profilePicture: 'profilePicture',
   role: 'role',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.SentEmailScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  subject: 'subject',
+  body: 'body',
+  sentAt: 'sentAt'
+};
+
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  userId: 'userId',
+  expires: 'expires',
   createdAt: 'createdAt'
 };
 
 exports.Prisma.VectorRiskDataScalarFieldEnum = {
   id: 'id',
+  displayName: 'displayName',
   title: 'title',
   country: 'country',
   region: 'region',
@@ -145,6 +161,16 @@ exports.Prisma.VectorRiskDataScalarFieldEnum = {
   highRisk: 'highRisk',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DoiScalarFieldEnum = {
+  id: 'id',
+  creator: 'creator',
+  publisher: 'publisher',
+  publicationYear: 'publicationYear',
+  resourceType: 'resourceType',
+  url: 'url',
+  modelId: 'modelId'
 };
 
 exports.Prisma.NotificationScalarFieldEnum = {
@@ -172,7 +198,10 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.ModelName = {
   users: 'users',
+  SentEmail: 'SentEmail',
+  PasswordResetToken: 'PasswordResetToken',
   VectorRiskData: 'VectorRiskData',
+  Doi: 'Doi',
   Notification: 'Notification'
 };
 

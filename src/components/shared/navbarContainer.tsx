@@ -1,61 +1,80 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/context";
 import Navbar from "./navbar";
 import NavbarLoggedIn from "./navbarLoggedIn";
+import { useMapDrilldown } from "../../../doiContext";
 
-const NavbarContainer: React.FC = () => {
-  const { user, loading } = useAuth();
+//added ischecked prop to receive
+// the value of the state from parent component
+// and use it to pass it down to navbarloggedin
+//added also interface for props
 
-  // Enhanced debugging with localStorage check
-  useEffect(() => {
-    console.log("NavbarContainer mounted/updated");
+//interface NavbarContainerProps {
+//isChecked: boolean;
+//selectedLayer: string | null;
+//}
 
-    // Check what's in localStorage directly
-    const localStorageUser = localStorage.getItem("user");
+const NavbarContainer: React.FC = () =>
+  //{
+  // isChecked,
+  //selectedLayer,
+  // }
+  {
+    const { user, loading } = useAuth();
+    const { isChecked, setIsChecked, selectedLayer } = useMapDrilldown();
 
-    console.log("Auth state details:", {
-      contextUser: user ? `${user.email} (set)` : "null",
-      loading,
-      localStorageHasUser: !!localStorageUser,
-      localStorageUserValue: localStorageUser,
-    });
+    // Enhanced debugging with localStorage check
+    useEffect(() => {
+      console.log("NavbarContainer mounted/updated");
 
-    // If there's a mismatch, log a warning
-    if (!!localStorageUser && !user) {
-      console.warn("MISMATCH: User exists in localStorage but not in context!");
-    }
-  }, [user, loading]);
+      // Check what's in localStorage directly
+      const localStorageUser = localStorage.getItem("user");
 
-  // Reserved space during loading
-  if (loading) {
-    console.log("Auth is still loading...");
-    return (
-      <div style={{ height: "80px" }}>
-        {/* Empty space to reserve height */}
-      </div>
-    );
-  }
+      console.log("Auth state details:", {
+        contextUser: user ? `${user.email} (set)` : "null",
+        loading,
+        localStorageHasUser: !!localStorageUser,
+        localStorageUserValue: localStorageUser,
+      });
 
-  // Force check localStorage one more time (defensive approach)
-  if (!user) {
-    try {
-      const savedUser = localStorage.getItem("user");
-      if (savedUser) {
+      // If there's a mismatch, log a warning
+      if (!!localStorageUser && !user) {
         console.warn(
-          "User found in localStorage but not in context - refresh may be needed"
+          "MISMATCH: User exists in localStorage but not in context!"
         );
       }
-    } catch (e) {
-      console.error("Error checking localStorage:", e);
-    }
-  }
+    }, [user, loading]);
 
-  console.log(
-    `Rendering navbar with ${user ? "authenticated user" : "no user"}`
-  );
-  return user ? <NavbarLoggedIn /> : <Navbar />;
-};
+    // Reserved space during loading
+    if (loading) {
+      console.log("Auth is still loading...");
+      return (
+        <div style={{ height: "80px" }}>
+          {/* Empty space to reserve height */}
+        </div>
+      );
+    }
+
+    // Force check localStorage one more time (defensive approach)
+    if (!user) {
+      try {
+        const savedUser = localStorage.getItem("user");
+        if (savedUser) {
+          console.warn(
+            "User found in localStorage but not in context - refresh may be needed"
+          );
+        }
+      } catch (e) {
+        console.error("Error checking localStorage:", e);
+      }
+    }
+
+    console.log(
+      `Rendering navbar with ${user ? "authenticated user" : "no user"}`
+    );
+    return user ? <NavbarLoggedIn /> : <Navbar />;
+  };
 
 export default NavbarContainer;

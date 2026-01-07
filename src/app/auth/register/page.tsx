@@ -37,7 +37,7 @@ const Register: React.FC = ({}) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
-  const [gender, setGender] = useState("");
+  //const [gender, setGender] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   //errors
   const [error, setError] = useState("");
@@ -52,7 +52,7 @@ const Register: React.FC = ({}) => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     setEmail(input);
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/i.test(input);
 
     setEmailError(!isValidEmail && input.length > 0);
   };
@@ -70,9 +70,9 @@ const Register: React.FC = ({}) => {
   };
 
   //gender
-  const handleGenderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setGender(event.target.value);
-  };
+  //const handleGenderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // setGender(event.target.value);
+  //};
 
   //PASSWORD VALIDATION
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,6 +90,20 @@ const Register: React.FC = ({}) => {
     router.push("/auth/login");
   };
   const handleRegister = async () => {
+    //restrict email
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/i.test(email);
+    const isValidPassword = /^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/.test(
+      password
+    );
+    if (!isValidEmail) {
+      setEmailError(true);
+      return;
+    }
+    if (!isValidPassword) {
+      setPasswordError(true);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
       return;
@@ -106,8 +120,8 @@ const Register: React.FC = ({}) => {
           password,
           firstName,
           lastName,
-          gender,
-          wantsNotification,
+          //gender,
+          wantsnotification: wantsNotification,
         }),
       });
 
@@ -123,19 +137,23 @@ const Register: React.FC = ({}) => {
         email: data.user.email,
         firstName: data.user.firstName,
         lastName: data.user.lastName,
-        gender: data.user.gender,
+        //added line
+        wantsnotification: data.user.wantsnotification,
+        //gender: data.user.gender,
         profilePicture: data.user.profileProfile ?? null,
+        //added role
+        role: "",
       });
-      toast.success("User Registered Successfully"),
+      (toast.success("User Registered Successfully"),
         {
           position: "top-right",
           autoclose: 5000,
           hideProgressBar: false,
           pauseOnHover: true,
-        };
+        });
 
       // No need for explicit redirect here - the login function now handles it
-      router.push("/"); // REMOVED this line
+      router.push("/");
     } catch (err) {
       console.error("Registration failed:", err);
       setError("Something went wrong. Please try again.");
@@ -244,7 +262,7 @@ const Register: React.FC = ({}) => {
               },
             }}
           />
-
+          {/* 
           <FormControl component="fieldset" margin="normal">
             <FormLabel
               component="legend"
@@ -299,29 +317,9 @@ const Register: React.FC = ({}) => {
                   </>
                 }
               />
-              <FormControlLabel
-                value="other"
-                control={
-                  <Radio
-                    sx={{
-                      "&.Mui-checked": {
-                        color: "green",
-                      },
-                    }}
-                  />
-                }
-                label={
-                  <>
-                    <TransgenderIcon
-                      sx={{ verticalAlign: "middle", mr: 0.5 }}
-                    />
-                    Other
-                  </>
-                }
-              />
             </RadioGroup>
           </FormControl>
-
+*/}
           <TextField
             label="Email"
             fullWidth

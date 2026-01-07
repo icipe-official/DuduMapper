@@ -39,7 +39,10 @@ const SignIn: React.FC = () => {
     const input = e.target.value;
     setPassword(input);
   };
-
+  //navigation to register
+  const handleNavigate = () => {
+    router.push("/auth/register");
+  };
   //navigation to forgotpassword
   const router = useRouter();
   const handleForgotPassword = () => {
@@ -69,6 +72,13 @@ const SignIn: React.FC = () => {
       
   };*/
   const handleEmailSignIn = async () => {
+    // restrict email
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!isValidEmail) {
+      setEmailError(true);
+      return;
+    }
+
     try {
       const response = await fetch("/api/session", {
         method: "POST",
@@ -292,7 +302,7 @@ const SignIn: React.FC = () => {
           )}
 
           <a
-            href="ForgotPassword"
+            href="forgotPassword"
             onClick={handleForgotPassword}
             style={{ textDecoration: "none", color: "green" }}
           >
@@ -316,9 +326,14 @@ const SignIn: React.FC = () => {
             Sign In
           </Button>
 
-          <Typography sx={{ mt: 2, mb: 1 }}>or</Typography>
+          <Typography sx={{ mt: 2 }}>
+            Don`t have an account?{" "}
+            <Button color="success" onClick={handleNavigate}>
+              Register
+            </Button>
+          </Typography>
 
-          <Button
+          {/*<Button
             variant="contained"
             fullWidth
             sx={{
@@ -329,7 +344,7 @@ const SignIn: React.FC = () => {
               textTransform: "none",
               fontWeight: "bold",
             }}
-            /*onClick={handleGoogleSignIn}*/
+            /*onClick={handleGoogleSignIn}
             startIcon={
               <svg
                 width="20"
@@ -357,7 +372,7 @@ const SignIn: React.FC = () => {
             }
           >
             Sign in with Google
-          </Button>
+          </Button>*/}
         </Box>
       </Container>
     </div>

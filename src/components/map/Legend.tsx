@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Legend.css";
 import { getLegendUrl } from "@/app/api/requests";
+import CloseIcon from "@mui/icons-material/Close";
 
 // Legend component to show and hide legends based on layer visibility
 interface LegendProps {
@@ -67,6 +68,15 @@ const Legend: React.FC<LegendProps> = ({ layerName }) => {
       <div className="legend-content">
         {legends.map((legend, index) => (
           <div key={index} className="legend-item">
+            <CloseIcon
+              sx={{
+                position: "absolute",
+                right: "5px",
+                fontSize: "20px",
+                cursor: "pointer",
+              }}
+              onClick={() => setLegends([])}
+            />
             <h3>{legend.title}</h3>
             {error ? (
               <div className="legend-error">{error}</div>

@@ -12,10 +12,14 @@
 // }
 
 // MapWrapper.tsx
-import React from "react";
+import React, { useState } from "react";
 import NewMap from "./Map";
 
 const MapWrapper = () => {
+  //aded state for ischecked then pass it
+  // to newmap so that it can check on checkbox
+  //const [isChecked, setIsChecked] = useState(false);
+  //const [selectedLayer, setSelectedLayer] = useState<string | null>(null);
   return (
     <div
       style={{
